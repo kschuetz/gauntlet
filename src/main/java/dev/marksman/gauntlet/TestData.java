@@ -1,5 +1,6 @@
 package dev.marksman.gauntlet;
 
+import com.jnape.palatable.lambda.adt.Maybe;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.shrink.Shrink;
 import lombok.AllArgsConstructor;
@@ -14,8 +15,8 @@ class TestData<A> {
     private final ImmutableFiniteIterable<A> values;
 
     @Getter
-    private final Shrink<A> shrinkStrategy;
+    private final Maybe<Shrink<A>> shrinkStrategy;
 
     @Getter
-    private final long initialSeedValue;
+    private final Maybe<Long> initialSeedValue;
 }
