@@ -12,7 +12,7 @@ public interface Prop<A> {
     }
 
     default Prop<A> or(Prop<A> other) {
-        throw new UnsupportedOperationException("todo");
+        return Combinators.disjunction(this, other);
     }
 
     default Prop<A> not() {

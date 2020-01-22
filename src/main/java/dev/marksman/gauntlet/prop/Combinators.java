@@ -18,6 +18,22 @@ public final class Combinators {
         return new Conjunction<>(operands);
     }
 
+    public static <A> Prop<A> disjunction(Prop<A> first, Prop<A> second) {
+        return new Disjunction<>(Vector.of(first, second));
+    }
+
+    public static <A> Prop<A> disjunction(ImmutableNonEmptyFiniteIterable<Prop<A>> operands) {
+        return new Disjunction<>(operands);
+    }
+
+    public static <A> Prop<A> negation(Prop<A> operand) {
+        if (operand instanceof Negation<?>) {
+            return ((Negation<A>) operand).operand;
+        } else {
+            return new Negation<>(operand);
+        }
+    }
+
     public static <A> Prop<A> named(Name name, Prop<A> prop) {
         while (prop instanceof Named<?>) {
             prop = ((Named<A>) prop).underlying;

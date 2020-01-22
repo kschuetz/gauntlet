@@ -1,6 +1,5 @@
 package dev.marksman.gauntlet.prop;
 
-import dev.marksman.collectionviews.Vector;
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Name;
@@ -9,20 +8,20 @@ import dev.marksman.gauntlet.Prop;
 import static dev.marksman.gauntlet.EvalResult.pass;
 
 
-class Conjunction<A> implements Prop<A> {
+class Disjunction<A> implements Prop<A> {
     private final ImmutableNonEmptyFiniteIterable<Prop<A>> operands;
     private final Name name;
 
-    Conjunction(ImmutableNonEmptyFiniteIterable<Prop<A>> operands) {
+    Disjunction(ImmutableNonEmptyFiniteIterable<Prop<A>> operands) {
         this.operands = operands;
-        this.name = Name.name(String.join(" ∧ ",
+        this.name = Name.name(String.join(" ∨ ",
                 operands.fmap(p -> p.getName().getValue())));
     }
 
     @Override
-    public Prop<A> and(Prop<A> other) {
-        return new Conjunction<>((other instanceof Conjunction<?>)
-                ? operands.concat(((Conjunction<A>) other).operands)
+    public Prop<A> or(Prop<A> other) {
+        return new Disjunction<>((other instanceof Disjunction<?>)
+                ? operands.concat(((Disjunction<A>) other).operands)
                 : operands.append(other));
     }
 
@@ -33,20 +32,16 @@ class Conjunction<A> implements Prop<A> {
                 .foldLeft((acc, result) -> acc.match(__ -> passState(result),
                         fail -> failState(fail, result),
                         error -> errorState(error, result)),
-                        pass());
+                        EvalResult.fail("All disjuncts failed"));
     }
 
     private EvalResult passState(EvalResult acc) {
-        return acc
-                .match(__ -> acc,
-                        fail -> EvalResult.fail(Vector.of("Conjuncts failed"),
-                                Vector.of(fail)),
-                        error -> error);
+        return acc;
     }
 
     private EvalResult failState(EvalResult.Fail acc, EvalResult evalResult) {
         return acc
-                .match(__ -> acc,
+                .match(__ -> pass(),
                         acc::addCause,
                         error -> error);
     }
