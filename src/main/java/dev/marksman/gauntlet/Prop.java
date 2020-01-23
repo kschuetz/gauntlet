@@ -1,9 +1,10 @@
 package dev.marksman.gauntlet;
 
+import com.jnape.palatable.lambda.adt.Either;
 import dev.marksman.gauntlet.prop.Combinators;
 
 public interface Prop<A> {
-    EvalResult test(A data);
+    Either<Errors, EvalResult> test(Context context, A data);
 
     Name getName();
 

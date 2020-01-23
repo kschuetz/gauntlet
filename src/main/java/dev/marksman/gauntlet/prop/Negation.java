@@ -1,10 +1,7 @@
 package dev.marksman.gauntlet.prop;
 
-import dev.marksman.gauntlet.EvalResult;
-import dev.marksman.gauntlet.Name;
-import dev.marksman.gauntlet.Prop;
-
-import static dev.marksman.gauntlet.EvalResult.pass;
+import com.jnape.palatable.lambda.adt.Either;
+import dev.marksman.gauntlet.*;
 
 class Negation<A> implements Prop<A> {
     final Prop<A> operand;
@@ -21,11 +18,8 @@ class Negation<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(A data) {
-        return operand.test(data)
-                .match(__ -> EvalResult.fail("Failure expected"),
-                        fail -> pass(),
-                        error -> error);
+    public Either<Errors, EvalResult> test(Context context, A data) {
+        throw new UnsupportedOperationException("todo");
     }
 
     @Override

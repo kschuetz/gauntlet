@@ -1,6 +1,6 @@
 package dev.marksman.gauntlet;
 
-import com.jnape.palatable.lambda.adt.coproduct.CoProduct3;
+import com.jnape.palatable.lambda.adt.coproduct.CoProduct2;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
@@ -12,7 +12,7 @@ import lombok.Value;
 import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
 import static lombok.AccessLevel.PRIVATE;
 
-public abstract class EvalResult implements CoProduct3<EvalResult.Pass, EvalResult.Fail, EvalResult.Error, EvalResult> {
+public abstract class EvalResult implements CoProduct2<EvalResult.Success, EvalResult.Failure, EvalResult> {
 
     public abstract boolean isSuccess();
 
@@ -23,8 +23,8 @@ public abstract class EvalResult implements CoProduct3<EvalResult.Pass, EvalResu
     @EqualsAndHashCode(callSuper = true)
     @AllArgsConstructor(access = PRIVATE)
     @Value
-    public static class Pass extends EvalResult {
-        private static final Pass INSTANCE = new Pass();
+    public static class Success extends EvalResult {
+        private static final Success INSTANCE = new Success();
 
         @Override
         public boolean isSuccess() {
@@ -32,69 +32,46 @@ public abstract class EvalResult implements CoProduct3<EvalResult.Pass, EvalResu
         }
 
         @Override
-        public <R> R match(Fn1<? super Pass, ? extends R> aFn, Fn1<? super Fail, ? extends R> bFn, Fn1<? super Error, ? extends R> cFn) {
+        public <R> R match(Fn1<? super Success, ? extends R> aFn, Fn1<? super Failure, ? extends R> bFn) {
             return aFn.apply(this);
         }
     }
 
-    public static abstract class Failure extends EvalResult {
+    @EqualsAndHashCode(callSuper = true)
+    @AllArgsConstructor(access = PRIVATE)
+    @Value
+    public static class Failure extends EvalResult {
+        private final Name propertyName;
+        private final ImmutableNonEmptyFiniteIterable<String> failureReasons;
+        private final ImmutableFiniteIterable<Failure> causes;
+
+        public Failure addCause(Name propertyName, Failure failure) {
+            return new Failure(propertyName, failureReasons, causes.append(failure));
+        }
+
         @Override
         public boolean isSuccess() {
             return false;
         }
-    }
-
-    @EqualsAndHashCode(callSuper = true)
-    @AllArgsConstructor(access = PRIVATE)
-    @Value
-    public static class Fail extends Failure {
-        private final ImmutableNonEmptyFiniteIterable<String> failureReasons;
-        private final ImmutableFiniteIterable<Failure> causes;
-
-        public Fail addCause(Failure failure) {
-            return new Fail(failureReasons, causes.append(failure));
-        }
 
         @Override
-        public <R> R match(Fn1<? super Pass, ? extends R> aFn, Fn1<? super Fail, ? extends R> bFn, Fn1<? super Error, ? extends R> cFn) {
+        public <R> R match(Fn1<? super Success, ? extends R> aFn, Fn1<? super Failure, ? extends R> bFn) {
             return bFn.apply(this);
         }
     }
 
-    @EqualsAndHashCode(callSuper = true)
-    @AllArgsConstructor(access = PRIVATE)
-    @Value
-    public static class Error extends Failure {
-        private final ImmutableNonEmptyFiniteIterable<Throwable> errors;
-
-        public Error addError(Throwable error) {
-            return new Error(errors.append(error));
-        }
-
-        public Error addErrors(ImmutableFiniteIterable<Throwable> errors) {
-            return new Error(this.errors.concat(errors));
-        }
-
-        @Override
-        public <R> R match(Fn1<? super Pass, ? extends R> aFn, Fn1<? super Fail, ? extends R> bFn, Fn1<? super Error, ? extends R> cFn) {
-            return cFn.apply(this);
-        }
-    }
-
     public static EvalResult pass() {
-        return Pass.INSTANCE;
+        return Success.INSTANCE;
     }
 
-    public static EvalResult fail(ImmutableNonEmptyFiniteIterable<String> reasons,
+    public static EvalResult fail(Name propertyName,
+                                  ImmutableNonEmptyFiniteIterable<String> reasons,
                                   ImmutableFiniteIterable<Failure> causes) {
-        return new Fail(reasons, causes);
+        return new Failure(propertyName, reasons, causes);
     }
 
-    public static EvalResult fail(String reason) {
-        return new Fail(Vector.of(reason), emptyImmutableFiniteIterable());
+    public static EvalResult fail(Name propertyName, String reason) {
+        return new Failure(propertyName, Vector.of(reason), emptyImmutableFiniteIterable());
     }
 
-    public static EvalResult error(Throwable error) {
-        return new Error(Vector.of(error));
-    }
 }
