@@ -1,6 +1,7 @@
 package dev.marksman.gauntlet.prop;
 
 import com.jnape.palatable.lambda.adt.Either;
+import com.jnape.palatable.lambda.adt.choice.Choice3;
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
 import dev.marksman.gauntlet.*;
 
@@ -24,8 +25,17 @@ class Disjunction<A> implements Prop<A> {
 
     @Override
     public Either<Errors, EvalResult> test(Context context, A data) {
-        throw new UnsupportedOperationException("todo");
+        return Evaluator.evaluate(EvalState.failure(Failure.failure(name, "All disjuncts failed")),
+                context,
+                data,
+                this::evalFn,
+                operands);
     }
+
+    public Choice3<Errors, EvalResult, EvalState> evalFn(EvalInfo<A> info) {
+        return null;
+    }
+
 
     @Override
     public Name getName() {

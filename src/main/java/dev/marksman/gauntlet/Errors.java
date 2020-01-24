@@ -6,7 +6,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Errors {
+public final class Errors {
     private final ImmutableNonEmptyFiniteIterable<Error> items;
 
     public Errors combine(Errors other) {

@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import static lombok.AccessLevel.PRIVATE;
 
 @AllArgsConstructor(access = PRIVATE)
-public class Error {
+public final class Error {
     private final Maybe<Name> propertyName;
     private final Throwable error;
 

@@ -6,7 +6,7 @@ import lombok.Value;
 
 @Value
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Name {
+public final class Name {
     private final String value;
 
     public static Name name(String value) {
