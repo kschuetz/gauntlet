@@ -1,8 +1,10 @@
 package dev.marksman.gauntlet.prop;
 
-import com.jnape.palatable.lambda.adt.Either;
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
-import dev.marksman.gauntlet.*;
+import dev.marksman.gauntlet.Context;
+import dev.marksman.gauntlet.EvalResult;
+import dev.marksman.gauntlet.Name;
+import dev.marksman.gauntlet.Prop;
 
 
 class Conjunction<A> implements Prop<A> {
@@ -23,7 +25,7 @@ class Conjunction<A> implements Prop<A> {
     }
 
     @Override
-    public Either<Errors, EvalResult> test(Context context, A data) {
+    public EvalResult test(Context context, A data) {
         throw new UnsupportedOperationException("todo");
     }
 

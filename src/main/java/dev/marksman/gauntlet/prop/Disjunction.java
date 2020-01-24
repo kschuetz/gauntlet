@@ -1,9 +1,13 @@
 package dev.marksman.gauntlet.prop;
 
-import com.jnape.palatable.lambda.adt.Either;
-import com.jnape.palatable.lambda.adt.choice.Choice3;
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
-import dev.marksman.gauntlet.*;
+import dev.marksman.gauntlet.Context;
+import dev.marksman.gauntlet.EvalResult;
+import dev.marksman.gauntlet.Name;
+import dev.marksman.gauntlet.Prop;
+
+import static dev.marksman.gauntlet.EvalResult.evalResult;
+import static dev.marksman.gauntlet.Failure.failure;
 
 
 class Disjunction<A> implements Prop<A> {
@@ -24,18 +28,37 @@ class Disjunction<A> implements Prop<A> {
     }
 
     @Override
-    public Either<Errors, EvalResult> test(Context context, A data) {
-        return Evaluator.evaluate(EvalState.failure(Failure.failure(name, "All disjuncts failed")),
-                context,
-                data,
-                this::evalFn,
-                operands);
+    public EvalResult test(Context context, A data) {
+        EvalResult result = evalResult(failure(name, "All disjuncts failed."));
+        for (Prop<A> prop : operands) {
+            EvalResult test = prop.safeTest(context, data);
+            if (test.isSuccess()) {
+                return test;
+            } else {
+                result = combine(prop.getName(), result, test);
+            }
+        }
+        return result;
     }
 
-    public Choice3<Errors, EvalResult, EvalState> evalFn(EvalInfo<A> info) {
-        return null;
-    }
+    private static EvalResult combine(Name name, EvalResult acc, EvalResult item) {
+        // success + _ = success
+        // failure + success = success
+        // failure + failure = failure
+        // failure + error = error
+        // error + success = success
+        // error + failure = error
+        // error + error = error
 
+        return acc
+                .match(EvalResult::evalResult,
+                        f1 -> item.match(EvalResult::evalResult,
+                                f2 -> evalResult(f1.addCause(name, f2)),
+                                EvalResult::evalResult),
+                        e1 -> item.match(EvalResult::evalResult,
+                                __ -> evalResult(e1),
+                                e2 -> evalResult(e1.combine(e2))));
+    }
 
     @Override
     public Name getName() {

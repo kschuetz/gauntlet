@@ -1,7 +1,9 @@
 package dev.marksman.gauntlet.prop;
 
-import com.jnape.palatable.lambda.adt.Either;
-import dev.marksman.gauntlet.*;
+import dev.marksman.gauntlet.Context;
+import dev.marksman.gauntlet.EvalResult;
+import dev.marksman.gauntlet.Name;
+import dev.marksman.gauntlet.Prop;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
@@ -11,7 +13,7 @@ class Named<A> implements Prop<A> {
     final Prop<A> underlying;
 
     @Override
-    public Either<Errors, EvalResult> test(Context context, A data) {
+    public EvalResult test(Context context, A data) {
         return underlying.test(context, data);
     }
 

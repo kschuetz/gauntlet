@@ -1,10 +1,13 @@
 package dev.marksman.gauntlet;
 
-import com.jnape.palatable.lambda.adt.Either;
 import dev.marksman.gauntlet.prop.Combinators;
 
+import static com.jnape.palatable.lambda.adt.Maybe.just;
+import static dev.marksman.gauntlet.Error.error;
+import static dev.marksman.gauntlet.EvalResult.evalResult;
+
 public interface Prop<A> {
-    Either<Errors, EvalResult> test(Context context, A data);
+    EvalResult test(Context context, A data);
 
     Name getName();
 
@@ -30,5 +33,13 @@ public interface Prop<A> {
 
     default Prop<A> named(Name name) {
         return Combinators.named(name, this);
+    }
+
+    default EvalResult safeTest(Context context, A data) {
+        try {
+            return test(context, data);
+        } catch (Exception e) {
+            return evalResult(error(just(getName()), e));
+        }
     }
 }
