@@ -1,5 +1,6 @@
 package dev.marksman.gauntlet.prop;
 
+import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
 import dev.marksman.gauntlet.Name;
@@ -47,5 +48,9 @@ public final class Combinators {
             prop = ((Named<A>) prop).underlying;
         }
         return new Named<>(name, prop);
+    }
+
+    public static <A, B> Prop<B> mapped(Fn1<? super B, ? extends A> fn, Prop<A> prop) {
+        return new Mapped<>(fn, prop);
     }
 }

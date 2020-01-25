@@ -5,12 +5,9 @@ import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Name;
 import dev.marksman.gauntlet.Prop;
 
-final class AlwaysPass<A> implements Prop<A> {
-    private final Name name;
-
-    AlwaysPass(Name name) {
-        this.name = name;
-    }
+final class Pass<A> implements Prop<A> {
+    private static final Name NAME = Name.name("Pass");
+    private static final Pass<?> INSTANCE = new Pass<>();
 
     @Override
     public EvalResult test(Context context, A data) {
@@ -19,6 +16,11 @@ final class AlwaysPass<A> implements Prop<A> {
 
     @Override
     public Name getName() {
-        return name;
+        return NAME;
+    }
+
+    @SuppressWarnings("unchecked")
+    static <A> Pass<A> pass() {
+        return (Pass<A>) INSTANCE;
     }
 }

@@ -1,6 +1,7 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.functions.Fn1;
+import com.jnape.palatable.lambda.functor.Contravariant;
 import dev.marksman.gauntlet.prop.Combinators;
 import dev.marksman.gauntlet.prop.Props;
 
@@ -9,10 +10,15 @@ import static dev.marksman.gauntlet.Error.error;
 import static dev.marksman.gauntlet.EvalResult.evalResult;
 import static dev.marksman.gauntlet.prop.Combinators.*;
 
-public interface Prop<A> {
+public interface Prop<A> extends Contravariant<A, Prop<?>> {
     EvalResult test(Context context, A data);
 
     Name getName();
+
+    @Override
+    default <B> Prop<B> contraMap(Fn1<? super B, ? extends A> fn) {
+        return mapped(fn, this);
+    }
 
     default Prop<A> and(Prop<A> other) {
         return conjunction(this, other);
@@ -54,4 +60,19 @@ public interface Prop<A> {
         return Props.fromPredicate(name, predicate);
     }
 
+    static <A> Prop<A> prop(String name, Fn1<A, Boolean> predicate) {
+        return prop(Name.name(name), predicate);
+    }
+
+    static <A> Prop<A> pass() {
+        return Props.pass();
+    }
+
+    static <A> Prop<A> fail() {
+        return Props.fail();
+    }
+
+    static <A> Prop<A> fail(String failureReason) {
+        return Props.fail(failureReason);
+    }
 }

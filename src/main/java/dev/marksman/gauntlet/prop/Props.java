@@ -16,11 +16,15 @@ public final class Props {
         return fromPredicate(name(PredicateProp.class.getSimpleName()), predicate);
     }
 
-    public static <A> Prop<A> alwaysPass(Name name) {
-        return new AlwaysPass<>(name);
+    public static <A> Prop<A> pass() {
+        return Pass.pass();
     }
 
-    public static <A> Prop<A> alwaysPass() {
-        return new AlwaysPass<>(name("Always pass"));
+    public static <A> Prop<A> fail() {
+        return Fail.fail();
+    }
+
+    public static <A> Prop<A> fail(String failureReason) {
+        return Fail.fail(failureReason);
     }
 }
