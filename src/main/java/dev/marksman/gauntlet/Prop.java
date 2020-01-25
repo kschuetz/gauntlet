@@ -1,6 +1,8 @@
 package dev.marksman.gauntlet;
 
+import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.gauntlet.prop.Combinators;
+import dev.marksman.gauntlet.prop.Props;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static dev.marksman.gauntlet.Error.error;
@@ -43,4 +45,13 @@ public interface Prop<A> {
             return evalResult(error(just(getName()), e));
         }
     }
+
+    static <A> Prop<A> prop(Fn1<A, Boolean> predicate) {
+        return Props.fromPredicate(predicate);
+    }
+
+    static <A> Prop<A> prop(Name name, Fn1<A, Boolean> predicate) {
+        return Props.fromPredicate(name, predicate);
+    }
+
 }
