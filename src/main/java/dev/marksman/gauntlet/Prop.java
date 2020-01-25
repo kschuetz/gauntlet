@@ -5,6 +5,7 @@ import dev.marksman.gauntlet.prop.Combinators;
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static dev.marksman.gauntlet.Error.error;
 import static dev.marksman.gauntlet.EvalResult.evalResult;
+import static dev.marksman.gauntlet.prop.Combinators.*;
 
 public interface Prop<A> {
     EvalResult test(Context context, A data);
@@ -12,23 +13,23 @@ public interface Prop<A> {
     Name getName();
 
     default Prop<A> and(Prop<A> other) {
-        return Combinators.conjunction(this, other);
+        return conjunction(this, other);
     }
 
     default Prop<A> or(Prop<A> other) {
-        return Combinators.disjunction(this, other);
+        return disjunction(this, other);
     }
 
     default Prop<A> not() {
-        throw new UnsupportedOperationException("todo");
+        return negation(this);
     }
 
     default Prop<A> implies(Prop<A> other) {
-        throw new UnsupportedOperationException("todo");
+        return implication(this, other);
     }
 
     default Prop<A> iff(Prop<A> other) {
-        throw new UnsupportedOperationException("todo");
+        return biconditional(this, other);
     }
 
     default Prop<A> named(Name name) {

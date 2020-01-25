@@ -6,8 +6,11 @@ import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Name;
 import dev.marksman.gauntlet.Prop;
 
+import static dev.marksman.gauntlet.EvalResult.evalResult;
+import static dev.marksman.gauntlet.Failure.failure;
 
-class Conjunction<A> implements Prop<A> {
+
+final class Conjunction<A> implements Prop<A> {
     private final ImmutableNonEmptyFiniteIterable<Prop<A>> operands;
     private final Name name;
 
@@ -26,7 +29,35 @@ class Conjunction<A> implements Prop<A> {
 
     @Override
     public EvalResult test(Context context, A data) {
-        throw new UnsupportedOperationException("todo");
+        return operands.foldLeft((acc, operand) ->
+                        combine(operand.getName(), acc, operand.safeTest(context, data)),
+                EvalResult.success());
+    }
+
+    private EvalResult combine(Name childName, EvalResult acc, EvalResult item) {
+        // success + success -> success
+        // success + failure -> failure
+        // success + error -> error
+        // failure + success -> failure
+        // failure + failure -> failure
+        // failure + error -> error
+        // error + success -> error
+        // error + failure -> error
+        // error + error -> error
+
+        return acc
+                .match(success -> item
+                                .match(__ -> item,
+                                        f1 -> evalResult(failure(name, "Conjuncts failed.")
+                                                .addCause(childName, f1)),
+                                        EvalResult::evalResult),
+                        f1 -> item.match(__ -> evalResult(f1),
+                                f2 -> evalResult(f1.addCause(childName, f2)),
+                                EvalResult::evalResult),
+                        e1 ->
+                                item.match(__ -> evalResult(e1),
+                                        __ -> evalResult(e1),
+                                        e2 -> evalResult(e1.combine(e2))));
     }
 
     @Override

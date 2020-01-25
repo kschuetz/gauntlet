@@ -34,6 +34,14 @@ public final class Combinators {
         }
     }
 
+    public static <A> Prop<A> implication(Prop<A> antecedent, Prop<A> consequent) {
+        return new Implication<>(antecedent, consequent);
+    }
+
+    public static <A> Prop<A> biconditional(Prop<A> antecedent, Prop<A> consequent) {
+        return new Biconditional<>(antecedent, consequent);
+    }
+
     public static <A> Prop<A> named(Name name, Prop<A> prop) {
         while (prop instanceof Named<?>) {
             prop = ((Named<A>) prop).underlying;

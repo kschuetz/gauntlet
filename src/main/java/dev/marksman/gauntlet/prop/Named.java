@@ -8,7 +8,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
-class Named<A> implements Prop<A> {
+final class Named<A> implements Prop<A> {
     private final Name name;
     final Prop<A> underlying;
 

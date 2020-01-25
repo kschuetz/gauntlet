@@ -10,7 +10,7 @@ import static dev.marksman.gauntlet.EvalResult.evalResult;
 import static dev.marksman.gauntlet.Failure.failure;
 
 
-class Disjunction<A> implements Prop<A> {
+final class Disjunction<A> implements Prop<A> {
     private final ImmutableNonEmptyFiniteIterable<Prop<A>> operands;
     private final Name name;
 
@@ -41,19 +41,19 @@ class Disjunction<A> implements Prop<A> {
         return result;
     }
 
-    private static EvalResult combine(Name name, EvalResult acc, EvalResult item) {
-        // success + _ = success
-        // failure + success = success
-        // failure + failure = failure
-        // failure + error = error
-        // error + success = success
-        // error + failure = error
-        // error + error = error
+    private EvalResult combine(Name childName, EvalResult acc, EvalResult item) {
+        // success + _ -> success
+        // failure + success -> success
+        // failure + failure -> failure
+        // failure + error -> error
+        // error + success -> success
+        // error + failure -> error
+        // error + error -> error
 
         return acc
                 .match(EvalResult::evalResult,
                         f1 -> item.match(EvalResult::evalResult,
-                                f2 -> evalResult(f1.addCause(name, f2)),
+                                f2 -> evalResult(f1.addCause(childName, f2)),
                                 EvalResult::evalResult),
                         e1 -> item.match(EvalResult::evalResult,
                                 __ -> evalResult(e1),

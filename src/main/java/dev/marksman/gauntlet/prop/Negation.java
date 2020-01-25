@@ -5,7 +5,9 @@ import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Name;
 import dev.marksman.gauntlet.Prop;
 
-class Negation<A> implements Prop<A> {
+import static dev.marksman.gauntlet.Failure.failure;
+
+final class Negation<A> implements Prop<A> {
     final Prop<A> operand;
     private final Name name;
 
@@ -21,7 +23,13 @@ class Negation<A> implements Prop<A> {
 
     @Override
     public EvalResult test(Context context, A data) {
-        throw new UnsupportedOperationException("todo");
+        // success -> failure
+        // failure -> success
+        // error -> error
+        return operand.safeTest(context, data)
+                .match(__ -> EvalResult.evalResult(failure(name, "Failure expected.")),
+                        __ -> EvalResult.success(),
+                        EvalResult::evalResult);
     }
 
     @Override
