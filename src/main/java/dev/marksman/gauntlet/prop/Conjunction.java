@@ -7,6 +7,7 @@ import dev.marksman.gauntlet.Name;
 import dev.marksman.gauntlet.Prop;
 
 import static dev.marksman.gauntlet.EvalResult.evalResult;
+import static dev.marksman.gauntlet.EvalResult.success;
 import static dev.marksman.gauntlet.Failure.failure;
 
 
@@ -30,11 +31,11 @@ final class Conjunction<A> implements Prop<A> {
     @Override
     public EvalResult test(Context context, A data) {
         return operands.foldLeft((acc, operand) ->
-                        combine(operand.getName(), acc, operand.safeTest(context, data)),
-                EvalResult.success());
+                        combine(acc, operand.safeTest(context, data)),
+                success());
     }
 
-    private EvalResult combine(Name childName, EvalResult acc, EvalResult item) {
+    private EvalResult combine(EvalResult acc, EvalResult item) {
         // success + success -> success
         // success + failure -> failure
         // success + error -> error
@@ -49,10 +50,10 @@ final class Conjunction<A> implements Prop<A> {
                 .match(success -> item
                                 .match(__ -> item,
                                         f1 -> evalResult(failure(name, "Conjuncts failed.")
-                                                .addCause(childName, f1)),
+                                                .addCause(f1)),
                                         EvalResult::evalResult),
                         f1 -> item.match(__ -> evalResult(f1),
-                                f2 -> evalResult(f1.addCause(childName, f2)),
+                                f2 -> evalResult(f1.addCause(f2)),
                                 EvalResult::evalResult),
                         e1 ->
                                 item.match(__ -> evalResult(e1),

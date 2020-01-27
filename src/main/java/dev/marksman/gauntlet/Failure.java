@@ -16,7 +16,7 @@ public final class Failure {
     private final ImmutableNonEmptyFiniteIterable<String> failureReasons;
     private final ImmutableFiniteIterable<Failure> causes;
 
-    public Failure addCause(Name propertyName, Failure failure) {
+    public Failure addCause(Failure failure) {
         return new Failure(propertyName, failureReasons, causes.append(failure));
     }
 

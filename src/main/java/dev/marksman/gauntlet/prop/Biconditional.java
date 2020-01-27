@@ -33,12 +33,12 @@ class Biconditional<A> implements Prop<A> {
                                 consequent.safeTest(context, data)
                                         .match(EvalResult::evalResult,
                                                 f1 -> evalResult(createFailure()
-                                                        .addCause(consequent.getName(), f1)),
+                                                        .addCause(f1)),
                                                 EvalResult::evalResult),
                         failure ->
                                 consequent.safeTest(context, data)
                                         .match(__ -> evalResult(createFailure()
-                                                        .addCause(antecedent.getName(), failure)),
+                                                        .addCause(failure)),
                                                 __ -> success(),
                                                 EvalResult::evalResult),
                         e1 ->

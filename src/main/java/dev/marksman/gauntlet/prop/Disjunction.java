@@ -35,13 +35,13 @@ final class Disjunction<A> implements Prop<A> {
             if (test.isSuccess()) {
                 return test;
             } else {
-                result = combine(prop.getName(), result, test);
+                result = combine(result, test);
             }
         }
         return result;
     }
 
-    private EvalResult combine(Name childName, EvalResult acc, EvalResult item) {
+    private EvalResult combine(EvalResult acc, EvalResult item) {
         // success + _ -> success
         // failure + success -> success
         // failure + failure -> failure
@@ -53,7 +53,7 @@ final class Disjunction<A> implements Prop<A> {
         return acc
                 .match(EvalResult::evalResult,
                         f1 -> item.match(EvalResult::evalResult,
-                                f2 -> evalResult(f1.addCause(childName, f2)),
+                                f2 -> evalResult(f1.addCause(f2)),
                                 EvalResult::evalResult),
                         e1 -> item.match(EvalResult::evalResult,
                                 __ -> evalResult(e1),

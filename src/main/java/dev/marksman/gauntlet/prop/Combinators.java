@@ -11,20 +11,24 @@ public final class Combinators {
     private Combinators() {
     }
 
-    public static <A> Prop<A> conjunction(Prop<A> first, Prop<A> second) {
-        return new Conjunction<>(Vector.of(first, second));
+    public static <A> Prop<A> conjunction(Prop<A> p, Prop<A> q) {
+        return new Conjunction<>(Vector.of(p, q));
     }
 
     public static <A> Prop<A> conjunction(ImmutableNonEmptyFiniteIterable<Prop<A>> operands) {
         return new Conjunction<>(operands);
     }
 
-    public static <A> Prop<A> disjunction(Prop<A> first, Prop<A> second) {
-        return new Disjunction<>(Vector.of(first, second));
+    public static <A> Prop<A> disjunction(Prop<A> p, Prop<A> q) {
+        return new Disjunction<>(Vector.of(p, q));
     }
 
     public static <A> Prop<A> disjunction(ImmutableNonEmptyFiniteIterable<Prop<A>> operands) {
         return new Disjunction<>(operands);
+    }
+
+    public static <A> Prop<A> exclusiveDisjunction(Prop<A> p, Prop<A> q) {
+        return new ExclusiveDisjunction<>(p, q);
     }
 
     public static <A> Prop<A> negation(Prop<A> operand) {

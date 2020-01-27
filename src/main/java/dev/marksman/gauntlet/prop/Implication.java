@@ -34,7 +34,7 @@ class Implication<A> implements Prop<A> {
                                 consequent.safeTest(context, data)
                                         .match(EvalResult::evalResult,
                                                 f1 -> evalResult(failure(name, "Implication failed.")
-                                                        .addCause(consequent.getName(), f1)),
+                                                        .addCause(f1)),
                                                 EvalResult::evalResult),
                         failure -> success(),
                         e1 ->

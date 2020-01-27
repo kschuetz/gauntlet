@@ -27,6 +27,10 @@ public interface Prop<A> extends Contravariant<A, Prop<?>> {
         return disjunction(this, other);
     }
 
+    default Prop<A> xor(Prop<A> other) {
+        return exclusiveDisjunction(this, other);
+    }
+
     default Prop<A> not() {
         return negation(this);
     }
