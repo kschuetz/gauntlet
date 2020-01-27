@@ -23,7 +23,7 @@ final class Named<A> implements Prop<A> {
     }
 
     @Override
-    public Prop<A> named(Name name) {
+    public Prop<A> rename(Name name) {
         return Combinators.named(name, underlying);
     }
 }

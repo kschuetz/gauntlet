@@ -2,7 +2,6 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functor.Contravariant;
-import dev.marksman.gauntlet.prop.Combinators;
 import dev.marksman.gauntlet.prop.Props;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
@@ -40,8 +39,8 @@ public interface Prop<A> extends Contravariant<A, Prop<?>> {
         return biconditional(this, other);
     }
 
-    default Prop<A> named(Name name) {
-        return Combinators.named(name, this);
+    default Prop<A> rename(Name name) {
+        return named(name, this);
     }
 
     default EvalResult safeTest(Context context, A data) {
