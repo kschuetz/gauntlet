@@ -8,6 +8,7 @@ import dev.marksman.gauntlet.Prop;
 
 import static dev.marksman.gauntlet.EvalResult.evalResult;
 import static dev.marksman.gauntlet.Failure.failure;
+import static dev.marksman.gauntlet.Name.name;
 
 
 final class Disjunction<A> implements Prop<A> {
@@ -16,7 +17,7 @@ final class Disjunction<A> implements Prop<A> {
 
     Disjunction(ImmutableNonEmptyFiniteIterable<Prop<A>> operands) {
         this.operands = operands;
-        this.name = Name.name(String.join(" ∨ ",
+        this.name = name(String.join(" ∨ ",
                 operands.fmap(p -> p.getName().getValue())));
     }
 

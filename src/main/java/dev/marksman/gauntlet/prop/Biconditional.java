@@ -5,6 +5,7 @@ import dev.marksman.gauntlet.*;
 import static dev.marksman.gauntlet.EvalResult.evalResult;
 import static dev.marksman.gauntlet.EvalResult.success;
 import static dev.marksman.gauntlet.Failure.failure;
+import static dev.marksman.gauntlet.Name.name;
 
 class Biconditional<A> implements Prop<A> {
     final Prop<A> antecedent;
@@ -14,7 +15,7 @@ class Biconditional<A> implements Prop<A> {
     Biconditional(Prop<A> antecedent, Prop<A> consequent) {
         this.antecedent = antecedent;
         this.consequent = consequent;
-        this.name = Name.name(antecedent.getName() + " <=> " + consequent.getName());
+        this.name = name(antecedent.getName() + " <=> " + consequent.getName());
     }
 
     @Override

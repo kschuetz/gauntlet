@@ -9,6 +9,7 @@ import dev.marksman.gauntlet.Prop;
 import static dev.marksman.gauntlet.EvalResult.evalResult;
 import static dev.marksman.gauntlet.EvalResult.success;
 import static dev.marksman.gauntlet.Failure.failure;
+import static dev.marksman.gauntlet.Name.name;
 
 
 final class Conjunction<A> implements Prop<A> {
@@ -17,7 +18,7 @@ final class Conjunction<A> implements Prop<A> {
 
     Conjunction(ImmutableNonEmptyFiniteIterable<Prop<A>> operands) {
         this.operands = operands;
-        this.name = Name.name(String.join(" ∧ ",
+        this.name = name(String.join(" ∧ ",
                 operands.fmap(p -> p.getName().getValue())));
     }
 

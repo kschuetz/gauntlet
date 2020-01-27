@@ -8,6 +8,7 @@ import dev.marksman.gauntlet.Prop;
 import static dev.marksman.gauntlet.EvalResult.evalResult;
 import static dev.marksman.gauntlet.EvalResult.success;
 import static dev.marksman.gauntlet.Failure.failure;
+import static dev.marksman.gauntlet.Name.name;
 
 class ExclusiveDisjunction<A> implements Prop<A> {
     final Prop<A> p;
@@ -17,7 +18,7 @@ class ExclusiveDisjunction<A> implements Prop<A> {
     ExclusiveDisjunction(Prop<A> p, Prop<A> q) {
         this.p = p;
         this.q = q;
-        this.name = Name.name(p.getName() + " xor " + q.getName());
+        this.name = name(p.getName() + " xor " + q.getName());
     }
 
     @Override

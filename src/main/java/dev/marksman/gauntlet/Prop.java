@@ -7,6 +7,7 @@ import dev.marksman.gauntlet.prop.Props;
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static dev.marksman.gauntlet.Error.error;
 import static dev.marksman.gauntlet.EvalResult.evalResult;
+import static dev.marksman.gauntlet.prop.Props.*;
 
 public interface Prop<A> extends Contravariant<A, Prop<?>> {
     EvalResult test(Context context, A data);
@@ -15,35 +16,35 @@ public interface Prop<A> extends Contravariant<A, Prop<?>> {
 
     @Override
     default <B> Prop<B> contraMap(Fn1<? super B, ? extends A> fn) {
-        return Props.mapped(fn, this);
+        return mapped(fn, this);
     }
 
     default Prop<A> and(Prop<A> other) {
-        return Props.conjunction(this, other);
+        return conjunction(this, other);
     }
 
     default Prop<A> or(Prop<A> other) {
-        return Props.disjunction(this, other);
+        return disjunction(this, other);
     }
 
     default Prop<A> xor(Prop<A> other) {
-        return Props.exclusiveDisjunction(this, other);
+        return exclusiveDisjunction(this, other);
     }
 
     default Prop<A> not() {
-        return Props.negation(this);
+        return negation(this);
     }
 
     default Prop<A> implies(Prop<A> other) {
-        return Props.implication(this, other);
+        return implication(this, other);
     }
 
     default Prop<A> iff(Prop<A> other) {
-        return Props.biconditional(this, other);
+        return biconditional(this, other);
     }
 
     default Prop<A> rename(Name name) {
-        return Props.named(name, this);
+        return named(name, this);
     }
 
     default EvalResult safeTest(Context context, A data) {

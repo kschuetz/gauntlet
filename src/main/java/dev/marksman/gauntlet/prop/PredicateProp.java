@@ -6,6 +6,7 @@ import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Name;
 import dev.marksman.gauntlet.Prop;
 
+import static dev.marksman.gauntlet.EvalResult.evalResult;
 import static dev.marksman.gauntlet.EvalResult.success;
 import static dev.marksman.gauntlet.Failure.failure;
 
@@ -23,7 +24,7 @@ final class PredicateProp<A> implements Prop<A> {
     public EvalResult test(Context context, A data) {
         return predicate.apply(data)
                 ? success()
-                : EvalResult.evalResult(failure(name, "Predicate failed."));
+                : evalResult(failure(name, "Predicate failed."));
     }
 
     @Override

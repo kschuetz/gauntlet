@@ -5,7 +5,10 @@ import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Name;
 import dev.marksman.gauntlet.Prop;
 
+import static dev.marksman.gauntlet.EvalResult.evalResult;
+import static dev.marksman.gauntlet.EvalResult.success;
 import static dev.marksman.gauntlet.Failure.failure;
+import static dev.marksman.gauntlet.Name.name;
 
 final class Negation<A> implements Prop<A> {
     final Prop<A> operand;
@@ -13,7 +16,7 @@ final class Negation<A> implements Prop<A> {
 
     Negation(Prop<A> operand) {
         this.operand = operand;
-        this.name = Name.name("~" + operand.getName());
+        this.name = name("~" + operand.getName());
     }
 
     @Override
@@ -27,8 +30,8 @@ final class Negation<A> implements Prop<A> {
         // failure -> success
         // error -> error
         return operand.safeTest(context, data)
-                .match(__ -> EvalResult.evalResult(failure(name, "Failure expected.")),
-                        __ -> EvalResult.success(),
+                .match(__ -> evalResult(failure(name, "Failure expected.")),
+                        __ -> success(),
                         EvalResult::evalResult);
     }
 

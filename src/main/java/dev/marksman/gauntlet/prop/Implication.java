@@ -8,6 +8,7 @@ import dev.marksman.gauntlet.Prop;
 import static dev.marksman.gauntlet.EvalResult.evalResult;
 import static dev.marksman.gauntlet.EvalResult.success;
 import static dev.marksman.gauntlet.Failure.failure;
+import static dev.marksman.gauntlet.Name.name;
 
 class Implication<A> implements Prop<A> {
     final Prop<A> antecedent;
@@ -17,7 +18,7 @@ class Implication<A> implements Prop<A> {
     Implication(Prop<A> antecedent, Prop<A> consequent) {
         this.antecedent = antecedent;
         this.consequent = consequent;
-        this.name = Name.name(antecedent.getName() + " => " + consequent.getName());
+        this.name = name(antecedent.getName() + " => " + consequent.getName());
     }
 
     @Override
