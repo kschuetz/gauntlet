@@ -13,18 +13,16 @@ import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static dev.marksman.gauntlet.GeneratorParameters.defaultGeneratorParameters;
 
 @AllArgsConstructor
-public class GeneratorPropTest<A> implements PropTest<A> {
+class ForAllFromGeneratorImpl<A> {
     private final Generator<A> generator;
     private final Prop<A> property;
     private final Maybe<Shrink<A>> shrinkStrategy;
     private final int sampleCount;
 
-    @Override
     public TestResult<A> run() {
         return runWithSeed(new Random().nextLong());
     }
 
-    @Override
     public TestResult<A> runWithSeed(long seedValue) {
         ImmutableFiniteIterable<A> values = generator.run(defaultGeneratorParameters(),
                 Seed.create(seedValue))

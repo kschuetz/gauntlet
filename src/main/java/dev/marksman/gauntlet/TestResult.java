@@ -8,4 +8,5 @@ import lombok.Getter;
 public class TestResult<A> {
     @Getter
     private final Maybe<Long> initialSeedValue;
+
 }

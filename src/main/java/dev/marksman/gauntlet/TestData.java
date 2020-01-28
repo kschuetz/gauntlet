@@ -19,4 +19,5 @@ class TestData<A> {
 
     @Getter
     private final Maybe<Long> initialSeedValue;
+
 }
