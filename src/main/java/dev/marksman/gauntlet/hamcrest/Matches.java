@@ -29,7 +29,7 @@ public final class Matches<A> implements Prop<A> {
         } else {
             Description description = new StringDescription();
             matcher.describeMismatch(data, description);
-            return evalResult(failure(name, description.toString()));
+            return evalResult(failure(this, description.toString()));
         }
     }
 

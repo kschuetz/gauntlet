@@ -50,7 +50,7 @@ final class Conjunction<A> implements Prop<A> {
         return acc
                 .match(success -> item
                                 .match(__ -> item,
-                                        f1 -> evalResult(failure(name, "Conjuncts failed.")
+                                        f1 -> evalResult(failure(this, "Conjuncts failed.")
                                                 .addCause(f1)),
                                         EvalResult::evalResult),
                         f1 -> item.match(__ -> evalResult(f1),

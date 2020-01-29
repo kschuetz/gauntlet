@@ -55,6 +55,6 @@ class Biconditional<A> implements Prop<A> {
     }
 
     private Failure createFailure() {
-        return failure(name, "Biconditional failed.");
+        return failure(this, "Biconditional failed.");
     }
 }

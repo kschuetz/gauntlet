@@ -35,14 +35,14 @@ class ExclusiveDisjunction<A> implements Prop<A> {
         return p.safeTest(context, data)
                 .match(success ->
                                 q.safeTest(context, data)
-                                        .match(__ -> evalResult(failure(name, "xor failed")
-                                                        .addCause(failure(q.getName(), "Expected failure"))),
+                                        .match(__ -> evalResult(failure(this, "xor failed")
+                                                        .addCause(failure(q, "Expected failure"))),
                                                 f1 -> success(),
                                                 EvalResult::evalResult),
                         failure ->
                                 q.safeTest(context, data)
                                         .match(EvalResult::evalResult,
-                                                f1 -> evalResult(failure(name, "xor failed")
+                                                f1 -> evalResult(failure(this, "xor failed")
                                                         .addCause(failure)
                                                         .addCause(f1)),
                                                 EvalResult::evalResult),

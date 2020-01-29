@@ -14,7 +14,7 @@ final class Fail<A> implements Prop<A> {
     private final Failure failure;
 
     Fail(String failureReason) {
-        this.failure = failure(NAME, failureReason);
+        this.failure = failure(this, failureReason);
     }
 
     @Override

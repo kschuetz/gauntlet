@@ -12,7 +12,7 @@ import static lombok.AccessLevel.PRIVATE;
 @AllArgsConstructor(access = PRIVATE)
 @Value
 public final class Failure {
-    private final Name propertyName;
+    private final Named propertyName;
     private final ImmutableNonEmptyFiniteIterable<String> failureReasons;
     private final ImmutableFiniteIterable<Failure> causes;
 
@@ -20,13 +20,13 @@ public final class Failure {
         return new Failure(propertyName, failureReasons, causes.append(failure));
     }
 
-    public static Failure failure(Name propertyName,
+    public static Failure failure(Named propertyName,
                                   ImmutableNonEmptyFiniteIterable<String> reasons,
                                   ImmutableFiniteIterable<Failure> causes) {
         return new Failure(propertyName, reasons, causes);
     }
 
-    public static Failure failure(Name propertyName, String reason) {
+    public static Failure failure(Named propertyName, String reason) {
         return new Failure(propertyName, Vector.of(reason), emptyImmutableFiniteIterable());
     }
 

@@ -67,13 +67,17 @@ public final class Props {
     }
 
     public static <A> Prop<A> named(Name name, Prop<A> prop) {
-        while (prop instanceof Named<?>) {
-            prop = ((Named<A>) prop).underlying;
+        while (prop instanceof Renamed<?>) {
+            prop = ((Renamed<A>) prop).underlying;
         }
-        return new Named<>(name, prop);
+        return new Renamed<>(name, prop);
     }
 
     public static <A, B> Prop<B> mapped(Fn1<? super B, ? extends A> fn, Prop<A> prop) {
         return new Mapped<>(fn, prop);
+    }
+
+    public static <A> Prop<A> dynamic(Fn1<A, Prop<A>> selector) {
+        return new Dynamic<>(selector);
     }
 }

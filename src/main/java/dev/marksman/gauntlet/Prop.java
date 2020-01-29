@@ -9,7 +9,7 @@ import static dev.marksman.gauntlet.Error.error;
 import static dev.marksman.gauntlet.EvalResult.evalResult;
 import static dev.marksman.gauntlet.prop.Props.*;
 
-public interface Prop<A> extends Contravariant<A, Prop<?>> {
+public interface Prop<A> extends Contravariant<A, Prop<?>>, Named {
     EvalResult test(Context context, A data);
 
     Name getName();
@@ -77,5 +77,9 @@ public interface Prop<A> extends Contravariant<A, Prop<?>> {
 
     static <A> Prop<A> fail(String failureReason) {
         return Props.fail(failureReason);
+    }
+
+    static <A> Prop<A> dynamic(Fn1<A, Prop<A>> selector) {
+        return Props.dynamic(selector);
     }
 }

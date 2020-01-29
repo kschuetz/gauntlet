@@ -30,7 +30,7 @@ final class Negation<A> implements Prop<A> {
         // failure -> success
         // error -> error
         return operand.safeTest(context, data)
-                .match(__ -> evalResult(failure(name, "Failure expected.")),
+                .match(__ -> evalResult(failure(this, "Failure expected.")),
                         __ -> success(),
                         EvalResult::evalResult);
     }

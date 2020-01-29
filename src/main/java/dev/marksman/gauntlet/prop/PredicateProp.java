@@ -24,7 +24,7 @@ final class PredicateProp<A> implements Prop<A> {
     public EvalResult test(Context context, A data) {
         return predicate.apply(data)
                 ? success()
-                : evalResult(failure(name, "Predicate failed."));
+                : evalResult(failure(this, "Predicate failed."));
     }
 
     @Override
