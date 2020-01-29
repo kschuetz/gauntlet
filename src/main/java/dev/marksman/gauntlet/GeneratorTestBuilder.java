@@ -3,6 +3,8 @@ package dev.marksman.gauntlet;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.gauntlet.shrink.Shrink;
 
+import java.util.Set;
+
 import static dev.marksman.gauntlet.Prop.prop;
 
 public interface GeneratorTestBuilder<A> {
@@ -16,6 +18,8 @@ public interface GeneratorTestBuilder<A> {
     GeneratorTestBuilder<A> withInitialSeed(long initialSeed);
 
     GeneratorTestBuilder<A> suchThat(Fn1<A, Boolean> predicate);
+
+    GeneratorTestBuilder<A> classifyUsing(Fn1<A, Set<String>> classifier);
 
     void mustSatisfy(Prop<A> prop);
 
