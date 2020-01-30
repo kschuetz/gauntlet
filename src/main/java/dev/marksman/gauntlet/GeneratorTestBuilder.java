@@ -13,11 +13,11 @@ public interface GeneratorTestBuilder<A> {
 
     GeneratorTestBuilder<A> withNoShrink();
 
+    GeneratorTestBuilder<A> suchThat(Fn1<A, Boolean> predicate);
+
     GeneratorTestBuilder<A> withSampleCount(int sampleCount);
 
     GeneratorTestBuilder<A> withInitialSeed(long initialSeed);
-
-    GeneratorTestBuilder<A> suchThat(Fn1<A, Boolean> predicate);
 
     GeneratorTestBuilder<A> classifyUsing(Fn1<A, Set<String>> classifier);
 
