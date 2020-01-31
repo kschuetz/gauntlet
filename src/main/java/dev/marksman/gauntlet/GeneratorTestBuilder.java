@@ -1,20 +1,12 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.functions.Fn1;
-import dev.marksman.gauntlet.shrink.Shrink;
 
 import java.util.Set;
 
 import static dev.marksman.gauntlet.Prop.prop;
 
 public interface GeneratorTestBuilder<A> {
-
-    GeneratorTestBuilder<A> withShrink(Shrink<A> shrink);
-
-    GeneratorTestBuilder<A> withNoShrink();
-
-    GeneratorTestBuilder<A> suchThat(Fn1<A, Boolean> predicate);
-
     GeneratorTestBuilder<A> withSampleCount(int sampleCount);
 
     GeneratorTestBuilder<A> withInitialSeed(long initialSeed);
