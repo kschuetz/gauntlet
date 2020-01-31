@@ -43,8 +43,8 @@ final class GeneratorTestBuilder1<A> implements GeneratorTestBuilder<A> {
     }
 
     @Override
-    public void mustSatisfy(Prop<A> prop) {
-
+    public Report<A> executeFor(Prop<A> prop) {
+        return null;
     }
 
     static <A> GeneratorTestBuilder<A> generatorTestBuilder1(GenerationStrategy<A> generator,

@@ -50,8 +50,8 @@ final class GeneratorTestBuilder3<A, B, C> implements GeneratorTestBuilder<Tuple
     }
 
     @Override
-    public void mustSatisfy(Prop<Tuple3<A, B, C>> prop) {
-
+    public Report<Tuple3<A, B, C>> executeFor(Prop<Tuple3<A, B, C>> prop) {
+        return null;
     }
 
     static <A, B, C> GeneratorTestBuilder<Tuple3<A, B, C>> generatorTestBuilder3(GenerationStrategy<A> genA,

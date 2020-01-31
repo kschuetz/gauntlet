@@ -47,8 +47,8 @@ final class GeneratorTestBuilder2<A, B> implements GeneratorTestBuilder<Tuple2<A
     }
 
     @Override
-    public void mustSatisfy(Prop<Tuple2<A, B>> prop) {
-
+    public Report<Tuple2<A, B>> executeFor(Prop<Tuple2<A, B>> prop) {
+        return null;
     }
 
     static <A, B> GeneratorTestBuilder<Tuple2<A, B>> generatorTestBuilder2(GenerationStrategy<A> genA,
