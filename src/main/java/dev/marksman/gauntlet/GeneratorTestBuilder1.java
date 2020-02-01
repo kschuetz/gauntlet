@@ -11,12 +11,12 @@ import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
 
 final class GeneratorTestBuilder1<A> implements GeneratorTestBuilder<A> {
-    private final GenerationStrategy<A> gen;
+    private final Arbitrary<A> gen;
     private final Maybe<Long> initialSeed;
     private final int sampleCount;
     private final ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers;
 
-    GeneratorTestBuilder1(GenerationStrategy<A> gen,
+    GeneratorTestBuilder1(Arbitrary<A> gen,
                           Maybe<Long> initialSeed,
                           int sampleCount,
                           ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers) {
@@ -47,7 +47,7 @@ final class GeneratorTestBuilder1<A> implements GeneratorTestBuilder<A> {
         return null;
     }
 
-    static <A> GeneratorTestBuilder<A> generatorTestBuilder1(GenerationStrategy<A> generator,
+    static <A> GeneratorTestBuilder<A> generatorTestBuilder1(Arbitrary<A> generator,
                                                              int sampleCount) {
         return new GeneratorTestBuilder1<>(generator, nothing(),
                 sampleCount, emptyImmutableFiniteIterable());

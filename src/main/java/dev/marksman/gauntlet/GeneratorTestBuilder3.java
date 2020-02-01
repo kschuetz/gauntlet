@@ -12,16 +12,16 @@ import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
 
 final class GeneratorTestBuilder3<A, B, C> implements GeneratorTestBuilder<Tuple3<A, B, C>> {
-    private final GenerationStrategy<A> genA;
-    private final GenerationStrategy<B> genB;
-    private final GenerationStrategy<C> genC;
+    private final Arbitrary<A> genA;
+    private final Arbitrary<B> genB;
+    private final Arbitrary<C> genC;
     private final Maybe<Long> initialSeed;
     private final int sampleCount;
     private final ImmutableFiniteIterable<Fn1<Tuple3<A, B, C>, Set<String>>> classifiers;
 
-    GeneratorTestBuilder3(GenerationStrategy<A> genA,
-                          GenerationStrategy<B> genB,
-                          GenerationStrategy<C> genC,
+    GeneratorTestBuilder3(Arbitrary<A> genA,
+                          Arbitrary<B> genB,
+                          Arbitrary<C> genC,
                           Maybe<Long> initialSeed,
                           int sampleCount,
                           ImmutableFiniteIterable<Fn1<Tuple3<A, B, C>, Set<String>>> classifiers) {
@@ -54,9 +54,9 @@ final class GeneratorTestBuilder3<A, B, C> implements GeneratorTestBuilder<Tuple
         return null;
     }
 
-    static <A, B, C> GeneratorTestBuilder<Tuple3<A, B, C>> generatorTestBuilder3(GenerationStrategy<A> genA,
-                                                                                 GenerationStrategy<B> genB,
-                                                                                 GenerationStrategy<C> genC,
+    static <A, B, C> GeneratorTestBuilder<Tuple3<A, B, C>> generatorTestBuilder3(Arbitrary<A> genA,
+                                                                                 Arbitrary<B> genB,
+                                                                                 Arbitrary<C> genC,
                                                                                  int sampleCount) {
         return new GeneratorTestBuilder3<>(genA, genB, genC, nothing(),
                 sampleCount, emptyImmutableFiniteIterable());

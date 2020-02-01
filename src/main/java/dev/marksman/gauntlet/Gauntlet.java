@@ -13,24 +13,25 @@ import static dev.marksman.gauntlet.UniversalDomainTestBuilder.universalDomainTe
 public final class Gauntlet {
 
     public static int DEFAULT_SAMPLE_COUNT = 100;
+    public static int DEFAULT_MAX_DISCARDS = 100;
 
     private Gauntlet() {
 
     }
 
-    public static <A> GeneratorTestBuilder<A> all(GenerationStrategy<A> generator) {
+    public static <A> GeneratorTestBuilder<A> all(Arbitrary<A> generator) {
         return generatorTestBuilder1(generator, DEFAULT_SAMPLE_COUNT);
     }
 
-    public static <A, B> GeneratorTestBuilder<Tuple2<A, B>> all(GenerationStrategy<A> generatorA,
-                                                                GenerationStrategy<B> generatorB) {
+    public static <A, B> GeneratorTestBuilder<Tuple2<A, B>> all(Arbitrary<A> generatorA,
+                                                                Arbitrary<B> generatorB) {
         return generatorTestBuilder2(generatorA, generatorB,
                 DEFAULT_SAMPLE_COUNT);
     }
 
-    public static <A, B, C> GeneratorTestBuilder<Tuple3<A, B, C>> all(GenerationStrategy<A> generatorA,
-                                                                      GenerationStrategy<B> generatorB,
-                                                                      GenerationStrategy<C> generatorC) {
+    public static <A, B, C> GeneratorTestBuilder<Tuple3<A, B, C>> all(Arbitrary<A> generatorA,
+                                                                      Arbitrary<B> generatorB,
+                                                                      Arbitrary<C> generatorC) {
         return generatorTestBuilder3(generatorA, generatorB, generatorC,
                 DEFAULT_SAMPLE_COUNT);
     }
