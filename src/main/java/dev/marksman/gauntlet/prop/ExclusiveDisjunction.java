@@ -25,32 +25,18 @@ class ExclusiveDisjunction<A> implements Prop<A> {
     public EvalResult test(Context context, A data) {
         // success + success -> failure
         // success + failure -> success
-        // success + error -> error
         // failure + success -> success
         // failure + failure -> failure
-        // failure + error -> failure
-        // error + success -> error
-        // error + failure -> error
-        // error + error -> error
-        return p.safeTest(context, data)
-                .match(success ->
-                                q.safeTest(context, data)
-                                        .match(__ -> evalResult(failure(this, "xor failed")
-                                                        .addCause(failure(q, "Expected failure"))),
-                                                f1 -> success(),
-                                                EvalResult::evalResult),
-                        failure ->
-                                q.safeTest(context, data)
-                                        .match(EvalResult::evalResult,
-                                                f1 -> evalResult(failure(this, "xor failed")
-                                                        .addCause(failure)
-                                                        .addCause(f1)),
-                                                EvalResult::evalResult),
-                        e1 ->
-                                q.safeTest(context, data)
-                                        .match(__ -> evalResult(e1),
-                                                __ -> evalResult(e1),
-                                                e2 -> evalResult(e1.combine(e2))));
+        return p.test(context, data)
+                .match(success -> q.test(context, data)
+                                .match(__ -> evalResult(failure(this, "xor failed")
+                                                .addCause(failure(q, "Expected failure"))),
+                                        f1 -> success()),
+                        failure -> q.test(context, data)
+                                .match(EvalResult::evalResult,
+                                        f1 -> evalResult(failure(this, "xor failed")
+                                                .addCause(failure)
+                                                .addCause(f1))));
     }
 
     @Override

@@ -80,4 +80,12 @@ public final class Props {
     public static <A> Prop<A> dynamic(Fn1<A, Prop<A>> selector) {
         return new Dynamic<>(selector);
     }
+
+    public static <A> Prop<A> safe(Prop<A> prop) {
+        if (prop instanceof Safe<?>) {
+            return prop;
+        } else {
+            return new Safe<>(prop);
+        }
+    }
 }

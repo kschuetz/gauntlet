@@ -28,11 +28,10 @@ final class Negation<A> implements Prop<A> {
     public EvalResult test(Context context, A data) {
         // success -> failure
         // failure -> success
-        // error -> error
-        return operand.safeTest(context, data)
+
+        return operand.test(context, data)
                 .match(__ -> evalResult(failure(this, "Failure expected.")),
-                        __ -> success(),
-                        EvalResult::evalResult);
+                        __ -> success());
     }
 
     @Override

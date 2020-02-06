@@ -31,35 +31,24 @@ final class Conjunction<A> implements Prop<A> {
 
     @Override
     public EvalResult test(Context context, A data) {
-        return operands.foldLeft((acc, operand) ->
-                        combine(acc, operand.safeTest(context, data)),
+        return operands.foldLeft((acc, operand) -> combine(acc, operand.test(context, data)),
                 success());
     }
 
     private EvalResult combine(EvalResult acc, EvalResult item) {
         // success + success -> success
         // success + failure -> failure
-        // success + error -> error
         // failure + success -> failure
         // failure + failure -> failure
-        // failure + error -> error
-        // error + success -> error
-        // error + failure -> error
-        // error + error -> error
 
         return acc
                 .match(success -> item
                                 .match(__ -> item,
                                         f1 -> evalResult(failure(this, "Conjuncts failed.")
-                                                .addCause(f1)),
-                                        EvalResult::evalResult),
+                                                .addCause(f1))),
+
                         f1 -> item.match(__ -> evalResult(f1),
-                                f2 -> evalResult(f1.addCause(f2)),
-                                EvalResult::evalResult),
-                        e1 ->
-                                item.match(__ -> evalResult(e1),
-                                        __ -> evalResult(e1),
-                                        e2 -> evalResult(e1.combine(e2))));
+                                f2 -> evalResult(f1.addCause(f2))));
     }
 
     @Override

@@ -32,7 +32,7 @@ final class Disjunction<A> implements Prop<A> {
     public EvalResult test(Context context, A data) {
         EvalResult result = evalResult(failure(this, "All disjuncts failed."));
         for (Prop<A> prop : operands) {
-            EvalResult test = prop.safeTest(context, data);
+            EvalResult test = prop.test(context, data);
             if (test.isSuccess()) {
                 return test;
             } else {
@@ -46,19 +46,11 @@ final class Disjunction<A> implements Prop<A> {
         // success + _ -> success
         // failure + success -> success
         // failure + failure -> failure
-        // failure + error -> error
-        // error + success -> success
-        // error + failure -> error
-        // error + error -> error
 
         return acc
                 .match(EvalResult::evalResult,
                         f1 -> item.match(EvalResult::evalResult,
-                                f2 -> evalResult(f1.addCause(f2)),
-                                EvalResult::evalResult),
-                        e1 -> item.match(EvalResult::evalResult,
-                                __ -> evalResult(e1),
-                                e2 -> evalResult(e1.combine(e2))));
+                                f2 -> evalResult(f1.addCause(f2))));
     }
 
     @Override

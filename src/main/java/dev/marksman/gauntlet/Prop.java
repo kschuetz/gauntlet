@@ -4,9 +4,6 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functor.Contravariant;
 import dev.marksman.gauntlet.prop.Props;
 
-import static com.jnape.palatable.lambda.adt.Maybe.just;
-import static dev.marksman.gauntlet.Error.error;
-import static dev.marksman.gauntlet.EvalResult.evalResult;
 import static dev.marksman.gauntlet.prop.Props.*;
 
 public interface Prop<A> extends Contravariant<A, Prop<?>>, Named {
@@ -47,12 +44,8 @@ public interface Prop<A> extends Contravariant<A, Prop<?>>, Named {
         return named(name, this);
     }
 
-    default EvalResult safeTest(Context context, A data) {
-        try {
-            return test(context, data);
-        } catch (Exception e) {
-            return evalResult(error(just(getName()), e));
-        }
+    default Prop<A> safe() {
+        return Props.safe(this);
     }
 
     static <A> Prop<A> prop(Fn1<A, Boolean> predicate) {

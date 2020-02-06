@@ -13,8 +13,7 @@ class Dynamic<A> implements Prop<A> {
 
     @Override
     public EvalResult test(Context context, A data) {
-        return selector.apply(data)
-                .safeTest(context, data);
+        return selector.apply(data).test(context, data);
     }
 
     @Override

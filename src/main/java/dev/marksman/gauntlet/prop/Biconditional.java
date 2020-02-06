@@ -22,31 +22,17 @@ class Biconditional<A> implements Prop<A> {
     public EvalResult test(Context context, A data) {
         // success + success -> success
         // success + failure -> failure
-        // success + error -> error
         // failure + success -> failure
         // failure + failure -> success
-        // failure + error -> error
-        // error + success -> error
-        // error + failure -> error
-        // error + error -> error
-        return antecedent.safeTest(context, data)
-                .match(success ->
-                                consequent.safeTest(context, data)
-                                        .match(EvalResult::evalResult,
-                                                f1 -> evalResult(createFailure()
-                                                        .addCause(f1)),
-                                                EvalResult::evalResult),
-                        failure ->
-                                consequent.safeTest(context, data)
-                                        .match(__ -> evalResult(createFailure()
-                                                        .addCause(failure)),
-                                                __ -> success(),
-                                                EvalResult::evalResult),
-                        e1 ->
-                                consequent.safeTest(context, data)
-                                        .match(__ -> evalResult(e1),
-                                                __ -> evalResult(e1),
-                                                e2 -> evalResult(e1.combine(e2))));
+        return antecedent.test(context, data)
+                .match(success -> consequent.test(context, data)
+                                .match(EvalResult::evalResult,
+                                        f1 -> evalResult(createFailure()
+                                                .addCause(f1))),
+                        failure -> consequent.test(context, data)
+                                .match(__ -> evalResult(createFailure()
+                                                .addCause(failure)),
+                                        __ -> success()));
     }
 
     @Override
