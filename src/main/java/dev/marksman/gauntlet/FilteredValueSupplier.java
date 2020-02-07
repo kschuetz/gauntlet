@@ -10,12 +10,12 @@ import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.kraftwerk.Result.result;
 
-final class FilteredSource<A> implements Source<A> {
+final class FilteredValueSupplier<A> implements ValueSupplier<A> {
     private final Generate<A> generateFn;
     private final Fn1<A, Boolean> filter;
     private final int maxDiscards;
 
-    FilteredSource(Generate<A> generateFn, Fn1<A, Boolean> filter, int maxDiscards) {
+    FilteredValueSupplier(Generate<A> generateFn, Fn1<A, Boolean> filter, int maxDiscards) {
         this.generateFn = generateFn;
         this.filter = filter;
         this.maxDiscards = maxDiscards;

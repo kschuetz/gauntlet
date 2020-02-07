@@ -5,14 +5,15 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.optics.Iso;
 import dev.marksman.gauntlet.shrink.Shrink;
 import dev.marksman.kraftwerk.Generator;
+import dev.marksman.kraftwerk.Parameters;
 
 import static com.jnape.palatable.lambda.optics.functions.View.view;
 import static dev.marksman.gauntlet.ConcreteArbitrary.concreteArbitrary;
 
 public interface Arbitrary<A> {
-    Maybe<Shrink<A>> getShrink();
+    ValueSupplier<A> prepare(Parameters parameters);
 
-    int getMaxDiscards();
+    Maybe<Shrink<A>> getShrink();
 
     Fn1<A, String> getPrettyPrinter();
 

@@ -16,8 +16,8 @@ final class UnfilteredGeneratorMaxDiscards<A> implements WrappedGenerator<A> {
     }
 
     @Override
-    public Source<A> prepare(Parameters parameters) {
-        return new UnfilteredSource<>(generator.prepare(parameters));
+    public ValueSupplier<A> prepare(Parameters parameters) {
+        return new UnfilteredValueSupplier<>(generator.prepare(parameters));
     }
 
     @Override
@@ -36,4 +36,10 @@ final class UnfilteredGeneratorMaxDiscards<A> implements WrappedGenerator<A> {
             return this;
         }
     }
+
+    @Override
+    public <B> WrappedGenerator<B> convert(Fn1<A, B> ab, Fn1<B, A> ba) {
+        return new UnfilteredGeneratorMaxDiscards<>(generator.fmap(ab), maxDiscards);
+    }
+
 }

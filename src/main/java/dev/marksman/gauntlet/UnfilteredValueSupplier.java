@@ -5,10 +5,10 @@ import dev.marksman.kraftwerk.Generate;
 import dev.marksman.kraftwerk.Result;
 import dev.marksman.kraftwerk.Seed;
 
-final class UnfilteredSource<A> implements Source<A> {
+final class UnfilteredValueSupplier<A> implements ValueSupplier<A> {
     private final Generate<A> generateFn;
 
-    UnfilteredSource(Generate<A> generateFn) {
+    UnfilteredValueSupplier(Generate<A> generateFn) {
         this.generateFn = generateFn;
     }
 

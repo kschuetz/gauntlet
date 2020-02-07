@@ -14,8 +14,8 @@ final class UnfilteredGenerator<A> implements WrappedGenerator<A> {
     }
 
     @Override
-    public Source<A> prepare(Parameters parameters) {
-        return new UnfilteredSource<>(generator.prepare(parameters));
+    public ValueSupplier<A> prepare(Parameters parameters) {
+        return new UnfilteredValueSupplier<>(generator.prepare(parameters));
     }
 
     @Override
@@ -33,5 +33,10 @@ final class UnfilteredGenerator<A> implements WrappedGenerator<A> {
         } else {
             return this;
         }
+    }
+
+    @Override
+    public <B> WrappedGenerator<B> convert(Fn1<A, B> ab, Fn1<B, A> ba) {
+        return new UnfilteredGenerator<>(generator.fmap(ab));
     }
 }

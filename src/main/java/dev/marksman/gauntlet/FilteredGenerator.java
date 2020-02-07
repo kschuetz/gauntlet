@@ -17,8 +17,8 @@ final class FilteredGenerator<A> implements WrappedGenerator<A> {
     }
 
     @Override
-    public final Source<A> prepare(Parameters parameters) {
-        return new FilteredSource<>(generator.prepare(parameters),
+    public final ValueSupplier<A> prepare(Parameters parameters) {
+        return new FilteredValueSupplier<>(generator.prepare(parameters),
                 filter,
                 maxDiscards);
     }
@@ -40,4 +40,10 @@ final class FilteredGenerator<A> implements WrappedGenerator<A> {
         }
     }
 
+    @Override
+    public <B> WrappedGenerator<B> convert(Fn1<A, B> ab, Fn1<B, A> ba) {
+        return new FilteredGenerator<>(generator.fmap(ab),
+                filter.contraMap(ba),
+                maxDiscards);
+    }
 }
