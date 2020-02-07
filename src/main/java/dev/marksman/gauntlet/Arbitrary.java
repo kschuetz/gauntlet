@@ -10,10 +10,6 @@ import static com.jnape.palatable.lambda.optics.functions.View.view;
 import static dev.marksman.gauntlet.ConcreteArbitrary.concreteArbitrary;
 
 public interface Arbitrary<A> {
-    Generator<A> getGenerator();
-
-    Fn1<A, Boolean> getFilter();
-
     Maybe<Shrink<A>> getShrink();
 
     int getMaxDiscards();
