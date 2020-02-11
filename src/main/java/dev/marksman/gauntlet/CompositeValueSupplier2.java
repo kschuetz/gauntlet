@@ -1,7 +1,6 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Maybe;
-import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.Fn2;
 import dev.marksman.kraftwerk.Result;
 import dev.marksman.kraftwerk.Seed;
@@ -14,15 +13,11 @@ final class CompositeValueSupplier2<A, B, Out> implements ValueSupplier<Out> {
     private final ValueSupplier<A> vsA;
     private final ValueSupplier<B> vsB;
     private final Fn2<A, B, Out> fn;
-    private final Fn1<Out, Boolean> filter;
-    private final int maxDiscards;
 
-    CompositeValueSupplier2(ValueSupplier<A> vsA, ValueSupplier<B> vsB, Fn2<A, B, Out> fn, Fn1<Out, Boolean> filter, int maxDiscards) {
+    CompositeValueSupplier2(ValueSupplier<A> vsA, ValueSupplier<B> vsB, Fn2<A, B, Out> fn) {
         this.vsA = vsA;
         this.vsB = vsB;
         this.fn = fn;
-        this.filter = filter;
-        this.maxDiscards = maxDiscards;
     }
 
     @Override

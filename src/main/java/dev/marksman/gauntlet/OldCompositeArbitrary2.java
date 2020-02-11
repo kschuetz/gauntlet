@@ -10,7 +10,7 @@ import dev.marksman.kraftwerk.Parameters;
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 
-class CompositeArbitrary2<AA, AB, Out> implements Arbitrary<Out> {
+class OldCompositeArbitrary2<AA, AB, Out> implements Arbitrary<Out> {
     private final Arbitrary<AA> componentA;
     private final Arbitrary<AB> componentB;
     private final Maybe<Shrink<Out>> shrink;
@@ -20,7 +20,7 @@ class CompositeArbitrary2<AA, AB, Out> implements Arbitrary<Out> {
     private final FilterChain<Out> filter;
     private final int maxDiscards;
 
-    CompositeArbitrary2(Arbitrary<AA> componentA, Arbitrary<AB> componentB, Maybe<Shrink<Out>> shrink, Fn1<Out, String> prettyPrinter, Fn1<Product2<AA, AB>, Out> toFn, Fn1<Out, Product2<AA, AB>> fromFn, FilterChain<Out> filter, int maxDiscards) {
+    OldCompositeArbitrary2(Arbitrary<AA> componentA, Arbitrary<AB> componentB, Maybe<Shrink<Out>> shrink, Fn1<Out, String> prettyPrinter, Fn1<Product2<AA, AB>, Out> toFn, Fn1<Out, Product2<AA, AB>> fromFn, FilterChain<Out> filter, int maxDiscards) {
         this.componentA = componentA;
         this.componentB = componentB;
         this.shrink = shrink;
@@ -48,19 +48,19 @@ class CompositeArbitrary2<AA, AB, Out> implements Arbitrary<Out> {
 
     @Override
     public Arbitrary<Out> withShrink(Shrink<Out> shrink) {
-        return new CompositeArbitrary2<>(componentA, componentB, just(shrink), prettyPrinter,
+        return new OldCompositeArbitrary2<>(componentA, componentB, just(shrink), prettyPrinter,
                 toFn, fromFn, filter, maxDiscards);
     }
 
     @Override
     public Arbitrary<Out> withNoShrink() {
-        return new CompositeArbitrary2<>(componentA, componentB, nothing(), prettyPrinter,
+        return new OldCompositeArbitrary2<>(componentA, componentB, nothing(), prettyPrinter,
                 toFn, fromFn, filter, maxDiscards);
     }
 
     @Override
     public Arbitrary<Out> suchThat(Fn1<Out, Boolean> predicate) {
-        return new CompositeArbitrary2<>(componentA, componentB, shrink, prettyPrinter,
+        return new OldCompositeArbitrary2<>(componentA, componentB, shrink, prettyPrinter,
                 toFn, fromFn, filter.add(predicate), maxDiscards);
 
     }
@@ -71,7 +71,7 @@ class CompositeArbitrary2<AA, AB, Out> implements Arbitrary<Out> {
             maxDiscards = 0;
         }
         if (maxDiscards != this.maxDiscards) {
-            return new CompositeArbitrary2<>(componentA, componentB, shrink, prettyPrinter,
+            return new OldCompositeArbitrary2<>(componentA, componentB, shrink, prettyPrinter,
                     toFn, fromFn, filter, maxDiscards);
         } else {
             return this;
@@ -80,7 +80,7 @@ class CompositeArbitrary2<AA, AB, Out> implements Arbitrary<Out> {
 
     @Override
     public Arbitrary<Out> withPrettyPrinter(Fn1<Out, String> prettyPrinter) {
-        return new CompositeArbitrary2<>(componentA, componentB, shrink, prettyPrinter,
+        return new OldCompositeArbitrary2<>(componentA, componentB, shrink, prettyPrinter,
                 toFn, fromFn, filter, maxDiscards);
     }
 

@@ -18,9 +18,7 @@ final class FilteredGenerator<A> implements WrappedGenerator<A> {
 
     @Override
     public final ValueSupplier<A> prepare(Parameters parameters) {
-        return new FilteredValueSupplier<>(generator.prepare(parameters),
-                filter,
-                maxDiscards);
+        throw new UnsupportedOperationException();
     }
 
     @Override
