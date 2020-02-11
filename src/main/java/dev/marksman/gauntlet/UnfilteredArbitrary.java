@@ -57,7 +57,14 @@ final class UnfilteredArbitrary<A> implements Arbitrary<A> {
 
     @Override
     public Arbitrary<A> withMaxDiscards(int maxDiscards) {
-        return null;
+        if (maxDiscards < 0) {
+            maxDiscards = 0;
+        }
+        if (maxDiscards != this.maxDiscards) {
+            return new UnfilteredArbitrary<>(generator, shrink, prettyPrinter, maxDiscards);
+        } else {
+            return this;
+        }
     }
 
     @Override
