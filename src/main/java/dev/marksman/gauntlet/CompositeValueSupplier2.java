@@ -22,15 +22,16 @@ final class CompositeValueSupplier2<A, B, Out> implements ValueSupplier<Out> {
 
     @Override
     public Result<Seed, Maybe<Out>> getNext(Seed input) {
-        // TODO: this needs work!
-        Result<Seed, Maybe<A>> r1 = vsA.getNext(input);
-        return r1.getValue()
-                .match(__ -> result(r1.getNextState(), nothing()),
-                        a -> {
-                            Result<Seed, Maybe<B>> r2 = vsB.getNext(r1.getNextState());
-                            return r2.getValue()
-                                    .match(__ -> result(r2.getNextState(), nothing()),
-                                            b -> result(r2.getNextState(), just(fn.apply(a, b))));
-                        });
+        return threadSeed(vsA.getNext(input),
+                (a, s1) -> threadSeed(vsB.getNext(s1),
+                        (b, s2) -> result(s2, just(fn.apply(a, b)))));
     }
+
+    static <A, B> Result<Seed, Maybe<B>> threadSeed(Result<Seed, Maybe<A>> ra,
+                                                    Fn2<A, Seed, Result<Seed, Maybe<B>>> f) {
+        return ra.getValue()
+                .match(__ -> result(ra.getNextState(), nothing()),
+                        a -> f.apply(a, ra.getNextState()));
+    }
+
 }

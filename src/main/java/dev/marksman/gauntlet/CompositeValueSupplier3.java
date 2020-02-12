@@ -6,7 +6,7 @@ import dev.marksman.kraftwerk.Result;
 import dev.marksman.kraftwerk.Seed;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
-import static com.jnape.palatable.lambda.adt.Maybe.nothing;
+import static dev.marksman.gauntlet.CompositeValueSupplier2.threadSeed;
 import static dev.marksman.kraftwerk.Result.result;
 
 final class CompositeValueSupplier3<A, B, C, Out> implements ValueSupplier<Out> {
@@ -24,21 +24,10 @@ final class CompositeValueSupplier3<A, B, C, Out> implements ValueSupplier<Out> 
 
     @Override
     public Result<Seed, Maybe<Out>> getNext(Seed input) {
-        // TODO: this needs work!
-        Result<Seed, Maybe<A>> r1 = vsA.getNext(input);
-        return r1.getValue()
-                .match(__ -> result(r1.getNextState(), nothing()),
-                        a -> {
-                            Result<Seed, Maybe<B>> r2 = vsB.getNext(r1.getNextState());
-                            return r2.getValue()
-                                    .match(__ -> result(r2.getNextState(), nothing()),
-                                            b -> {
-                                                Result<Seed, Maybe<C>> r3 = vsC.getNext(r2.getNextState());
-                                                return r3.getValue()
-                                                        .match(___ -> result(r3.getNextState(), nothing()),
-                                                                c -> result(r3.getNextState(),
-                                                                        just(fn.apply(a, b, c))));
-                                            });
-                        });
+        return threadSeed(vsA.getNext(input),
+                (a, s1) -> threadSeed(vsB.getNext(s1),
+                        (b, s2) -> threadSeed(vsC.getNext(s2),
+                                (c, s3) -> result(s3, just(fn.apply(a, b, c))))));
     }
+
 }
