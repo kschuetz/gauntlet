@@ -16,16 +16,21 @@ final class CompositeValueSupplier2<A, B, Out> implements ValueSupplier<Out> {
 
     @Override
     public GeneratorOutput<Out> getNext(Seed input) {
-        return threadSeed(vsA.getNext(input),
-                (a, s1) -> threadSeed(vsB.getNext(s1),
+        return threadSeed(0,
+                vsA.getNext(input), (a, s1) -> threadSeed(1, vsB.getNext(s1),
                         (b, s2) -> GeneratorOutput.success(s2, fn.apply(a, b))));
 
     }
 
-    static <A, B> GeneratorOutput<B> threadSeed(GeneratorOutput<A> ra,
+    static <A, B> GeneratorOutput<B> threadSeed(int posIndex,
+                                                GeneratorOutput<A> ra,
                                                 Fn2<A, Seed, GeneratorOutput<B>> f) {
         return ra.getValue()
-                .match(gf -> GeneratorOutput.failure(ra.getNextState(), gf),
+                .match(gf -> GeneratorOutput.failure(ra.getNextState(), gf.prepend(positionName(posIndex))),
                         a -> f.apply(a, ra.getNextState()));
+    }
+
+    private static String positionName(int posIndex) {
+        return "position " + (posIndex + 1);
     }
 }

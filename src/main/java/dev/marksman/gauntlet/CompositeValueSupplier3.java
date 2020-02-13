@@ -20,9 +20,9 @@ final class CompositeValueSupplier3<A, B, C, Out> implements ValueSupplier<Out> 
 
     @Override
     public GeneratorOutput<Out> getNext(Seed input) {
-        return threadSeed(vsA.getNext(input),
-                (a, s1) -> threadSeed(vsB.getNext(s1),
-                        (b, s2) -> threadSeed(vsC.getNext(s2),
+        return threadSeed(0,
+                vsA.getNext(input), (a, s1) -> threadSeed(1, vsB.getNext(s1),
+                        (b, s2) -> threadSeed(2, vsC.getNext(s2),
                                 (c, s3) -> GeneratorOutput.success(s3, fn.apply(a, b, c)))));
     }
 }
