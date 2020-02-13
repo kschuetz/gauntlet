@@ -26,8 +26,7 @@ final class UnfilteredArbitrary<A> implements Arbitrary<A> {
 
     @Override
     public ValueSupplier<A> prepare(Parameters parameters) {
-        return new UnfilteredValueSupplier<>(generator.prepare(parameters),
-                generator.getLabel().orElse(generator.toString()));
+        return new UnfilteredValueSupplier<>(generator.prepare(parameters));
     }
 
     @Override
