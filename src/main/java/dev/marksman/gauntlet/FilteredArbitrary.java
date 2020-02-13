@@ -1,6 +1,7 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Maybe;
+import com.jnape.palatable.lambda.functions.Fn0;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.gauntlet.shrink.Shrink;
 import dev.marksman.gauntlet.util.FilterChain;
@@ -10,17 +11,19 @@ final class FilteredArbitrary<A> implements Arbitrary<A> {
     private final Arbitrary<A> underlying;
     private final FilterChain<A> filter;
     private final int maxDiscards;
+    private final Fn0<String> labelSupplier;
 
-    private FilteredArbitrary(Arbitrary<A> underlying, FilterChain<A> filter, int maxDiscards) {
+    private FilteredArbitrary(Arbitrary<A> underlying, FilterChain<A> filter, int maxDiscards, Fn0<String> labelSupplier) {
         this.underlying = underlying;
         this.filter = filter;
         this.maxDiscards = maxDiscards;
+        this.labelSupplier = labelSupplier;
     }
 
     @Override
     public final ValueSupplier<A> prepare(Parameters parameters) {
         return new FilteredValueSupplier<>(underlying.prepare(parameters),
-                filter, maxDiscards, this::getLabel);
+                filter, maxDiscards, labelSupplier);
     }
 
     @Override
@@ -34,23 +37,18 @@ final class FilteredArbitrary<A> implements Arbitrary<A> {
     }
 
     @Override
-    public String getLabel() {
-        return underlying.getLabel();
-    }
-
-    @Override
     public Arbitrary<A> withShrink(Shrink<A> shrink) {
-        return new FilteredArbitrary<>(underlying.withShrink(shrink), filter, maxDiscards);
+        return new FilteredArbitrary<>(underlying.withShrink(shrink), filter, maxDiscards, labelSupplier);
     }
 
     @Override
     public Arbitrary<A> withNoShrink() {
-        return new FilteredArbitrary<>(underlying.withNoShrink(), filter, maxDiscards);
+        return new FilteredArbitrary<>(underlying.withNoShrink(), filter, maxDiscards, labelSupplier);
     }
 
     @Override
     public Arbitrary<A> suchThat(Fn1<A, Boolean> predicate) {
-        return new FilteredArbitrary<>(underlying, filter.add(predicate), maxDiscards);
+        return new FilteredArbitrary<>(underlying, filter.add(predicate), maxDiscards, labelSupplier);
     }
 
     @Override
@@ -59,7 +57,7 @@ final class FilteredArbitrary<A> implements Arbitrary<A> {
             maxDiscards = 0;
         }
         if (maxDiscards != this.maxDiscards) {
-            return new FilteredArbitrary<>(underlying, filter, maxDiscards);
+            return new FilteredArbitrary<>(underlying, filter, maxDiscards, labelSupplier);
         } else {
             return this;
         }
@@ -68,19 +66,20 @@ final class FilteredArbitrary<A> implements Arbitrary<A> {
     @Override
     public Arbitrary<A> withPrettyPrinter(Fn1<A, String> prettyPrinter) {
         return new FilteredArbitrary<>(underlying.withPrettyPrinter(prettyPrinter),
-                filter, maxDiscards);
+                filter, maxDiscards, labelSupplier);
     }
 
     @Override
     public <B> Arbitrary<B> convert(Fn1<A, B> ab, Fn1<B, A> ba) {
         return new FilteredArbitrary<>(underlying.convert(ab, ba),
                 filter.contraMap(ba),
-                maxDiscards);
+                maxDiscards, labelSupplier);
     }
 
     static <A> FilteredArbitrary<A> filteredArbitrary(Arbitrary<A> underlying,
                                                       FilterChain<A> filter,
-                                                      int maxDiscards) {
-        return new FilteredArbitrary<>(underlying, filter, maxDiscards);
+                                                      int maxDiscards,
+                                                      Fn0<String> labelSupplier) {
+        return new FilteredArbitrary<>(underlying, filter, maxDiscards, labelSupplier);
     }
 }

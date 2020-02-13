@@ -40,11 +40,6 @@ final class UnfilteredArbitrary<A> implements Arbitrary<A> {
     }
 
     @Override
-    public String getLabel() {
-        return generator.getLabel().orElseGet(generator::toString);
-    }
-
-    @Override
     public Arbitrary<A> withShrink(Shrink<A> shrink) {
         return new UnfilteredArbitrary<>(generator, just(shrink), prettyPrinter, maxDiscards);
     }
@@ -57,7 +52,7 @@ final class UnfilteredArbitrary<A> implements Arbitrary<A> {
 
     @Override
     public Arbitrary<A> suchThat(Fn1<A, Boolean> predicate) {
-        return filteredArbitrary(this, filterChain(predicate), maxDiscards);
+        return filteredArbitrary(this, filterChain(predicate), maxDiscards, this::getLabel);
     }
 
     @Override
@@ -84,6 +79,10 @@ final class UnfilteredArbitrary<A> implements Arbitrary<A> {
                 prettyPrinter.contraMap(ba),
                 maxDiscards);
 
+    }
+
+    private String getLabel() {
+        return generator.getLabel().orElseGet(generator::toString);
     }
 
     static <A> UnfilteredArbitrary<A> unfilteredArbitrary(Generator<A> generator) {

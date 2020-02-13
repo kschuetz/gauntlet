@@ -46,11 +46,6 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
     }
 
     @Override
-    public String getLabel() {
-        return labelSupplier.apply();
-    }
-
-    @Override
     public Arbitrary<A> withShrink(Shrink<A> shrink) {
         return new ConcreteArbitrary<>(generator, just(shrink), prettyPrinter, maxDiscards, labelSupplier);
     }
@@ -63,7 +58,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
 
     @Override
     public Arbitrary<A> suchThat(Fn1<A, Boolean> predicate) {
-        return filteredArbitrary(this, filterChain(predicate), maxDiscards);
+        return filteredArbitrary(this, filterChain(predicate), maxDiscards, labelSupplier);
     }
 
     @Override

@@ -27,8 +27,6 @@ public interface Arbitrary<A> {
 
     Arbitrary<A> withPrettyPrinter(Fn1<A, String> prettyPrinter);
 
-    String getLabel();
-
     <B> Arbitrary<B> convert(Fn1<A, B> ab, Fn1<B, A> ba);
 
     default <B> Arbitrary<B> convert(Iso<A, A, B, B> iso) {
