@@ -1,7 +1,7 @@
 package dev.marksman.gauntlet;
 
-import com.jnape.palatable.lambda.adt.product.Product2;
-import com.jnape.palatable.lambda.functions.Fn1;
+import com.jnape.palatable.lambda.adt.hlist.Tuple2;
+import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkInt;
@@ -22,13 +22,16 @@ public final class Arbitraries {
     }
 
 
-    public static <A, B, Out> Arbitrary<Out> combine(Fn1<Product2<A, B>, Out> to,
-                                                     Fn1<Out, Product2<A, B>> from,
-                                                     Arbitrary<A> a,
-                                                     Arbitrary<B> b) {
-        // TODO: replace WrappedGenerator abstraction;  filters should not be coupled with generators
-
-        return null;
+    public static <A, B> Arbitrary<Tuple2<A, B>> combine(Arbitrary<A> a,
+                                                         Arbitrary<B> b) {
+        return CompositeArbitraries.combine2(a, b);
     }
+
+    public static <A, B, C> Arbitrary<Tuple3<A, B, C>> combine(Arbitrary<A> a,
+                                                               Arbitrary<B> b,
+                                                               Arbitrary<C> c) {
+        return CompositeArbitraries.combine3(a, b, c);
+    }
+
 
 }
