@@ -1,15 +1,10 @@
 package dev.marksman.gauntlet;
 
-import com.jnape.palatable.lambda.adt.Either;
-import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.functions.Fn0;
 import com.jnape.palatable.lambda.functions.Fn1;
-import dev.marksman.kraftwerk.Result;
 import dev.marksman.kraftwerk.Seed;
 
-import static com.jnape.palatable.lambda.adt.Maybe.just;
-import static com.jnape.palatable.lambda.adt.Maybe.nothing;
-import static dev.marksman.kraftwerk.Result.result;
+import static dev.marksman.gauntlet.GeneratorFailure.generatorFailure;
 
 final class FilteredValueSupplier<A> implements ValueSupplier<A> {
     private final ValueSupplier<A> underlying;
@@ -25,36 +20,26 @@ final class FilteredValueSupplier<A> implements ValueSupplier<A> {
     }
 
     @Override
-    public Result<Seed, Maybe<A>> getNext(Seed input) {
+    public GeneratorOutput<A> getNext(Seed input) {
         int discardsRemaining = maxDiscards;
         Seed state = input;
         while (discardsRemaining >= 0) {
-            Result<Seed, Maybe<A>> current = underlying.getNext(state);
-            Maybe<A> maybeValue = current.getValue();
-            if (!maybeValue.match(__ -> true, __ -> false)) {
+            GeneratorOutput<A> current = underlying.getNext(state);
+            if (current.isFailure()) {
                 return current;
             }
 
-            A value = maybeValue.orElse(null);
+            A value = current.getValue().orThrow(AssertionError::new);
 
             if (filter.apply(value)) {
-                return result(current._1(), just(value));
+                return current;
             } else {
                 discardsRemaining -= 1;
-                state = current._1();
+                state = current.getNextState();
             }
         }
 
-        return result(state, nothing());
-    }
-
-    @Override
-    public Result<Seed, Either<GeneratorFailure, A>> getNext2(Seed input) {
-        return null;
-    }
-
-    @Override
-    public GeneratorOutput<A> getNext3(Seed input) {
-        return null;
+        return GeneratorOutput.failure(state, generatorFailure(labelSupplier.apply(),
+                maxDiscards));
     }
 }

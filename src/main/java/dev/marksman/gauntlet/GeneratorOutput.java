@@ -1,6 +1,8 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Either;
+import com.jnape.palatable.lambda.functions.Fn1;
+import com.jnape.palatable.lambda.functor.Functor;
 import dev.marksman.kraftwerk.Result;
 import dev.marksman.kraftwerk.Seed;
 import lombok.AccessLevel;
@@ -12,9 +14,18 @@ import static com.jnape.palatable.lambda.adt.Either.right;
 
 @Value
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class GeneratorOutput<A> {
+public final class GeneratorOutput<A> implements Functor<A, GeneratorOutput<?>> {
     private final Seed nextState;
     private final Either<GeneratorFailure, A> value;
+
+    public final boolean isFailure() {
+        return value.match(__ -> true, __ -> false);
+    }
+
+    @Override
+    public <B> GeneratorOutput<B> fmap(Fn1<? super A, ? extends B> fn) {
+        return generatorOutput(nextState, value.fmap(fn));
+    }
 
     static <A> GeneratorOutput<A> generatorOutput(Seed nextState, Either<GeneratorFailure, A> value) {
         return new GeneratorOutput<>(nextState, value);

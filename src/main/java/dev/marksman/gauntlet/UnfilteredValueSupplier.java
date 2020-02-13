@@ -1,12 +1,7 @@
 package dev.marksman.gauntlet;
 
-import com.jnape.palatable.lambda.adt.Either;
-import com.jnape.palatable.lambda.adt.Maybe;
 import dev.marksman.kraftwerk.Generate;
-import dev.marksman.kraftwerk.Result;
 import dev.marksman.kraftwerk.Seed;
-
-import static com.jnape.palatable.lambda.adt.Either.right;
 
 final class UnfilteredValueSupplier<A> implements ValueSupplier<A> {
     private final Generate<A> generateFn;
@@ -17,20 +12,8 @@ final class UnfilteredValueSupplier<A> implements ValueSupplier<A> {
         this.generatorLabel = generatorLabel;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public Result<Seed, Maybe<A>> getNext(Seed input) {
-        return (Result<Seed, Maybe<A>>) generateFn.apply(input).fmap(Maybe::just);
-    }
-
-    @Override
-    public Result<Seed, Either<GeneratorFailure, A>> getNext2(Seed input) {
-        Result<? extends Seed, A> r = generateFn.apply(input);
-        return Result.result(r._1(), right(r._2()));
-    }
-
-    @Override
-    public GeneratorOutput<A> getNext3(Seed input) {
+    public GeneratorOutput<A> getNext(Seed input) {
         return GeneratorOutput.success(generateFn.apply(input));
     }
 }

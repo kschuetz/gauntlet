@@ -1,10 +1,7 @@
 package dev.marksman.gauntlet;
 
-import com.jnape.palatable.lambda.adt.Either;
-import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.gauntlet.util.MapperChain;
-import dev.marksman.kraftwerk.Result;
 import dev.marksman.kraftwerk.Seed;
 
 final class MappedValueSupplier<A, B> implements ValueSupplier<B> {
@@ -18,19 +15,9 @@ final class MappedValueSupplier<A, B> implements ValueSupplier<B> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Result<Seed, Maybe<B>> getNext(Seed input) {
+    public GeneratorOutput<B> getNext(Seed input) {
         return underlying.getNext(input)
-                .fmap(x -> (Maybe<B>) x.fmap(mapperChain.getFn()));
-    }
-
-    @Override
-    public Result<Seed, Either<GeneratorFailure, B>> getNext2(Seed input) {
-        return null;
-    }
-
-    @Override
-    public GeneratorOutput<B> getNext3(Seed input) {
-        return null;
+                .fmap(a -> (B) mapperChain.getFn().apply(a));
     }
 
     @SuppressWarnings("unchecked")
