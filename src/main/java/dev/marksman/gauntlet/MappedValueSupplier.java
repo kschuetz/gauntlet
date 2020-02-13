@@ -28,6 +28,11 @@ final class MappedValueSupplier<A, B> implements ValueSupplier<B> {
         return null;
     }
 
+    @Override
+    public GeneratorOutput<B> getNext3(Seed input) {
+        return null;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public <B1> ValueSupplier<B1> fmap(Fn1<? super B, ? extends B1> fn) {

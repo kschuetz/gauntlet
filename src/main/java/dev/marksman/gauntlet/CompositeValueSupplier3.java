@@ -35,4 +35,9 @@ final class CompositeValueSupplier3<A, B, C, Out> implements ValueSupplier<Out> 
     public Result<Seed, Either<GeneratorFailure, Out>> getNext2(Seed input) {
         return null;
     }
+
+    @Override
+    public GeneratorOutput<Out> getNext3(Seed input) {
+        return null;
+    }
 }

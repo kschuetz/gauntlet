@@ -7,6 +7,7 @@ import dev.marksman.kraftwerk.Result;
 import dev.marksman.kraftwerk.Seed;
 
 import static com.jnape.palatable.lambda.adt.Either.right;
+import static dev.marksman.gauntlet.GeneratorOutput.generatorOutput;
 
 final class UnfilteredValueSupplier<A> implements ValueSupplier<A> {
     private final Generate<A> generateFn;
@@ -27,5 +28,10 @@ final class UnfilteredValueSupplier<A> implements ValueSupplier<A> {
     public Result<Seed, Either<GeneratorFailure, A>> getNext2(Seed input) {
         Result<? extends Seed, A> r = generateFn.apply(input);
         return Result.result(r._1(), right(r._2()));
+    }
+
+    @Override
+    public GeneratorOutput<A> getNext3(Seed input) {
+        return generatorOutput(generateFn.apply(input));
     }
 }

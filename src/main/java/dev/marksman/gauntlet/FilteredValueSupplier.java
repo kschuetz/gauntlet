@@ -52,4 +52,9 @@ final class FilteredValueSupplier<A> implements ValueSupplier<A> {
     public Result<Seed, Either<GeneratorFailure, A>> getNext2(Seed input) {
         return null;
     }
+
+    @Override
+    public GeneratorOutput<A> getNext3(Seed input) {
+        return null;
+    }
 }

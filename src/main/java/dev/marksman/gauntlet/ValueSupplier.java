@@ -15,6 +15,8 @@ public interface ValueSupplier<A> extends Functor<A, ValueSupplier<?>> {
 
     Result<Seed, Either<GeneratorFailure, A>> getNext2(Seed input);
 
+    GeneratorOutput<A> getNext3(Seed input);
+
     @Override
     default <B> ValueSupplier<B> fmap(Fn1<? super A, ? extends B> fn) {
         return mappedValueSupplier(fn, this);
