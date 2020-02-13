@@ -8,6 +8,7 @@ import dev.marksman.kraftwerk.Seed;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static dev.marksman.gauntlet.CompositeValueSupplier2.threadSeed;
+import static dev.marksman.gauntlet.CompositeValueSupplier2.threadSeed3;
 import static dev.marksman.kraftwerk.Result.result;
 
 final class CompositeValueSupplier3<A, B, C, Out> implements ValueSupplier<Out> {
@@ -38,6 +39,9 @@ final class CompositeValueSupplier3<A, B, C, Out> implements ValueSupplier<Out> 
 
     @Override
     public GeneratorOutput<Out> getNext3(Seed input) {
-        return null;
+        return threadSeed3(vsA.getNext3(input),
+                (a, s1) -> threadSeed3(vsB.getNext3(s1),
+                        (b, s2) -> threadSeed3(vsC.getNext3(s2),
+                                (c, s3) -> GeneratorOutput.success(s3, fn.apply(a, b, c)))));
     }
 }

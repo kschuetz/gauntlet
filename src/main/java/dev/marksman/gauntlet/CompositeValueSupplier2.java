@@ -56,4 +56,11 @@ final class CompositeValueSupplier2<A, B, Out> implements ValueSupplier<Out> {
                 .match(gf -> result(ra.getNextState(), left(gf)),
                         a -> f.apply(a, ra.getNextState()));
     }
+
+    static <A, B> GeneratorOutput<B> threadSeed3(GeneratorOutput<A> ra,
+                                                 Fn2<A, Seed, GeneratorOutput<B>> f) {
+        return ra.getValue()
+                .match(gf -> GeneratorOutput.failure(ra.getNextState(), gf),
+                        a -> f.apply(a, ra.getNextState()));
+    }
 }
