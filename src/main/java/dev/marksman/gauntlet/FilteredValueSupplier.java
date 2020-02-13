@@ -1,6 +1,8 @@
 package dev.marksman.gauntlet;
 
+import com.jnape.palatable.lambda.adt.Either;
 import com.jnape.palatable.lambda.adt.Maybe;
+import com.jnape.palatable.lambda.functions.Fn0;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.kraftwerk.Result;
 import dev.marksman.kraftwerk.Seed;
@@ -13,11 +15,13 @@ final class FilteredValueSupplier<A> implements ValueSupplier<A> {
     private final ValueSupplier<A> underlying;
     private final Fn1<A, Boolean> filter;
     private final int maxDiscards;
+    private final Fn0<String> labelSupplier;
 
-    FilteredValueSupplier(ValueSupplier<A> underlying, Fn1<A, Boolean> filter, int maxDiscards) {
+    FilteredValueSupplier(ValueSupplier<A> underlying, Fn1<A, Boolean> filter, int maxDiscards, Fn0<String> labelSupplier) {
         this.underlying = underlying;
         this.filter = filter;
         this.maxDiscards = maxDiscards;
+        this.labelSupplier = labelSupplier;
     }
 
     @Override
@@ -42,5 +46,10 @@ final class FilteredValueSupplier<A> implements ValueSupplier<A> {
         }
 
         return result(state, nothing());
+    }
+
+    @Override
+    public Result<Seed, Either<GeneratorFailure, A>> getNext2(Seed input) {
+        return null;
     }
 }

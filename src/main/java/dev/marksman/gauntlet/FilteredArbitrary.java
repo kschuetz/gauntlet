@@ -20,7 +20,7 @@ final class FilteredArbitrary<A> implements Arbitrary<A> {
     @Override
     public final ValueSupplier<A> prepare(Parameters parameters) {
         return new FilteredValueSupplier<>(underlying.prepare(parameters),
-                filter, maxDiscards);
+                filter, maxDiscards, this::getLabel);
     }
 
     @Override
@@ -31,6 +31,11 @@ final class FilteredArbitrary<A> implements Arbitrary<A> {
     @Override
     public Fn1<A, String> getPrettyPrinter() {
         return underlying.getPrettyPrinter();
+    }
+
+    @Override
+    public String getLabel() {
+        return underlying.getLabel();
     }
 
     @Override

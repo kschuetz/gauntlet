@@ -26,7 +26,8 @@ final class UnfilteredArbitrary<A> implements Arbitrary<A> {
 
     @Override
     public ValueSupplier<A> prepare(Parameters parameters) {
-        return new UnfilteredValueSupplier<>(generator.prepare(parameters));
+        return new UnfilteredValueSupplier<>(generator.prepare(parameters),
+                generator.getLabel().orElse(generator.toString()));
     }
 
     @Override
@@ -37,6 +38,11 @@ final class UnfilteredArbitrary<A> implements Arbitrary<A> {
     @Override
     public Fn1<A, String> getPrettyPrinter() {
         return prettyPrinter;
+    }
+
+    @Override
+    public String getLabel() {
+        return generator.getLabel().orElseGet(generator::toString);
     }
 
     @Override

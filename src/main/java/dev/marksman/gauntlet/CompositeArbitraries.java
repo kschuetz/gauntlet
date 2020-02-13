@@ -27,7 +27,7 @@ final class CompositeArbitraries {
                         b.prepare(parameters),
                         toFn),
                 combineShrinks(a.getShrink(), b.getShrink(), toFn),
-                combinePrettyPrinters(a.getPrettyPrinter(), b.getPrettyPrinter()));
+                combinePrettyPrinters(a.getPrettyPrinter(), b.getPrettyPrinter()), () -> "TODO");
     }
 
     static <A, B, C> Arbitrary<Tuple3<A, B, C>> combine3(Arbitrary<A> a,
@@ -41,7 +41,7 @@ final class CompositeArbitraries {
                         c.prepare(parameters),
                         toFn),
                 combineShrinks(a.getShrink(), b.getShrink(), c.getShrink(), toFn),
-                combinePrettyPrinters(a.getPrettyPrinter(), b.getPrettyPrinter(), c.getPrettyPrinter()));
+                combinePrettyPrinters(a.getPrettyPrinter(), b.getPrettyPrinter(), c.getPrettyPrinter()), () -> "TODO");
     }
 
 

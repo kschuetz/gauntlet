@@ -1,5 +1,6 @@
 package dev.marksman.gauntlet;
 
+import com.jnape.palatable.lambda.adt.Either;
 import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.functions.Fn2;
 import dev.marksman.kraftwerk.Result;
@@ -25,6 +26,11 @@ final class CompositeValueSupplier2<A, B, Out> implements ValueSupplier<Out> {
         return threadSeed(vsA.getNext(input),
                 (a, s1) -> threadSeed(vsB.getNext(s1),
                         (b, s2) -> result(s2, just(fn.apply(a, b)))));
+    }
+
+    @Override
+    public Result<Seed, Either<GeneratorFailure, Out>> getNext2(Seed input) {
+        return null;
     }
 
     static <A, B> Result<Seed, Maybe<B>> threadSeed(Result<Seed, Maybe<A>> ra,
