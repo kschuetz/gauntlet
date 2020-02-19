@@ -42,4 +42,6 @@ final class FilteredValueSupplier<A> implements ValueSupplier<A> {
         return GeneratorOutput.failure(state, generatorFailure(labelSupplier.apply(),
                 maxDiscards));
     }
+
+    // TODO: use types to build a path rather than using labels
 }
