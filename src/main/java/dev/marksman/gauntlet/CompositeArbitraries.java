@@ -18,8 +18,8 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkProducts.shrink3;
 
 final class CompositeArbitraries {
 
-    static <A, B> Arbitrary<Tuple2<A, B>> combine2(Arbitrary<A> a,
-                                                   Arbitrary<B> b) {
+    static <A, B> Arbitrary<Tuple2<A, B>> combine(Arbitrary<A> a,
+                                                  Arbitrary<B> b) {
 
         Fn2<A, B, Tuple2<A, B>> toFn = HList::tuple;
 
@@ -27,12 +27,14 @@ final class CompositeArbitraries {
                         b.prepare(parameters),
                         toFn),
                 combineShrinks(a.getShrink(), b.getShrink(), toFn),
-                combinePrettyPrinters(a.getPrettyPrinter(), b.getPrettyPrinter()), () -> "TODO");
+                combinePrettyPrinters(a.getPrettyPrinter(), b.getPrettyPrinter()),
+                () -> combinedLabel(a.getLabel(),
+                        b.getLabel()));
     }
 
-    static <A, B, C> Arbitrary<Tuple3<A, B, C>> combine3(Arbitrary<A> a,
-                                                         Arbitrary<B> b,
-                                                         Arbitrary<C> c) {
+    static <A, B, C> Arbitrary<Tuple3<A, B, C>> combine(Arbitrary<A> a,
+                                                        Arbitrary<B> b,
+                                                        Arbitrary<C> c) {
 
         Fn3<A, B, C, Tuple3<A, B, C>> toFn = HList::tuple;
 
@@ -41,7 +43,10 @@ final class CompositeArbitraries {
                         c.prepare(parameters),
                         toFn),
                 combineShrinks(a.getShrink(), b.getShrink(), c.getShrink(), toFn),
-                combinePrettyPrinters(a.getPrettyPrinter(), b.getPrettyPrinter(), c.getPrettyPrinter()), () -> "TODO");
+                combinePrettyPrinters(a.getPrettyPrinter(), b.getPrettyPrinter(), c.getPrettyPrinter()),
+                () -> combinedLabel(a.getLabel(),
+                        b.getLabel(),
+                        c.getLabel()));
     }
 
 
@@ -86,4 +91,8 @@ final class CompositeArbitraries {
         return t -> tuple(ppA.apply(t._1()), ppB.apply(t._2()), ppC.apply(t._3())).toString();
     }
 
+
+    private static String combinedLabel(String... components) {
+        return "(" + String.join(", ", components) + ")";
+    }
 }

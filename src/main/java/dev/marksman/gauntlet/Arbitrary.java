@@ -10,8 +10,7 @@ import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.Parameters;
 
 import static com.jnape.palatable.lambda.optics.functions.View.view;
-import static dev.marksman.gauntlet.CompositeArbitraries.combine2;
-import static dev.marksman.gauntlet.CompositeArbitraries.combine3;
+import static dev.marksman.gauntlet.CompositeArbitraries.combine;
 import static dev.marksman.gauntlet.ConcreteArbitrary.concreteArbitrary;
 
 public interface Arbitrary<A> {
@@ -20,6 +19,8 @@ public interface Arbitrary<A> {
     Maybe<Shrink<A>> getShrink();
 
     Fn1<A, String> getPrettyPrinter();
+
+    String getLabel();
 
     Arbitrary<A> withShrink(Shrink<A> shrink);
 
@@ -40,11 +41,11 @@ public interface Arbitrary<A> {
     }
 
     default Arbitrary<Tuple2<A, A>> pair() {
-        return combine2(this, this);
+        return combine(this, this);
     }
 
     default Arbitrary<Tuple3<A, A, A>> triple() {
-        return combine3(this, this, this);
+        return CompositeArbitraries.combine(this, this, this);
     }
 
     static <A> Arbitrary<A> arbitrary(Generator<A> generator) {

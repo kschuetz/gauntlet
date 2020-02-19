@@ -23,14 +23,14 @@ public final class Gauntlet {
 
     public static <A, B> GeneratorTestBuilder<Tuple2<A, B>> all(Arbitrary<A> generatorA,
                                                                 Arbitrary<B> generatorB) {
-        return generatorTestBuilder1(CompositeArbitraries.combine2(generatorA, generatorB),
+        return generatorTestBuilder1(CompositeArbitraries.combine(generatorA, generatorB),
                 DEFAULT_SAMPLE_COUNT);
     }
 
     public static <A, B, C> GeneratorTestBuilder<Tuple3<A, B, C>> all(Arbitrary<A> generatorA,
                                                                       Arbitrary<B> generatorB,
                                                                       Arbitrary<C> generatorC) {
-        return generatorTestBuilder1(CompositeArbitraries.combine3(generatorA, generatorB, generatorC),
+        return generatorTestBuilder1(CompositeArbitraries.combine(generatorA, generatorB, generatorC),
                 DEFAULT_SAMPLE_COUNT);
     }
 

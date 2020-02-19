@@ -24,13 +24,13 @@ public final class Arbitraries {
 
     public static <A, B> Arbitrary<Tuple2<A, B>> combine(Arbitrary<A> a,
                                                          Arbitrary<B> b) {
-        return CompositeArbitraries.combine2(a, b);
+        return CompositeArbitraries.combine(a, b);
     }
 
     public static <A, B, C> Arbitrary<Tuple3<A, B, C>> combine(Arbitrary<A> a,
                                                                Arbitrary<B> b,
                                                                Arbitrary<C> c) {
-        return CompositeArbitraries.combine3(a, b, c);
+        return CompositeArbitraries.combine(a, b, c);
     }
 
 
