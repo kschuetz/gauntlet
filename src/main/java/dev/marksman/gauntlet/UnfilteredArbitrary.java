@@ -2,23 +2,27 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.functions.Fn1;
+import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.shrink.Shrink;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.Parameters;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
+import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
 import static dev.marksman.gauntlet.FilteredArbitrary.filteredArbitrary;
 import static dev.marksman.gauntlet.util.FilterChain.filterChain;
 
 final class UnfilteredArbitrary<A> implements Arbitrary<A> {
     private final Generator<A> generator;
+    private final ImmutableFiniteIterable<Fn1<Parameters, Parameters>> parameterTransforms;
     private final Maybe<Shrink<A>> shrink;
     private final Fn1<A, String> prettyPrinter;
     private final int maxDiscards;
 
-    private UnfilteredArbitrary(Generator<A> generator, Maybe<Shrink<A>> shrink, Fn1<A, String> prettyPrinter, int maxDiscards) {
+    private UnfilteredArbitrary(Generator<A> generator, ImmutableFiniteIterable<Fn1<Parameters, Parameters>> parameterTransforms, Maybe<Shrink<A>> shrink, Fn1<A, String> prettyPrinter, int maxDiscards) {
         this.generator = generator;
+        this.parameterTransforms = parameterTransforms;
         this.shrink = shrink;
         this.prettyPrinter = prettyPrinter;
         this.maxDiscards = maxDiscards;
@@ -26,7 +30,8 @@ final class UnfilteredArbitrary<A> implements Arbitrary<A> {
 
     @Override
     public ValueSupplier<A> prepare(Parameters parameters) {
-        return new UnfilteredValueSupplier<>(generator.prepare(parameters));
+        Parameters transformedParameters = parameterTransforms.foldLeft((acc, f) -> f.apply(acc), parameters);
+        return new UnfilteredValueSupplier<>(generator.prepare(transformedParameters));
     }
 
     @Override
@@ -41,13 +46,13 @@ final class UnfilteredArbitrary<A> implements Arbitrary<A> {
 
     @Override
     public Arbitrary<A> withShrink(Shrink<A> shrink) {
-        return new UnfilteredArbitrary<>(generator, just(shrink), prettyPrinter, maxDiscards);
+        return new UnfilteredArbitrary<>(generator, parameterTransforms, just(shrink), prettyPrinter, maxDiscards);
     }
 
     @Override
     public Arbitrary<A> withNoShrink() {
         return shrink.match(__ -> this,
-                __ -> new UnfilteredArbitrary<>(generator, nothing(), prettyPrinter, maxDiscards));
+                __ -> new UnfilteredArbitrary<>(generator, parameterTransforms, nothing(), prettyPrinter, maxDiscards));
     }
 
     @Override
@@ -61,7 +66,7 @@ final class UnfilteredArbitrary<A> implements Arbitrary<A> {
             maxDiscards = 0;
         }
         if (maxDiscards != this.maxDiscards) {
-            return new UnfilteredArbitrary<>(generator, shrink, prettyPrinter, maxDiscards);
+            return new UnfilteredArbitrary<>(generator, parameterTransforms, shrink, prettyPrinter, maxDiscards);
         } else {
             return this;
         }
@@ -69,16 +74,21 @@ final class UnfilteredArbitrary<A> implements Arbitrary<A> {
 
     @Override
     public Arbitrary<A> withPrettyPrinter(Fn1<A, String> prettyPrinter) {
-        return new UnfilteredArbitrary<>(generator, shrink, prettyPrinter, maxDiscards);
+        return new UnfilteredArbitrary<>(generator, parameterTransforms, shrink, prettyPrinter, maxDiscards);
     }
 
     @Override
     public <B> Arbitrary<B> convert(Fn1<A, B> ab, Fn1<B, A> ba) {
         return new UnfilteredArbitrary<>(generator.fmap(ab),
-                shrink.fmap(s -> s.convert(ab, ba)),
+                parameterTransforms, shrink.fmap(s -> s.convert(ab, ba)),
                 prettyPrinter.contraMap(ba),
                 maxDiscards);
 
+    }
+
+    @Override
+    public Arbitrary<A> modifyGeneratorParameters(Fn1<Parameters, Parameters> modifyFn) {
+        return new UnfilteredArbitrary<>(generator, parameterTransforms.append(modifyFn), shrink, prettyPrinter, maxDiscards);
     }
 
     private String getLabel() {
@@ -86,6 +96,6 @@ final class UnfilteredArbitrary<A> implements Arbitrary<A> {
     }
 
     static <A> UnfilteredArbitrary<A> unfilteredArbitrary(Generator<A> generator) {
-        return new UnfilteredArbitrary<>(generator, nothing(), Object::toString, Gauntlet.DEFAULT_MAX_DISCARDS);
+        return new UnfilteredArbitrary<>(generator, emptyImmutableFiniteIterable(), nothing(), Object::toString, Gauntlet.DEFAULT_MAX_DISCARDS);
     }
 }

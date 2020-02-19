@@ -76,6 +76,12 @@ final class FilteredArbitrary<A> implements Arbitrary<A> {
                 maxDiscards, labelSupplier);
     }
 
+    @Override
+    public Arbitrary<A> modifyGeneratorParameters(Fn1<Parameters, Parameters> modifyFn) {
+        return new FilteredArbitrary<>(underlying.modifyGeneratorParameters(modifyFn),
+                filter, maxDiscards, labelSupplier);
+    }
+
     static <A> FilteredArbitrary<A> filteredArbitrary(Arbitrary<A> underlying,
                                                       FilterChain<A> filter,
                                                       int maxDiscards,

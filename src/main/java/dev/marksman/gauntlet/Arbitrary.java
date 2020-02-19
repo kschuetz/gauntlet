@@ -29,6 +29,8 @@ public interface Arbitrary<A> {
 
     <B> Arbitrary<B> convert(Fn1<A, B> ab, Fn1<B, A> ba);
 
+    Arbitrary<A> modifyGeneratorParameters(Fn1<Parameters, Parameters> modifyFn);
+
     default <B> Arbitrary<B> convert(Iso<A, A, B, B> iso) {
         return convert(view(iso), view(iso.mirror()));
     }
