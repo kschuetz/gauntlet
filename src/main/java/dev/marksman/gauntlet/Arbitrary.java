@@ -8,7 +8,7 @@ import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.Parameters;
 
 import static com.jnape.palatable.lambda.optics.functions.View.view;
-import static dev.marksman.gauntlet.UnfilteredArbitrary.unfilteredArbitrary;
+import static dev.marksman.gauntlet.ConcreteArbitrary.concreteArbitrary;
 
 public interface Arbitrary<A> {
     ValueSupplier<A> prepare(Parameters parameters);
@@ -36,7 +36,7 @@ public interface Arbitrary<A> {
     }
 
     static <A> Arbitrary<A> arbitrary(Generator<A> generator) {
-        return unfilteredArbitrary(generator);
+        return concreteArbitrary(generator);
     }
 
 }

@@ -5,6 +5,7 @@ import com.jnape.palatable.lambda.functions.Fn0;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.shrink.Shrink;
+import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.Parameters;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
@@ -106,4 +107,8 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                 labelSupplier);
     }
 
+    static <A> Arbitrary<A> concreteArbitrary(Generator<A> generator) {
+        return concreteArbitrary(p -> new UnfilteredValueSupplier<>(generator.prepare(p)),
+                nothing(), Object::toString, () -> generator.getLabel().orElseGet(generator::toString));
+    }
 }
