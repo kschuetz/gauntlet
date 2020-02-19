@@ -9,7 +9,7 @@ import dev.marksman.kraftwerk.Parameters;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
-import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
+import static dev.marksman.gauntlet.ConcreteArbitrary.concreteArbitrary;
 import static dev.marksman.gauntlet.FilteredArbitrary.filteredArbitrary;
 import static dev.marksman.gauntlet.util.FilterChain.filterChain;
 
@@ -95,7 +95,8 @@ final class UnfilteredArbitrary<A> implements Arbitrary<A> {
         return generator.getLabel().orElseGet(generator::toString);
     }
 
-    static <A> UnfilteredArbitrary<A> unfilteredArbitrary(Generator<A> generator) {
-        return new UnfilteredArbitrary<>(generator, emptyImmutableFiniteIterable(), nothing(), Object::toString, Gauntlet.DEFAULT_MAX_DISCARDS);
+    static <A> Arbitrary<A> unfilteredArbitrary(Generator<A> generator) {
+        return concreteArbitrary(p -> new UnfilteredValueSupplier<>(generator.prepare(p)),
+                nothing(), Object::toString, () -> generator.getLabel().orElseGet(generator::toString));
     }
 }
