@@ -8,38 +8,39 @@ import lombok.Getter;
 
 import static lombok.AccessLevel.PRIVATE;
 
-public abstract class Ascription<A> implements CoProduct2<Ascription.Composite<A>,
-        Ascription.GeneratorSource<A>, Ascription<A>> {
+public abstract class Ascription implements CoProduct2<Ascription.Composite,
+        Ascription.GeneratorSource, Ascription> {
 
-    public Ascription<A> composite(int position) {
-        return new Composite<>(position, this);
+    public Ascription composite(int position) {
+        return new Composite(position, this);
     }
 
     @AllArgsConstructor(access = PRIVATE)
-    public static class Composite<A> extends Ascription<A> {
+    public static class Composite extends Ascription {
         @Getter
         private final int position;
         @Getter
-        private final Ascription<A> next;
+        private final Ascription next;
 
         @Override
-        public <R> R match(Fn1<? super Composite<A>, ? extends R> aFn, Fn1<? super GeneratorSource<A>, ? extends R> bFn) {
+        public <R> R match(Fn1<? super Composite, ? extends R> aFn, Fn1<? super GeneratorSource, ? extends R> bFn) {
             return aFn.apply(this);
         }
     }
 
     @AllArgsConstructor(access = PRIVATE)
-    public static class GeneratorSource<A> extends Ascription<A> {
-        private final Generator<A> generator;
+    public static class GeneratorSource extends Ascription {
+        @Getter
+        private final Generator<?> generator;
 
         @Override
-        public <R> R match(Fn1<? super Composite<A>, ? extends R> aFn, Fn1<? super GeneratorSource<A>, ? extends R> bFn) {
+        public <R> R match(Fn1<? super Composite, ? extends R> aFn, Fn1<? super GeneratorSource, ? extends R> bFn) {
             return bFn.apply(this);
         }
     }
 
-    public static <A> Ascription<A> generatorSource(Generator<A> generator) {
-        return new GeneratorSource<>(generator);
+    public static Ascription generatorSource(Generator<?> generator) {
+        return new GeneratorSource(generator);
     }
 
 }
