@@ -5,13 +5,10 @@ import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
-import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
 import static dev.marksman.gauntlet.util.CompoundFilterChain.compoundFilterChain;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 final class SimpleFilterChain<A> implements FilterChain<A> {
-    private static final FilterChain<?> EMPTY = new SimpleFilterChain<>(emptyImmutableFiniteIterable());
-
     private final ImmutableFiniteIterable<Fn1<A, Boolean>> filters;
 
     @Override
@@ -35,14 +32,13 @@ final class SimpleFilterChain<A> implements FilterChain<A> {
         return compoundFilterChain(MapperChain.mapperChain((Fn1<Object, Object>) fn), this);
     }
 
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
     static <A> FilterChain<A> simpleFilterChain(Fn1<A, Boolean> filter) {
         return new SimpleFilterChain<>(ImmutableFiniteIterable.of(filter));
     }
 
-    @SuppressWarnings("unchecked")
-    static <A> FilterChain<A> simpleFilterChain() {
-        return (FilterChain<A>) EMPTY;
-    }
 }
-
-

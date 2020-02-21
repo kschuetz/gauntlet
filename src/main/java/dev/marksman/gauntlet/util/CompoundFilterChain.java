@@ -29,6 +29,11 @@ final class CompoundFilterChain<A, B> implements FilterChain<A> {
         return underlying.apply(b);
     }
 
+    @Override
+    public boolean isEmpty() {
+        return underlying.isEmpty();
+    }
+
     static <A, B> CompoundFilterChain<A, B> compoundFilterChain(MapperChain mapperChain,
                                                                 FilterChain<B> underlying) {
         return new CompoundFilterChain<>(mapperChain, underlying);
