@@ -4,20 +4,19 @@ import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.functions.Fn0;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
+import dev.marksman.gauntlet.filter.Filter;
 import dev.marksman.gauntlet.shrink.Shrink;
-import dev.marksman.gauntlet.util.FilterChain;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.Parameters;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
-import static dev.marksman.gauntlet.util.FilterChain.filterChain;
 
 final class ConcreteArbitrary<A> implements Arbitrary<A> {
     private final Fn1<Parameters, ValueSupplier<A>> generator;
     private final ImmutableFiniteIterable<Fn1<Parameters, Parameters>> parameterTransforms;
-    private final FilterChain<A> filter;
+    private final Filter<A> filter;
     private final Maybe<Shrink<A>> shrink;
     private final Fn1<A, String> prettyPrinter;
     private final int maxDiscards;
@@ -25,7 +24,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
 
     private ConcreteArbitrary(Fn1<Parameters, ValueSupplier<A>> generator,
                               ImmutableFiniteIterable<Fn1<Parameters, Parameters>> parameterTransforms,
-                              FilterChain<A> filter, Maybe<Shrink<A>> shrink,
+                              Filter<A> filter, Maybe<Shrink<A>> shrink,
                               Fn1<A, String> prettyPrinter,
                               int maxDiscards,
                               Fn0<String> labelSupplier) {
@@ -118,7 +117,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                                                       Maybe<Shrink<A>> shrink,
                                                       Fn1<A, String> prettyPrinter,
                                                       Fn0<String> labelSupplier) {
-        return new ConcreteArbitrary<>(generator, emptyImmutableFiniteIterable(), filterChain(), shrink, prettyPrinter, Gauntlet.DEFAULT_MAX_DISCARDS,
+        return new ConcreteArbitrary<>(generator, emptyImmutableFiniteIterable(), Filter.emptyFilter(), shrink, prettyPrinter, Gauntlet.DEFAULT_MAX_DISCARDS,
                 labelSupplier);
     }
 
