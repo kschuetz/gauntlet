@@ -3,8 +3,8 @@ package dev.marksman.gauntlet.filter;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.gauntlet.util.MapperChain;
 
-import static dev.marksman.gauntlet.filter.MappedFilter.compoundFilterChain;
-import static dev.marksman.gauntlet.filter.SimpleFilter.simpleFilterChain;
+import static dev.marksman.gauntlet.filter.MappedFilter.mappedFilter;
+import static dev.marksman.gauntlet.filter.MultiFilter.multiFilter;
 
 final class EmptyFilter<A> implements Filter<A> {
 
@@ -12,13 +12,13 @@ final class EmptyFilter<A> implements Filter<A> {
 
     @Override
     public Filter<A> add(Fn1<A, Boolean> predicate) {
-        return simpleFilterChain(predicate);
+        return multiFilter(predicate);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <Z> Filter<Z> contraMap(Fn1<? super Z, ? extends A> fn) {
-        return compoundFilterChain(MapperChain.mapperChain((Fn1<Object, Object>) fn), this);
+        return mappedFilter(MapperChain.mapperChain((Fn1<Object, Object>) fn), this);
     }
 
     @Override

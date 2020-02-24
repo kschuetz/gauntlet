@@ -5,7 +5,7 @@ import dev.marksman.gauntlet.util.MapperChain;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
-import static dev.marksman.gauntlet.filter.SimpleFilter.simpleFilterChain;
+import static dev.marksman.gauntlet.filter.MultiFilter.multiFilter;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 final class MappedFilter<A, B> implements Filter<A> {
@@ -14,7 +14,7 @@ final class MappedFilter<A, B> implements Filter<A> {
 
     @Override
     public Filter<A> add(Fn1<A, Boolean> predicate) {
-        return simpleFilterChain(this).add(predicate);
+        return multiFilter(this).add(predicate);
     }
 
     @SuppressWarnings("unchecked")
@@ -35,8 +35,8 @@ final class MappedFilter<A, B> implements Filter<A> {
         return underlying.isEmpty();
     }
 
-    static <A, B> MappedFilter<A, B> compoundFilterChain(MapperChain mapperChain,
-                                                         Filter<B> underlying) {
+    static <A, B> MappedFilter<A, B> mappedFilter(MapperChain mapperChain,
+                                                  Filter<B> underlying) {
         return new MappedFilter<>(mapperChain, underlying);
     }
 

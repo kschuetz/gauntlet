@@ -6,15 +6,15 @@ import dev.marksman.gauntlet.util.MapperChain;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
-import static dev.marksman.gauntlet.filter.MappedFilter.compoundFilterChain;
+import static dev.marksman.gauntlet.filter.MappedFilter.mappedFilter;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-final class SimpleFilter<A> implements Filter<A> {
+final class MultiFilter<A> implements Filter<A> {
     private final ImmutableFiniteIterable<Fn1<A, Boolean>> filters;
 
     @Override
     public Filter<A> add(Fn1<A, Boolean> predicate) {
-        return new SimpleFilter<>(filters.prepend(predicate));
+        return new MultiFilter<>(filters.prepend(predicate));
     }
 
     @Override
@@ -30,7 +30,7 @@ final class SimpleFilter<A> implements Filter<A> {
     @SuppressWarnings("unchecked")
     @Override
     public <Z> Filter<Z> contraMap(Fn1<? super Z, ? extends A> fn) {
-        return compoundFilterChain(MapperChain.mapperChain((Fn1<Object, Object>) fn), this);
+        return mappedFilter(MapperChain.mapperChain((Fn1<Object, Object>) fn), this);
     }
 
     @Override
@@ -38,8 +38,8 @@ final class SimpleFilter<A> implements Filter<A> {
         return false;
     }
 
-    static <A> Filter<A> simpleFilterChain(Fn1<A, Boolean> filter) {
-        return new SimpleFilter<>(ImmutableFiniteIterable.of(filter));
+    static <A> Filter<A> multiFilter(Fn1<A, Boolean> filter) {
+        return new MultiFilter<>(ImmutableFiniteIterable.of(filter));
     }
 
 }
