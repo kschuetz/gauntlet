@@ -16,7 +16,7 @@ import static com.jnape.palatable.lambda.adt.Either.right;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GeneratorOutput<A> implements Functor<A, GeneratorOutput<?>> {
     private final Seed nextState;
-    private final Either<GeneratorFailure, A> value;
+    private final Either<SupplyFailure, A> value;
 
     public final boolean isFailure() {
         return value.match(__ -> true, __ -> false);
@@ -27,7 +27,7 @@ public final class GeneratorOutput<A> implements Functor<A, GeneratorOutput<?>> 
         return generatorOutput(nextState, value.fmap(fn));
     }
 
-    static <A> GeneratorOutput<A> generatorOutput(Seed nextState, Either<GeneratorFailure, A> value) {
+    static <A> GeneratorOutput<A> generatorOutput(Seed nextState, Either<SupplyFailure, A> value) {
         return new GeneratorOutput<>(nextState, value);
     }
 
@@ -39,7 +39,7 @@ public final class GeneratorOutput<A> implements Functor<A, GeneratorOutput<?>> 
         return generatorOutput(result.getNextState(), right(result.getValue()));
     }
 
-    static <A> GeneratorOutput<A> failure(Seed nextState, GeneratorFailure failure) {
+    static <A> GeneratorOutput<A> failure(Seed nextState, SupplyFailure failure) {
         return generatorOutput(nextState, left(failure));
     }
 }

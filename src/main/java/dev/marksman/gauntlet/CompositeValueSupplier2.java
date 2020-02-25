@@ -26,7 +26,7 @@ final class CompositeValueSupplier2<A, B, Out> implements ValueSupplier<Out> {
                                                 GeneratorOutput<A> ra,
                                                 Fn2<A, Seed, GeneratorOutput<B>> f) {
         return ra.getValue()
-                .match(gf -> GeneratorOutput.failure(ra.getNextState(), gf.prepend(positionName(posIndex))),
+                .match(gf -> GeneratorOutput.failure(ra.getNextState(), gf),
                         a -> f.apply(a, ra.getNextState()));
     }
 

@@ -4,8 +4,6 @@ import com.jnape.palatable.lambda.functions.Fn0;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.kraftwerk.Seed;
 
-import static dev.marksman.gauntlet.GeneratorFailure.generatorFailure;
-
 final class FilteredValueSupplier<A> implements ValueSupplier<A> {
     private final ValueSupplier<A> underlying;
     private final Fn1<A, Boolean> filter;
@@ -39,8 +37,7 @@ final class FilteredValueSupplier<A> implements ValueSupplier<A> {
             }
         }
 
-        return GeneratorOutput.failure(state, generatorFailure(labelSupplier.apply(),
-                maxDiscards));
+        return GeneratorOutput.failure(state, SupplyFailure.supplyFailure(null));
     }
 
     // TODO: use types to build a path rather than using labels
