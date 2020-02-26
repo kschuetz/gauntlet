@@ -27,6 +27,25 @@ final class CompositeValueSupplier2<A, B, Out> implements ValueSupplier<Out> {
 
     }
 
+    // TODO: find another way to build SupplyTree because this is going to be way too ugly
+
+//    private GeneratorOutput<Out> getNext2(Seed input) {
+//        GeneratorOutput<A> ra = vsA.getNext(input);
+//        return ra.getValue()
+//                .match(sf -> supplyFailure(SupplyTree.composite(sf.getTree(),
+//                        vsB.getSupplyTree())),
+//                        a -> {
+//                            GeneratorOutput<B> rb = vsB.getNext(ra.getNextState());
+//                            rb.getValue()
+//                                    .match(sf -> GeneratorOutput.failure(rb.getNextState(),
+//                                            supplyFailure(SupplyTree.composite(vsA.getSupplyTree(),
+//                                            sf.getTree()))),
+//                                            b -> GeneratorOutput.success(rb.getNextState(),
+//                                                    fn.apply(a, b)));
+//                            return match;
+//                        });
+//    }
+
     static <A, B> GeneratorOutput<B> threadSeed(int posIndex,
                                                 GeneratorOutput<A> ra,
                                                 Fn2<A, Seed, GeneratorOutput<B>> f) {
