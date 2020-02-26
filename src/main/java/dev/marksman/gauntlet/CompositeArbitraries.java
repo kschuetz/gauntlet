@@ -27,9 +27,7 @@ final class CompositeArbitraries {
                         b.prepare(parameters),
                         toFn),
                 combineShrinks(a.getShrink(), b.getShrink(), toFn),
-                combinePrettyPrinters(a.getPrettyPrinter(), b.getPrettyPrinter()),
-                () -> combinedLabel(a.getLabel(),
-                        b.getLabel()));
+                combinePrettyPrinters(a.getPrettyPrinter(), b.getPrettyPrinter()));
     }
 
     static <A, B, C> Arbitrary<Tuple3<A, B, C>> combine(Arbitrary<A> a,
@@ -43,10 +41,7 @@ final class CompositeArbitraries {
                         c.prepare(parameters),
                         toFn),
                 combineShrinks(a.getShrink(), b.getShrink(), c.getShrink(), toFn),
-                combinePrettyPrinters(a.getPrettyPrinter(), b.getPrettyPrinter(), c.getPrettyPrinter()),
-                () -> combinedLabel(a.getLabel(),
-                        b.getLabel(),
-                        c.getLabel()));
+                combinePrettyPrinters(a.getPrettyPrinter(), b.getPrettyPrinter(), c.getPrettyPrinter()));
     }
 
 
@@ -91,8 +86,4 @@ final class CompositeArbitraries {
         return t -> tuple(ppA.apply(t._1()), ppB.apply(t._2()), ppC.apply(t._3())).toString();
     }
 
-
-    private static String combinedLabel(String... components) {
-        return "(" + String.join(", ", components) + ")";
-    }
 }

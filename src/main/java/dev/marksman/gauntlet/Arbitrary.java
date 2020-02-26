@@ -20,8 +20,6 @@ public interface Arbitrary<A> {
 
     Fn1<A, String> getPrettyPrinter();
 
-    String getLabel();
-
     Arbitrary<A> withShrink(Shrink<A> shrink);
 
     Arbitrary<A> withNoShrink();

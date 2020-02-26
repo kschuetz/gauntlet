@@ -10,6 +10,8 @@ public interface ValueSupplier<A> extends Functor<A, ValueSupplier<?>> {
 
     GeneratorOutput<A> getNext(Seed input);
 
+    SupplyTree getSupplyTree();
+
     @Override
     default <B> ValueSupplier<B> fmap(Fn1<? super A, ? extends B> fn) {
         return mappedValueSupplier(fn, this);

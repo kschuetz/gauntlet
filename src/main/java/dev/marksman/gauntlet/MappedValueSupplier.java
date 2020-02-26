@@ -13,6 +13,11 @@ final class MappedValueSupplier<A, B> implements ValueSupplier<B> {
         this.mapperChain = mapperChain;
     }
 
+    @Override
+    public SupplyTree getSupplyTree() {
+        return underlying.getSupplyTree();
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public GeneratorOutput<B> getNext(Seed input) {

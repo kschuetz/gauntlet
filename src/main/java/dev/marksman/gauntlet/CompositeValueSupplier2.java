@@ -15,6 +15,11 @@ final class CompositeValueSupplier2<A, B, Out> implements ValueSupplier<Out> {
     }
 
     @Override
+    public SupplyTree getSupplyTree() {
+        return SupplyTree.composite(vsA.getSupplyTree(), vsB.getSupplyTree());
+    }
+
+    @Override
     public GeneratorOutput<Out> getNext(Seed input) {
         return threadSeed(0,
                 vsA.getNext(input), (a, s1) -> threadSeed(1, vsB.getNext(s1),

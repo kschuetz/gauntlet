@@ -20,21 +20,18 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
     private final Maybe<Shrink<A>> shrink;
     private final Fn1<A, String> prettyPrinter;
     private final int maxDiscards;
-    private final Fn0<String> labelSupplier;
 
     private ConcreteArbitrary(Fn1<Parameters, ValueSupplier<A>> generator,
                               ImmutableFiniteIterable<Fn1<Parameters, Parameters>> parameterTransforms,
                               Filter<A> filter, Maybe<Shrink<A>> shrink,
                               Fn1<A, String> prettyPrinter,
-                              int maxDiscards,
-                              Fn0<String> labelSupplier) {
+                              int maxDiscards) {
         this.generator = generator;
         this.parameterTransforms = parameterTransforms;
         this.filter = filter;
         this.shrink = shrink;
         this.prettyPrinter = prettyPrinter;
         this.maxDiscards = maxDiscards;
-        this.labelSupplier = labelSupplier;
     }
 
     @Override
@@ -44,7 +41,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
         if (filter.isEmpty()) {
             return vs;
         } else {
-            return new FilteredValueSupplier<>(vs, filter, maxDiscards, labelSupplier);
+            return new FilteredValueSupplier<>(vs, filter, maxDiscards);
         }
     }
 
@@ -59,24 +56,19 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
     }
 
     @Override
-    public String getLabel() {
-        return labelSupplier.apply();
-    }
-
-    @Override
     public Arbitrary<A> withShrink(Shrink<A> shrink) {
-        return new ConcreteArbitrary<>(generator, parameterTransforms, filter, just(shrink), prettyPrinter, maxDiscards, labelSupplier);
+        return new ConcreteArbitrary<>(generator, parameterTransforms, filter, just(shrink), prettyPrinter, maxDiscards);
     }
 
     @Override
     public Arbitrary<A> withNoShrink() {
         return shrink.match(__ -> this,
-                __ -> new ConcreteArbitrary<>(generator, parameterTransforms, filter, nothing(), prettyPrinter, maxDiscards, labelSupplier));
+                __ -> new ConcreteArbitrary<>(generator, parameterTransforms, filter, nothing(), prettyPrinter, maxDiscards));
     }
 
     @Override
     public Arbitrary<A> suchThat(Fn1<A, Boolean> predicate) {
-        return new ConcreteArbitrary<>(generator, parameterTransforms, filter.add(predicate), shrink, prettyPrinter, maxDiscards, labelSupplier);
+        return new ConcreteArbitrary<>(generator, parameterTransforms, filter.add(predicate), shrink, prettyPrinter, maxDiscards);
 
     }
 
@@ -86,7 +78,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
             maxDiscards = 0;
         }
         if (maxDiscards != this.maxDiscards) {
-            return new ConcreteArbitrary<>(generator, parameterTransforms, filter, shrink, prettyPrinter, maxDiscards, labelSupplier);
+            return new ConcreteArbitrary<>(generator, parameterTransforms, filter, shrink, prettyPrinter, maxDiscards);
         } else {
             return this;
         }
@@ -94,7 +86,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
 
     @Override
     public Arbitrary<A> withPrettyPrinter(Fn1<A, String> prettyPrinter) {
-        return new ConcreteArbitrary<>(generator, parameterTransforms, filter, shrink, prettyPrinter, maxDiscards, labelSupplier);
+        return new ConcreteArbitrary<>(generator, parameterTransforms, filter, shrink, prettyPrinter, maxDiscards);
     }
 
     @Override
@@ -104,25 +96,24 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                 filter.contraMap(ba),
                 shrink.fmap(s -> s.convert(ab, ba)),
                 prettyPrinter.contraMap(ba),
-                maxDiscards, labelSupplier);
+                maxDiscards);
 
     }
 
     @Override
     public Arbitrary<A> modifyGeneratorParameters(Fn1<Parameters, Parameters> modifyFn) {
-        return new ConcreteArbitrary<>(generator, parameterTransforms.append(modifyFn), filter, shrink, prettyPrinter, maxDiscards, labelSupplier);
+        return new ConcreteArbitrary<>(generator, parameterTransforms.append(modifyFn), filter, shrink, prettyPrinter, maxDiscards);
     }
 
     static <A> ConcreteArbitrary<A> concreteArbitrary(Fn1<Parameters, ValueSupplier<A>> generator,
                                                       Maybe<Shrink<A>> shrink,
-                                                      Fn1<A, String> prettyPrinter,
-                                                      Fn0<String> labelSupplier) {
-        return new ConcreteArbitrary<>(generator, emptyImmutableFiniteIterable(), Filter.emptyFilter(), shrink, prettyPrinter, Gauntlet.DEFAULT_MAX_DISCARDS,
-                labelSupplier);
+                                                      Fn1<A, String> prettyPrinter) {
+        return new ConcreteArbitrary<>(generator, emptyImmutableFiniteIterable(), Filter.emptyFilter(), shrink, prettyPrinter, Gauntlet.DEFAULT_MAX_DISCARDS);
     }
 
     static <A> Arbitrary<A> concreteArbitrary(Generator<A> generator) {
-        return concreteArbitrary(p -> new UnfilteredValueSupplier<>(generator.prepare(p)),
-                nothing(), Object::toString, () -> generator.getLabel().orElseGet(generator::toString));
+        Fn0<String> labelSupplier = () -> generator.getLabel().orElseGet(generator::toString);
+        return concreteArbitrary(p -> new UnfilteredValueSupplier<>(generator.prepare(p), labelSupplier),
+                nothing(), Object::toString);
     }
 }

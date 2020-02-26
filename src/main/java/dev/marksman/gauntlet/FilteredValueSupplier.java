@@ -1,20 +1,25 @@
 package dev.marksman.gauntlet;
 
-import com.jnape.palatable.lambda.functions.Fn0;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.kraftwerk.Seed;
+
+import static dev.marksman.gauntlet.SupplyFailure.supplyFailure;
+import static dev.marksman.gauntlet.SupplyTree.failedFilter;
 
 final class FilteredValueSupplier<A> implements ValueSupplier<A> {
     private final ValueSupplier<A> underlying;
     private final Fn1<A, Boolean> filter;
     private final int maxDiscards;
-    private final Fn0<String> labelSupplier;
 
-    FilteredValueSupplier(ValueSupplier<A> underlying, Fn1<A, Boolean> filter, int maxDiscards, Fn0<String> labelSupplier) {
+    FilteredValueSupplier(ValueSupplier<A> underlying, Fn1<A, Boolean> filter, int maxDiscards) {
         this.underlying = underlying;
         this.filter = filter;
         this.maxDiscards = maxDiscards;
-        this.labelSupplier = labelSupplier;
+    }
+
+    @Override
+    public SupplyTree getSupplyTree() {
+        return SupplyTree.filter(underlying.getSupplyTree());
     }
 
     @Override
@@ -37,7 +42,7 @@ final class FilteredValueSupplier<A> implements ValueSupplier<A> {
             }
         }
 
-        return GeneratorOutput.failure(state, SupplyFailure.supplyFailure(null));
+        return GeneratorOutput.failure(state, supplyFailure(failedFilter(maxDiscards, underlying.getSupplyTree())));
     }
 
     // TODO: use types to build a path rather than using labels
