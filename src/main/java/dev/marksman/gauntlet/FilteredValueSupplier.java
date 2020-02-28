@@ -50,4 +50,6 @@ final class FilteredValueSupplier<A> implements ValueSupplier<A> {
     // TODO: redesign ValueSupplier
 
     // TODO: replace Ascription with a tree representing pipeline and failure points
+
+    // TODO: consider adding FilterGenerator to kraftwerk
 }
