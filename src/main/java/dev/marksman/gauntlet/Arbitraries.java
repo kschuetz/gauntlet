@@ -2,6 +2,8 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
+import dev.marksman.kraftwerk.Generator;
+import dev.marksman.kraftwerk.frequency.FrequencyMap;
 
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkInt;
@@ -13,12 +15,20 @@ public final class Arbitraries {
 
     }
 
+    public static Arbitrary<Integer> arbitraryInt(Generator<Integer> generator) {
+        return arbitrary(generator).withShrink(shrinkInt());
+    }
+
     public static Arbitrary<Integer> arbitraryInt() {
-        return arbitrary(generateInt()).withShrink(shrinkInt());
+        return arbitraryInt(generateInt());
     }
 
     public static Arbitrary<Integer> arbitraryInt(int min, int max) {
-        return arbitrary(generateInt(min, max)).withShrink(shrinkInt());
+        return arbitraryInt(generateInt(min, max));
+    }
+
+    public static Arbitrary<Integer> arbitraryInt(FrequencyMap<Integer> frequencyMap) {
+        return arbitraryInt(frequencyMap.toGenerator());
     }
 
 
