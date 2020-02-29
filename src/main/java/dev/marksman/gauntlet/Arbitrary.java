@@ -5,6 +5,7 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.optics.Iso;
+import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.gauntlet.shrink.Shrink;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.Parameters;
@@ -33,6 +34,10 @@ public interface Arbitrary<A> {
     <B> Arbitrary<B> convert(Fn1<A, B> ab, Fn1<B, A> ba);
 
     Arbitrary<A> modifyGeneratorParameters(Fn1<Parameters, Parameters> modifyFn);
+
+    Arbitrary<ImmutableVector<A>> vector();
+
+    Arbitrary<ImmutableVector<A>> vectorOfN(int count);
 
     default <B> Arbitrary<B> convert(Iso<A, A, B, B> iso) {
         return convert(view(iso), view(iso.mirror()));

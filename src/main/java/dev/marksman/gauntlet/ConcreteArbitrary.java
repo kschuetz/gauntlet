@@ -3,10 +3,16 @@ package dev.marksman.gauntlet;
 import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.functions.Fn0;
 import com.jnape.palatable.lambda.functions.Fn1;
+import dev.marksman.collectionviews.ImmutableVector;
+import dev.marksman.collectionviews.Vector;
+import dev.marksman.collectionviews.VectorBuilder;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.filter.Filter;
 import dev.marksman.gauntlet.shrink.Shrink;
+import dev.marksman.gauntlet.shrink.builtins.ShrinkCollections;
+import dev.marksman.kraftwerk.Generate;
 import dev.marksman.kraftwerk.Generator;
+import dev.marksman.kraftwerk.Generators;
 import dev.marksman.kraftwerk.Parameters;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
@@ -100,6 +106,30 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
 
     }
 
+    public Arbitrary<ImmutableVector<A>> vector() {
+        return concreteArbitrary(parameters ->
+                        new CollectionValueSupplier<>(generator.apply(parameters),
+                                sizeGenerator(parameters),
+                                Vector::<A>builder,
+                                VectorBuilder::add,
+                                VectorBuilder::build),
+                shrink.fmap(ShrinkCollections::shrinkVector),
+                // TODO: prettyPrinter
+                Object::toString);
+    }
+
+    public Arbitrary<ImmutableVector<A>> vectorOfN(int count) {
+        return concreteArbitrary(parameters ->
+                        new CollectionValueSupplier<>(generator.apply(parameters),
+                                Generators.constant(count).prepare(parameters),
+                                Vector::<A>builder,
+                                VectorBuilder::add,
+                                VectorBuilder::build),
+                shrink.fmap(ShrinkCollections::shrinkVector),
+                // TODO: prettyPrinter
+                Object::toString);
+    }
+
     @Override
     public Arbitrary<A> modifyGeneratorParameters(Fn1<Parameters, Parameters> modifyFn) {
         return new ConcreteArbitrary<>(generator, parameterTransforms.append(modifyFn), filter, shrink, prettyPrinter, maxDiscards);
@@ -115,5 +145,10 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
         Fn0<String> labelSupplier = () -> generator.getLabel().orElseGet(generator::toString);
         return concreteArbitrary(p -> new UnfilteredValueSupplier<>(generator.prepare(p), labelSupplier),
                 nothing(), Object::toString);
+    }
+
+    private static Generate<Integer> sizeGenerator(Parameters parameters) {
+        // TODO:  replace with generateSize when available in kraftwerk
+        return Generators.sized(Generators::constant).prepare(parameters);
     }
 }
