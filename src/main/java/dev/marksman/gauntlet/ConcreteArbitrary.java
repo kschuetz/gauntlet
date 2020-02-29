@@ -108,7 +108,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
 
     public Arbitrary<ImmutableVector<A>> vector() {
         return concreteArbitrary(parameters ->
-                        new CollectionValueSupplier<>(generator.apply(parameters),
+                        new CollectionValueSupplier<>(prepare(parameters),
                                 sizeGenerator(parameters),
                                 Vector::<A>builder,
                                 VectorBuilder::add,
@@ -120,7 +120,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
 
     public Arbitrary<ImmutableVector<A>> vectorOfN(int count) {
         return concreteArbitrary(parameters ->
-                        new CollectionValueSupplier<>(generator.apply(parameters),
+                        new CollectionValueSupplier<>(prepare(parameters),
                                 Generators.constant(count).prepare(parameters),
                                 Vector::<A>builder,
                                 VectorBuilder::add,
