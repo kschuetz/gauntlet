@@ -3,9 +3,8 @@ package dev.marksman.gauntlet;
 import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.functions.Fn0;
 import com.jnape.palatable.lambda.functions.Fn1;
+import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.collectionviews.ImmutableVector;
-import dev.marksman.collectionviews.Vector;
-import dev.marksman.collectionviews.VectorBuilder;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.filter.Filter;
 import dev.marksman.gauntlet.shrink.Shrink;
@@ -15,9 +14,15 @@ import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.Generators;
 import dev.marksman.kraftwerk.Parameters;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
+import static dev.marksman.kraftwerk.Generators.generateSize;
+import static dev.marksman.kraftwerk.aggregator.Aggregators.collectionAggregator;
+import static dev.marksman.kraftwerk.aggregator.Aggregators.vectorAggregator;
 
 final class ConcreteArbitrary<A> implements Arbitrary<A> {
     private final Fn1<Parameters, ValueSupplier<A>> generator;
@@ -110,9 +115,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
         return concreteArbitrary(parameters ->
                         new CollectionValueSupplier<>(prepare(parameters),
                                 sizeGenerator(parameters),
-                                Vector::<A>builder,
-                                VectorBuilder::add,
-                                VectorBuilder::build),
+                                vectorAggregator()),
                 shrink.fmap(ShrinkCollections::shrinkVector),
                 // TODO: prettyPrinter
                 Object::toString);
@@ -122,10 +125,88 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
         return concreteArbitrary(parameters ->
                         new CollectionValueSupplier<>(prepare(parameters),
                                 Generators.constant(count).prepare(parameters),
-                                Vector::<A>builder,
-                                VectorBuilder::add,
-                                VectorBuilder::build),
+                                vectorAggregator()),
                 shrink.fmap(ShrinkCollections::shrinkVector),
+                // TODO: prettyPrinter
+                Object::toString);
+    }
+
+    public Arbitrary<ImmutableNonEmptyVector<A>> nonEmptyVector() {
+        return concreteArbitrary(parameters ->
+                        new CollectionValueSupplier<>(prepare(parameters),
+                                sizeGenerator(1, parameters),
+                                vectorAggregator())
+                                .fmap(ImmutableVector::toNonEmptyOrThrow),
+                shrink.fmap(ShrinkCollections::shrinkNonEmptyVector),
+                // TODO: prettyPrinter
+                Object::toString);
+    }
+
+    public Arbitrary<ImmutableNonEmptyVector<A>> nonEmptyVectorOfN(int count) {
+        if (count < 1) {
+            throw new IllegalArgumentException("count must be >= 1");
+        }
+        return concreteArbitrary(parameters ->
+                        new CollectionValueSupplier<>(prepare(parameters),
+                                Generators.constant(count).prepare(parameters),
+                                vectorAggregator())
+                                .fmap(ImmutableVector::toNonEmptyOrThrow),
+                shrink.fmap(ShrinkCollections::shrinkNonEmptyVector),
+                // TODO: prettyPrinter
+                Object::toString);
+    }
+
+    @Override
+    public Arbitrary<ArrayList<A>> arrayList() {
+        return concreteArbitrary(parameters ->
+                        new CollectionValueSupplier<>(prepare(parameters),
+                                sizeGenerator(parameters),
+                                collectionAggregator(ArrayList::new)),
+                shrink.fmap(ShrinkCollections::shrinkArrayList),
+                // TODO: prettyPrinter
+                Object::toString);
+    }
+
+    @Override
+    public Arbitrary<ArrayList<A>> arrayListOfN(int count) {
+        return concreteArbitrary(parameters ->
+                        new CollectionValueSupplier<>(prepare(parameters),
+                                Generators.constant(count).prepare(parameters),
+                                collectionAggregator(ArrayList::new)),
+                shrink.fmap(ShrinkCollections::shrinkArrayList),
+                // TODO: prettyPrinter
+                Object::toString);
+    }
+
+    @Override
+    public Arbitrary<ArrayList<A>> nonEmptyArrayList() {
+        return concreteArbitrary(parameters ->
+                        new CollectionValueSupplier<>(prepare(parameters),
+                                sizeGenerator(1, parameters),
+                                collectionAggregator(ArrayList::new)),
+                shrink.fmap(ShrinkCollections::shrinkNonEmptyArrayList),
+                // TODO: prettyPrinter
+                Object::toString);
+    }
+
+    @Override
+    public Arbitrary<HashSet<A>> hashSet() {
+        return concreteArbitrary(parameters ->
+                        new CollectionValueSupplier<>(prepare(parameters),
+                                sizeGenerator(parameters),
+                                collectionAggregator(HashSet::new)),
+                shrink.fmap(ShrinkCollections::shrinkHashSet),
+                // TODO: prettyPrinter
+                Object::toString);
+    }
+
+    @Override
+    public Arbitrary<HashSet<A>> nonEmptyHashSet() {
+        return concreteArbitrary(parameters ->
+                        new CollectionValueSupplier<>(prepare(parameters),
+                                sizeGenerator(1, parameters),
+                                collectionAggregator(HashSet::new)),
+                shrink.fmap(ShrinkCollections::shrinkNonEmptyHashSet),
                 // TODO: prettyPrinter
                 Object::toString);
     }
@@ -148,7 +229,13 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
     }
 
     private static Generate<Integer> sizeGenerator(Parameters parameters) {
-        // TODO:  replace with generateSize when available in kraftwerk
-        return Generators.sized(Generators::constant).prepare(parameters);
+        return generateSize()
+                .prepare(parameters);
+    }
+
+    private static Generate<Integer> sizeGenerator(int minSize, Parameters parameters) {
+        return generateSize()
+                .fmap(s -> Math.max(minSize, s))
+                .prepare(parameters);
     }
 }

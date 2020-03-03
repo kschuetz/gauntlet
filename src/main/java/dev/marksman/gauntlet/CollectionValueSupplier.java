@@ -1,25 +1,19 @@
 package dev.marksman.gauntlet;
 
-import com.jnape.palatable.lambda.functions.Fn0;
-import com.jnape.palatable.lambda.functions.Fn1;
-import com.jnape.palatable.lambda.functions.Fn2;
 import dev.marksman.kraftwerk.Generate;
 import dev.marksman.kraftwerk.Result;
 import dev.marksman.kraftwerk.Seed;
+import dev.marksman.kraftwerk.aggregator.Aggregator;
 
 final class CollectionValueSupplier<A, Builder, Out> implements ValueSupplier<Out> {
     private final ValueSupplier<A> elementSupplier;
     private final Generate<Integer> sizeGenerator;
-    private final Fn0<Builder> initialBuilderSupplier;
-    private final Fn2<Builder, A, Builder> addFn;
-    private final Fn1<Builder, Out> buildFn;
+    private final Aggregator<A, Builder, Out> aggregator;
 
-    CollectionValueSupplier(ValueSupplier<A> elementSupplier, Generate<Integer> sizeGenerator, Fn0<Builder> initialBuilderSupplier, Fn2<Builder, A, Builder> addFn, Fn1<Builder, Out> buildFn) {
+    CollectionValueSupplier(ValueSupplier<A> elementSupplier, Generate<Integer> sizeGenerator, Aggregator<A, Builder, Out> aggregator) {
         this.elementSupplier = elementSupplier;
         this.sizeGenerator = sizeGenerator;
-        this.initialBuilderSupplier = initialBuilderSupplier;
-        this.addFn = addFn;
-        this.buildFn = buildFn;
+        this.aggregator = aggregator;
     }
 
     @Override
@@ -27,7 +21,7 @@ final class CollectionValueSupplier<A, Builder, Out> implements ValueSupplier<Ou
         Result<? extends Seed, Integer> sizeResult = sizeGenerator.apply(input);
         Seed state = sizeResult.getNextState();
         int size = sizeResult.getValue();
-        Builder builder = initialBuilderSupplier.apply();
+        Builder builder = aggregator.builder();
 
         while (size > 0) {
             GeneratorOutput<A> current = elementSupplier.getNext(state);
@@ -35,11 +29,11 @@ final class CollectionValueSupplier<A, Builder, Out> implements ValueSupplier<Ou
             if (current.isFailure()) {
                 return GeneratorOutput.failure(state, SupplyFailure.supplyFailure(getSupplyTree()));
             }
-            builder = addFn.apply(builder, current.getValue().orThrow(AssertionError::new));
+            builder = aggregator.add(builder, current.getValue().orThrow(AssertionError::new));
             size--;
         }
 
-        Out output = buildFn.apply(builder);
+        Out output = aggregator.build(builder);
         return GeneratorOutput.success(state, output);
     }
 

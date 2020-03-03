@@ -5,10 +5,14 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.optics.Iso;
+import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.gauntlet.shrink.Shrink;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.Parameters;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 
 import static com.jnape.palatable.lambda.optics.functions.View.view;
 import static dev.marksman.gauntlet.CompositeArbitraries.combine;
@@ -38,6 +42,20 @@ public interface Arbitrary<A> {
     Arbitrary<ImmutableVector<A>> vector();
 
     Arbitrary<ImmutableVector<A>> vectorOfN(int count);
+
+    Arbitrary<ImmutableNonEmptyVector<A>> nonEmptyVector();
+
+    Arbitrary<ImmutableNonEmptyVector<A>> nonEmptyVectorOfN(int count);
+
+    Arbitrary<ArrayList<A>> arrayList();
+
+    Arbitrary<ArrayList<A>> arrayListOfN(int count);
+
+    Arbitrary<ArrayList<A>> nonEmptyArrayList();
+
+    Arbitrary<HashSet<A>> hashSet();
+
+    Arbitrary<HashSet<A>> nonEmptyHashSet();
 
     default <B> Arbitrary<B> convert(Iso<A, A, B, B> iso) {
         return convert(view(iso), view(iso.mirror()));
