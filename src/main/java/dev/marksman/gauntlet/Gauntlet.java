@@ -17,6 +17,14 @@ public final class Gauntlet {
 
     }
 
+    public static GeneratorTestRunner defaultGeneratorTestRunner() {
+        return null;
+    }
+
+    public static void setDefaultGeneratorTestRunner(GeneratorTestRunner generatorTestRunner) {
+        // TODO
+    }
+
     public static <A> GeneratorTestBuilder<A> all(Arbitrary<A> generator) {
         return generatorTestBuilder1(generator, DEFAULT_SAMPLE_COUNT);
     }
