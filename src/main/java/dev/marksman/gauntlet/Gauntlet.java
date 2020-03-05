@@ -4,8 +4,11 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import dev.marksman.collectionviews.Vector;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import static dev.marksman.gauntlet.ExistentialDomainTestBuilder.existentialDomainTestBuilder;
 import static dev.marksman.gauntlet.GeneratorTestBuilder1.generatorTestBuilder1;
+import static dev.marksman.gauntlet.SimpleGeneratorTestRunner.simpleGeneratorTestRunner;
 import static dev.marksman.gauntlet.UniversalDomainTestBuilder.universalDomainTestBuilder;
 
 public final class Gauntlet {
@@ -13,16 +16,18 @@ public final class Gauntlet {
     public static int DEFAULT_SAMPLE_COUNT = 100;
     public static int DEFAULT_MAX_DISCARDS = 100;
 
+    private static AtomicReference<GeneratorTestRunner> defaultGeneratorTestRunner = new AtomicReference<>(simpleGeneratorTestRunner());
+
     private Gauntlet() {
 
     }
 
     public static GeneratorTestRunner defaultGeneratorTestRunner() {
-        return null;
+        return defaultGeneratorTestRunner.get();
     }
 
     public static void setDefaultGeneratorTestRunner(GeneratorTestRunner generatorTestRunner) {
-        // TODO
+        defaultGeneratorTestRunner.set(generatorTestRunner);
     }
 
     public static <A> GeneratorTestBuilder<A> all(Arbitrary<A> generator) {
