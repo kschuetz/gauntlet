@@ -22,7 +22,7 @@ public final class SimpleGeneratorTestRunner implements GeneratorTestRunner {
         ValueSupplier<A> valueSupplier = testData.getArbitrary().prepare(defaultGeneratorParameters());
         long initialSeed = testData.getInitialSeed().orElseGet(() -> new Random().nextLong());
         Seed state = Seed.create(initialSeed);
-        MutableReportBuilder<A> reportBuilder = MutableReportBuilder.mutableReportBuilder();
+        GeneratorTestRun<A> reportBuilder = GeneratorTestRun.mutableReportBuilder();
         reportBuilder.setInitialSeed(initialSeed);
         reportBuilder.setClassifiers(testData.getClassifiers());
         for (int i = 0; i < sampleCount; i++) {
@@ -43,10 +43,10 @@ public final class SimpleGeneratorTestRunner implements GeneratorTestRunner {
             }
         }
 
-        return reportBuilder.build();
+        return reportBuilder.buildReport();
     }
 
-    private <A> void runCase(Context context, MutableReportBuilder<A> reportBuilder, GeneratorTest<A> testData, A value) {
+    private <A> void runCase(Context context, GeneratorTestRun<A> reportBuilder, GeneratorTest<A> testData, A value) {
         EvalResult evalResult;
         try {
             evalResult = testData.getProperty().test(context, value);

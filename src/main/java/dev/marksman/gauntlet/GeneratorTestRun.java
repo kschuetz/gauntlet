@@ -5,8 +5,8 @@ import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 
 import java.util.Set;
 
-final class MutableReportBuilder<A> {
-    Report<A> build() {
+final class GeneratorTestRun<A> {
+    Report<A> buildReport() {
         throw new UnsupportedOperationException("TODO");
     }
 
@@ -34,7 +34,7 @@ final class MutableReportBuilder<A> {
         return true;
     }
 
-    static <A> MutableReportBuilder<A> mutableReportBuilder() {
-        return new MutableReportBuilder<>();
+    static <A> GeneratorTestRun<A> mutableReportBuilder() {
+        return new GeneratorTestRun<>();
     }
 }
