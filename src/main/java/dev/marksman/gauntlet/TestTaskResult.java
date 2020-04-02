@@ -16,6 +16,10 @@ public final class TestTaskResult implements CoProduct4<Success, Failure, Skip, 
 
     private final Choice4<Success, Failure, Skip, Throwable> underlying;
 
+    public boolean isFailure() {
+        return match(__ -> false, __ -> true, __ -> false, __ -> false);
+    }
+
     @Override
     public <R> R match(Fn1<? super Success, ? extends R> aFn, Fn1<? super Failure, ? extends R> bFn, Fn1<? super Skip, ? extends R> cFn, Fn1<? super Throwable, ? extends R> dFn) {
         return underlying.match(aFn, bFn, cFn, dFn);
@@ -23,6 +27,10 @@ public final class TestTaskResult implements CoProduct4<Success, Failure, Skip, 
 
     public static TestTaskResult success() {
         return SUCCESS;
+    }
+
+    public static TestTaskResult testTaskResult(EvalResult evalResult) {
+        return evalResult.match(__ -> SUCCESS, TestTaskResult::failure);
     }
 
     public static TestTaskResult failure(Failure failure) {

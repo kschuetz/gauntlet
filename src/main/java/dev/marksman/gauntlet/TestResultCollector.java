@@ -10,7 +10,7 @@ import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.gauntlet.AscribedFailure.ascribedFailure;
 
-class TestResultCollector<A> {
+class TestResultCollector<A> implements TestResultReceiver {
     private final ImmutableVector<A> samples;
     private final Object lock = new Object();
     private final Boolean[] reported;
@@ -27,6 +27,7 @@ class TestResultCollector<A> {
         this.latch = new CountDownLatch(sampleCount);
     }
 
+    @Override
     public boolean shouldRun(int sampleIndex) {
         synchronized (lock) {
             if (done) {
@@ -38,6 +39,7 @@ class TestResultCollector<A> {
         }
     }
 
+    @Override
     public void reportResult(int sampleIndex, TestTaskResult result) {
 //        synchronized (lock) {
 //            if (done || reported[sampleIndex]) {
