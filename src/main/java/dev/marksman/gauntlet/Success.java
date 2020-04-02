@@ -3,7 +3,7 @@ package dev.marksman.gauntlet;
 import lombok.Value;
 
 @Value
-public final class Success {
+public class Success {
     private static Success INSTANCE = new Success();
 
     private Success() {

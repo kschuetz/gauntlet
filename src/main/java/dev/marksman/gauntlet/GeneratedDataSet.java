@@ -10,10 +10,10 @@ import lombok.Value;
 
 @Value
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class GeneratedDataSet<A> implements DataSet<A> {
-    private final ImmutableVector<A> values;
-    private final Maybe<SupplyFailure> supplyFailure;
-    private final Seed outputSeed;
+public class GeneratedDataSet<A> implements DataSet<A> {
+    ImmutableVector<A> values;
+    Maybe<SupplyFailure> supplyFailure;
+    Seed outputSeed;
 
     public static <A> GeneratedDataSet<A> generatedDataSet(Iterable<A> values,
                                                            Maybe<SupplyFailure> supplyFailure,
