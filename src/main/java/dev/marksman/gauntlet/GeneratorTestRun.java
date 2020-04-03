@@ -6,7 +6,7 @@ import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import java.util.Set;
 
 final class GeneratorTestRun<A> {
-    Report<A> buildReport() {
+    Outcome<A> buildReport() {
         throw new UnsupportedOperationException("TODO");
     }
 

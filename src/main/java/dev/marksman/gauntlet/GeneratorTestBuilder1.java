@@ -49,7 +49,7 @@ final class GeneratorTestBuilder1<A> implements GeneratorTestBuilder<A> {
     }
 
     @Override
-    public Report<A> executeFor(Prop<A> prop) {
+    public Outcome<A> executeFor(Prop<A> prop) {
         GeneratorTest<A> testData = new GeneratorTest<>(gen, prop, initialSeed, sampleCount, classifiers);
         return runner.orElseGet(Gauntlet::defaultGeneratorTestRunner).run(testData);
     }

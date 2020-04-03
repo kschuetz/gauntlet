@@ -38,7 +38,7 @@ public class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     // if failure is found, run tests on shrinks
 
     @Override
-    public <A> Report<A> run(GeneratorTest<A> testData) {
+    public <A> Outcome<A> run(GeneratorTest<A> testData) {
         Maybe<AscribedFailure<A>> result = nothing();
         Context context = new Context();
         Status status = Status.RUNNING;

@@ -16,7 +16,7 @@ public final class SimpleGeneratorTestRunner implements GeneratorTestRunner {
     }
 
     @Override
-    public <A> Report<A> run(GeneratorTest<A> testData) {
+    public <A> Outcome<A> run(GeneratorTest<A> testData) {
         Context context = new Context();
         int sampleCount = testData.getSampleCount();
         ValueSupplier<A> valueSupplier = testData.getArbitrary().prepare(defaultGeneratorParameters());

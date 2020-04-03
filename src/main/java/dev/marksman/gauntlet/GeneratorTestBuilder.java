@@ -13,7 +13,7 @@ public interface GeneratorTestBuilder<A> {
 
     GeneratorTestBuilder<A> classifyUsing(Fn1<A, Set<String>> classifier);
 
-    Report<A> executeFor(Prop<A> prop);
+    Outcome<A> executeFor(Prop<A> prop);
 
     default void mustSatisfy(Prop<A> prop) {
 
