@@ -20,6 +20,10 @@ public class Classified<A> {
         return new Classified<>(value, categories);
     }
 
+    public static <A> Fn1<A, Classified<A>> applyClassifiers(Iterable<Fn1<A, Set<String>>> classifiers) {
+        return value -> applyClassifiers(classifiers, value);
+    }
+
     public static <A> Classified<A> applyClassifiers(Iterable<Fn1<A, Set<String>>> classifiers, A value) {
         SetBuilder<String> builder = SetBuilder.builder();
         for (Fn1<A, Set<String>> classifier : classifiers) {

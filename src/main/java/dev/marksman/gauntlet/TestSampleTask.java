@@ -12,13 +12,13 @@ public class TestSampleTask<A> implements Runnable {
     private final TestResultReceiver receiver;
     private final Prop<A> property;
     private final int sampleIndex;
-    private final A input;
+    private final A sample;
 
     @Override
     public void run() {
         if (receiver.shouldRun(sampleIndex)) {
             try {
-                EvalResult evalResult = property.test(context, input);
+                EvalResult evalResult = property.test(context, sample);
                 receiver.reportResult(sampleIndex, TestTaskResult.testTaskResult(evalResult));
             } catch (Throwable error) {
                 receiver.reportResult(sampleIndex, error(error));
@@ -28,7 +28,7 @@ public class TestSampleTask<A> implements Runnable {
         }
     }
 
-    public static <A> TestSampleTask<A> testSampleTask(Context context, TestResultReceiver receiver, Prop<A> property, int sampleIndex, A input) {
-        return new TestSampleTask<>(context, receiver, property, sampleIndex, input);
+    public static <A> TestSampleTask<A> testSampleTask(Context context, TestResultReceiver receiver, Prop<A> property, int sampleIndex, A sample) {
+        return new TestSampleTask<>(context, receiver, property, sampleIndex, sample);
     }
 }
