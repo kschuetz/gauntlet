@@ -40,4 +40,5 @@ public final class Classifier<A> implements Fn1<A, Set<String>> {
     public static <A> Classifier<A> classify(String category, Fn1<A, Boolean> predicate) {
         return new Classifier<>(Vector.of(tuple(category, predicate)));
     }
+
 }
