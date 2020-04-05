@@ -5,21 +5,19 @@ import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.kraftwerk.Parameters;
 import dev.marksman.kraftwerk.Seed;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.Executor;
-import java.util.concurrent.TimeUnit;
 
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.gauntlet.GeneratedDataSet.generatedDataSet;
 import static dev.marksman.gauntlet.TestSampleTask.testSampleTask;
 
 public class DefaultGeneratorTestRunner implements GeneratorTestRunner {
-    private enum Status {RUNNING, COMPLETED, INTERRUPTED, TIMED_OUT}
-
     private static final Random seedGenerator = new Random();
 
-    private static final int timeoutSeconds = 10;   // TODO
+    private static final Duration defaultTimeout = Duration.ofSeconds(10);  // TODO
     private final Executor executor;
 
     private final Parameters parameters;
@@ -41,7 +39,6 @@ public class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     public <A> Outcome<A> run(GeneratorTest<A> testData) {
         Maybe<AscribedFailure<A>> result = nothing();
         Context context = new Context();
-        Status status = Status.RUNNING;
         long initialSeedValue = testData.getInitialSeed().orElseGet(seedGenerator::nextLong);
         Seed initialSeed = Seed.create(initialSeedValue);
         Arbitrary<A> arbitrary = testData.getArbitrary();
@@ -55,18 +52,9 @@ public class DefaultGeneratorTestRunner implements GeneratorTestRunner {
             TestSampleTask<A> task = testSampleTask(context, collector, testData.getProperty(), sampleIndex, samples.unsafeGet(sampleIndex));
             executor.execute(task);
         }
-        try {
-            if (collector.await(10, TimeUnit.SECONDS)) {
-                result = collector.getResultBlocking();
-                status = Status.COMPLETED;
-            } else {
-                status = Status.TIMED_OUT;
-            }
-        } catch (InterruptedException e) {
-            status = Status.INTERRUPTED;
-        }
-
-        return null;
+        // TODO: handle supply failure
+        // TODO: handle shrinks
+        return collector.getResultBlocking(defaultTimeout);
     }
 
     private <A> GeneratedDataSet<A> generateDataSet(Seed initialSeed,
@@ -91,7 +79,7 @@ public class DefaultGeneratorTestRunner implements GeneratorTestRunner {
         return generatedDataSet(values, supplyFailure, state);
     }
 
-    private final Long createInitialSeed(Maybe<Long> supplied) {
+    private Long createInitialSeed(Maybe<Long> supplied) {
         return supplied.orElseGet(seedGenerator::nextLong);
     }
 }

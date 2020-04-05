@@ -1,89 +1,122 @@
 package dev.marksman.gauntlet;
 
-import com.jnape.palatable.lambda.adt.Maybe;
 import dev.marksman.collectionviews.ImmutableVector;
+import dev.marksman.collectionviews.Vector;
+import dev.marksman.collectionviews.VectorBuilder;
 
 import java.time.Duration;
-import java.util.concurrent.CountDownLatch;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.jnape.palatable.lambda.adt.Maybe.maybe;
-import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 
-// TODO: rewrite this whole thing
 class TestResultCollector<A> implements TestResultReceiver {
     private final ImmutableVector<A> samples;
-    private final Object lock = new Object();
-    private final Boolean[] reported;
-    private final CountDownLatch latch;
-    private volatile Maybe<AscribedFailure<A>> earliestFailure;
-    private volatile boolean done;
+    private final ReentrantLock lock;
+    private final TreeSet<Integer> notReported;
+    private final Condition done;
+    private volatile int firstFailureIndex;
+    private volatile TestTaskResult result;
 
     public TestResultCollector(ImmutableVector<A> samples) {
         int sampleCount = samples.size();
         this.samples = samples;
-        this.earliestFailure = nothing();
-        this.reported = new Boolean[sampleCount];
-        this.done = false;
-        this.latch = new CountDownLatch(sampleCount);
+        this.firstFailureIndex = sampleCount;
+        this.lock = new ReentrantLock();
+        this.done = lock.newCondition();
+        this.notReported = Vector.range(sampleCount).toCollection(TreeSet::new);
+        this.result = TestTaskResult.success();
     }
 
     @Override
     public boolean shouldRun(int sampleIndex) {
-        synchronized (lock) {
-            if (done) {
-                return false;
-            } else {
-                return earliestFailure.match(__ -> true,
-                        ef -> ef.getSampleIndex() < sampleIndex);
-            }
+        lock.lock();
+        try {
+            return sampleIndex < firstFailureIndex;
+        } finally {
+            lock.unlock();
         }
     }
 
     @Override
     public void reportResult(int sampleIndex, TestTaskResult result) {
-//        synchronized (lock) {
-//            if (done || reported[sampleIndex]) {
-//                return;
-//            }
-//            Maybe<Failure> maybeFailure = result.flatMap(CoProduct2::projectB);
-//            maybeFailure.toOptional().ifPresent(failure -> handleFailure(sampleIndex, failure));
-//            reported[sampleIndex] = true;
-//            latch.countDown();
-//        }
-    }
+        lock.lock();
+        try {
+            if (sampleIndex >= firstFailureIndex) {
+                return;
+            }
+            if (result.isFailure() || result.isError()) {
+                firstFailureIndex = sampleIndex;
+                this.result = result;
+            }
 
-    public boolean await(long timeout, TimeUnit unit) throws InterruptedException {
-        return latch.await(timeout, unit);
-    }
+            notReported.remove(sampleIndex);
+            if (getFirstUnreportedIndex() >= firstFailureIndex) {
+                done.signal();
+            }
 
-    public Maybe<AscribedFailure<A>> getResultBlocking() throws InterruptedException {
-        latch.await();
-        return earliestFailure;
-    }
+        } finally {
+            lock.unlock();
+        }
 
+    }
 
     public Outcome<A> getResultBlocking(Duration timeout) {
+        lock.lock();
         try {
-            if (!latch.await(timeout.toMillis(), TimeUnit.MILLISECONDS)) {
+            if (await(timeout)) {
                 return Outcome.timedOut(getPassedSamples(), timeout);
             }
+            return getOutcome();
         } catch (InterruptedException e) {
             return Outcome.interrupted(getPassedSamples(), maybe(e.getMessage()));
+        } finally {
+            lock.unlock();
         }
-        return null;
+
+    }
+
+    private Outcome<A> getOutcome() {
+        return result.match(__ -> Outcome.passed(samples),
+                failure -> Outcome.falsified(getPassedSamples(), samples.unsafeGet(firstFailureIndex), failure, Vector.empty()),
+                error -> Outcome.error(getPassedSamples(), samples.unsafeGet(firstFailureIndex), error));
+    }
+
+    private boolean await(Duration timeout) throws InterruptedException {
+        lock.lock();
+        try {
+            return done.await(timeout.toMillis(), TimeUnit.MILLISECONDS);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private int getFirstUnreportedIndex() {
+        lock.lock();
+        try {
+            if (notReported.isEmpty()) {
+                return samples.size();
+            } else {
+                return notReported.first();
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     private ImmutableVector<A> getPassedSamples() {
-        return null;
-    }
-
-    private void handleFailure(int sampleIndex, Failure failure) {
-//        earliestFailure = just(earliestFailure
-//                .match(__ -> ascribedFailure(sampleIndex, samples.unsafeGet(sampleIndex), failure),
-//                        ef -> sampleIndex < ef.getSampleIndex()
-//                                ? ascribedFailure(sampleIndex, samples.unsafeGet(sampleIndex), failure)
-//                                : ef));
+        lock.lock();
+        try {
+            return samples
+                    .zipWithIndex()
+                    .foldLeft((acc, si) -> notReported.contains(si._2()) ? acc : acc.add(si._1()),
+                            VectorBuilder.<A>builder())
+                    .build();
+        } finally {
+            lock.unlock();
+        }
     }
 
 }

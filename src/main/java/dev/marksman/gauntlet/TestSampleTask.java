@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
 import static dev.marksman.gauntlet.TestTaskResult.error;
-import static dev.marksman.gauntlet.TestTaskResult.skip;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TestSampleTask<A> implements Runnable {
@@ -23,8 +22,6 @@ public class TestSampleTask<A> implements Runnable {
             } catch (Throwable error) {
                 receiver.reportResult(sampleIndex, error(error));
             }
-        } else {
-            receiver.reportResult(sampleIndex, skip());
         }
     }
 
