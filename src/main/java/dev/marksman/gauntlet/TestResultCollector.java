@@ -16,7 +16,8 @@ class TestResultCollector<A> implements TestResultReceiver {
     private final ImmutableVector<A> samples;
     private final ReentrantLock lock;
     private final TreeSet<Integer> notReported;
-    private final Condition done;
+    private final Condition doneLatch;
+    private volatile boolean done;
     private volatile int firstFailureIndex;
     private volatile TestTaskResult result;
 
@@ -25,7 +26,8 @@ class TestResultCollector<A> implements TestResultReceiver {
         this.samples = samples;
         this.firstFailureIndex = sampleCount;
         this.lock = new ReentrantLock();
-        this.done = lock.newCondition();
+        this.doneLatch = lock.newCondition();
+        this.done = false;
         this.notReported = Vector.range(sampleCount).toCollection(TreeSet::new);
         this.result = TestTaskResult.success();
     }
@@ -54,7 +56,8 @@ class TestResultCollector<A> implements TestResultReceiver {
 
             notReported.remove(sampleIndex);
             if (getFirstUnreportedIndex() >= firstFailureIndex) {
-                done.signal();
+                this.done = true;
+                doneLatch.signalAll();
             }
 
         } finally {
@@ -66,7 +69,7 @@ class TestResultCollector<A> implements TestResultReceiver {
     public Outcome<A> getResultBlocking(Duration timeout) {
         lock.lock();
         try {
-            if (await(timeout)) {
+            if (!await(timeout)) {
                 return Outcome.timedOut(getPassedSamples(), timeout);
             }
             return getOutcome();
@@ -87,7 +90,11 @@ class TestResultCollector<A> implements TestResultReceiver {
     private boolean await(Duration timeout) throws InterruptedException {
         lock.lock();
         try {
-            return done.await(timeout.toMillis(), TimeUnit.MILLISECONDS);
+            if (done) {
+                return true;
+            } else {
+                return doneLatch.await(timeout.toMillis(), TimeUnit.MILLISECONDS);
+            }
         } finally {
             lock.unlock();
         }
@@ -111,7 +118,9 @@ class TestResultCollector<A> implements TestResultReceiver {
         try {
             return samples
                     .zipWithIndex()
-                    .foldLeft((acc, si) -> notReported.contains(si._2()) ? acc : acc.add(si._1()),
+                    .foldLeft((acc, si) -> notReported.contains(si._2())
+                                    ? acc
+                                    : acc.add(si._1()),
                             VectorBuilder.<A>builder())
                     .build();
         } finally {

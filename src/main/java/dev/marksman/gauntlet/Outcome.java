@@ -5,13 +5,15 @@ import com.jnape.palatable.lambda.adt.coproduct.CoProduct6;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.ImmutableVector;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.EqualsAndHashCode;
+import lombok.Value;
 
 import java.time.Duration;
 import java.util.Set;
 
 import static lombok.AccessLevel.PRIVATE;
 
+@EqualsAndHashCode
 public abstract class Outcome<A> implements CoProduct6<Outcome.Passed<A>,
         Outcome.Falsified<A>, Outcome.SupplyFailed<A>, Outcome.Error<A>, Outcome.TimedOut<A>,
         Outcome.Interrupted<A>, Outcome<A>> {
@@ -23,10 +25,11 @@ public abstract class Outcome<A> implements CoProduct6<Outcome.Passed<A>,
     public abstract Outcome<Classified<A>> applyClassifiers(Iterable<Fn1<A, Set<String>>> classifiers);
 
     // All cases succeeded
+    @EqualsAndHashCode(callSuper = true)
+    @Value
     @AllArgsConstructor(access = PRIVATE)
     public static class Passed<A> extends Outcome<A> {
-        @Getter
-        private final ImmutableVector<A> passedSamples;
+        ImmutableVector<A> passedSamples;
 
         @Override
         public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Falsified<A>, ? extends R> bFn, Fn1<? super SupplyFailed<A>, ? extends R> cFn, Fn1<? super Error<A>, ? extends R> dFn, Fn1<? super TimedOut<A>, ? extends R> eFn, Fn1<? super Interrupted<A>, ? extends R> fFn) {
@@ -45,16 +48,14 @@ public abstract class Outcome<A> implements CoProduct6<Outcome.Passed<A>,
     }
 
     // A case was found that falsified the property
+    @EqualsAndHashCode(callSuper = true)
+    @Value
     @AllArgsConstructor(access = PRIVATE)
     public static class Falsified<A> extends Outcome<A> {
-        @Getter
-        private final ImmutableVector<A> passedSamples;
-        @Getter
-        private final A falsifiedSample;
-        @Getter
-        private final Failure failure;
-        @Getter
-        private final ImmutableVector<A> shrinks;
+        ImmutableVector<A> passedSamples;
+        A falsifiedSample;
+        Failure failure;
+        ImmutableVector<A> shrinks;
 
         @Override
         public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Falsified<A>, ? extends R> bFn, Fn1<? super SupplyFailed<A>, ? extends R> cFn, Fn1<? super Error<A>, ? extends R> dFn, Fn1<? super TimedOut<A>, ? extends R> eFn, Fn1<? super Interrupted<A>, ? extends R> fFn) {
@@ -74,12 +75,12 @@ public abstract class Outcome<A> implements CoProduct6<Outcome.Passed<A>,
     }
 
     // Generator encountered a supply failure before a case was falsified
+    @EqualsAndHashCode(callSuper = true)
+    @Value
     @AllArgsConstructor(access = PRIVATE)
     public static class SupplyFailed<A> extends Outcome<A> {
-        @Getter
-        private final ImmutableVector<A> passedSamples;
-        @Getter
-        private final SupplyFailure supplyFailure;
+        ImmutableVector<A> passedSamples;
+        SupplyFailure supplyFailure;
 
         @Override
         public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Falsified<A>, ? extends R> bFn, Fn1<? super SupplyFailed<A>, ? extends R> cFn, Fn1<? super Error<A>, ? extends R> dFn, Fn1<? super TimedOut<A>, ? extends R> eFn, Fn1<? super Interrupted<A>, ? extends R> fFn) {
@@ -98,14 +99,13 @@ public abstract class Outcome<A> implements CoProduct6<Outcome.Passed<A>,
     }
 
     // An exception was thrown from a test
+    @EqualsAndHashCode(callSuper = true)
+    @Value
     @AllArgsConstructor(access = PRIVATE)
     public static class Error<A> extends Outcome<A> {
-        @Getter
-        private final ImmutableVector<A> passedSamples;
-        @Getter
-        private final A errorSample;
-        @Getter
-        private final Throwable error;
+        ImmutableVector<A> passedSamples;
+        A errorSample;
+        Throwable error;
 
         @Override
         public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Falsified<A>, ? extends R> bFn, Fn1<? super SupplyFailed<A>, ? extends R> cFn, Fn1<? super Error<A>, ? extends R> dFn, Fn1<? super TimedOut<A>, ? extends R> eFn, Fn1<? super Interrupted<A>, ? extends R> fFn) {
@@ -124,13 +124,13 @@ public abstract class Outcome<A> implements CoProduct6<Outcome.Passed<A>,
         }
     }
 
-    // It took to long to run all samples
+    // It took too long to run all samples
+    @EqualsAndHashCode(callSuper = true)
+    @Value
     @AllArgsConstructor(access = PRIVATE)
     public static class TimedOut<A> extends Outcome<A> {
-        @Getter
-        private final ImmutableVector<A> passedSamples;
-        @Getter
-        private final Duration duration;
+        ImmutableVector<A> passedSamples;
+        Duration duration;
 
         @Override
         public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Falsified<A>, ? extends R> bFn, Fn1<? super SupplyFailed<A>, ? extends R> cFn, Fn1<? super Error<A>, ? extends R> dFn, Fn1<? super TimedOut<A>, ? extends R> eFn, Fn1<? super Interrupted<A>, ? extends R> fFn) {
@@ -149,12 +149,12 @@ public abstract class Outcome<A> implements CoProduct6<Outcome.Passed<A>,
     }
 
     // An InterruptedException was thrown while running the test
+    @EqualsAndHashCode(callSuper = true)
+    @Value
     @AllArgsConstructor(access = PRIVATE)
     public static class Interrupted<A> extends Outcome<A> {
-        @Getter
-        private final ImmutableVector<A> passedSamples;
-        @Getter
-        private final Maybe<String> message;
+        ImmutableVector<A> passedSamples;
+        Maybe<String> message;
 
         @Override
         public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Falsified<A>, ? extends R> bFn, Fn1<? super SupplyFailed<A>, ? extends R> cFn, Fn1<? super Error<A>, ? extends R> dFn, Fn1<? super TimedOut<A>, ? extends R> eFn, Fn1<? super Interrupted<A>, ? extends R> fFn) {
