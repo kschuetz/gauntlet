@@ -73,7 +73,7 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
         }
         // TODO: handle supply failure
         // TODO: handle shrinks
-        return collector.getResultBlocking(DEFAULT_TIMEOUT);
+        return collector.getResultBlocking(testData.getTimeout().orElse(defaultTimeout));
     }
 
     private <A> GeneratedDataSet<A> generateDataSet(Seed initialSeed,

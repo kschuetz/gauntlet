@@ -5,6 +5,7 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import lombok.Getter;
 
+import java.time.Duration;
 import java.util.Set;
 
 public final class GeneratorTest<A> {
@@ -18,12 +19,15 @@ public final class GeneratorTest<A> {
     private final int sampleCount;
     @Getter
     private final ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers;
+    @Getter
+    private final Maybe<Duration> timeout;
 
-    GeneratorTest(Arbitrary<A> arbitrary, Prop<A> property, Maybe<Long> initialSeed, int sampleCount, ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers) {
+    GeneratorTest(Arbitrary<A> arbitrary, Prop<A> property, Maybe<Long> initialSeed, int sampleCount, ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers, Maybe<Duration> timeout) {
         this.arbitrary = arbitrary;
         this.initialSeed = initialSeed;
         this.sampleCount = sampleCount;
         this.classifiers = classifiers;
         this.property = property;
+        this.timeout = timeout;
     }
 }

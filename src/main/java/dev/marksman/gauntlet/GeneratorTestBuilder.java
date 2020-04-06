@@ -2,14 +2,17 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.functions.Fn1;
 
+import java.time.Duration;
 import java.util.Set;
 
 import static dev.marksman.gauntlet.Prop.prop;
 
 public interface GeneratorTestBuilder<A> {
+    GeneratorTestBuilder<A> withInitialSeed(long initialSeed);
+
     GeneratorTestBuilder<A> withSampleCount(int sampleCount);
 
-    GeneratorTestBuilder<A> withInitialSeed(long initialSeed);
+    GeneratorTestBuilder<A> withTimeout(Duration timeout);
 
     GeneratorTestBuilder<A> classifyUsing(Fn1<A, Set<String>> classifier);
 
