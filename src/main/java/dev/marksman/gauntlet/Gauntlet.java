@@ -4,19 +4,23 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import dev.marksman.collectionviews.Vector;
 
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static dev.marksman.gauntlet.ExistentialDomainTestBuilder.existentialDomainTestBuilder;
+import static dev.marksman.gauntlet.GeneratorParameters.defaultGeneratorParameters;
 import static dev.marksman.gauntlet.GeneratorTestBuilder1.generatorTestBuilder1;
-import static dev.marksman.gauntlet.SimpleGeneratorTestRunner.simpleGeneratorTestRunner;
 import static dev.marksman.gauntlet.UniversalDomainTestBuilder.universalDomainTestBuilder;
+import static java.util.concurrent.Executors.newFixedThreadPool;
 
 public final class Gauntlet {
 
     public static int DEFAULT_SAMPLE_COUNT = 100;
     public static int DEFAULT_MAX_DISCARDS = 100;
 
-    private static AtomicReference<GeneratorTestRunner> defaultGeneratorTestRunner = new AtomicReference<>(simpleGeneratorTestRunner());
+    private static Executor executor = newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+    private static AtomicReference<GeneratorTestRunner> defaultGeneratorTestRunner = new AtomicReference<>(DefaultGeneratorTestRunner.defaultGeneratorTestRunner(executor, defaultGeneratorParameters()));
 
     private Gauntlet() {
 
