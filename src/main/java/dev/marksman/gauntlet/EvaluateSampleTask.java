@@ -6,9 +6,9 @@ import lombok.AllArgsConstructor;
 import static dev.marksman.gauntlet.TestTaskResult.error;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class TestSampleTask<A> implements Runnable {
+public class EvaluateSampleTask<A> implements Runnable {
     private final Context context;
-    private final TestResultReceiver receiver;
+    private final ResultReceiver receiver;
     private final Prop<A> property;
     private final int sampleIndex;
     private final A sample;
@@ -19,13 +19,13 @@ public class TestSampleTask<A> implements Runnable {
             try {
                 EvalResult evalResult = property.test(context, sample);
                 receiver.reportResult(sampleIndex, TestTaskResult.testTaskResult(evalResult));
-            } catch (Throwable error) {
+            } catch (Exception error) {
                 receiver.reportResult(sampleIndex, error(error));
             }
         }
     }
 
-    public static <A> TestSampleTask<A> testSampleTask(Context context, TestResultReceiver receiver, Prop<A> property, int sampleIndex, A sample) {
-        return new TestSampleTask<>(context, receiver, property, sampleIndex, sample);
+    public static <A> EvaluateSampleTask<A> testSampleTask(Context context, ResultReceiver receiver, Prop<A> property, int sampleIndex, A sample) {
+        return new EvaluateSampleTask<>(context, receiver, property, sampleIndex, sample);
     }
 }

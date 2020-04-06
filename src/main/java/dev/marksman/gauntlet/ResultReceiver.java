@@ -1,6 +1,6 @@
 package dev.marksman.gauntlet;
 
-public interface TestResultReceiver {
+public interface ResultReceiver {
     boolean shouldRun(int sampleIndex);
 
     void reportResult(int sampleIndex, TestTaskResult result);

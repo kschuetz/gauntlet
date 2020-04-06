@@ -7,6 +7,7 @@ import java.util.Random;
 import static com.jnape.palatable.lambda.adt.Unit.UNIT;
 import static dev.marksman.gauntlet.GeneratorParameters.defaultGeneratorParameters;
 
+// TODO: delete this
 public final class SimpleGeneratorTestRunner implements GeneratorTestRunner {
 
     private static final SimpleGeneratorTestRunner INSTANCE = new SimpleGeneratorTestRunner();

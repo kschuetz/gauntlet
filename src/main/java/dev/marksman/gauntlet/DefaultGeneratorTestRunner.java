@@ -11,8 +11,8 @@ import java.util.Random;
 import java.util.concurrent.Executor;
 
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
+import static dev.marksman.gauntlet.EvaluateSampleTask.testSampleTask;
 import static dev.marksman.gauntlet.GeneratedDataSet.generatedDataSet;
-import static dev.marksman.gauntlet.TestSampleTask.testSampleTask;
 
 public class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     private static final Random seedGenerator = new Random();
@@ -47,9 +47,9 @@ public class DefaultGeneratorTestRunner implements GeneratorTestRunner {
 
         ImmutableVector<A> samples = dataSet.getValues();
         int actualSampleCount = samples.size();
-        TestResultCollector<A> collector = new TestResultCollector<>(dataSet.getValues());
+        ResultCollector<A> collector = new ResultCollector<>(dataSet.getValues());
         for (int sampleIndex = 0; sampleIndex < actualSampleCount; sampleIndex++) {
-            TestSampleTask<A> task = testSampleTask(context, collector, testData.getProperty(), sampleIndex, samples.unsafeGet(sampleIndex));
+            EvaluateSampleTask<A> task = testSampleTask(context, collector, testData.getProperty(), sampleIndex, samples.unsafeGet(sampleIndex));
             executor.execute(task);
         }
         // TODO: handle supply failure

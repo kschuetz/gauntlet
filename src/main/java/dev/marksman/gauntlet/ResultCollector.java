@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static com.jnape.palatable.lambda.adt.Maybe.maybe;
 
-class TestResultCollector<A> implements TestResultReceiver {
+class ResultCollector<A> implements ResultReceiver {
     private final ImmutableVector<A> samples;
     private final ReentrantLock lock;
     private final TreeSet<Integer> notReported;
@@ -21,7 +21,7 @@ class TestResultCollector<A> implements TestResultReceiver {
     private volatile int firstFailureIndex;
     private volatile TestTaskResult result;
 
-    public TestResultCollector(ImmutableVector<A> samples) {
+    public ResultCollector(ImmutableVector<A> samples) {
         int sampleCount = samples.size();
         this.samples = samples;
         this.firstFailureIndex = sampleCount;
@@ -118,14 +118,18 @@ class TestResultCollector<A> implements TestResultReceiver {
         try {
             return samples
                     .zipWithIndex()
-                    .foldLeft((acc, si) -> notReported.contains(si._2())
-                                    ? acc
-                                    : acc.add(si._1()),
+                    .foldLeft((acc, si) -> sampleIndexPassed(si._2())
+                                    ? acc.add(si._1())
+                                    : acc,
                             VectorBuilder.<A>builder())
                     .build();
         } finally {
             lock.unlock();
         }
+    }
+
+    private boolean sampleIndexPassed(int index) {
+        return index < firstFailureIndex && !notReported.contains(index);
     }
 
 }

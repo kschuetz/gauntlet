@@ -4,6 +4,7 @@ import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.adt.coproduct.CoProduct6;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.ImmutableVector;
+import dev.marksman.collectionviews.Vector;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
@@ -181,6 +182,12 @@ public abstract class Outcome<A> implements CoProduct6<Outcome.Passed<A>,
                                              Failure failure,
                                              ImmutableVector<A> shrinks) {
         return new Falsified<>(passedSamples, falsifiedSample, failure, shrinks);
+    }
+
+    public static <A> Falsified<A> falsified(ImmutableVector<A> passedSamples,
+                                             A falsifiedSample,
+                                             Failure failure) {
+        return new Falsified<>(passedSamples, falsifiedSample, failure, Vector.empty());
     }
 
     public static <A> SupplyFailed<A> supplyFailed(ImmutableVector<A> passedSamples, SupplyFailure supplyFailure) {
