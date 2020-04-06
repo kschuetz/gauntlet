@@ -18,9 +18,7 @@ public interface GeneratorTestBuilder<A> {
 
     Outcome<A> executeFor(Prop<A> prop);
 
-    default void mustSatisfy(Prop<A> prop) {
-
-    }
+    void mustSatisfy(Prop<A> prop);
 
     default void mustSatisfy(Fn1<A, Boolean> predicate) {
         mustSatisfy(prop(predicate));

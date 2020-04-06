@@ -10,6 +10,7 @@ import java.util.Set;
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
+import static dev.marksman.gauntlet.ReportData.reportData;
 
 final class GeneratorTestBuilder1<A> implements GeneratorTestBuilder<A> {
     private final Maybe<GeneratorTestRunner> runner;
@@ -58,8 +59,28 @@ final class GeneratorTestBuilder1<A> implements GeneratorTestBuilder<A> {
 
     @Override
     public Outcome<A> executeFor(Prop<A> prop) {
-        GeneratorTest<A> testData = new GeneratorTest<>(gen, prop, initialSeed, sampleCount, classifiers, timeout);
+        return runImpl(buildGeneratorTest(prop));
+    }
+
+    @Override
+    public void mustSatisfy(Prop<A> prop) {
+        GeneratorTest<A> testData = buildGeneratorTest(prop);
+        Outcome<A> outcome = runImpl(testData);
+        ReportData<A> reportData = buildReportData(testData, outcome);
+        DefaultReporter.defaultReporter().reportOutcome(reportData);
+    }
+
+    private Outcome<A> runImpl(GeneratorTest<A> testData) {
         return runner.orElseGet(Gauntlet::defaultGeneratorTestRunner).run(testData);
+    }
+
+    private GeneratorTest<A> buildGeneratorTest(Prop<A> prop) {
+        return new GeneratorTest<>(gen, prop, initialSeed, sampleCount, classifiers, timeout);
+    }
+
+    private ReportData<A> buildReportData(GeneratorTest<A> testData,
+                                          Outcome<A> outcome) {
+        return reportData(testData.getProperty(), outcome, testData.getArbitrary().getPrettyPrinter());
     }
 
     static <A> GeneratorTestBuilder<A> generatorTestBuilder1(Arbitrary<A> generator,
