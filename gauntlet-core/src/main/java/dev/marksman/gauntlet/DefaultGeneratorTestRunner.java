@@ -14,6 +14,7 @@ import java.util.concurrent.Executor;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.gauntlet.EvaluateSampleTask.testSampleTask;
 import static dev.marksman.gauntlet.GeneratedDataSet.generatedDataSet;
+import static dev.marksman.gauntlet.GeneratorTestResult.generatorTestResult;
 
 public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     private static final Random seedGenerator = new Random();
@@ -55,7 +56,7 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     // if failure is found, run tests on shrinks
 
     @Override
-    public <A> Outcome<A> run(GeneratorTest<A> testData) {
+    public <A> GeneratorTestResult<A> run(GeneratorTest<A> testData) {
         Maybe<AscribedFailure<A>> result = nothing();
         Context context = new Context();
         long initialSeedValue = testData.getInitialSeed().orElseGet(seedGenerator::nextLong);
@@ -73,7 +74,8 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
         }
         // TODO: handle supply failure
         // TODO: handle shrinks
-        return collector.getResultBlocking(testData.getTimeout().orElse(defaultTimeout));
+        return generatorTestResult(collector.getResultBlocking(testData.getTimeout().orElse(defaultTimeout)),
+                initialSeedValue);
     }
 
     private <A> GeneratedDataSet<A> generateDataSet(Seed initialSeed,

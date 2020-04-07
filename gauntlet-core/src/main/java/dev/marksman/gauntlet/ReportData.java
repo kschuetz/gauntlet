@@ -1,5 +1,6 @@
 package dev.marksman.gauntlet;
 
+import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.functions.Fn1;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,11 +12,13 @@ public final class ReportData<A> {
     @Getter
     private final Prop<A> prop;
     @Getter
-    private final Outcome<A> outcome;
+    private final TestResult<A> result;
     @Getter
     private final Fn1<A, String> prettyPrinter;
+    @Getter
+    private final Maybe<Long> initialSeedValue;
 
-    public static <A> ReportData<A> reportData(Prop<A> prop, Outcome<A> outcome, Fn1<A, String> prettyPrinter) {
-        return new ReportData<>(prop, outcome, prettyPrinter);
+    public static <A> ReportData<A> reportData(Prop<A> prop, TestResult<A> testResult, Fn1<A, String> prettyPrinter, Maybe<Long> initialSeedValue) {
+        return new ReportData<>(prop, testResult, prettyPrinter, initialSeedValue);
     }
 }

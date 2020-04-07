@@ -66,25 +66,25 @@ class ResultCollector<A> implements ResultReceiver {
 
     }
 
-    public Outcome<A> getResultBlocking(Duration timeout) {
+    public TestResult<A> getResultBlocking(Duration timeout) {
         lock.lock();
         try {
             if (!await(timeout)) {
-                return Outcome.timedOut(getPassedSamples(), timeout);
+                return TestResult.timedOut(getPassedSamples(), timeout);
             }
             return getOutcome();
         } catch (InterruptedException e) {
-            return Outcome.interrupted(getPassedSamples(), maybe(e.getMessage()));
+            return TestResult.interrupted(getPassedSamples(), maybe(e.getMessage()));
         } finally {
             lock.unlock();
         }
 
     }
 
-    private Outcome<A> getOutcome() {
-        return result.match(__ -> Outcome.passed(samples),
-                failure -> Outcome.falsified(getPassedSamples(), samples.unsafeGet(firstFailureIndex), failure, Vector.empty()),
-                error -> Outcome.error(getPassedSamples(), samples.unsafeGet(firstFailureIndex), error));
+    private TestResult<A> getOutcome() {
+        return result.match(__ -> TestResult.passed(samples),
+                failure -> TestResult.falsified(getPassedSamples(), samples.unsafeGet(firstFailureIndex), failure, Vector.empty()),
+                error -> TestResult.error(getPassedSamples(), samples.unsafeGet(firstFailureIndex), error));
     }
 
     private boolean await(Duration timeout) throws InterruptedException {

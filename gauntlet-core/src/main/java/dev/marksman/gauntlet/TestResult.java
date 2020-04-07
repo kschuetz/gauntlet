@@ -15,21 +15,21 @@ import java.util.Set;
 import static lombok.AccessLevel.PRIVATE;
 
 @EqualsAndHashCode
-public abstract class Outcome<A> implements CoProduct6<Outcome.Passed<A>,
-        Outcome.Falsified<A>, Outcome.SupplyFailed<A>, Outcome.Error<A>, Outcome.TimedOut<A>,
-        Outcome.Interrupted<A>, Outcome<A>> {
+public abstract class TestResult<A> implements CoProduct6<TestResult.Passed<A>,
+        TestResult.Falsified<A>, TestResult.SupplyFailed<A>, TestResult.Error<A>, TestResult.TimedOut<A>,
+        TestResult.Interrupted<A>, TestResult<A>> {
 
     public abstract ImmutableVector<A> getPassedSamples();
 
     public abstract boolean isPassed();
 
-    public abstract Outcome<Classified<A>> applyClassifiers(Iterable<Fn1<A, Set<String>>> classifiers);
+    public abstract TestResult<Classified<A>> applyClassifiers(Iterable<Fn1<A, Set<String>>> classifiers);
 
     // All cases succeeded
     @EqualsAndHashCode(callSuper = true)
     @Value
     @AllArgsConstructor(access = PRIVATE)
-    public static class Passed<A> extends Outcome<A> {
+    public static class Passed<A> extends TestResult<A> {
         ImmutableVector<A> passedSamples;
 
         @Override
@@ -52,11 +52,12 @@ public abstract class Outcome<A> implements CoProduct6<Outcome.Passed<A>,
     @EqualsAndHashCode(callSuper = true)
     @Value
     @AllArgsConstructor(access = PRIVATE)
-    public static class Falsified<A> extends Outcome<A> {
+    public static class Falsified<A> extends TestResult<A> {
         ImmutableVector<A> passedSamples;
         A falsifiedSample;
         Failure failure;
         ImmutableVector<A> shrinks;
+
 
         @Override
         public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Falsified<A>, ? extends R> bFn, Fn1<? super SupplyFailed<A>, ? extends R> cFn, Fn1<? super Error<A>, ? extends R> dFn, Fn1<? super TimedOut<A>, ? extends R> eFn, Fn1<? super Interrupted<A>, ? extends R> fFn) {
@@ -79,7 +80,7 @@ public abstract class Outcome<A> implements CoProduct6<Outcome.Passed<A>,
     @EqualsAndHashCode(callSuper = true)
     @Value
     @AllArgsConstructor(access = PRIVATE)
-    public static class SupplyFailed<A> extends Outcome<A> {
+    public static class SupplyFailed<A> extends TestResult<A> {
         ImmutableVector<A> passedSamples;
         SupplyFailure supplyFailure;
 
@@ -103,7 +104,7 @@ public abstract class Outcome<A> implements CoProduct6<Outcome.Passed<A>,
     @EqualsAndHashCode(callSuper = true)
     @Value
     @AllArgsConstructor(access = PRIVATE)
-    public static class Error<A> extends Outcome<A> {
+    public static class Error<A> extends TestResult<A> {
         ImmutableVector<A> passedSamples;
         A errorSample;
         Throwable error;
@@ -129,7 +130,7 @@ public abstract class Outcome<A> implements CoProduct6<Outcome.Passed<A>,
     @EqualsAndHashCode(callSuper = true)
     @Value
     @AllArgsConstructor(access = PRIVATE)
-    public static class TimedOut<A> extends Outcome<A> {
+    public static class TimedOut<A> extends TestResult<A> {
         ImmutableVector<A> passedSamples;
         Duration duration;
 
@@ -153,7 +154,7 @@ public abstract class Outcome<A> implements CoProduct6<Outcome.Passed<A>,
     @EqualsAndHashCode(callSuper = true)
     @Value
     @AllArgsConstructor(access = PRIVATE)
-    public static class Interrupted<A> extends Outcome<A> {
+    public static class Interrupted<A> extends TestResult<A> {
         ImmutableVector<A> passedSamples;
         Maybe<String> message;
 

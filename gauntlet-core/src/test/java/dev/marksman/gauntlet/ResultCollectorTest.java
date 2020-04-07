@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 
 import static dev.marksman.gauntlet.Failure.failure;
-import static dev.marksman.gauntlet.Outcome.*;
+import static dev.marksman.gauntlet.TestResult.*;
 import static dev.marksman.gauntlet.TestTaskResult.success;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,7 +34,7 @@ class ResultCollectorTest {
             collector.reportResult(sampleIndex, success());
         }
 
-        Outcome<Integer> result = collector.getResultBlocking(Duration.ZERO);
+        TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
         assertEquals(passed(samples), result);
     }
@@ -45,7 +45,7 @@ class ResultCollectorTest {
             collector.reportResult(sampleIndex, success());
         }
 
-        Outcome<Integer> result = collector.getResultBlocking(Duration.ZERO);
+        TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
         assertEquals(passed(samples), result);
     }
@@ -57,7 +57,7 @@ class ResultCollectorTest {
             collector.reportResult(sampleIndex, success());
         }
 
-        Outcome<Integer> result = collector.getResultBlocking(Duration.ZERO);
+        TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
         assertEquals(timedOut(samples.take(samplesToFinishBeforeTimeout), Duration.ZERO),
                 result);
@@ -70,7 +70,7 @@ class ResultCollectorTest {
             collector.reportResult(sampleIndex, sampleIndex == failedIndex ? TestTaskResult.failure(failure) : success());
         }
 
-        Outcome<Integer> result = collector.getResultBlocking(Duration.ZERO);
+        TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
         assertEquals(falsified(samples.take(failedIndex), samples.unsafeGet(failedIndex), failure),
                 result);
@@ -85,7 +85,7 @@ class ResultCollectorTest {
                     : success());
         }
 
-        Outcome<Integer> result = collector.getResultBlocking(Duration.ZERO);
+        TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
         assertEquals(falsified(samples.take(firstFailedIndex), samples.unsafeGet(firstFailedIndex), failure),
                 result);
@@ -99,7 +99,7 @@ class ResultCollectorTest {
             collector.reportResult(sampleIndex, sampleIndex == erroredIndex ? TestTaskResult.error(exception) : success());
         }
 
-        Outcome<Integer> result = collector.getResultBlocking(Duration.ZERO);
+        TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
         assertEquals(error(samples.take(erroredIndex), samples.unsafeGet(erroredIndex), exception),
                 result);
@@ -115,7 +115,7 @@ class ResultCollectorTest {
                     : success());
         }
 
-        Outcome<Integer> result = collector.getResultBlocking(Duration.ZERO);
+        TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
         assertEquals(error(samples.take(firstErroredIndex), samples.unsafeGet(firstErroredIndex), exception),
                 result);
@@ -129,7 +129,7 @@ class ResultCollectorTest {
         }
         collector.reportResult(failedIndex, TestTaskResult.failure(failure));
 
-        Outcome<Integer> result = collector.getResultBlocking(Duration.ZERO);
+        TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
         assertEquals(falsified(samples.take(failedIndex), samples.unsafeGet(failedIndex), failure),
                 result);
@@ -144,7 +144,7 @@ class ResultCollectorTest {
         }
         collector.reportResult(errorIndex, TestTaskResult.error(exception));
 
-        Outcome<Integer> result = collector.getResultBlocking(Duration.ZERO);
+        TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
         assertEquals(error(samples.take(errorIndex), samples.unsafeGet(errorIndex), exception),
                 result);

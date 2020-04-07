@@ -58,19 +58,19 @@ final class GeneratorTestBuilder1<A> implements GeneratorTestBuilder<A> {
     }
 
     @Override
-    public Outcome<A> executeFor(Prop<A> prop) {
+    public GeneratorTestResult<A> executeFor(Prop<A> prop) {
         return runImpl(buildGeneratorTest(prop));
     }
 
     @Override
     public void mustSatisfy(Prop<A> prop) {
         GeneratorTest<A> testData = buildGeneratorTest(prop);
-        Outcome<A> outcome = runImpl(testData);
-        ReportData<A> reportData = buildReportData(testData, outcome);
-        DefaultReporter.defaultReporter().reportOutcome(reportData);
+        GeneratorTestResult<A> testResult = runImpl(testData);
+        ReportData<A> reportData = buildReportData(testData, testResult);
+        DefaultReporter.defaultReporter().report(reportData);
     }
 
-    private Outcome<A> runImpl(GeneratorTest<A> testData) {
+    private GeneratorTestResult<A> runImpl(GeneratorTest<A> testData) {
         return runner.orElseGet(Gauntlet::defaultGeneratorTestRunner).run(testData);
     }
 
@@ -79,8 +79,9 @@ final class GeneratorTestBuilder1<A> implements GeneratorTestBuilder<A> {
     }
 
     private ReportData<A> buildReportData(GeneratorTest<A> testData,
-                                          Outcome<A> outcome) {
-        return reportData(testData.getProperty(), outcome, testData.getArbitrary().getPrettyPrinter());
+                                          GeneratorTestResult<A> testResult) {
+        return reportData(testData.getProperty(), testResult.getResult(), testData.getArbitrary().getPrettyPrinter(),
+                just(testResult.getInitialSeedValue()));
     }
 
     static <A> GeneratorTestBuilder<A> generatorTestBuilder1(Arbitrary<A> generator,

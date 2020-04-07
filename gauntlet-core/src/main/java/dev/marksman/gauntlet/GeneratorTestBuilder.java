@@ -16,7 +16,7 @@ public interface GeneratorTestBuilder<A> {
 
     GeneratorTestBuilder<A> classifyUsing(Fn1<A, Set<String>> classifier);
 
-    Outcome<A> executeFor(Prop<A> prop);
+    GeneratorTestResult<A> executeFor(Prop<A> prop);
 
     void mustSatisfy(Prop<A> prop);
 
