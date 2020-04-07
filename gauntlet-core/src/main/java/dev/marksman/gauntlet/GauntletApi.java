@@ -7,7 +7,17 @@ import dev.marksman.kraftwerk.GeneratorParameters;
 import java.time.Duration;
 import java.util.concurrent.Executor;
 
-public interface GauntletApi extends GauntletEnvironment {
+public interface GauntletApi {
+    Executor getExecutor();
+
+    GeneratorTestRunner getGeneratorTestRunner();
+
+    Reporter getReporter();
+
+    GeneratorParameters getGeneratorParameters();
+
+    Duration getDefaultTimeout();
+
     int getDefaultSampleCount();
 
     GauntletApi withExecutor(Executor executor);
