@@ -10,9 +10,6 @@ import java.util.concurrent.Executor;
 import static dev.marksman.gauntlet.GeneratorTestBuilder1.generatorTestBuilder1;
 
 class DefaultGauntlet implements GauntletApi {
-    private static final int INITIAL_DEFAULT_SAMPLE_COUNT = 100;
-    private static final int INITIAL_DEFAULT_MAX_DISCARDS = 100;
-
     private final Executor executor;
     private final GeneratorTestRunner generatorTestRunner;
     private final Reporter reporter;
