@@ -7,16 +7,14 @@ import java.util.Set;
 
 import static dev.marksman.gauntlet.Prop.prop;
 
-public interface GeneratorTestBuilder<A> {
-    GeneratorTestBuilder<A> withInitialSeed(long initialSeed);
+public interface GeneratorTestApi<A> {
+    GeneratorTestApi<A> withInitialSeed(long initialSeed);
 
-    GeneratorTestBuilder<A> withSampleCount(int sampleCount);
+    GeneratorTestApi<A> withSampleCount(int sampleCount);
 
-    GeneratorTestBuilder<A> withTimeout(Duration timeout);
+    GeneratorTestApi<A> withTimeout(Duration timeout);
 
-    GeneratorTestBuilder<A> classifyUsing(Fn1<A, Set<String>> classifier);
-
-    GeneratorTestResult<A> executeFor(Prop<A> prop);
+    GeneratorTestApi<A> classifyUsing(Fn1<A, Set<String>> classifier);
 
     void mustSatisfy(Prop<A> prop);
 

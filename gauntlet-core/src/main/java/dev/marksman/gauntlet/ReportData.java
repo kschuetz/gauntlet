@@ -21,4 +21,5 @@ public final class ReportData<A> {
     public static <A> ReportData<A> reportData(Prop<A> prop, TestResult<A> testResult, Fn1<A, String> prettyPrinter, Maybe<Long> initialSeedValue) {
         return new ReportData<>(prop, testResult, prettyPrinter, initialSeedValue);
     }
+
 }

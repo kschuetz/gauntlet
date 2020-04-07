@@ -2,12 +2,19 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
+import dev.marksman.collectionviews.Vector;
 import dev.marksman.kraftwerk.GeneratorParameters;
 
 import java.time.Duration;
 import java.util.concurrent.Executor;
 
-import static dev.marksman.gauntlet.GeneratorTestBuilder1.generatorTestBuilder1;
+import static com.jnape.palatable.lambda.adt.Maybe.just;
+import static com.jnape.palatable.lambda.adt.Maybe.nothing;
+import static dev.marksman.gauntlet.GeneratorTestApi1.generatorTestBuilder1;
+import static dev.marksman.gauntlet.GeneratorTestApi2.generatorTestApi2;
+import static dev.marksman.gauntlet.GeneratorTestExecutionParameters.generatorTestExecutionParameters;
+import static dev.marksman.gauntlet.GeneratorTestParameters.generatorTestParameters;
+import static dev.marksman.gauntlet.ReportData.reportData;
 
 class DefaultGauntlet implements GauntletApi {
     private final Executor executor;
@@ -99,20 +106,41 @@ class DefaultGauntlet implements GauntletApi {
     }
 
     @Override
-    public <A> GeneratorTestBuilder<A> all(Arbitrary<A> generator) {
-        return generatorTestBuilder1(this, generator, defaultSampleCount);
+    public <A> GeneratorTestApi<A> all(Arbitrary<A> generator) {
+        return createGeneratorTestApi(generator);
     }
 
     @Override
-    public <A, B> GeneratorTestBuilder<Tuple2<A, B>> all(Arbitrary<A> generatorA, Arbitrary<B> generatorB) {
-        return generatorTestBuilder1(this, CompositeArbitraries.combine(generatorA, generatorB),
-                defaultSampleCount);
+    public <A, B> GeneratorTestApi<Tuple2<A, B>> all(Arbitrary<A> generatorA, Arbitrary<B> generatorB) {
+        return createGeneratorTestApi(CompositeArbitraries.combine(generatorA, generatorB));
     }
 
     @Override
-    public <A, B, C> GeneratorTestBuilder<Tuple3<A, B, C>> all(Arbitrary<A> generatorA, Arbitrary<B> generatorB, Arbitrary<C> generatorC) {
-        return generatorTestBuilder1(this, CompositeArbitraries.combine(generatorA, generatorB, generatorC),
-                defaultSampleCount);
+    public <A, B, C> GeneratorTestApi<Tuple3<A, B, C>> all(Arbitrary<A> generatorA, Arbitrary<B> generatorB, Arbitrary<C> generatorC) {
+        return createGeneratorTestApi(CompositeArbitraries.combine(generatorA, generatorB, generatorC));
+    }
+
+    private <A> GeneratorTestApi<A> createGeneratorTestApi1(Arbitrary<A> generator) {
+        GeneratorTestExecutionParameters gtep = generatorTestExecutionParameters(getExecutor(),
+                getGeneratorParameters(), defaultTimeout);
+
+        return generatorTestBuilder1(testData -> getGeneratorTestRunner().run(gtep, testData),
+                reporter::report,
+                generatorTestParameters(generator, nothing(), defaultSampleCount, Vector.empty(), nothing()));
+    }
+
+    private <A> GeneratorTestApi<A> createGeneratorTestApi(Arbitrary<A> generator) {
+        return generatorTestApi2(this::runGeneratorTest,
+                generatorTestParameters(generator, nothing(), defaultSampleCount, Vector.empty(), nothing()));
+    }
+
+    private <A> void runGeneratorTest(GeneratorTest<A> generatorTest) {
+        GeneratorTestResult<A> result = generatorTestRunner.run(
+                generatorTestExecutionParameters(getExecutor(), getGeneratorParameters(), defaultTimeout),
+                generatorTest);
+        ReportData<A> reportData = reportData(generatorTest.getProperty(), result.getResult(), generatorTest.getArbitrary().getPrettyPrinter(),
+                just(result.getInitialSeedValue()));
+        reporter.report(reportData);
     }
 
 }

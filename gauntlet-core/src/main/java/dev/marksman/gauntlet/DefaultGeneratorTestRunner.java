@@ -26,14 +26,14 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
 
 
     @Override
-    public <A> GeneratorTestResult<A> run(GauntletEnvironment environment, GeneratorTest<A> testData) {
-        Executor executor = environment.getExecutor();
+    public <A> GeneratorTestResult<A> run(GeneratorTestExecutionParameters executionParameters, GeneratorTest<A> testData) {
+        Executor executor = executionParameters.getExecutor();
         Maybe<AscribedFailure<A>> result = nothing();
         Context context = new Context();
         long initialSeedValue = testData.getInitialSeed().orElseGet(seedGenerator::nextLong);
         Seed initialSeed = Seed.create(initialSeedValue);
         Arbitrary<A> arbitrary = testData.getArbitrary();
-        ValueSupplier<A> valueSupplier = arbitrary.prepare(environment.getGeneratorParameters());
+        ValueSupplier<A> valueSupplier = arbitrary.prepare(executionParameters.getGeneratorParameters());
         GeneratedDataSet<A> dataSet = generateDataSet(initialSeed, valueSupplier, testData.getSampleCount());
 
         ImmutableVector<A> samples = dataSet.getValues();
@@ -45,7 +45,7 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
         }
         // TODO: handle supply failure
         // TODO: handle shrinks
-        return generatorTestResult(collector.getResultBlocking(testData.getTimeout().orElse(environment.getDefaultTimeout())),
+        return generatorTestResult(collector.getResultBlocking(testData.getTimeout().orElse(executionParameters.getDefaultTimeout())),
                 initialSeedValue);
     }
 

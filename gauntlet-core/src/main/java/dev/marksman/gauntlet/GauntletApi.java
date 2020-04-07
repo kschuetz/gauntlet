@@ -26,12 +26,12 @@ public interface GauntletApi extends GauntletEnvironment {
 
     GauntletApi withDefaultTimeout(Duration timeout);
 
-    <A> GeneratorTestBuilder<A> all(Arbitrary<A> generator);
+    <A> GeneratorTestApi<A> all(Arbitrary<A> generator);
 
-    <A, B> GeneratorTestBuilder<Tuple2<A, B>> all(Arbitrary<A> generatorA,
-                                                  Arbitrary<B> generatorB);
+    <A, B> GeneratorTestApi<Tuple2<A, B>> all(Arbitrary<A> generatorA,
+                                              Arbitrary<B> generatorB);
 
-    <A, B, C> GeneratorTestBuilder<Tuple3<A, B, C>> all(Arbitrary<A> generatorA,
-                                                        Arbitrary<B> generatorB,
-                                                        Arbitrary<C> generatorC);
+    <A, B, C> GeneratorTestApi<Tuple3<A, B, C>> all(Arbitrary<A> generatorA,
+                                                    Arbitrary<B> generatorB,
+                                                    Arbitrary<C> generatorC);
 }
