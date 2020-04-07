@@ -21,8 +21,6 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
 
     private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(60);  // TODO
 
-    @Getter
-    private final Executor executor;
 
     @Getter
     private final Parameters generatorParameters;
@@ -30,22 +28,17 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     @Getter
     private final Duration defaultTimeout;
 
-    private DefaultGeneratorTestRunner(Executor executor, Parameters generatorParameters, Duration defaultTimeout) {
-        this.executor = executor;
+    private DefaultGeneratorTestRunner(Parameters generatorParameters, Duration defaultTimeout) {
         this.generatorParameters = generatorParameters;
         this.defaultTimeout = defaultTimeout;
     }
 
-    public DefaultGeneratorTestRunner withExecutor(Executor executor) {
-        return new DefaultGeneratorTestRunner(executor, generatorParameters, defaultTimeout);
-    }
-
     public DefaultGeneratorTestRunner withGeneratorParameters(Parameters generatorParameters) {
-        return new DefaultGeneratorTestRunner(executor, generatorParameters, defaultTimeout);
+        return new DefaultGeneratorTestRunner(generatorParameters, defaultTimeout);
     }
 
     public DefaultGeneratorTestRunner withDefaultTimeout(Duration timeout) {
-        return new DefaultGeneratorTestRunner(executor, generatorParameters, defaultTimeout);
+        return new DefaultGeneratorTestRunner(generatorParameters, defaultTimeout);
     }
 
     // generate all inputs
@@ -56,7 +49,7 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     // if failure is found, run tests on shrinks
 
     @Override
-    public <A> GeneratorTestResult<A> run(GeneratorTest<A> testData) {
+    public <A> GeneratorTestResult<A> run(Executor executor, GeneratorTest<A> testData) {
         Maybe<AscribedFailure<A>> result = nothing();
         Context context = new Context();
         long initialSeedValue = testData.getInitialSeed().orElseGet(seedGenerator::nextLong);
@@ -104,8 +97,7 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
         return supplied.orElseGet(seedGenerator::nextLong);
     }
 
-    public static DefaultGeneratorTestRunner defaultGeneratorTestRunner(Executor executor,
-                                                                        Parameters generatorParameters) {
-        return new DefaultGeneratorTestRunner(executor, generatorParameters, DEFAULT_TIMEOUT);
+    public static DefaultGeneratorTestRunner defaultGeneratorTestRunner(Parameters generatorParameters) {
+        return new DefaultGeneratorTestRunner(generatorParameters, DEFAULT_TIMEOUT);
     }
 }

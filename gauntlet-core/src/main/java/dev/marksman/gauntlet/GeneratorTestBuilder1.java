@@ -13,6 +13,7 @@ import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmuta
 import static dev.marksman.gauntlet.ReportData.reportData;
 
 final class GeneratorTestBuilder1<A> implements GeneratorTestBuilder<A> {
+    private final GauntletEnvironment environment;
     private final Maybe<GeneratorTestRunner> runner;
     private final Arbitrary<A> gen;
     private final Maybe<Long> initialSeed;
@@ -20,11 +21,13 @@ final class GeneratorTestBuilder1<A> implements GeneratorTestBuilder<A> {
     private final ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers;
     private final Maybe<Duration> timeout;
 
-    GeneratorTestBuilder1(Maybe<GeneratorTestRunner> runner,
+    GeneratorTestBuilder1(GauntletEnvironment environment,
+                          Maybe<GeneratorTestRunner> runner,
                           Arbitrary<A> gen,
                           Maybe<Long> initialSeed,
                           int sampleCount,
                           ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers, Maybe<Duration> timeout) {
+        this.environment = environment;
         this.runner = runner;
         this.gen = gen;
         this.initialSeed = initialSeed;
@@ -35,26 +38,26 @@ final class GeneratorTestBuilder1<A> implements GeneratorTestBuilder<A> {
 
     @Override
     public GeneratorTestBuilder<A> withSampleCount(int sampleCount) {
-        return new GeneratorTestBuilder1<>(runner, gen, initialSeed, sampleCount, classifiers, timeout);
+        return new GeneratorTestBuilder1<>(environment, runner, gen, initialSeed, sampleCount, classifiers, timeout);
     }
 
     @Override
     public GeneratorTestBuilder<A> withInitialSeed(long initialSeed) {
-        return new GeneratorTestBuilder1<>(runner, gen, just(initialSeed), sampleCount, classifiers, timeout);
+        return new GeneratorTestBuilder1<>(environment, runner, gen, just(initialSeed), sampleCount, classifiers, timeout);
     }
 
     @Override
     public GeneratorTestBuilder<A> withTimeout(Duration timeout) {
-        return new GeneratorTestBuilder1<>(runner, gen, initialSeed, sampleCount, classifiers, just(timeout));
+        return new GeneratorTestBuilder1<>(environment, runner, gen, initialSeed, sampleCount, classifiers, just(timeout));
     }
 
     @Override
     public GeneratorTestBuilder<A> classifyUsing(Fn1<A, Set<String>> classifier) {
-        return new GeneratorTestBuilder1<>(runner, gen, initialSeed, sampleCount, classifiers.prepend(classifier), timeout);
+        return new GeneratorTestBuilder1<>(environment, runner, gen, initialSeed, sampleCount, classifiers.prepend(classifier), timeout);
     }
 
     public GeneratorTestBuilder<A> withRunner(GeneratorTestRunner runner) {
-        return new GeneratorTestBuilder1<>(just(runner), gen, initialSeed, sampleCount, classifiers, timeout);
+        return new GeneratorTestBuilder1<>(environment, just(runner), gen, initialSeed, sampleCount, classifiers, timeout);
     }
 
     @Override
@@ -67,11 +70,11 @@ final class GeneratorTestBuilder1<A> implements GeneratorTestBuilder<A> {
         GeneratorTest<A> testData = buildGeneratorTest(prop);
         GeneratorTestResult<A> testResult = runImpl(testData);
         ReportData<A> reportData = buildReportData(testData, testResult);
-        DefaultReporter.defaultReporter().report(reportData);
+        environment.getReporter().report(reportData);
     }
 
     private GeneratorTestResult<A> runImpl(GeneratorTest<A> testData) {
-        return runner.orElseGet(Gauntlet::defaultGeneratorTestRunner).run(testData);
+        return runner.orElseGet(environment::getGeneratorTestRunner).run(environment.getExecutor(), testData);
     }
 
     private GeneratorTest<A> buildGeneratorTest(Prop<A> prop) {
@@ -84,9 +87,10 @@ final class GeneratorTestBuilder1<A> implements GeneratorTestBuilder<A> {
                 just(testResult.getInitialSeedValue()));
     }
 
-    static <A> GeneratorTestBuilder<A> generatorTestBuilder1(Arbitrary<A> generator,
+    static <A> GeneratorTestBuilder<A> generatorTestBuilder1(GauntletEnvironment environment,
+                                                             Arbitrary<A> generator,
                                                              int sampleCount) {
-        return new GeneratorTestBuilder1<>(nothing(), generator, nothing(),
+        return new GeneratorTestBuilder1<>(environment, nothing(), generator, nothing(),
                 sampleCount, emptyImmutableFiniteIterable(), nothing());
     }
 
