@@ -8,10 +8,4 @@ public interface GauntletEnvironment {
     GeneratorTestRunner getGeneratorTestRunner();
 
     Reporter getReporter();
-
-    GauntletEnvironment withExecutor(Executor executor);
-
-    GauntletEnvironment withGeneratorTestRunner(GeneratorTestRunner testRunner);
-
-    GauntletEnvironment withReporter(Reporter reporter);
 }
