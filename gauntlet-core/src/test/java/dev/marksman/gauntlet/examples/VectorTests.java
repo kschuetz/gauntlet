@@ -14,8 +14,10 @@ public class VectorTests {
 
     @Test
     void reverseTwiceIsOriginal() {
-        gauntlet().all(arbitraryInt().vector()).mustSatisfy(prop("reverse twice is original",
-                xs -> xs.reverse().reverse().equals(xs)));
+        gauntlet()
+                .all(vectors)
+                .mustSatisfy(prop("reverse twice is original",
+                        xs -> xs.reverse().reverse().equals(xs)));
     }
 
 }
