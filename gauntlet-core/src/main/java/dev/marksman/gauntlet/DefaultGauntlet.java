@@ -2,6 +2,7 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
+import dev.marksman.kraftwerk.Parameters;
 
 import java.util.concurrent.Executor;
 
@@ -14,13 +15,15 @@ class DefaultGauntlet implements GauntletApi {
     private final Executor executor;
     private final GeneratorTestRunner generatorTestRunner;
     private final Reporter reporter;
+    private final Parameters generatorParameters;
     private final int defaultSampleCount;
     private final int defaultMaxDiscards;
 
-    public DefaultGauntlet(Executor executor, GeneratorTestRunner generatorTestRunner, Reporter reporter, int defaultSampleCount, int defaultMaxDiscards) {
+    public DefaultGauntlet(Executor executor, GeneratorTestRunner generatorTestRunner, Reporter reporter, Parameters generatorParameters, int defaultSampleCount, int defaultMaxDiscards) {
         this.executor = executor;
         this.generatorTestRunner = generatorTestRunner;
         this.reporter = reporter;
+        this.generatorParameters = generatorParameters;
         this.defaultSampleCount = defaultSampleCount;
         this.defaultMaxDiscards = defaultMaxDiscards;
     }
@@ -33,6 +36,11 @@ class DefaultGauntlet implements GauntletApi {
     @Override
     public GeneratorTestRunner getGeneratorTestRunner() {
         return generatorTestRunner;
+    }
+
+    @Override
+    public Parameters getGeneratorParameters() {
+        return generatorParameters;
     }
 
     @Override
@@ -52,27 +60,32 @@ class DefaultGauntlet implements GauntletApi {
 
     @Override
     public GauntletApi withDefaultSampleCount(int sampleCount) {
-        return new DefaultGauntlet(executor, generatorTestRunner, reporter, sampleCount, defaultMaxDiscards);
+        return new DefaultGauntlet(executor, generatorTestRunner, reporter, generatorParameters, sampleCount, defaultMaxDiscards);
     }
 
     @Override
     public GauntletApi withDefaultMaxDiscards(int maxDiscards) {
-        return new DefaultGauntlet(executor, generatorTestRunner, reporter, defaultSampleCount, maxDiscards);
+        return new DefaultGauntlet(executor, generatorTestRunner, reporter, generatorParameters, defaultSampleCount, maxDiscards);
     }
 
     @Override
     public GauntletApi withExecutor(Executor executor) {
-        return new DefaultGauntlet(executor, generatorTestRunner, reporter, defaultSampleCount, defaultMaxDiscards);
+        return new DefaultGauntlet(executor, generatorTestRunner, reporter, generatorParameters, defaultSampleCount, defaultMaxDiscards);
     }
 
     @Override
     public GauntletApi withGeneratorTestRunner(GeneratorTestRunner testRunner) {
-        return new DefaultGauntlet(executor, generatorTestRunner, reporter, defaultSampleCount, defaultMaxDiscards);
+        return new DefaultGauntlet(executor, generatorTestRunner, reporter, generatorParameters, defaultSampleCount, defaultMaxDiscards);
+    }
+
+    @Override
+    public GauntletApi withGeneratorParameters(Parameters generatorParameters) {
+        return new DefaultGauntlet(executor, generatorTestRunner, reporter, generatorParameters, defaultSampleCount, defaultMaxDiscards);
     }
 
     @Override
     public GauntletApi withReporter(Reporter reporter) {
-        return new DefaultGauntlet(executor, generatorTestRunner, reporter, defaultSampleCount, defaultMaxDiscards);
+        return new DefaultGauntlet(executor, generatorTestRunner, reporter, generatorParameters, defaultSampleCount, defaultMaxDiscards);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package dev.marksman.gauntlet;
 
+import dev.marksman.kraftwerk.Parameters;
+
 import java.util.concurrent.Executor;
 
 public interface GauntletEnvironment {
@@ -8,4 +10,6 @@ public interface GauntletEnvironment {
     GeneratorTestRunner getGeneratorTestRunner();
 
     Reporter getReporter();
+
+    Parameters getGeneratorParameters();
 }

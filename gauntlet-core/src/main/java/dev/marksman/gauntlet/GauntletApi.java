@@ -2,6 +2,7 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
+import dev.marksman.kraftwerk.Parameters;
 
 import java.util.concurrent.Executor;
 
@@ -19,6 +20,8 @@ public interface GauntletApi extends GauntletEnvironment {
     GauntletApi withDefaultSampleCount(int sampleCount);
 
     GauntletApi withDefaultMaxDiscards(int maxDiscards);
+
+    GauntletApi withGeneratorParameters(Parameters generatorParameters);
 
     <A> GeneratorTestBuilder<A> all(Arbitrary<A> generator);
 

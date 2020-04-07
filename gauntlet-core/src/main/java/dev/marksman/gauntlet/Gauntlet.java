@@ -19,7 +19,7 @@ public final class Gauntlet {
     public static GauntletApi GAUNTLET = new DefaultGauntlet(executor,
             DefaultGeneratorTestRunner.defaultGeneratorTestRunner(defaultGeneratorParameters()),
             DefaultReporter.defaultReporter(),
-            DEFAULT_SAMPLE_COUNT,
+            defaultGeneratorParameters(), DEFAULT_SAMPLE_COUNT,
             DEFAULT_MAX_DISCARDS);
 
 
