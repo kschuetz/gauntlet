@@ -9,33 +9,33 @@ import java.util.function.Consumer;
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static dev.marksman.gauntlet.GeneratorTest.generatorTest;
 
-final class GeneratorTestApi2<A> implements GeneratorTestApi<A> {
+final class ConcreteGeneratorTestApi<A> implements GeneratorTestApi<A> {
     private final Consumer<GeneratorTest<A>> runner;
     private final GeneratorTestParameters<A> parameters;
 
-    GeneratorTestApi2(Consumer<GeneratorTest<A>> runner, GeneratorTestParameters<A> parameters) {
+    ConcreteGeneratorTestApi(Consumer<GeneratorTest<A>> runner, GeneratorTestParameters<A> parameters) {
         this.runner = runner;
         this.parameters = parameters;
     }
 
     @Override
     public GeneratorTestApi<A> withSampleCount(int sampleCount) {
-        return new GeneratorTestApi2<>(runner, parameters.withSampleCount(sampleCount));
+        return new ConcreteGeneratorTestApi<>(runner, parameters.withSampleCount(sampleCount));
     }
 
     @Override
     public GeneratorTestApi<A> withInitialSeed(long initialSeed) {
-        return new GeneratorTestApi2<>(runner, parameters.withInitialSeed(just(initialSeed)));
+        return new ConcreteGeneratorTestApi<>(runner, parameters.withInitialSeed(just(initialSeed)));
     }
 
     @Override
     public GeneratorTestApi<A> withTimeout(Duration timeout) {
-        return new GeneratorTestApi2<>(runner, parameters.withTimeout(just(timeout)));
+        return new ConcreteGeneratorTestApi<>(runner, parameters.withTimeout(just(timeout)));
     }
 
     @Override
     public GeneratorTestApi<A> classifyUsing(Fn1<A, Set<String>> classifier) {
-        return new GeneratorTestApi2<>(runner, parameters.addClassifier(classifier));
+        return new ConcreteGeneratorTestApi<>(runner, parameters.addClassifier(classifier));
     }
 
     @Override
@@ -43,8 +43,8 @@ final class GeneratorTestApi2<A> implements GeneratorTestApi<A> {
         runner.accept(generatorTest(parameters, property));
     }
 
-    static <A> GeneratorTestApi2<A> generatorTestApi2(Consumer<GeneratorTest<A>> runner, GeneratorTestParameters<A> parameters) {
-        return new GeneratorTestApi2<>(runner, parameters);
+    static <A> ConcreteGeneratorTestApi<A> concreteGeneratorTestApi(Consumer<GeneratorTest<A>> runner, GeneratorTestParameters<A> parameters) {
+        return new ConcreteGeneratorTestApi<>(runner, parameters);
     }
 
 }

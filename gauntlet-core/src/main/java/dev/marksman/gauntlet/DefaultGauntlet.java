@@ -10,8 +10,7 @@ import java.util.concurrent.Executor;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
-import static dev.marksman.gauntlet.GeneratorTestApi1.generatorTestBuilder1;
-import static dev.marksman.gauntlet.GeneratorTestApi2.generatorTestApi2;
+import static dev.marksman.gauntlet.ConcreteGeneratorTestApi.concreteGeneratorTestApi;
 import static dev.marksman.gauntlet.GeneratorTestExecutionParameters.generatorTestExecutionParameters;
 import static dev.marksman.gauntlet.GeneratorTestParameters.generatorTestParameters;
 import static dev.marksman.gauntlet.ReportData.reportData;
@@ -120,17 +119,8 @@ class DefaultGauntlet implements GauntletApi {
         return createGeneratorTestApi(CompositeArbitraries.combine(generatorA, generatorB, generatorC));
     }
 
-    private <A> GeneratorTestApi<A> createGeneratorTestApi1(Arbitrary<A> generator) {
-        GeneratorTestExecutionParameters gtep = generatorTestExecutionParameters(getExecutor(),
-                getGeneratorParameters(), defaultTimeout);
-
-        return generatorTestBuilder1(testData -> getGeneratorTestRunner().run(gtep, testData),
-                reporter::report,
-                generatorTestParameters(generator, nothing(), defaultSampleCount, Vector.empty(), nothing()));
-    }
-
     private <A> GeneratorTestApi<A> createGeneratorTestApi(Arbitrary<A> generator) {
-        return generatorTestApi2(this::runGeneratorTest,
+        return concreteGeneratorTestApi(this::runGeneratorTest,
                 generatorTestParameters(generator, nothing(), defaultSampleCount, Vector.empty(), nothing()));
     }
 
