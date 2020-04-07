@@ -1,13 +1,12 @@
 package dev.marksman.gauntlet;
 
-import java.util.concurrent.Executor;
+import dev.marksman.kraftwerk.GeneratorParameters;
 
-import static dev.marksman.gauntlet.GParams.defaultGeneratorParameters;
+import static dev.marksman.kraftwerk.StandardGeneratorParameters.defaultGeneratorParameters;
+import static dev.marksman.kraftwerk.bias.DefaultPropertyTestingBiasSettings.defaultPropertyTestBiasSettings;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 
 public final class Gauntlet {
-
-    private static Executor executor = newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public static int DEFAULT_SAMPLE_COUNT = 100;
     public static int DEFAULT_MAX_DISCARDS = 100;
@@ -16,11 +15,25 @@ public final class Gauntlet {
 
     }
 
-    public static GauntletApi GAUNTLET = new DefaultGauntlet(executor,
-            DefaultGeneratorTestRunner.defaultGeneratorTestRunner(defaultGeneratorParameters()),
-            DefaultReporter.defaultReporter(),
-            defaultGeneratorParameters(), DEFAULT_SAMPLE_COUNT,
-            DEFAULT_MAX_DISCARDS);
+    private static GauntletApi INSTANCE;
 
+    public static GauntletApi gauntlet() {
+        if (INSTANCE == null) {
+            synchronized (Gauntlet.class) {
+                if (INSTANCE == null) {
+                    GeneratorParameters generatorParameters = defaultGeneratorParameters()
+                            .withBiasSettings(defaultPropertyTestBiasSettings());
+
+                    INSTANCE = new DefaultGauntlet(newFixedThreadPool(Runtime.getRuntime().availableProcessors()),
+                            DefaultGeneratorTestRunner.defaultGeneratorTestRunner(generatorParameters),
+                            DefaultReporter.defaultReporter(),
+                            generatorParameters,
+                            DEFAULT_SAMPLE_COUNT,
+                            DEFAULT_MAX_DISCARDS);
+                }
+            }
+        }
+        return INSTANCE;
+    }
 
 }
