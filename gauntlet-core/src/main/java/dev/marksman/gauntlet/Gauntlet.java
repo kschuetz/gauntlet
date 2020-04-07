@@ -29,7 +29,6 @@ public final class Gauntlet {
                             defaultGeneratorParameters()
                                     .withBiasSettings(defaultPropertyTestBiasSettings()),
                             DEFAULT_SAMPLE_COUNT,
-                            DEFAULT_MAX_DISCARDS,
                             DEFAULT_TIMEOUT);
                 }
             }

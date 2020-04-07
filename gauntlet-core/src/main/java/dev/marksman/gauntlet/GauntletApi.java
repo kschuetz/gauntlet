@@ -10,8 +10,6 @@ import java.util.concurrent.Executor;
 public interface GauntletApi extends GauntletEnvironment {
     int getDefaultSampleCount();
 
-    int getDefaultMaxDiscards();
-
     GauntletApi withExecutor(Executor executor);
 
     GauntletApi withGeneratorTestRunner(GeneratorTestRunner testRunner);
@@ -19,8 +17,6 @@ public interface GauntletApi extends GauntletEnvironment {
     GauntletApi withReporter(Reporter reporter);
 
     GauntletApi withDefaultSampleCount(int sampleCount);
-
-    GauntletApi withDefaultMaxDiscards(int maxDiscards);
 
     GauntletApi withGeneratorParameters(GeneratorParameters generatorParameters);
 
