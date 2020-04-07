@@ -2,6 +2,7 @@ package dev.marksman.gauntlet;
 
 import dev.marksman.kraftwerk.GeneratorParameters;
 
+import java.time.Duration;
 import java.util.concurrent.Executor;
 
 public interface GauntletEnvironment {
@@ -12,4 +13,6 @@ public interface GauntletEnvironment {
     Reporter getReporter();
 
     GeneratorParameters getGeneratorParameters();
+
+    Duration getDefaultTimeout();
 }

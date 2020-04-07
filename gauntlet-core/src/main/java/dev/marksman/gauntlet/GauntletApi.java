@@ -4,6 +4,7 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import dev.marksman.kraftwerk.GeneratorParameters;
 
+import java.time.Duration;
 import java.util.concurrent.Executor;
 
 public interface GauntletApi extends GauntletEnvironment {
@@ -22,6 +23,8 @@ public interface GauntletApi extends GauntletEnvironment {
     GauntletApi withDefaultMaxDiscards(int maxDiscards);
 
     GauntletApi withGeneratorParameters(GeneratorParameters generatorParameters);
+
+    GauntletApi withDefaultTimeout(Duration timeout);
 
     <A> GeneratorTestBuilder<A> all(Arbitrary<A> generator);
 

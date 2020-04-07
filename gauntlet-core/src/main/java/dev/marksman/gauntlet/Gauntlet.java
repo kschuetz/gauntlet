@@ -1,15 +1,17 @@
 package dev.marksman.gauntlet;
 
-import dev.marksman.kraftwerk.GeneratorParameters;
+import java.time.Duration;
 
+import static dev.marksman.gauntlet.DefaultGeneratorTestRunner.defaultGeneratorTestRunner;
 import static dev.marksman.kraftwerk.StandardGeneratorParameters.defaultGeneratorParameters;
 import static dev.marksman.kraftwerk.bias.DefaultPropertyTestingBiasSettings.defaultPropertyTestBiasSettings;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 
 public final class Gauntlet {
 
-    public static int DEFAULT_SAMPLE_COUNT = 100;
-    public static int DEFAULT_MAX_DISCARDS = 100;
+    public static final int DEFAULT_SAMPLE_COUNT = 100;
+    public static final int DEFAULT_MAX_DISCARDS = 100;
+    public static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(30);  // TODO: default timeout
 
     private Gauntlet() {
 
@@ -21,15 +23,14 @@ public final class Gauntlet {
         if (INSTANCE == null) {
             synchronized (Gauntlet.class) {
                 if (INSTANCE == null) {
-                    GeneratorParameters generatorParameters = defaultGeneratorParameters()
-                            .withBiasSettings(defaultPropertyTestBiasSettings());
-
                     INSTANCE = new DefaultGauntlet(newFixedThreadPool(Runtime.getRuntime().availableProcessors()),
-                            DefaultGeneratorTestRunner.defaultGeneratorTestRunner(generatorParameters),
+                            defaultGeneratorTestRunner(),
                             DefaultReporter.defaultReporter(),
-                            generatorParameters,
+                            defaultGeneratorParameters()
+                                    .withBiasSettings(defaultPropertyTestBiasSettings()),
                             DEFAULT_SAMPLE_COUNT,
-                            DEFAULT_MAX_DISCARDS);
+                            DEFAULT_MAX_DISCARDS,
+                            DEFAULT_TIMEOUT);
                 }
             }
         }

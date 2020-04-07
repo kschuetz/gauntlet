@@ -14,7 +14,7 @@ import static dev.marksman.gauntlet.ReportData.reportData;
 
 final class GeneratorTestBuilder1<A> implements GeneratorTestBuilder<A> {
     private final GauntletEnvironment environment;
-    private final Maybe<GeneratorTestRunner> runner;
+    private final Maybe<GeneratorTestRunner> runner;   // TODO: remove this
     private final Arbitrary<A> gen;
     private final Maybe<Long> initialSeed;
     private final int sampleCount;
@@ -74,7 +74,7 @@ final class GeneratorTestBuilder1<A> implements GeneratorTestBuilder<A> {
     }
 
     private GeneratorTestResult<A> runImpl(GeneratorTest<A> testData) {
-        return runner.orElseGet(environment::getGeneratorTestRunner).run(environment.getExecutor(), testData);
+        return runner.orElseGet(environment::getGeneratorTestRunner).run(environment, testData);
     }
 
     private GeneratorTest<A> buildGeneratorTest(Prop<A> prop) {

@@ -2,11 +2,8 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Maybe;
 import dev.marksman.collectionviews.ImmutableVector;
-import dev.marksman.kraftwerk.GeneratorParameters;
 import dev.marksman.kraftwerk.Seed;
-import lombok.Getter;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.Executor;
@@ -18,28 +15,7 @@ import static dev.marksman.gauntlet.GeneratorTestResult.generatorTestResult;
 
 public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     private static final Random seedGenerator = new Random();
-
-    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(60);  // TODO
-
-
-    @Getter
-    private final GeneratorParameters generatorParameters;
-
-    @Getter
-    private final Duration defaultTimeout;
-
-    private DefaultGeneratorTestRunner(GeneratorParameters generatorParameters, Duration defaultTimeout) {
-        this.generatorParameters = generatorParameters;
-        this.defaultTimeout = defaultTimeout;
-    }
-
-    public DefaultGeneratorTestRunner withGeneratorParameters(GeneratorParameters generatorParameters) {
-        return new DefaultGeneratorTestRunner(generatorParameters, defaultTimeout);
-    }
-
-    public DefaultGeneratorTestRunner withDefaultTimeout(Duration timeout) {
-        return new DefaultGeneratorTestRunner(generatorParameters, defaultTimeout);
-    }
+    private static final DefaultGeneratorTestRunner INSTANCE = new DefaultGeneratorTestRunner();
 
     // generate all inputs
     // if generator fails early:
@@ -48,14 +24,16 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     // if all inputs can be generated, submit test tasks to executor along with sample index
     // if failure is found, run tests on shrinks
 
+
     @Override
-    public <A> GeneratorTestResult<A> run(Executor executor, GeneratorTest<A> testData) {
+    public <A> GeneratorTestResult<A> run(GauntletEnvironment environment, GeneratorTest<A> testData) {
+        Executor executor = environment.getExecutor();
         Maybe<AscribedFailure<A>> result = nothing();
         Context context = new Context();
         long initialSeedValue = testData.getInitialSeed().orElseGet(seedGenerator::nextLong);
         Seed initialSeed = Seed.create(initialSeedValue);
         Arbitrary<A> arbitrary = testData.getArbitrary();
-        ValueSupplier<A> valueSupplier = arbitrary.prepare(generatorParameters);
+        ValueSupplier<A> valueSupplier = arbitrary.prepare(environment.getGeneratorParameters());
         GeneratedDataSet<A> dataSet = generateDataSet(initialSeed, valueSupplier, testData.getSampleCount());
 
         ImmutableVector<A> samples = dataSet.getValues();
@@ -67,7 +45,7 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
         }
         // TODO: handle supply failure
         // TODO: handle shrinks
-        return generatorTestResult(collector.getResultBlocking(testData.getTimeout().orElse(defaultTimeout)),
+        return generatorTestResult(collector.getResultBlocking(testData.getTimeout().orElse(environment.getDefaultTimeout())),
                 initialSeedValue);
     }
 
@@ -93,11 +71,7 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
         return generatedDataSet(values, supplyFailure, state);
     }
 
-    private Long createInitialSeed(Maybe<Long> supplied) {
-        return supplied.orElseGet(seedGenerator::nextLong);
-    }
-
-    public static DefaultGeneratorTestRunner defaultGeneratorTestRunner(GeneratorParameters generatorParameters) {
-        return new DefaultGeneratorTestRunner(generatorParameters, DEFAULT_TIMEOUT);
+    public static DefaultGeneratorTestRunner defaultGeneratorTestRunner() {
+        return INSTANCE;
     }
 }
