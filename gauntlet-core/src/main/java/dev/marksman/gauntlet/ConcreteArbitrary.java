@@ -11,8 +11,8 @@ import dev.marksman.gauntlet.shrink.Shrink;
 import dev.marksman.gauntlet.shrink.builtins.ShrinkCollections;
 import dev.marksman.kraftwerk.Generate;
 import dev.marksman.kraftwerk.Generator;
+import dev.marksman.kraftwerk.GeneratorParameters;
 import dev.marksman.kraftwerk.Generators;
-import dev.marksman.kraftwerk.Parameters;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,15 +25,15 @@ import static dev.marksman.kraftwerk.aggregator.Aggregators.collectionAggregator
 import static dev.marksman.kraftwerk.aggregator.Aggregators.vectorAggregator;
 
 final class ConcreteArbitrary<A> implements Arbitrary<A> {
-    private final Fn1<Parameters, ValueSupplier<A>> generator;
-    private final ImmutableFiniteIterable<Fn1<Parameters, Parameters>> parameterTransforms;
+    private final Fn1<GeneratorParameters, ValueSupplier<A>> generator;
+    private final ImmutableFiniteIterable<Fn1<GeneratorParameters, GeneratorParameters>> parameterTransforms;
     private final Filter<A> filter;
     private final Maybe<Shrink<A>> shrink;
     private final Fn1<A, String> prettyPrinter;
     private final int maxDiscards;
 
-    private ConcreteArbitrary(Fn1<Parameters, ValueSupplier<A>> generator,
-                              ImmutableFiniteIterable<Fn1<Parameters, Parameters>> parameterTransforms,
+    private ConcreteArbitrary(Fn1<GeneratorParameters, ValueSupplier<A>> generator,
+                              ImmutableFiniteIterable<Fn1<GeneratorParameters, GeneratorParameters>> parameterTransforms,
                               Filter<A> filter, Maybe<Shrink<A>> shrink,
                               Fn1<A, String> prettyPrinter,
                               int maxDiscards) {
@@ -46,8 +46,8 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
     }
 
     @Override
-    public ValueSupplier<A> prepare(Parameters parameters) {
-        Parameters transformedParameters = parameterTransforms.foldLeft((acc, f) -> f.apply(acc), parameters);
+    public ValueSupplier<A> prepare(GeneratorParameters parameters) {
+        GeneratorParameters transformedParameters = parameterTransforms.foldLeft((acc, f) -> f.apply(acc), parameters);
         ValueSupplier<A> vs = generator.apply(transformedParameters);
         if (filter.isEmpty()) {
             return vs;
@@ -212,11 +212,11 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
     }
 
     @Override
-    public Arbitrary<A> modifyGeneratorParameters(Fn1<Parameters, Parameters> modifyFn) {
+    public Arbitrary<A> modifyGeneratorParameters(Fn1<GeneratorParameters, GeneratorParameters> modifyFn) {
         return new ConcreteArbitrary<>(generator, parameterTransforms.append(modifyFn), filter, shrink, prettyPrinter, maxDiscards);
     }
 
-    static <A> ConcreteArbitrary<A> concreteArbitrary(Fn1<Parameters, ValueSupplier<A>> generator,
+    static <A> ConcreteArbitrary<A> concreteArbitrary(Fn1<GeneratorParameters, ValueSupplier<A>> generator,
                                                       Maybe<Shrink<A>> shrink,
                                                       Fn1<A, String> prettyPrinter) {
         return new ConcreteArbitrary<>(generator, emptyImmutableFiniteIterable(), Filter.emptyFilter(), shrink, prettyPrinter, Gauntlet.DEFAULT_MAX_DISCARDS);
@@ -228,12 +228,12 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                 nothing(), Object::toString);
     }
 
-    private static Generate<Integer> sizeGenerator(Parameters parameters) {
+    private static Generate<Integer> sizeGenerator(GeneratorParameters parameters) {
         return generateSize()
                 .prepare(parameters);
     }
 
-    private static Generate<Integer> sizeGenerator(int minSize, Parameters parameters) {
+    private static Generate<Integer> sizeGenerator(int minSize, GeneratorParameters parameters) {
         return generateSize()
                 .fmap(s -> Math.max(minSize, s))
                 .prepare(parameters);

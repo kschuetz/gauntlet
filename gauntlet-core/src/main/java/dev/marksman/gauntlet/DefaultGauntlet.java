@@ -2,7 +2,7 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
-import dev.marksman.kraftwerk.Parameters;
+import dev.marksman.kraftwerk.GeneratorParameters;
 
 import java.util.concurrent.Executor;
 
@@ -15,11 +15,11 @@ class DefaultGauntlet implements GauntletApi {
     private final Executor executor;
     private final GeneratorTestRunner generatorTestRunner;
     private final Reporter reporter;
-    private final Parameters generatorParameters;
+    private final GeneratorParameters generatorParameters;
     private final int defaultSampleCount;
     private final int defaultMaxDiscards;
 
-    public DefaultGauntlet(Executor executor, GeneratorTestRunner generatorTestRunner, Reporter reporter, Parameters generatorParameters, int defaultSampleCount, int defaultMaxDiscards) {
+    public DefaultGauntlet(Executor executor, GeneratorTestRunner generatorTestRunner, Reporter reporter, GeneratorParameters generatorParameters, int defaultSampleCount, int defaultMaxDiscards) {
         this.executor = executor;
         this.generatorTestRunner = generatorTestRunner;
         this.reporter = reporter;
@@ -39,7 +39,7 @@ class DefaultGauntlet implements GauntletApi {
     }
 
     @Override
-    public Parameters getGeneratorParameters() {
+    public GeneratorParameters getGeneratorParameters() {
         return generatorParameters;
     }
 
@@ -79,7 +79,7 @@ class DefaultGauntlet implements GauntletApi {
     }
 
     @Override
-    public GauntletApi withGeneratorParameters(Parameters generatorParameters) {
+    public GauntletApi withGeneratorParameters(GeneratorParameters generatorParameters) {
         return new DefaultGauntlet(executor, generatorTestRunner, reporter, generatorParameters, defaultSampleCount, defaultMaxDiscards);
     }
 

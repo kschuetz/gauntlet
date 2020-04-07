@@ -2,7 +2,7 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Maybe;
 import dev.marksman.collectionviews.ImmutableVector;
-import dev.marksman.kraftwerk.Parameters;
+import dev.marksman.kraftwerk.GeneratorParameters;
 import dev.marksman.kraftwerk.Seed;
 import lombok.Getter;
 
@@ -23,17 +23,17 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
 
 
     @Getter
-    private final Parameters generatorParameters;
+    private final GeneratorParameters generatorParameters;
 
     @Getter
     private final Duration defaultTimeout;
 
-    private DefaultGeneratorTestRunner(Parameters generatorParameters, Duration defaultTimeout) {
+    private DefaultGeneratorTestRunner(GeneratorParameters generatorParameters, Duration defaultTimeout) {
         this.generatorParameters = generatorParameters;
         this.defaultTimeout = defaultTimeout;
     }
 
-    public DefaultGeneratorTestRunner withGeneratorParameters(Parameters generatorParameters) {
+    public DefaultGeneratorTestRunner withGeneratorParameters(GeneratorParameters generatorParameters) {
         return new DefaultGeneratorTestRunner(generatorParameters, defaultTimeout);
     }
 
@@ -97,7 +97,7 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
         return supplied.orElseGet(seedGenerator::nextLong);
     }
 
-    public static DefaultGeneratorTestRunner defaultGeneratorTestRunner(Parameters generatorParameters) {
+    public static DefaultGeneratorTestRunner defaultGeneratorTestRunner(GeneratorParameters generatorParameters) {
         return new DefaultGeneratorTestRunner(generatorParameters, DEFAULT_TIMEOUT);
     }
 }

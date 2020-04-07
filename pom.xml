@@ -17,7 +17,7 @@
 
     <properties>
         <lambda.version>5.1.0</lambda.version>
-        <kraftwerk.version>0.4.2</kraftwerk.version>
+        <kraftwerk.version>0.5.0</kraftwerk.version>
         <collection-views.version>1.2.0</collection-views.version>
         <junit.version>5.4.0</junit.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>

@@ -9,7 +9,7 @@ import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.gauntlet.shrink.Shrink;
 import dev.marksman.kraftwerk.Generator;
-import dev.marksman.kraftwerk.Parameters;
+import dev.marksman.kraftwerk.GeneratorParameters;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -19,7 +19,7 @@ import static dev.marksman.gauntlet.CompositeArbitraries.combine;
 import static dev.marksman.gauntlet.ConcreteArbitrary.concreteArbitrary;
 
 public interface Arbitrary<A> {
-    ValueSupplier<A> prepare(Parameters parameters);
+    ValueSupplier<A> prepare(GeneratorParameters parameters);
 
     Maybe<Shrink<A>> getShrink();
 
@@ -37,7 +37,7 @@ public interface Arbitrary<A> {
 
     <B> Arbitrary<B> convert(Fn1<A, B> ab, Fn1<B, A> ba);
 
-    Arbitrary<A> modifyGeneratorParameters(Fn1<Parameters, Parameters> modifyFn);
+    Arbitrary<A> modifyGeneratorParameters(Fn1<GeneratorParameters, GeneratorParameters> modifyFn);
 
     Arbitrary<ImmutableVector<A>> vector();
 

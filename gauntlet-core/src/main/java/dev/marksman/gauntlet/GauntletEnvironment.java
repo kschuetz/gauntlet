@@ -1,6 +1,6 @@
 package dev.marksman.gauntlet;
 
-import dev.marksman.kraftwerk.Parameters;
+import dev.marksman.kraftwerk.GeneratorParameters;
 
 import java.util.concurrent.Executor;
 
@@ -11,5 +11,5 @@ public interface GauntletEnvironment {
 
     Reporter getReporter();
 
-    Parameters getGeneratorParameters();
+    GeneratorParameters getGeneratorParameters();
 }

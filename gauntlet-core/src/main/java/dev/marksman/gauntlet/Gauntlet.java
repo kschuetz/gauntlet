@@ -2,7 +2,7 @@ package dev.marksman.gauntlet;
 
 import java.util.concurrent.Executor;
 
-import static dev.marksman.gauntlet.GeneratorParameters.defaultGeneratorParameters;
+import static dev.marksman.gauntlet.GParams.defaultGeneratorParameters;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 
 public final class Gauntlet {
