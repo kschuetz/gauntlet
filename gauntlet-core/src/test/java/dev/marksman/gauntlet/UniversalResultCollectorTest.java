@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 
+import static dev.marksman.gauntlet.FailedSample.failedSample;
 import static dev.marksman.gauntlet.Failure.failure;
 import static dev.marksman.gauntlet.TestResult.*;
 import static dev.marksman.gauntlet.TestTaskResult.success;
@@ -72,7 +73,7 @@ class UniversalResultCollectorTest {
 
         TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-        assertEquals(falsified(samples.take(failedIndex), samples.unsafeGet(failedIndex), failure),
+        assertEquals(falsified(samples.take(failedIndex), failedSample(failure, samples.unsafeGet(failedIndex))),
                 result);
     }
 
@@ -87,7 +88,7 @@ class UniversalResultCollectorTest {
 
         TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-        assertEquals(falsified(samples.take(firstFailedIndex), samples.unsafeGet(firstFailedIndex), failure),
+        assertEquals(falsified(samples.take(firstFailedIndex), failedSample(failure, samples.unsafeGet(firstFailedIndex))),
                 result);
     }
 
@@ -131,7 +132,7 @@ class UniversalResultCollectorTest {
 
         TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-        assertEquals(falsified(samples.take(failedIndex), samples.unsafeGet(failedIndex), failure),
+        assertEquals(falsified(samples.take(failedIndex), failedSample(failure, samples.unsafeGet(failedIndex))),
                 result);
     }
 

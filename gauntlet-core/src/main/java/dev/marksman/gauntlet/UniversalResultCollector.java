@@ -1,7 +1,6 @@
 package dev.marksman.gauntlet;
 
 import dev.marksman.collectionviews.ImmutableVector;
-import dev.marksman.collectionviews.Vector;
 import dev.marksman.collectionviews.VectorBuilder;
 
 import java.time.Duration;
@@ -10,8 +9,9 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.jnape.palatable.lambda.adt.Maybe.maybe;
+import static dev.marksman.gauntlet.FailedSample.failedSample;
 
-class UniversalResultCollector<A> implements ResultCollector<A> {
+final class UniversalResultCollector<A> implements ResultCollector<A> {
     private final ImmutableVector<A> samples;
     private final ReentrantLock lock;
     private final CheckList reported;
@@ -71,19 +71,15 @@ class UniversalResultCollector<A> implements ResultCollector<A> {
             if (!await(timeout)) {
                 return TestResult.timedOut(getPassedSamples(), timeout);
             }
-            return getOutcome();
+            return result.match(__ -> TestResult.passed(samples),
+                    failure -> TestResult.falsified(getPassedSamples(), failedSample(failure, samples.unsafeGet(cutoffIndex))),
+                    error -> TestResult.error(getPassedSamples(), samples.unsafeGet(cutoffIndex), error));
         } catch (InterruptedException e) {
             return TestResult.interrupted(getPassedSamples(), maybe(e.getMessage()));
         } finally {
             lock.unlock();
         }
 
-    }
-
-    private TestResult<A> getOutcome() {
-        return result.match(__ -> TestResult.passed(samples),
-                failure -> TestResult.falsified(getPassedSamples(), samples.unsafeGet(cutoffIndex), failure, Vector.empty()),
-                error -> TestResult.error(getPassedSamples(), samples.unsafeGet(cutoffIndex), error));
     }
 
     private boolean await(Duration timeout) throws InterruptedException {

@@ -40,7 +40,7 @@ public final class DefaultReporter implements Reporter {
 
     private <A> void handleFalsified(ReportData<A> reportData, TestResult.Falsified<A> falsified) {
         throw new AssertionError("Failed property '" + reportData.getProp().getName().getValue() + "' " +
-                " with value '" + reportData.getPrettyPrinter().apply(falsified.getFalsifiedSample()) + "'");
+                " with value '" + reportData.getPrettyPrinter().apply(falsified.getFailedSample().getSample()) + "'");
     }
 
     private <A> void handleError(ReportData<A> reportData, TestResult.Error<A> error) {

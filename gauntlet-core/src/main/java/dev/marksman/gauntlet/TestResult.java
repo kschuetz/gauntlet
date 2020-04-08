@@ -12,6 +12,7 @@ import lombok.Value;
 import java.time.Duration;
 import java.util.Set;
 
+import static dev.marksman.gauntlet.FailedSample.failedSample;
 import static lombok.AccessLevel.PRIVATE;
 
 @EqualsAndHashCode
@@ -19,7 +20,6 @@ public abstract class TestResult<A> implements CoProduct6<TestResult.Passed<A>,
         TestResult.Falsified<A>, TestResult.SupplyFailed<A>, TestResult.Error<A>, TestResult.TimedOut<A>,
         TestResult.Interrupted<A>, TestResult<A>> {
 
-    public abstract ImmutableVector<A> getPassedSamples();
 
     public abstract boolean isPassed();
 
@@ -54,8 +54,7 @@ public abstract class TestResult<A> implements CoProduct6<TestResult.Passed<A>,
     @AllArgsConstructor(access = PRIVATE)
     public static class Falsified<A> extends TestResult<A> {
         ImmutableVector<A> passedSamples;
-        A falsifiedSample;
-        Failure failure;
+        FailedSample<A> failedSample;
         ImmutableVector<A> shrinks;
 
 
@@ -72,7 +71,8 @@ public abstract class TestResult<A> implements CoProduct6<TestResult.Passed<A>,
         @Override
         public Falsified<Classified<A>> applyClassifiers(Iterable<Fn1<A, Set<String>>> classifiers) {
             Fn1<A, Classified<A>> f = Classified.applyClassifiers(classifiers);
-            return falsified(passedSamples.fmap(f), f.apply(falsifiedSample), failure, shrinks.fmap(f));
+            return falsified(passedSamples.fmap(f), failedSample(failedSample.getFailure(),
+                    f.apply(failedSample.getSample())), shrinks.fmap(f));
         }
     }
 
@@ -179,16 +179,14 @@ public abstract class TestResult<A> implements CoProduct6<TestResult.Passed<A>,
     }
 
     public static <A> Falsified<A> falsified(ImmutableVector<A> passedSamples,
-                                             A falsifiedSample,
-                                             Failure failure,
+                                             FailedSample<A> failedSample,
                                              ImmutableVector<A> shrinks) {
-        return new Falsified<>(passedSamples, falsifiedSample, failure, shrinks);
+        return new Falsified<>(passedSamples, failedSample, shrinks);
     }
 
     public static <A> Falsified<A> falsified(ImmutableVector<A> passedSamples,
-                                             A falsifiedSample,
-                                             Failure failure) {
-        return new Falsified<>(passedSamples, falsifiedSample, failure, Vector.empty());
+                                             FailedSample<A> failedSample) {
+        return new Falsified<>(passedSamples, failedSample, Vector.empty());
     }
 
     public static <A> SupplyFailed<A> supplyFailed(ImmutableVector<A> passedSamples, SupplyFailure supplyFailure) {
