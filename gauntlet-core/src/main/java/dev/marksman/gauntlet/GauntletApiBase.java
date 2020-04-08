@@ -2,6 +2,7 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
+import com.jnape.palatable.lambda.adt.hlist.Tuple4;
 import dev.marksman.kraftwerk.GeneratorParameters;
 
 import java.time.Duration;
@@ -47,6 +48,58 @@ public abstract class GauntletApiBase implements GauntletApi {
     @Override
     public <A, B, C> GeneratorTestApi<Tuple3<A, B, C>> all(Arbitrary<A> generatorA, Arbitrary<B> generatorB, Arbitrary<C> generatorC) {
         return getApi().all(generatorA, generatorB, generatorC);
+    }
+
+    @Override
+    public <A> DiscreteDomainTestApi<A> all(Iterable<A> domain) {
+        return getApi().all(domain);
+    }
+
+    @Override
+    public <A, B> DiscreteDomainTestApi<Tuple2<A, B>> all(Iterable<A> domainA,
+                                                          Iterable<B> domainB) {
+        return getApi().all(domainA, domainB);
+    }
+
+    @Override
+    public <A, B, C> DiscreteDomainTestApi<Tuple3<A, B, C>> all(Iterable<A> domainA,
+                                                                Iterable<B> domainB,
+                                                                Iterable<C> domainC) {
+        return getApi().all(domainA, domainB, domainC);
+    }
+
+    @Override
+    public <A, B, C, D> DiscreteDomainTestApi<Tuple4<A, B, C, D>> all(Iterable<A> domainA,
+                                                                      Iterable<B> domainB,
+                                                                      Iterable<C> domainC,
+                                                                      Iterable<D> domainD) {
+        return getApi().all(domainA, domainB, domainC, domainD);
+    }
+
+    @Override
+    public <A> DiscreteDomainTestApi<A> some(Iterable<A> domain) {
+        return getApi().some(domain);
+    }
+
+    @Override
+    public <A, B> DiscreteDomainTestApi<Tuple2<A, B>> some(Iterable<A> domainA,
+                                                           Iterable<B> domainB) {
+        return getApi().some(domainA, domainB);
+    }
+
+    @Override
+    public <A, B, C> DiscreteDomainTestApi<Tuple3<A, B, C>> some(Iterable<A> domainA,
+                                                                 Iterable<B> domainB,
+                                                                 Iterable<C> domainC) {
+        return getApi().some(domainA, domainB, domainC);
+    }
+
+    @Override
+    public <A, B, C, D> DiscreteDomainTestApi<Tuple4<A, B, C, D>> some(Iterable<A> domainA,
+                                                                       Iterable<B> domainB,
+                                                                       Iterable<C> domainC,
+                                                                       Iterable<D> domainD) {
+        return getApi().some(domainA, domainB, domainC, domainD);
     }
 
     @Override

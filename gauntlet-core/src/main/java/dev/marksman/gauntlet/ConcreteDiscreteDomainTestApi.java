@@ -30,4 +30,8 @@ final class ConcreteDiscreteDomainTestApi<A> implements DiscreteDomainTestApi<A>
     public void mustSatisfy(Prop<A> property) {
         runner.accept(discreteDomainTest(parameters, property));
     }
+
+    static <A> ConcreteDiscreteDomainTestApi<A> concreteGeneratorTestApi(Consumer<DiscreteDomainTest<A>> runner, DiscreteDomainTestParameters<A> parameters) {
+        return new ConcreteDiscreteDomainTestApi<>(runner, parameters);
+    }
 }
