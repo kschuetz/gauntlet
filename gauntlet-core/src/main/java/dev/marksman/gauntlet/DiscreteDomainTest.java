@@ -16,7 +16,7 @@ public final class DiscreteDomainTest<A> {
     @Getter
     private final ImmutableFiniteIterable<A> discreteDomain;
     @Getter
-    private final DiscreteDomainTestType testType;
+    private final Quantifier quantifier;
     @Getter
     private final ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers;
     @Getter
@@ -26,7 +26,7 @@ public final class DiscreteDomainTest<A> {
 
     public static <A> DiscreteDomainTest<A> discreteDomainTest(DiscreteDomainTestParameters<A> parameters,
                                                                Prop<A> property) {
-        return new DiscreteDomainTest<>(parameters.getDiscreteDomain(), parameters.getTestType(),
+        return new DiscreteDomainTest<>(parameters.getDiscreteDomain(), parameters.getQuantifier(),
                 parameters.getClassifiers(), parameters.getTimeout(), property);
     }
 

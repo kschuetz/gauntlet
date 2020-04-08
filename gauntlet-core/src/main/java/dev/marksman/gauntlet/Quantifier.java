@@ -1,5 +1,5 @@
 package dev.marksman.gauntlet;
 
-public enum DiscreteDomainTestType {
+public enum Quantifier {
     UNIVERSAL, EXISTENTIAL
 }

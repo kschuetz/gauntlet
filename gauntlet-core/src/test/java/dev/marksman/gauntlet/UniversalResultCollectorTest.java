@@ -12,12 +12,12 @@ import static dev.marksman.gauntlet.TestResult.*;
 import static dev.marksman.gauntlet.TestTaskResult.success;
 import static org.junit.jupiter.api.Assertions.*;
 
-class ResultCollectorTest {
+class UniversalResultCollectorTest {
 
     private static final Prop<Integer> failureProp = Prop.<Integer>fail().rename(Name.name("prop"));
     private static final Failure failure = failure(failureProp, "failed");
 
-    private ResultCollector<Integer> collector;
+    private UniversalResultCollector<Integer> collector;
     private ImmutableVector<Integer> samples;
     private int sampleCount;
 
@@ -25,7 +25,7 @@ class ResultCollectorTest {
     void setUp() {
         sampleCount = 16;
         samples = Vector.range(sampleCount);
-        collector = new ResultCollector<>(samples);
+        collector = new UniversalResultCollector<>(samples);
     }
 
     @Test
