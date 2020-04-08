@@ -8,8 +8,13 @@ public final class DefaultReporter implements Reporter {
 
     @Override
     public <A> void report(ReportData<A> reportData) {
-        reportData.getResult().match(__ -> {
-                    handleSuccess();
+        reportData.getResult().match(
+                passed -> {
+                    handlePassed(reportData, passed);
+                    return UNIT;
+                },
+                proved -> {
+                    handleProved(reportData, proved);
                     return UNIT;
                 },
                 falsified -> {
@@ -34,7 +39,11 @@ public final class DefaultReporter implements Reporter {
                 });
     }
 
-    private void handleSuccess() {
+    private <A> void handlePassed(ReportData<A> reportData, TestResult.Passed<A> passed) {
+
+    }
+
+    private <A> void handleProved(ReportData<A> reportData, TestResult.Proved<A> proved) {
 
     }
 
