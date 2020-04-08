@@ -53,7 +53,7 @@ public final class DefaultReporter implements Reporter {
 
     private <A> void handleFalsified(ReportData<A> reportData, TestResult.Falsified<A> falsified) {
         throw new AssertionError("Failed property '" + reportData.getProp().getName().getValue() + "' " +
-                " with value '" + reportData.getPrettyPrinter().apply(falsified.getFailedSample().getSample()) + "'");
+                " with value '" + reportData.getPrettyPrinter().apply(falsified.getCounterexample().getSample()) + "'");
     }
 
     private <A> void handleUnproved(ReportData<A> reportData, TestResult.Unproved<A> proved) {

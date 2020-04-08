@@ -38,7 +38,7 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
     @AllArgsConstructor(access = PRIVATE)
     public static class Proved<A> extends TestResult<A> {
         A passedSample;
-        ImmutableVector<FailedSample<A>> failedSamples;
+        ImmutableVector<Counterexample<A>> counterexamples;
 
         @Override
         public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
@@ -53,7 +53,7 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
     @AllArgsConstructor(access = PRIVATE)
     public static class Falsified<A> extends TestResult<A> {
         ImmutableVector<A> passedSamples;
-        FailedSample<A> failedSample;
+        Counterexample<A> counterexample;
         ImmutableVector<A> shrinks;
 
         @Override
@@ -68,7 +68,7 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
     @Value
     @AllArgsConstructor(access = PRIVATE)
     public static class Unproved<A> extends TestResult<A> {
-        ImmutableVector<FailedSample<A>> failedSamples;
+        ImmutableVector<Counterexample<A>> counterexamples;
 
         @Override
         public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
@@ -142,23 +142,23 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
         return new Passed<>(passedSamples);
     }
 
-    public static <A> Proved<A> proved(A passedSample, ImmutableVector<FailedSample<A>> failedSamples) {
-        return new Proved<>(passedSample, failedSamples);
+    public static <A> Proved<A> proved(A passedSample, ImmutableVector<Counterexample<A>> counterexamples) {
+        return new Proved<>(passedSample, counterexamples);
     }
 
     public static <A> Falsified<A> falsified(ImmutableVector<A> passedSamples,
-                                             FailedSample<A> failedSample,
+                                             Counterexample<A> counterexample,
                                              ImmutableVector<A> shrinks) {
-        return new Falsified<>(passedSamples, failedSample, shrinks);
+        return new Falsified<>(passedSamples, counterexample, shrinks);
     }
 
     public static <A> Falsified<A> falsified(ImmutableVector<A> passedSamples,
-                                             FailedSample<A> failedSample) {
-        return new Falsified<>(passedSamples, failedSample, Vector.empty());
+                                             Counterexample<A> counterexample) {
+        return new Falsified<>(passedSamples, counterexample, Vector.empty());
     }
 
-    public static <A> Unproved<A> unproved(ImmutableVector<FailedSample<A>> failedSamples) {
-        return new Unproved<>(failedSamples);
+    public static <A> Unproved<A> unproved(ImmutableVector<Counterexample<A>> counterexamples) {
+        return new Unproved<>(counterexamples);
     }
 
     public static <A> SupplyFailed<A> supplyFailed(ImmutableVector<A> passedSamples, SupplyFailure supplyFailure) {

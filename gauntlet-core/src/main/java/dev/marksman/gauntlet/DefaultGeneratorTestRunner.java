@@ -12,6 +12,7 @@ import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.gauntlet.EvaluateSampleTask.testSampleTask;
 import static dev.marksman.gauntlet.GeneratedDataSet.generatedDataSet;
 import static dev.marksman.gauntlet.GeneratorTestResult.generatorTestResult;
+import static dev.marksman.gauntlet.ResultCollector.universalResultCollector;
 
 public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     private static final Random seedGenerator = new Random();
@@ -38,7 +39,7 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
 
         ImmutableVector<A> samples = dataSet.getValues();
         int actualSampleCount = samples.size();
-        UniversalResultCollector<A> collector = new UniversalResultCollector<>(dataSet.getValues());
+        ResultCollector<A> collector = universalResultCollector(dataSet.getValues());
         for (int sampleIndex = 0; sampleIndex < actualSampleCount; sampleIndex++) {
             EvaluateSampleTask<A> task = testSampleTask(context, collector, testData.getProperty(), sampleIndex, samples.unsafeGet(sampleIndex));
             executor.execute(task);

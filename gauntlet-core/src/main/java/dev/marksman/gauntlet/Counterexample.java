@@ -8,11 +8,11 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Value
 @AllArgsConstructor(access = PRIVATE)
-public class FailedSample<A> {
+public class Counterexample<A> {
     Failure failure;
     A sample;
 
-    public static <A> FailedSample<A> failedSample(Failure failure, A sample) {
-        return new FailedSample<>(failure, sample);
+    public static <A> Counterexample<A> counterexample(Failure failure, A sample) {
+        return new Counterexample<>(failure, sample);
     }
 }
