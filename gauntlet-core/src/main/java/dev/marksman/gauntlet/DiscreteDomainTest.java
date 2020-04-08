@@ -12,13 +12,11 @@ import java.util.Set;
 import static lombok.AccessLevel.PRIVATE;
 
 @AllArgsConstructor(access = PRIVATE)
-public final class GeneratorTest<A> {
+public final class DiscreteDomainTest<A> {
     @Getter
-    private final Arbitrary<A> arbitrary;
+    private final ImmutableFiniteIterable<A> discreteDomain;
     @Getter
-    private final Maybe<Long> initialSeed;
-    @Getter
-    private final int sampleCount;
+    private final DiscreteDomainTestType testType;
     @Getter
     private final ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers;
     @Getter
@@ -26,10 +24,10 @@ public final class GeneratorTest<A> {
     @Getter
     private final Prop<A> property;
 
-    public static <A> GeneratorTest<A> generatorTest(GeneratorTestParameters<A> parameters, Prop<A> property) {
-        return new GeneratorTest<>(parameters.getArbitrary(),
-                parameters.getInitialSeed(), parameters.getSampleCount(), parameters.getClassifiers(),
-                parameters.getTimeout(), property);
+    public static <A> DiscreteDomainTest<A> discreteDomainTest(DiscreteDomainTestParameters<A> parameters,
+                                                               Prop<A> property) {
+        return new DiscreteDomainTest<>(parameters.getDiscreteDomain(), parameters.getTestType(),
+                parameters.getClassifiers(), parameters.getTimeout(), property);
     }
 
 }

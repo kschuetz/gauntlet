@@ -1,6 +1,7 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.functions.Fn1;
+import lombok.AllArgsConstructor;
 
 import java.time.Duration;
 import java.util.Set;
@@ -8,15 +9,12 @@ import java.util.function.Consumer;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static dev.marksman.gauntlet.GeneratorTest.generatorTest;
+import static lombok.AccessLevel.PRIVATE;
 
+@AllArgsConstructor(access = PRIVATE)
 final class ConcreteGeneratorTestApi<A> implements GeneratorTestApi<A> {
     private final Consumer<GeneratorTest<A>> runner;
     private final GeneratorTestParameters<A> parameters;
-
-    ConcreteGeneratorTestApi(Consumer<GeneratorTest<A>> runner, GeneratorTestParameters<A> parameters) {
-        this.runner = runner;
-        this.parameters = parameters;
-    }
 
     @Override
     public GeneratorTestApi<A> withSampleCount(int sampleCount) {
