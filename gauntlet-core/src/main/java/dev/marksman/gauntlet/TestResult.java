@@ -1,7 +1,7 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Maybe;
-import com.jnape.palatable.lambda.adt.coproduct.CoProduct7;
+import com.jnape.palatable.lambda.adt.coproduct.CoProduct8;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.collectionviews.Vector;
@@ -14,9 +14,9 @@ import java.time.Duration;
 import static lombok.AccessLevel.PRIVATE;
 
 @EqualsAndHashCode
-public abstract class TestResult<A> implements CoProduct7<TestResult.Passed<A>, TestResult.Proved<A>,
-        TestResult.Falsified<A>, TestResult.SupplyFailed<A>, TestResult.Error<A>, TestResult.TimedOut<A>,
-        TestResult.Interrupted<A>, TestResult<A>> {
+public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, TestResult.Proved<A>,
+        TestResult.Falsified<A>, TestResult.Unproved<A>, TestResult.SupplyFailed<A>, TestResult.Error<A>,
+        TestResult.TimedOut<A>, TestResult.Interrupted<A>, TestResult<A>> {
 
     // All cases succeeded
     @EqualsAndHashCode(callSuper = true)
@@ -26,7 +26,7 @@ public abstract class TestResult<A> implements CoProduct7<TestResult.Passed<A>, 
         ImmutableVector<A> passedSamples;
 
         @Override
-        public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super SupplyFailed<A>, ? extends R> dFn, Fn1<? super Error<A>, ? extends R> eFn, Fn1<? super TimedOut<A>, ? extends R> fFn, Fn1<? super Interrupted<A>, ? extends R> gFn) {
+        public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
             return aFn.apply(this);
         }
 
@@ -41,7 +41,7 @@ public abstract class TestResult<A> implements CoProduct7<TestResult.Passed<A>, 
         ImmutableVector<FailedSample<A>> failedSamples;
 
         @Override
-        public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super SupplyFailed<A>, ? extends R> dFn, Fn1<? super Error<A>, ? extends R> eFn, Fn1<? super TimedOut<A>, ? extends R> fFn, Fn1<? super Interrupted<A>, ? extends R> gFn) {
+        public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
             return bFn.apply(this);
         }
 
@@ -56,14 +56,26 @@ public abstract class TestResult<A> implements CoProduct7<TestResult.Passed<A>, 
         FailedSample<A> failedSample;
         ImmutableVector<A> shrinks;
 
-
         @Override
-        public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super SupplyFailed<A>, ? extends R> dFn, Fn1<? super Error<A>, ? extends R> eFn, Fn1<? super TimedOut<A>, ? extends R> fFn, Fn1<? super Interrupted<A>, ? extends R> gFn) {
+        public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
             return cFn.apply(this);
         }
 
     }
 
+    // No cases were found that prove the property
+    @EqualsAndHashCode(callSuper = true)
+    @Value
+    @AllArgsConstructor(access = PRIVATE)
+    public static class Unproved<A> extends TestResult<A> {
+        ImmutableVector<FailedSample<A>> failedSamples;
+
+        @Override
+        public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
+            return dFn.apply(this);
+        }
+
+    }
 
     // Generator encountered a supply failure before a case was falsified
     @EqualsAndHashCode(callSuper = true)
@@ -74,8 +86,8 @@ public abstract class TestResult<A> implements CoProduct7<TestResult.Passed<A>, 
         SupplyFailure supplyFailure;
 
         @Override
-        public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super SupplyFailed<A>, ? extends R> dFn, Fn1<? super Error<A>, ? extends R> eFn, Fn1<? super TimedOut<A>, ? extends R> fFn, Fn1<? super Interrupted<A>, ? extends R> gFn) {
-            return dFn.apply(this);
+        public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
+            return eFn.apply(this);
         }
 
     }
@@ -90,8 +102,8 @@ public abstract class TestResult<A> implements CoProduct7<TestResult.Passed<A>, 
         Throwable error;
 
         @Override
-        public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super SupplyFailed<A>, ? extends R> dFn, Fn1<? super Error<A>, ? extends R> eFn, Fn1<? super TimedOut<A>, ? extends R> fFn, Fn1<? super Interrupted<A>, ? extends R> gFn) {
-            return eFn.apply(this);
+        public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
+            return fFn.apply(this);
         }
 
     }
@@ -105,8 +117,8 @@ public abstract class TestResult<A> implements CoProduct7<TestResult.Passed<A>, 
         Duration duration;
 
         @Override
-        public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super SupplyFailed<A>, ? extends R> dFn, Fn1<? super Error<A>, ? extends R> eFn, Fn1<? super TimedOut<A>, ? extends R> fFn, Fn1<? super Interrupted<A>, ? extends R> gFn) {
-            return fFn.apply(this);
+        public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
+            return gFn.apply(this);
         }
 
     }
@@ -120,8 +132,8 @@ public abstract class TestResult<A> implements CoProduct7<TestResult.Passed<A>, 
         Maybe<String> message;
 
         @Override
-        public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super SupplyFailed<A>, ? extends R> dFn, Fn1<? super Error<A>, ? extends R> eFn, Fn1<? super TimedOut<A>, ? extends R> fFn, Fn1<? super Interrupted<A>, ? extends R> gFn) {
-            return gFn.apply(this);
+        public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
+            return hFn.apply(this);
         }
 
     }
@@ -143,6 +155,10 @@ public abstract class TestResult<A> implements CoProduct7<TestResult.Passed<A>, 
     public static <A> Falsified<A> falsified(ImmutableVector<A> passedSamples,
                                              FailedSample<A> failedSample) {
         return new Falsified<>(passedSamples, failedSample, Vector.empty());
+    }
+
+    public static <A> Unproved<A> unproved(ImmutableVector<FailedSample<A>> failedSamples) {
+        return new Unproved<>(failedSamples);
     }
 
     public static <A> SupplyFailed<A> supplyFailed(ImmutableVector<A> passedSamples, SupplyFailure supplyFailure) {

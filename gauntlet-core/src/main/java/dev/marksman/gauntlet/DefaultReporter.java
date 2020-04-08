@@ -21,6 +21,10 @@ public final class DefaultReporter implements Reporter {
                     handleFalsified(reportData, falsified);
                     return UNIT;
                 },
+                unproved -> {
+                    handleUnproved(reportData, unproved);
+                    return UNIT;
+                },
                 sf -> {
                     handleSupplyFailure(reportData, sf);
                     return UNIT;
@@ -50,6 +54,11 @@ public final class DefaultReporter implements Reporter {
     private <A> void handleFalsified(ReportData<A> reportData, TestResult.Falsified<A> falsified) {
         throw new AssertionError("Failed property '" + reportData.getProp().getName().getValue() + "' " +
                 " with value '" + reportData.getPrettyPrinter().apply(falsified.getFailedSample().getSample()) + "'");
+    }
+
+    private <A> void handleUnproved(ReportData<A> reportData, TestResult.Unproved<A> proved) {
+        throw new AssertionError("Property '" + reportData.getProp().getName().getValue() + "' " +
+                " remains unproved with the given data");
     }
 
     private <A> void handleError(ReportData<A> reportData, TestResult.Error<A> error) {
