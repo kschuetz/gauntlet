@@ -29,7 +29,7 @@ public interface Arbitrary<A> {
 
     Arbitrary<A> withNoShrink();
 
-    Arbitrary<A> suchThat(Fn1<A, Boolean> predicate);
+    Arbitrary<A> suchThat(Fn1<? super A, Boolean> predicate);
 
     Arbitrary<A> withMaxDiscards(int maxDiscards);
 

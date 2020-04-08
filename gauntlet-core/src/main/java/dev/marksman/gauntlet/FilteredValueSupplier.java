@@ -8,10 +8,10 @@ import static dev.marksman.gauntlet.SupplyTree.failedFilter;
 
 final class FilteredValueSupplier<A> implements ValueSupplier<A> {
     private final ValueSupplier<A> underlying;
-    private final Fn1<A, Boolean> filter;
+    private final Fn1<? super A, Boolean> filter;
     private final int maxDiscards;
 
-    FilteredValueSupplier(ValueSupplier<A> underlying, Fn1<A, Boolean> filter, int maxDiscards) {
+    FilteredValueSupplier(ValueSupplier<A> underlying, Fn1<? super A, Boolean> filter, int maxDiscards) {
         this.underlying = underlying;
         this.filter = filter;
         this.maxDiscards = maxDiscards;

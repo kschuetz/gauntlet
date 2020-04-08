@@ -11,7 +11,7 @@ import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmuta
 public interface Shrink<A> {
     ImmutableFiniteIterable<A> apply(A input);
 
-    default Shrink<A> filter(Fn1<A, Boolean> predicate) {
+    default Shrink<A> filter(Fn1<? super A, Boolean> predicate) {
         return new FilterShrink<>(this, predicate);
     }
 

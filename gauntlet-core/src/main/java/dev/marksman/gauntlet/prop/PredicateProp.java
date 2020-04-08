@@ -13,9 +13,9 @@ import static dev.marksman.gauntlet.Failure.failure;
 
 final class PredicateProp<A> implements Prop<A> {
     private final Name name;
-    private final Fn1<A, Boolean> predicate;
+    private final Fn1<? super A, Boolean> predicate;
 
-    PredicateProp(Name name, Fn1<A, Boolean> predicate) {
+    PredicateProp(Name name, Fn1<? super A, Boolean> predicate) {
         this.name = name;
         this.predicate = predicate;
     }

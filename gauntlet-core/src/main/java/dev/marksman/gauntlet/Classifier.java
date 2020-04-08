@@ -12,16 +12,16 @@ import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
 
 public final class Classifier<A> implements Fn1<A, Set<String>> {
 
-    private final ImmutableFiniteIterable<Tuple2<String, Fn1<A, Boolean>>> items;
+    private final ImmutableFiniteIterable<Tuple2<String, Fn1<? super A, Boolean>>> items;
 
-    private Classifier(ImmutableFiniteIterable<Tuple2<String, Fn1<A, Boolean>>> items) {
+    private Classifier(ImmutableFiniteIterable<Tuple2<String, Fn1<? super A, Boolean>>> items) {
         this.items = items;
     }
 
     @Override
     public Set<String> checkedApply(A a) {
         Set<String> result = new HashSet<>();
-        for (Tuple2<String, Fn1<A, Boolean>> item : items) {
+        for (Tuple2<String, Fn1<? super A, Boolean>> item : items) {
             if (item._2().apply(a)) {
                 result.add(item._1());
             }
@@ -33,11 +33,11 @@ public final class Classifier<A> implements Fn1<A, Set<String>> {
         return new Classifier<>(items.concat(other.items));
     }
 
-    public Classifier<A> and(String category, Fn1<A, Boolean> predicate) {
+    public Classifier<A> and(String category, Fn1<? super A, Boolean> predicate) {
         return new Classifier<>(items.prepend(tuple(category, predicate)));
     }
 
-    public static <A> Classifier<A> classify(String category, Fn1<A, Boolean> predicate) {
+    public static <A> Classifier<A> classify(String category, Fn1<? super A, Boolean> predicate) {
         return new Classifier<>(Vector.of(tuple(category, predicate)));
     }
 

@@ -13,7 +13,7 @@ final class MappedFilter<A, B> implements Filter<A> {
     private final Filter<B> underlying;
 
     @Override
-    public Filter<A> add(Fn1<A, Boolean> predicate) {
+    public Filter<A> add(Fn1<? super A, Boolean> predicate) {
         return multiFilter(this).add(predicate);
     }
 

@@ -10,11 +10,11 @@ import static dev.marksman.gauntlet.Name.name;
 
 public final class Props {
 
-    public static <A> Prop<A> prop(Name name, Fn1<A, Boolean> predicate) {
+    public static <A> Prop<A> prop(Name name, Fn1<? super A, Boolean> predicate) {
         return new PredicateProp<>(name, predicate);
     }
 
-    public static <A> Prop<A> prop(Fn1<A, Boolean> predicate) {
+    public static <A> Prop<A> prop(Fn1<? super A, Boolean> predicate) {
         return prop(name(PredicateProp.class.getSimpleName()), predicate);
     }
 

@@ -7,7 +7,7 @@ import static dev.marksman.gauntlet.filter.EmptyFilter.emptyFilterChain;
 import static dev.marksman.gauntlet.filter.MultiFilter.multiFilter;
 
 public interface Filter<A> extends Predicate<A> {
-    Filter<A> add(Fn1<A, Boolean> predicate);
+    Filter<A> add(Fn1<? super A, Boolean> predicate);
 
     @Override
     <Z> Filter<Z> contraMap(Fn1<? super Z, ? extends A> fn);
@@ -18,7 +18,7 @@ public interface Filter<A> extends Predicate<A> {
         return emptyFilterChain();
     }
 
-    static <A> Filter<A> filter(Fn1<A, Boolean> f) {
+    static <A> Filter<A> filter(Fn1<? super A, Boolean> f) {
         return multiFilter(f);
     }
 

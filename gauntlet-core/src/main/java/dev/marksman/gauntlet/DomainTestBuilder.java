@@ -8,15 +8,15 @@ public interface DomainTestBuilder<A> {
 
     void mustSatisfy(Prop<A> prop);
 
-    default void mustSatisfy(Fn1<A, Boolean> predicate) {
+    default void mustSatisfy(Fn1<? super A, Boolean> predicate) {
         mustSatisfy(prop(predicate));
     }
 
-    default void mustSatisfy(Name name, Fn1<A, Boolean> predicate) {
+    default void mustSatisfy(Name name, Fn1<? super A, Boolean> predicate) {
         mustSatisfy(prop(name, predicate));
     }
 
-    default void mustSatisfy(String name, Fn1<A, Boolean> predicate) {
+    default void mustSatisfy(String name, Fn1<? super A, Boolean> predicate) {
         mustSatisfy(prop(name, predicate));
     }
 

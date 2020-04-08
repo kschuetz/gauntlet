@@ -11,7 +11,7 @@ final class EmptyFilter<A> implements Filter<A> {
     private static final EmptyFilter<?> INSTANCE = new EmptyFilter<>();
 
     @Override
-    public Filter<A> add(Fn1<A, Boolean> predicate) {
+    public Filter<A> add(Fn1<? super A, Boolean> predicate) {
         return multiFilter(predicate);
     }
 

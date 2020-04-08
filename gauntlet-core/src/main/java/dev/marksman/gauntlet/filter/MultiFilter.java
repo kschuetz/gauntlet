@@ -10,16 +10,16 @@ import static dev.marksman.gauntlet.filter.MappedFilter.mappedFilter;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 final class MultiFilter<A> implements Filter<A> {
-    private final ImmutableFiniteIterable<Fn1<A, Boolean>> filters;
+    private final ImmutableFiniteIterable<Fn1<? super A, Boolean>> filters;
 
     @Override
-    public Filter<A> add(Fn1<A, Boolean> predicate) {
+    public Filter<A> add(Fn1<? super A, Boolean> predicate) {
         return new MultiFilter<>(filters.prepend(predicate));
     }
 
     @Override
     public Boolean checkedApply(A a) {
-        for (Fn1<A, Boolean> filter : filters) {
+        for (Fn1<? super A, Boolean> filter : filters) {
             if (!filter.apply(a)) {
                 return false;
             }
@@ -38,7 +38,7 @@ final class MultiFilter<A> implements Filter<A> {
         return false;
     }
 
-    static <A> Filter<A> multiFilter(Fn1<A, Boolean> filter) {
+    static <A> Filter<A> multiFilter(Fn1<? super A, Boolean> filter) {
         return new MultiFilter<>(ImmutableFiniteIterable.of(filter));
     }
 

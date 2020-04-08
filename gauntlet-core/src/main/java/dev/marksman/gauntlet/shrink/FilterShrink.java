@@ -5,9 +5,9 @@ import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 
 class FilterShrink<A> implements Shrink<A> {
     private final Shrink<A> underlying;
-    private final Fn1<A, Boolean> predicate;
+    private final Fn1<? super A, Boolean> predicate;
 
-    FilterShrink(Shrink<A> underlying, Fn1<A, Boolean> predicate) {
+    FilterShrink(Shrink<A> underlying, Fn1<? super A, Boolean> predicate) {
         this.underlying = underlying;
         this.predicate = predicate;
     }
