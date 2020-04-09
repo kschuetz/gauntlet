@@ -6,7 +6,7 @@ import dev.marksman.gauntlet.GauntletApiBase;
 import org.junit.jupiter.api.Test;
 
 import static dev.marksman.gauntlet.Arbitraries.arbitraryInt;
-import static dev.marksman.gauntlet.Prop.prop;
+import static dev.marksman.gauntlet.Prop.predicate;
 
 public class VectorTests extends GauntletApiBase {
 
@@ -15,7 +15,7 @@ public class VectorTests extends GauntletApiBase {
     @Test
     void reverseTwiceIsOriginal() {
         all(vectors)
-                .mustSatisfy(prop("reverse twice is original",
+                .mustSatisfy(predicate("reverse twice is original",
                         xs -> xs.reverse().reverse().equals(xs)));
     }
 

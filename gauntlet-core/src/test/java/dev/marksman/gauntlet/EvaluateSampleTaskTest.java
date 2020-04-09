@@ -6,7 +6,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static dev.marksman.gauntlet.EvaluateSampleTask.testSampleTask;
-import static dev.marksman.gauntlet.Prop.prop;
 import static dev.marksman.gauntlet.TestTaskResult.success;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
@@ -16,7 +15,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class EvaluateSampleTaskTest {
 
-    private static final Prop<Integer> isOdd = prop(n -> n % 2 == 1);
+    private static final Prop<Integer> isOdd = Prop.predicate(n -> n % 2 == 1);
 
     @Mock
     Context context;
@@ -48,7 +47,7 @@ class EvaluateSampleTaskTest {
     @Test
     void errorCase() {
         when(receiver.shouldRun(0)).thenReturn(true);
-        EvaluateSampleTask<Integer> task = testSampleTask(context, receiver, prop(n -> {
+        EvaluateSampleTask<Integer> task = testSampleTask(context, receiver, Prop.predicate(n -> {
             throw new Exception("error!");
         }), 0, 2);
 
