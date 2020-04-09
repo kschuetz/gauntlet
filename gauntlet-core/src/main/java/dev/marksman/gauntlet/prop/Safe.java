@@ -20,7 +20,7 @@ final class Safe<A> implements Prop<A> {
         try {
             return underlying.test(context, data);
         } catch (Exception e) {
-            return evalResult(failure(underlying, "Threw an exception: " + e.getMessage()));
+            return evalResult(failure(underlying, "Threw an exception: " + e));
         }
     }
 

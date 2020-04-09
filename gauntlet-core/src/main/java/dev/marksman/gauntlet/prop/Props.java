@@ -8,7 +8,7 @@ import dev.marksman.gauntlet.Prop;
 
 import java.util.function.Consumer;
 
-import static dev.marksman.gauntlet.prop.ConsumerProp.consumerProp;
+import static dev.marksman.gauntlet.prop.Executes.executes;
 
 public final class Props {
 
@@ -103,17 +103,21 @@ public final class Props {
         return new WhenExecuting<A>() {
             @Override
             public <T extends Throwable> Prop<A> throwsClass(Class<T> expectedClass) {
-                return null;
+                return ThrowsExceptionMatching.throwsExceptionMatching("throws exception of class " + expectedClass.getSimpleName(),
+                        e -> e.getClass().equals(expectedClass),
+                        executes(executable));
             }
 
             @Override
             public Prop<A> throwsExceptionMatching(Fn1<? super Throwable, Boolean> exceptionMatcher) {
-                return null;
+                return ThrowsExceptionMatching.throwsExceptionMatching("throws exception matching",
+                        exceptionMatcher,
+                        executes(executable));
             }
 
             @Override
             public Prop<A> doesNotThrow() {
-                return consumerProp("does not throw", executable).safe();
+                return executes("does not throw", executable).safe();
             }
         };
     }

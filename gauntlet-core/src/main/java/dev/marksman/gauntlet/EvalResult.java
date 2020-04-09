@@ -5,10 +5,12 @@ import com.jnape.palatable.lambda.adt.coproduct.CoProduct2;
 import com.jnape.palatable.lambda.functions.Fn1;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import static lombok.AccessLevel.PRIVATE;
 
 @EqualsAndHashCode
+@ToString
 @AllArgsConstructor(access = PRIVATE)
 public final class EvalResult implements CoProduct2<Success, Failure, EvalResult> {
     private static final EvalResult SUCCESS = new EvalResult(Choice2.a(Success.success()));
