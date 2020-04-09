@@ -1,11 +1,11 @@
 package dev.marksman.gauntlet.prop;
 
 import com.jnape.palatable.lambda.functions.Fn1;
+import dev.marksman.gauntlet.EvalFailure;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
-import static dev.marksman.gauntlet.EvalResult.evalResult;
-import static dev.marksman.gauntlet.Failure.failure;
+import static dev.marksman.gauntlet.FailureReasons.failureReasons;
 
 final class Safe<A> implements Prop<A> {
     private final Prop<A> underlying;
@@ -19,7 +19,7 @@ final class Safe<A> implements Prop<A> {
         try {
             return underlying.test(data);
         } catch (Exception e) {
-            return evalResult(failure(underlying, "Threw an exception: " + e));
+            return EvalFailure.evalFailure(underlying, failureReasons("Threw an exception: " + e));
         }
     }
 

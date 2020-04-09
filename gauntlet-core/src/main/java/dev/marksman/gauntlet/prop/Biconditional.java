@@ -1,12 +1,12 @@
 package dev.marksman.gauntlet.prop;
 
+import dev.marksman.gauntlet.EvalFailure;
 import dev.marksman.gauntlet.EvalResult;
-import dev.marksman.gauntlet.Failure;
 import dev.marksman.gauntlet.Prop;
 
-import static dev.marksman.gauntlet.EvalResult.evalResult;
-import static dev.marksman.gauntlet.EvalResult.success;
-import static dev.marksman.gauntlet.Failure.failure;
+import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
+import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
+import static dev.marksman.gauntlet.FailureReasons.failureReasons;
 
 class Biconditional<A> implements Prop<A> {
     final Prop<A> antecedent;
@@ -27,13 +27,11 @@ class Biconditional<A> implements Prop<A> {
         // failure + failure -> success
         return antecedent.test(data)
                 .match(success -> consequent.test(data)
-                                .match(EvalResult::evalResult,
-                                        f1 -> evalResult(createFailure()
-                                                .addCause(f1))),
+                                .match(id(),
+                                        f1 -> createFailure().addCause(f1)),
                         failure -> consequent.test(data)
-                                .match(__ -> evalResult(createFailure()
-                                                .addCause(failure)),
-                                        __ -> success()));
+                                .match(__ -> createFailure().addCause(failure),
+                                        __ -> evalSuccess()));
     }
 
     @Override
@@ -41,7 +39,7 @@ class Biconditional<A> implements Prop<A> {
         return name;
     }
 
-    private Failure createFailure() {
-        return failure(this, "Biconditional failed.");
+    private EvalFailure createFailure() {
+        return EvalFailure.evalFailure(this, failureReasons("Biconditional failed."));
     }
 }

@@ -4,9 +4,9 @@ import dev.marksman.gauntlet.EvalResult;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 
-public final class EvalResultSuccessMatcher extends TypeSafeMatcher<EvalResult> {
+public final class EvalSuccessMatcher extends TypeSafeMatcher<EvalResult> {
 
-    private EvalResultSuccessMatcher() {
+    private EvalSuccessMatcher() {
     }
 
     @Override
@@ -17,11 +17,11 @@ public final class EvalResultSuccessMatcher extends TypeSafeMatcher<EvalResult> 
 
     @Override
     public void describeTo(Description description) {
-        description.appendText("EvalResult success");
+        description.appendText("EvalSuccess");
     }
 
-    public static EvalResultSuccessMatcher isEvalResultSuccess() {
-        return new EvalResultSuccessMatcher();
+    public static EvalSuccessMatcher isEvalSuccess() {
+        return new EvalSuccessMatcher();
     }
 
 }

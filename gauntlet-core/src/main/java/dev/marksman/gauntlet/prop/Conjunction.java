@@ -1,12 +1,12 @@
 package dev.marksman.gauntlet.prop;
 
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
+import dev.marksman.gauntlet.EvalFailure;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
-import static dev.marksman.gauntlet.EvalResult.evalResult;
-import static dev.marksman.gauntlet.EvalResult.success;
-import static dev.marksman.gauntlet.Failure.failure;
+import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
+import static dev.marksman.gauntlet.FailureReasons.failureReasons;
 
 
 final class Conjunction<A> implements Prop<A> {
@@ -29,7 +29,7 @@ final class Conjunction<A> implements Prop<A> {
     @Override
     public EvalResult test(A data) {
         return operands.foldLeft((acc, operand) -> combine(acc, operand.test(data)),
-                success());
+                (EvalResult) evalSuccess());
     }
 
     private EvalResult combine(EvalResult acc, EvalResult item) {
@@ -41,15 +41,16 @@ final class Conjunction<A> implements Prop<A> {
         return acc
                 .match(success -> item
                                 .match(__ -> item,
-                                        f1 -> evalResult(failure(this, "Conjuncts failed.")
-                                                .addCause(f1))),
+                                        f1 -> EvalFailure.evalFailure(this, failureReasons("Conjuncts failed."))
+                                                .addCause(f1)),
 
-                        f1 -> item.match(__ -> evalResult(f1),
-                                f2 -> evalResult(f1.addCause(f2))));
+                        f1 -> item.match(__ -> f1,
+                                f1::addCause));
     }
 
     @Override
     public String getName() {
         return name;
     }
+
 }

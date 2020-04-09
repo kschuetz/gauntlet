@@ -3,15 +3,15 @@ package dev.marksman.gauntlet.prop;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
-import static dev.marksman.gauntlet.EvalResult.success;
+import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
 
-final class Pass<A> implements Prop<A> {
+final class AlwaysPass<A> implements Prop<A> {
     private static final String NAME = "Pass";
-    private static final Pass<?> INSTANCE = new Pass<>();
+    private static final AlwaysPass<?> INSTANCE = new AlwaysPass<>();
 
     @Override
     public EvalResult test(A data) {
-        return success();
+        return evalSuccess();
     }
 
     @Override
@@ -20,7 +20,7 @@ final class Pass<A> implements Prop<A> {
     }
 
     @SuppressWarnings("unchecked")
-    static <A> Pass<A> pass() {
-        return (Pass<A>) INSTANCE;
+    static <A> AlwaysPass<A> alwaysPass() {
+        return (AlwaysPass<A>) INSTANCE;
     }
 }

@@ -1,12 +1,12 @@
 package dev.marksman.gauntlet.prop;
 
 import com.jnape.palatable.lambda.functions.Fn1;
+import dev.marksman.gauntlet.EvalFailure;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
-import static dev.marksman.gauntlet.EvalResult.evalResult;
-import static dev.marksman.gauntlet.EvalResult.success;
-import static dev.marksman.gauntlet.Failure.failure;
+import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
+import static dev.marksman.gauntlet.FailureReasons.failureReasons;
 
 
 final class PredicateProp<A> implements Prop<A> {
@@ -21,8 +21,8 @@ final class PredicateProp<A> implements Prop<A> {
     @Override
     public EvalResult test(A data) {
         return predicate.apply(data)
-                ? success()
-                : evalResult(failure(this, "Predicate failed."));
+                ? evalSuccess()
+                : EvalFailure.evalFailure(this, failureReasons("Predicate failed."));
     }
 
     @Override

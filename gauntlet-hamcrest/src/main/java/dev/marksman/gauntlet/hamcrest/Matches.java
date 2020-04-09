@@ -1,13 +1,16 @@
 package dev.marksman.gauntlet.hamcrest;
 
+import dev.marksman.gauntlet.EvalFailure;
 import dev.marksman.gauntlet.EvalResult;
-import dev.marksman.gauntlet.Failure;
 import dev.marksman.gauntlet.Prop;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.StringDescription;
+
+import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
+import static dev.marksman.gauntlet.FailureReasons.failureReasons;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Matches<A> implements Prop<A> {
@@ -19,11 +22,11 @@ public final class Matches<A> implements Prop<A> {
     @Override
     public EvalResult test(A data) {
         if (matcher.matches(data)) {
-            return EvalResult.success();
+            return evalSuccess();
         } else {
             Description description = new StringDescription();
             matcher.describeMismatch(data, description);
-            return EvalResult.evalResult(Failure.failure(this, description.toString()));
+            return EvalFailure.evalFailure(this, failureReasons(description.toString()));
         }
     }
 

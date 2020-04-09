@@ -1,11 +1,12 @@
 package dev.marksman.gauntlet.prop;
 
+import dev.marksman.gauntlet.EvalFailure;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
-import static dev.marksman.gauntlet.EvalResult.evalResult;
-import static dev.marksman.gauntlet.EvalResult.success;
-import static dev.marksman.gauntlet.Failure.failure;
+import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
+import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
+import static dev.marksman.gauntlet.FailureReasons.failureReasons;
 
 class Implication<A> implements Prop<A> {
     final Prop<A> antecedent;
@@ -26,10 +27,10 @@ class Implication<A> implements Prop<A> {
 
         return antecedent.test(data)
                 .match(success -> consequent.test(data)
-                                .match(EvalResult::evalResult,
-                                        f1 -> evalResult(failure(this, "Implication failed.")
-                                                .addCause(f1))),
-                        failure -> success());
+                                .match(id(),
+                                        f1 -> EvalFailure.evalFailure(this, failureReasons("Implication failed."))
+                                                .addCause(f1)),
+                        failure -> evalSuccess());
     }
 
     @Override

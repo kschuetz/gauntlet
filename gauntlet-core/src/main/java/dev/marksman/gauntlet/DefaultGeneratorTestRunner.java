@@ -29,7 +29,6 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     @Override
     public <A> GeneratorTestResult<A> run(GeneratorTestExecutionParameters executionParameters, GeneratorTest<A> testData) {
         Executor executor = executionParameters.getExecutor();
-        Maybe<AscribedFailure<A>> result = nothing();
         long initialSeedValue = testData.getInitialSeed().orElseGet(seedGenerator::nextLong);
         Seed initialSeed = Seed.create(initialSeedValue);
         Arbitrary<A> arbitrary = testData.getArbitrary();

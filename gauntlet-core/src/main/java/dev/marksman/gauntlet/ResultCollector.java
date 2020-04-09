@@ -90,7 +90,7 @@ abstract class ResultCollector<A> implements ResultReceiver {
 
     protected abstract void handleSuccess(int sampleIndex);
 
-    protected abstract void handleFailure(int sampleIndex, Failure failure);
+    protected abstract void handleFailure(int sampleIndex, EvalFailure failure);
 
     protected abstract void handleError(int sampleIndex, Throwable error);
 
@@ -109,7 +109,7 @@ abstract class ResultCollector<A> implements ResultReceiver {
 
     static class UniversalResultCollector<A> extends ResultCollector<A> {
         // status: success, failure, error
-        private volatile Choice3<Unit, Failure, Throwable> status;
+        private volatile Choice3<Unit, EvalFailure, Throwable> status;
 
         UniversalResultCollector(ImmutableVector<A> samples) {
             super(samples);
@@ -123,7 +123,7 @@ abstract class ResultCollector<A> implements ResultReceiver {
         }
 
         @Override
-        protected void handleFailure(int sampleIndex, Failure failure) {
+        protected void handleFailure(int sampleIndex, EvalFailure failure) {
             cutoffIndex = sampleIndex;
             this.status = Choice3.b(failure);
         }
@@ -170,12 +170,12 @@ abstract class ResultCollector<A> implements ResultReceiver {
     static class ExistentialResultCollector<A> extends ResultCollector<A> {
         // status: unproved, proved, error
         private volatile Choice3<Unit, A, Throwable> status;
-        private Failure[] collectedFailures;
+        private EvalFailure[] collectedFailures;
 
         ExistentialResultCollector(ImmutableVector<A> samples) {
             super(samples);
             status = Choice3.a(UNIT);
-            collectedFailures = new Failure[samples.size()];
+            collectedFailures = new EvalFailure[samples.size()];
             checkIfDone();
         }
 
@@ -186,7 +186,7 @@ abstract class ResultCollector<A> implements ResultReceiver {
         }
 
         @Override
-        protected void handleFailure(int sampleIndex, Failure failure) {
+        protected void handleFailure(int sampleIndex, EvalFailure failure) {
             collectedFailures[sampleIndex] = failure;
         }
 
@@ -216,7 +216,7 @@ abstract class ResultCollector<A> implements ResultReceiver {
         private ImmutableVector<Counterexample<A>> getFailedSamples() {
             VectorBuilder<Counterexample<A>> builder = Vector.builder();
             for (int idx = 0; idx < samples.size(); idx++) {
-                Failure failure = collectedFailures[idx];
+                EvalFailure failure = collectedFailures[idx];
                 if (failure != null) {
                     builder = builder.add(counterexample(failure, samples.unsafeGet(idx)));
                 }

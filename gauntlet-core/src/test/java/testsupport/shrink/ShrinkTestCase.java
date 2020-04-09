@@ -11,9 +11,9 @@ import lombok.Value;
 import java.util.HashSet;
 
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
-import static dev.marksman.gauntlet.BasicPropResult.failureWithReason;
-import static dev.marksman.gauntlet.BasicPropResult.success;
 import static dev.marksman.gauntlet.Prop.prop;
+import static dev.marksman.gauntlet.SimpleResult.fail;
+import static dev.marksman.gauntlet.SimpleResult.pass;
 import static lombok.AccessLevel.PRIVATE;
 
 @Value
@@ -38,11 +38,11 @@ public class ShrinkTestCase<A> {
                     seen.add(testCase.getInput());
                     for (A element : testCase.getOutput()) {
                         if (seen.contains(element)) {
-                            return failureWithReason("repeated element " + element);
+                            return fail("repeated element " + element);
                         }
                         seen.add(element);
                     }
-                    return success();
+                    return pass();
                 });
     }
 }

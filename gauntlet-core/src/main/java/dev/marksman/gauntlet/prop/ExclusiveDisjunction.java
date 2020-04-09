@@ -1,11 +1,12 @@
 package dev.marksman.gauntlet.prop;
 
+import dev.marksman.gauntlet.EvalFailure;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
-import static dev.marksman.gauntlet.EvalResult.evalResult;
-import static dev.marksman.gauntlet.EvalResult.success;
-import static dev.marksman.gauntlet.Failure.failure;
+import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
+import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
+import static dev.marksman.gauntlet.FailureReasons.failureReasons;
 
 class ExclusiveDisjunction<A> implements Prop<A> {
     final Prop<A> p;
@@ -26,14 +27,14 @@ class ExclusiveDisjunction<A> implements Prop<A> {
         // failure + failure -> failure
         return p.test(data)
                 .match(success -> q.test(data)
-                                .match(__ -> evalResult(failure(this, "xor failed")
-                                                .addCause(failure(q, "Expected failure"))),
-                                        f1 -> success()),
+                                .match(__ -> EvalFailure.evalFailure(this, failureReasons("xor failed"))
+                                                .addCause(EvalFailure.evalFailure(q, failureReasons("Expected failure"))),
+                                        f1 -> evalSuccess()),
                         failure -> q.test(data)
-                                .match(EvalResult::evalResult,
-                                        f1 -> evalResult(failure(this, "xor failed")
+                                .match(id(),
+                                        f1 -> EvalFailure.evalFailure(this, failureReasons("xor failed"))
                                                 .addCause(failure)
-                                                .addCause(f1))));
+                                                .addCause(f1)));
     }
 
     @Override

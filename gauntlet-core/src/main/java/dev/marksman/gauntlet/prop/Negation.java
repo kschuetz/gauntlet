@@ -1,11 +1,11 @@
 package dev.marksman.gauntlet.prop;
 
+import dev.marksman.gauntlet.EvalFailure;
 import dev.marksman.gauntlet.EvalResult;
+import dev.marksman.gauntlet.FailureReasons;
 import dev.marksman.gauntlet.Prop;
 
-import static dev.marksman.gauntlet.EvalResult.evalResult;
-import static dev.marksman.gauntlet.EvalResult.success;
-import static dev.marksman.gauntlet.Failure.failure;
+import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
 
 final class Negation<A> implements Prop<A> {
     final Prop<A> operand;
@@ -27,8 +27,8 @@ final class Negation<A> implements Prop<A> {
         // failure -> success
 
         return operand.test(data)
-                .match(__ -> evalResult(failure(this, "Failure expected.")),
-                        __ -> success());
+                .match(__ -> EvalFailure.evalFailure(this, FailureReasons.failureReasons("Failure expected.")),
+                        __ -> evalSuccess());
     }
 
     @Override

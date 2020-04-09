@@ -1,12 +1,12 @@
 package dev.marksman.gauntlet.prop;
 
 import com.jnape.palatable.lambda.functions.Fn1;
+import dev.marksman.gauntlet.EvalFailure;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
-import static dev.marksman.gauntlet.EvalResult.evalResult;
-import static dev.marksman.gauntlet.EvalResult.success;
-import static dev.marksman.gauntlet.Failure.failure;
+import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
+import static dev.marksman.gauntlet.FailureReasons.failureReasons;
 
 final class ThrowsExceptionMatching<A> implements Prop<A> {
     private final String name;
@@ -28,12 +28,12 @@ final class ThrowsExceptionMatching<A> implements Prop<A> {
     public EvalResult test(A data) {
         try {
             underlying.test(data);
-            return evalResult(failure(this, "Did not throw an exception"));
+            return EvalFailure.evalFailure(this, failureReasons("Did not throw an exception"));
         } catch (Exception e) {
             if (exceptionMatcher.apply(e)) {
-                return success();
+                return evalSuccess();
             } else {
-                return evalResult(failure(this, "Threw an exception that didn't match"));
+                return EvalFailure.evalFailure(this, failureReasons("Threw an exception that didn't match"));
             }
         }
     }

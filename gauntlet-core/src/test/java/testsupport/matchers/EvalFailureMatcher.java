@@ -1,7 +1,7 @@
 package testsupport.matchers;
 
+import dev.marksman.gauntlet.EvalFailure;
 import dev.marksman.gauntlet.EvalResult;
-import dev.marksman.gauntlet.Failure;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
@@ -9,11 +9,11 @@ import org.hamcrest.TypeSafeMatcher;
 import static com.jnape.palatable.lambda.io.IO.io;
 import static org.hamcrest.core.IsAnything.anything;
 
-public final class EvalResultFailureMatcher extends TypeSafeMatcher<EvalResult> {
+public final class EvalFailureMatcher extends TypeSafeMatcher<EvalResult> {
 
-    private final Matcher<? super Failure> failureMatcher;
+    private final Matcher<? super EvalFailure> failureMatcher;
 
-    private EvalResultFailureMatcher(Matcher<? super Failure> failureMatcher) {
+    private EvalFailureMatcher(Matcher<? super EvalFailure> failureMatcher) {
         this.failureMatcher = failureMatcher;
     }
 
@@ -25,27 +25,27 @@ public final class EvalResultFailureMatcher extends TypeSafeMatcher<EvalResult> 
 
     @Override
     public void describeTo(Description description) {
-        description.appendText("EvalResult failure of ");
+        description.appendText("EvalFailure of ");
         failureMatcher.describeTo(description);
     }
 
     @Override
     protected void describeMismatchSafely(EvalResult item, Description mismatchDescription) {
         mismatchDescription.appendText("was ");
-        item.match(__ -> io(() -> mismatchDescription.appendText("EvalResult success")),
+        item.match(__ -> io(() -> mismatchDescription.appendText("EvalSuccess")),
                 f -> io(() -> {
-                    mismatchDescription.appendText("EvalResult failure of ");
+                    mismatchDescription.appendText("EvalFailure of ");
                     failureMatcher.describeMismatch(f, mismatchDescription);
                 }))
                 .unsafePerformIO();
     }
 
-    public static EvalResultFailureMatcher isEvalResultFailureThat(Matcher<? super Failure> matcher) {
-        return new EvalResultFailureMatcher(matcher);
+    public static EvalFailureMatcher isEvalFailureThat(Matcher<? super EvalFailure> matcher) {
+        return new EvalFailureMatcher(matcher);
     }
 
-    public static EvalResultFailureMatcher isEvalResultFailure() {
-        return isEvalResultFailureThat(anything());
+    public static EvalFailureMatcher isEvalFailure() {
+        return isEvalFailureThat(anything());
     }
 
 }

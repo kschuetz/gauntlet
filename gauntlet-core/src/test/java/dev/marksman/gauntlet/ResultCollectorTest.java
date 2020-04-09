@@ -10,17 +10,18 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 
 import static dev.marksman.gauntlet.Counterexample.counterexample;
-import static dev.marksman.gauntlet.Failure.failure;
+import static dev.marksman.gauntlet.FailureReasons.failureReasons;
 import static dev.marksman.gauntlet.ResultCollector.existentialResultCollector;
 import static dev.marksman.gauntlet.ResultCollector.universalResultCollector;
 import static dev.marksman.gauntlet.TestResult.*;
 import static dev.marksman.gauntlet.TestTaskResult.success;
+import static dev.marksman.gauntlet.TestTaskResult.testTaskResult;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ResultCollectorTest {
 
-    private static final Prop<Integer> failureProp = Prop.<Integer>fail().rename("prop");
-    private static final Failure failure = failure(failureProp, "failed");
+    private static final Prop<Integer> failureProp = Prop.<Integer>alwaysFail().rename("prop");
+    private static final EvalFailure failure = EvalFailure.evalFailure(failureProp, failureReasons("failed"));
 
     private ImmutableVector<Integer> samples;
     private int sampleCount;
@@ -87,7 +88,7 @@ class ResultCollectorTest {
         void singleFailure() {
             int failedIndex = 3;
             for (int sampleIndex = 0; sampleIndex < sampleCount; sampleIndex++) {
-                collector.reportResult(sampleIndex, sampleIndex == failedIndex ? TestTaskResult.failure(failure) : success());
+                collector.reportResult(sampleIndex, sampleIndex == failedIndex ? testTaskResult(failure) : success());
             }
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
@@ -101,7 +102,7 @@ class ResultCollectorTest {
             int firstFailedIndex = 3;
             for (int sampleIndex = 0; sampleIndex < sampleCount; sampleIndex++) {
                 collector.reportResult(sampleIndex, sampleIndex >= firstFailedIndex
-                        ? TestTaskResult.failure(failure)
+                        ? testTaskResult(failure)
                         : success());
             }
 
@@ -147,7 +148,7 @@ class ResultCollectorTest {
             for (int sampleIndex = 0; sampleIndex < failedIndex; sampleIndex++) {
                 collector.reportResult(sampleIndex, success());
             }
-            collector.reportResult(failedIndex, TestTaskResult.failure(failure));
+            collector.reportResult(failedIndex, testTaskResult(failure));
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
@@ -172,7 +173,7 @@ class ResultCollectorTest {
 
         @Test
         void shouldNotRunTestsBeyondEarliestFailure() {
-            collector.reportResult(0, TestTaskResult.failure(failure));
+            collector.reportResult(0, testTaskResult(failure));
             assertFalse(collector.shouldRun(1));
         }
 
@@ -184,7 +185,7 @@ class ResultCollectorTest {
 
         @Test
         void shouldRunTestsBeforeFirstFailure() {
-            collector.reportResult(5, TestTaskResult.failure(failure));
+            collector.reportResult(5, testTaskResult(failure));
             assertTrue(collector.shouldRun(0));
             assertTrue(collector.shouldRun(4));
         }
@@ -254,7 +255,7 @@ class ResultCollectorTest {
         void timeoutBeforeCompleting() {
             int samplesToFinishBeforeTimeout = 3;
             for (int sampleIndex = 0; sampleIndex < samplesToFinishBeforeTimeout; sampleIndex++) {
-                collector.reportResult(sampleIndex, TestTaskResult.failure(failure));
+                collector.reportResult(sampleIndex, testTaskResult(failure));
             }
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
@@ -266,7 +267,7 @@ class ResultCollectorTest {
         @Test
         void firstTwoFailOthersPass() {
             for (int sampleIndex = 0; sampleIndex < sampleCount; sampleIndex++) {
-                collector.reportResult(sampleIndex, sampleIndex < 2 ? TestTaskResult.failure(failure) : success());
+                collector.reportResult(sampleIndex, sampleIndex < 2 ? testTaskResult(failure) : success());
             }
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
@@ -283,7 +284,7 @@ class ResultCollectorTest {
             for (int sampleIndex = 2; sampleIndex < sampleCount; sampleIndex++) {
                 collector.reportResult(sampleIndex, success());
             }
-            collector.reportResult(0, TestTaskResult.failure(failure));
+            collector.reportResult(0, testTaskResult(failure));
             collector.reportResult(1, TestTaskResult.error(exception));
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
@@ -295,7 +296,7 @@ class ResultCollectorTest {
         void passedSampleEarlierThanErrorYieldsProved() {
             Exception exception = new Exception("error");
 
-            collector.reportResult(0, TestTaskResult.failure(failure));
+            collector.reportResult(0, testTaskResult(failure));
             collector.reportResult(1, success());
             collector.reportResult(2, TestTaskResult.error(exception));
             for (int sampleIndex = 3; sampleIndex < sampleCount; sampleIndex++) {
@@ -314,7 +315,7 @@ class ResultCollectorTest {
             for (int sampleIndex = 0; sampleIndex < sampleCount; sampleIndex++) {
                 collector.reportResult(sampleIndex, sampleIndex >= firstErroredIndex
                         ? TestTaskResult.error(exception)
-                        : TestTaskResult.failure(failure));
+                        : testTaskResult(failure));
             }
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
@@ -348,7 +349,7 @@ class ResultCollectorTest {
 
         @Test
         void shouldRunTestsBeforeFirstFailure() {
-            collector.reportResult(5, TestTaskResult.failure(failure));
+            collector.reportResult(5, testTaskResult(failure));
             assertTrue(collector.shouldRun(0));
             assertTrue(collector.shouldRun(4));
         }
@@ -369,7 +370,7 @@ class ResultCollectorTest {
 
         @Test
         void failureDoesNotAffectCutoff() {
-            collector.reportResult(1, TestTaskResult.failure(failure));
+            collector.reportResult(1, testTaskResult(failure));
             assertTrue(collector.shouldRun(2));
         }
     }

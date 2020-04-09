@@ -1,11 +1,12 @@
 package dev.marksman.gauntlet.prop;
 
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
+import dev.marksman.gauntlet.EvalFailure;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
-import static dev.marksman.gauntlet.EvalResult.evalResult;
-import static dev.marksman.gauntlet.Failure.failure;
+import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
+import static dev.marksman.gauntlet.FailureReasons.failureReasons;
 
 
 final class Disjunction<A> implements Prop<A> {
@@ -27,7 +28,7 @@ final class Disjunction<A> implements Prop<A> {
 
     @Override
     public EvalResult test(A data) {
-        EvalResult result = evalResult(failure(this, "All disjuncts failed."));
+        EvalResult result = EvalFailure.evalFailure(this, failureReasons("All disjuncts failed."));
         for (Prop<A> prop : operands) {
             EvalResult test = prop.test(data);
             if (test.isSuccess()) {
@@ -45,9 +46,9 @@ final class Disjunction<A> implements Prop<A> {
         // failure + failure -> failure
 
         return acc
-                .match(EvalResult::evalResult,
-                        f1 -> item.match(EvalResult::evalResult,
-                                f2 -> evalResult(f1.addCause(f2))));
+                .match(id(),
+                        f1 -> item.match(id(),
+                                f1::addCause));
     }
 
     @Override

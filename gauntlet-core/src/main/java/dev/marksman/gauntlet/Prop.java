@@ -56,24 +56,24 @@ public interface Prop<A> extends Contravariant<A, Prop<?>>, Named {
         return Props.predicate(name, predicate);
     }
 
-    static <A> Prop<A> prop(Fn1<? super A, BasicPropResult> evaluator) {
+    static <A> Prop<A> prop(Fn1<? super A, SimpleResult> evaluator) {
         return Props.prop(evaluator);
     }
 
-    static <A> Prop<A> prop(String name, Fn1<? super A, BasicPropResult> evaluator) {
+    static <A> Prop<A> prop(String name, Fn1<? super A, SimpleResult> evaluator) {
         return Props.prop(name, evaluator);
     }
 
     static <A> Prop<A> pass() {
-        return Props.pass();
+        return Props.alwaysPass();
     }
 
-    static <A> Prop<A> fail() {
-        return Props.fail();
+    static <A> Prop<A> alwaysFail() {
+        return Props.alwaysFail();
     }
 
-    static <A> Prop<A> fail(String failureReason) {
-        return Props.fail(failureReason);
+    static <A> Prop<A> alwaysFail(String failureReason) {
+        return Props.alwaysFail(failureReason);
     }
 
     static <A> Prop<A> dynamic(Fn1<A, Prop<A>> selector) {

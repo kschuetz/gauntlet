@@ -5,6 +5,8 @@ import dev.marksman.gauntlet.Prop;
 
 import java.util.function.Consumer;
 
+import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
+
 final class Executes<A> implements Prop<A> {
     private final String name;
     private final Consumer<A> executable;
@@ -17,7 +19,7 @@ final class Executes<A> implements Prop<A> {
     @Override
     public EvalResult test(A data) {
         executable.accept(data);
-        return EvalResult.success();
+        return evalSuccess();
     }
 
     @Override

@@ -3,11 +3,13 @@ package dev.marksman.gauntlet.prop;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
-import dev.marksman.gauntlet.BasicPropResult;
+import dev.marksman.gauntlet.FailureReasons;
 import dev.marksman.gauntlet.Prop;
+import dev.marksman.gauntlet.SimpleResult;
 
 import java.util.function.Consumer;
 
+import static dev.marksman.gauntlet.FailureReasons.failureReasons;
 import static dev.marksman.gauntlet.prop.Executes.executes;
 
 public final class Props {
@@ -20,24 +22,28 @@ public final class Props {
         return new PredicateProp<>(name, predicate);
     }
 
-    public static <A> Prop<A> prop(Fn1<? super A, BasicPropResult> evaluator) {
+    public static <A> Prop<A> prop(Fn1<? super A, SimpleResult> evaluator) {
         return new BasicProp<>(BasicProp.class.getSimpleName(), evaluator);
     }
 
-    public static <A> Prop<A> prop(String name, Fn1<? super A, BasicPropResult> evaluator) {
+    public static <A> Prop<A> prop(String name, Fn1<? super A, SimpleResult> evaluator) {
         return new BasicProp<>(name, evaluator);
     }
 
-    public static <A> Prop<A> pass() {
-        return Pass.pass();
+    public static <A> Prop<A> alwaysPass() {
+        return AlwaysPass.alwaysPass();
     }
 
-    public static <A> Prop<A> fail() {
-        return Fail.fail();
+    public static <A> Prop<A> alwaysFail() {
+        return AlwaysFail.alwaysFail();
     }
 
-    public static <A> Prop<A> fail(String failureReason) {
-        return Fail.fail(failureReason);
+    public static <A> Prop<A> alwaysFail(String failureReason) {
+        return AlwaysFail.alwaysFail(failureReasons(failureReason));
+    }
+
+    public static <A> Prop<A> alwaysFail(FailureReasons failureReasons) {
+        return AlwaysFail.alwaysFail(failureReasons);
     }
 
     public static <A> Prop<A> conjunction(Prop<A> p, Prop<A> q) {
