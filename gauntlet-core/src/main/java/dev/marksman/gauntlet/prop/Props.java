@@ -6,6 +6,10 @@ import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
 import dev.marksman.gauntlet.BasicPropResult;
 import dev.marksman.gauntlet.Prop;
 
+import java.util.function.Consumer;
+
+import static dev.marksman.gauntlet.prop.ConsumerProp.consumerProp;
+
 public final class Props {
 
     public static <A> Prop<A> predicate(Fn1<? super A, Boolean> predicate) {
@@ -94,4 +98,24 @@ public final class Props {
             return new Safe<>(prop);
         }
     }
+
+    public static <A> WhenExecuting<A> whenExecuting(Consumer<A> executable) {
+        return new WhenExecuting<A>() {
+            @Override
+            public <T extends Throwable> Prop<A> throwsClass(Class<T> expectedClass) {
+                return null;
+            }
+
+            @Override
+            public Prop<A> throwsExceptionMatching(Fn1<? super Throwable, Boolean> exceptionMatcher) {
+                return null;
+            }
+
+            @Override
+            public Prop<A> doesNotThrow() {
+                return consumerProp("does not throw", executable).safe();
+            }
+        };
+    }
+
 }
