@@ -19,33 +19,33 @@ public interface GauntletApi {
                                                     Arbitrary<B> generatorB,
                                                     Arbitrary<C> generatorC);
 
-    <A> DiscreteDomainTestApi<A> all(Iterable<A> domain);
+    <A> DomainTestApi<A> all(Domain<A> domain);
 
-    <A, B> DiscreteDomainTestApi<Tuple2<A, B>> all(Iterable<A> domainA,
-                                                   Iterable<B> domainB);
+    <A, B> DomainTestApi<Tuple2<A, B>> all(Domain<A> domainA,
+                                           Domain<B> domainB);
 
-    <A, B, C> DiscreteDomainTestApi<Tuple3<A, B, C>> all(Iterable<A> domainA,
-                                                         Iterable<B> domainB,
-                                                         Iterable<C> domainC);
+    <A, B, C> DomainTestApi<Tuple3<A, B, C>> all(Domain<A> domainA,
+                                                 Domain<B> domainB,
+                                                 Domain<C> domainC);
 
-    <A, B, C, D> DiscreteDomainTestApi<Tuple4<A, B, C, D>> all(Iterable<A> domainA,
-                                                               Iterable<B> domainB,
-                                                               Iterable<C> domainC,
-                                                               Iterable<D> domainD);
+    <A, B, C, D> DomainTestApi<Tuple4<A, B, C, D>> all(Domain<A> domainA,
+                                                       Domain<B> domainB,
+                                                       Domain<C> domainC,
+                                                       Domain<D> domainD);
 
-    <A> DiscreteDomainTestApi<A> some(Iterable<A> domain);
+    <A> DomainTestApi<A> some(Domain<A> domain);
 
-    <A, B> DiscreteDomainTestApi<Tuple2<A, B>> some(Iterable<A> domainA,
-                                                    Iterable<B> domainB);
+    <A, B> DomainTestApi<Tuple2<A, B>> some(Domain<A> domainA,
+                                            Domain<B> domainB);
 
-    <A, B, C> DiscreteDomainTestApi<Tuple3<A, B, C>> some(Iterable<A> domainA,
-                                                          Iterable<B> domainB,
-                                                          Iterable<C> domainC);
+    <A, B, C> DomainTestApi<Tuple3<A, B, C>> some(Domain<A> domainA,
+                                                  Domain<B> domainB,
+                                                  Domain<C> domainC);
 
-    <A, B, C, D> DiscreteDomainTestApi<Tuple4<A, B, C, D>> some(Iterable<A> domainA,
-                                                                Iterable<B> domainB,
-                                                                Iterable<C> domainC,
-                                                                Iterable<D> domainD);
+    <A, B, C, D> DomainTestApi<Tuple4<A, B, C, D>> some(Domain<A> domainA,
+                                                        Domain<B> domainB,
+                                                        Domain<C> domainC,
+                                                        Domain<D> domainD);
 
     Executor getExecutor();
 

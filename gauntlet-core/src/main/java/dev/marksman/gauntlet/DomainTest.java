@@ -12,9 +12,9 @@ import java.util.Set;
 import static lombok.AccessLevel.PRIVATE;
 
 @AllArgsConstructor(access = PRIVATE)
-public final class DiscreteDomainTest<A> {
+public final class DomainTest<A> {
     @Getter
-    private final ImmutableFiniteIterable<A> discreteDomain;
+    private final Domain<A> domain;
     @Getter
     private final Quantifier quantifier;
     @Getter
@@ -24,9 +24,9 @@ public final class DiscreteDomainTest<A> {
     @Getter
     private final Prop<A> property;
 
-    public static <A> DiscreteDomainTest<A> discreteDomainTest(DiscreteDomainTestParameters<A> parameters,
-                                                               Prop<A> property) {
-        return new DiscreteDomainTest<>(parameters.getDiscreteDomain(), parameters.getQuantifier(),
+    public static <A> DomainTest<A> domainTest(DomainTestParameters<A> parameters,
+                                               Prop<A> property) {
+        return new DomainTest<>(parameters.getDomain(), parameters.getQuantifier(),
                 parameters.getClassifiers(), parameters.getTimeout(), property);
     }
 

@@ -51,54 +51,54 @@ public abstract class GauntletApiBase implements GauntletApi {
     }
 
     @Override
-    public <A> DiscreteDomainTestApi<A> all(Iterable<A> domain) {
+    public <A> DomainTestApi<A> all(Domain<A> domain) {
         return getApi().all(domain);
     }
 
     @Override
-    public <A, B> DiscreteDomainTestApi<Tuple2<A, B>> all(Iterable<A> domainA,
-                                                          Iterable<B> domainB) {
+    public <A, B> DomainTestApi<Tuple2<A, B>> all(Domain<A> domainA,
+                                                  Domain<B> domainB) {
         return getApi().all(domainA, domainB);
     }
 
     @Override
-    public <A, B, C> DiscreteDomainTestApi<Tuple3<A, B, C>> all(Iterable<A> domainA,
-                                                                Iterable<B> domainB,
-                                                                Iterable<C> domainC) {
+    public <A, B, C> DomainTestApi<Tuple3<A, B, C>> all(Domain<A> domainA,
+                                                        Domain<B> domainB,
+                                                        Domain<C> domainC) {
         return getApi().all(domainA, domainB, domainC);
     }
 
     @Override
-    public <A, B, C, D> DiscreteDomainTestApi<Tuple4<A, B, C, D>> all(Iterable<A> domainA,
-                                                                      Iterable<B> domainB,
-                                                                      Iterable<C> domainC,
-                                                                      Iterable<D> domainD) {
+    public <A, B, C, D> DomainTestApi<Tuple4<A, B, C, D>> all(Domain<A> domainA,
+                                                              Domain<B> domainB,
+                                                              Domain<C> domainC,
+                                                              Domain<D> domainD) {
         return getApi().all(domainA, domainB, domainC, domainD);
     }
 
     @Override
-    public <A> DiscreteDomainTestApi<A> some(Iterable<A> domain) {
+    public <A> DomainTestApi<A> some(Domain<A> domain) {
         return getApi().some(domain);
     }
 
     @Override
-    public <A, B> DiscreteDomainTestApi<Tuple2<A, B>> some(Iterable<A> domainA,
-                                                           Iterable<B> domainB) {
+    public <A, B> DomainTestApi<Tuple2<A, B>> some(Domain<A> domainA,
+                                                   Domain<B> domainB) {
         return getApi().some(domainA, domainB);
     }
 
     @Override
-    public <A, B, C> DiscreteDomainTestApi<Tuple3<A, B, C>> some(Iterable<A> domainA,
-                                                                 Iterable<B> domainB,
-                                                                 Iterable<C> domainC) {
+    public <A, B, C> DomainTestApi<Tuple3<A, B, C>> some(Domain<A> domainA,
+                                                         Domain<B> domainB,
+                                                         Domain<C> domainC) {
         return getApi().some(domainA, domainB, domainC);
     }
 
     @Override
-    public <A, B, C, D> DiscreteDomainTestApi<Tuple4<A, B, C, D>> some(Iterable<A> domainA,
-                                                                       Iterable<B> domainB,
-                                                                       Iterable<C> domainC,
-                                                                       Iterable<D> domainD) {
+    public <A, B, C, D> DomainTestApi<Tuple4<A, B, C, D>> some(Domain<A> domainA,
+                                                               Domain<B> domainB,
+                                                               Domain<C> domainC,
+                                                               Domain<D> domainD) {
         return getApi().some(domainA, domainB, domainC, domainD);
     }
 

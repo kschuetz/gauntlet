@@ -3,7 +3,6 @@ package dev.marksman.gauntlet;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
-import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.kraftwerk.GeneratorParameters;
 
@@ -12,7 +11,10 @@ import java.util.concurrent.Executor;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
+import static dev.marksman.gauntlet.ConcreteDomainTestApi.concreteGeneratorTestApi;
 import static dev.marksman.gauntlet.ConcreteGeneratorTestApi.concreteGeneratorTestApi;
+import static dev.marksman.gauntlet.Domain.combineDomains;
+import static dev.marksman.gauntlet.DomainTestParameters.domainTestParameters;
 import static dev.marksman.gauntlet.GeneratorTestExecutionParameters.generatorTestExecutionParameters;
 import static dev.marksman.gauntlet.GeneratorTestParameters.generatorTestParameters;
 import static dev.marksman.gauntlet.Quantifier.EXISTENTIAL;
@@ -112,47 +114,43 @@ class DefaultGauntlet implements GauntletApi {
     }
 
     @Override
-    public <A> DiscreteDomainTestApi<A> all(Iterable<A> domain) {
-        return createDiscreteDomainTestApi(UNIVERSAL, Vector.copyFrom(domain));
+    public <A> DomainTestApi<A> all(Domain<A> domain) {
+        return createDomainTestApi(UNIVERSAL, domain);
     }
 
     @Override
-    public <A, B> DiscreteDomainTestApi<Tuple2<A, B>> all(Iterable<A> domainA, Iterable<B> domainB) {
-        return createDiscreteDomainTestApi(UNIVERSAL, combineDomains(Vector.copyFrom(domainA), Vector.copyFrom(domainB)));
+    public <A, B> DomainTestApi<Tuple2<A, B>> all(Domain<A> domainA, Domain<B> domainB) {
+        return createDomainTestApi(UNIVERSAL, combineDomains(domainA, domainB));
     }
 
     @Override
-    public <A, B, C> DiscreteDomainTestApi<Tuple3<A, B, C>> all(Iterable<A> domainA, Iterable<B> domainB, Iterable<C> domainC) {
-        return createDiscreteDomainTestApi(UNIVERSAL, combineDomains(Vector.copyFrom(domainA), Vector.copyFrom(domainB),
-                Vector.copyFrom(domainC)));
+    public <A, B, C> DomainTestApi<Tuple3<A, B, C>> all(Domain<A> domainA, Domain<B> domainB, Domain<C> domainC) {
+        return createDomainTestApi(UNIVERSAL, combineDomains(domainA, domainB, domainC));
     }
 
     @Override
-    public <A, B, C, D> DiscreteDomainTestApi<Tuple4<A, B, C, D>> all(Iterable<A> domainA, Iterable<B> domainB, Iterable<C> domainC, Iterable<D> domainD) {
-        return createDiscreteDomainTestApi(UNIVERSAL, combineDomains(Vector.copyFrom(domainA), Vector.copyFrom(domainB),
-                Vector.copyFrom(domainC), Vector.copyFrom(domainD)));
+    public <A, B, C, D> DomainTestApi<Tuple4<A, B, C, D>> all(Domain<A> domainA, Domain<B> domainB, Domain<C> domainC, Domain<D> domainD) {
+        return createDomainTestApi(UNIVERSAL, combineDomains(domainA, domainB, domainC, domainD));
     }
 
     @Override
-    public <A> DiscreteDomainTestApi<A> some(Iterable<A> domain) {
-        return createDiscreteDomainTestApi(EXISTENTIAL, Vector.copyFrom(domain));
+    public <A> DomainTestApi<A> some(Domain<A> domain) {
+        return createDomainTestApi(EXISTENTIAL, domain);
     }
 
     @Override
-    public <A, B> DiscreteDomainTestApi<Tuple2<A, B>> some(Iterable<A> domainA, Iterable<B> domainB) {
-        return createDiscreteDomainTestApi(EXISTENTIAL, combineDomains(Vector.copyFrom(domainA), Vector.copyFrom(domainB)));
+    public <A, B> DomainTestApi<Tuple2<A, B>> some(Domain<A> domainA, Domain<B> domainB) {
+        return createDomainTestApi(EXISTENTIAL, combineDomains(domainA, domainB));
     }
 
     @Override
-    public <A, B, C> DiscreteDomainTestApi<Tuple3<A, B, C>> some(Iterable<A> domainA, Iterable<B> domainB, Iterable<C> domainC) {
-        return createDiscreteDomainTestApi(EXISTENTIAL, combineDomains(Vector.copyFrom(domainA), Vector.copyFrom(domainB),
-                Vector.copyFrom(domainC)));
+    public <A, B, C> DomainTestApi<Tuple3<A, B, C>> some(Domain<A> domainA, Domain<B> domainB, Domain<C> domainC) {
+        return createDomainTestApi(EXISTENTIAL, combineDomains(domainA, domainB, domainC));
     }
 
     @Override
-    public <A, B, C, D> DiscreteDomainTestApi<Tuple4<A, B, C, D>> some(Iterable<A> domainA, Iterable<B> domainB, Iterable<C> domainC, Iterable<D> domainD) {
-        return createDiscreteDomainTestApi(EXISTENTIAL, combineDomains(Vector.copyFrom(domainA), Vector.copyFrom(domainB),
-                Vector.copyFrom(domainC), Vector.copyFrom(domainD)));
+    public <A, B, C, D> DomainTestApi<Tuple4<A, B, C, D>> some(Domain<A> domainA, Domain<B> domainB, Domain<C> domainC, Domain<D> domainD) {
+        return createDomainTestApi(EXISTENTIAL, combineDomains(domainA, domainB, domainC, domainD));
     }
 
     private <A> GeneratorTestApi<A> createGeneratorTestApi(Arbitrary<A> generator) {
@@ -169,40 +167,13 @@ class DefaultGauntlet implements GauntletApi {
         reporter.report(reportData);
     }
 
-    private <A> void runDiscreteDomainTest(DiscreteDomainTest<A> discreteDomainTest) {
+    private <A> void runDomainTest(DomainTest<A> domainTest) {
         throw new UnsupportedOperationException("TODO");
     }
 
-    private <A> DiscreteDomainTestApi<A> createDiscreteDomainTestApi(Quantifier quantifier, ImmutableVector<A> domain) {
-        return ConcreteDiscreteDomainTestApi.concreteGeneratorTestApi(this::runDiscreteDomainTest,
-                DiscreteDomainTestParameters.discreteDomainTestParameters(domain, quantifier, Vector.empty(), nothing()));
-    }
-
-    private static <A, B> ImmutableVector<Tuple2<A, B>> combineDomains(ImmutableVector<A> domainA,
-                                                                       ImmutableVector<B> domainB) {
-        return domainA.cross(domainB);
-    }
-
-    private static <A, B, C> ImmutableVector<Tuple3<A, B, C>> combineDomains(ImmutableVector<A> domainA,
-                                                                             ImmutableVector<B> domainB,
-                                                                             ImmutableVector<C> domainC) {
-        return domainA.cross(domainB.cross(domainC))
-                .fmap(t -> Tuple3.tuple(
-                        t._1(),
-                        t._2()._1(),
-                        t._2()._2()));
-    }
-
-    private static <A, B, C, D> ImmutableVector<Tuple4<A, B, C, D>> combineDomains(ImmutableVector<A> domainA,
-                                                                                   ImmutableVector<B> domainB,
-                                                                                   ImmutableVector<C> domainC,
-                                                                                   ImmutableVector<D> domainD) {
-        return domainA.cross(domainB.cross(domainC.cross(domainD)))
-                .fmap(t -> Tuple4.tuple(
-                        t._1(),
-                        t._2()._1(),
-                        t._2()._2()._1(),
-                        t._2()._2()._2()));
+    private <A> DomainTestApi<A> createDomainTestApi(Quantifier quantifier, Domain<A> domain) {
+        return concreteGeneratorTestApi(this::runDomainTest,
+                domainTestParameters(domain, quantifier, Vector.empty(), nothing()));
     }
 
 }
