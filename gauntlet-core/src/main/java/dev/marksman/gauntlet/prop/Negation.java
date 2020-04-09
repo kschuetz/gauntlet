@@ -2,21 +2,19 @@ package dev.marksman.gauntlet.prop;
 
 import dev.marksman.gauntlet.Context;
 import dev.marksman.gauntlet.EvalResult;
-import dev.marksman.gauntlet.Name;
 import dev.marksman.gauntlet.Prop;
 
 import static dev.marksman.gauntlet.EvalResult.evalResult;
 import static dev.marksman.gauntlet.EvalResult.success;
 import static dev.marksman.gauntlet.Failure.failure;
-import static dev.marksman.gauntlet.Name.name;
 
 final class Negation<A> implements Prop<A> {
     final Prop<A> operand;
-    private final Name name;
+    private final String name;
 
     Negation(Prop<A> operand) {
         this.operand = operand;
-        this.name = name("~" + operand.getName());
+        this.name = "~" + operand.getName();
     }
 
     @Override
@@ -35,7 +33,7 @@ final class Negation<A> implements Prop<A> {
     }
 
     @Override
-    public Name getName() {
+    public String getName() {
         return name;
     }
 }

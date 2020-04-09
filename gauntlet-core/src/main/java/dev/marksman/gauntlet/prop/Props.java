@@ -4,35 +4,24 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
 import dev.marksman.gauntlet.BasicPropResult;
-import dev.marksman.gauntlet.Name;
 import dev.marksman.gauntlet.Prop;
-
-import static dev.marksman.gauntlet.Name.name;
 
 public final class Props {
 
     public static <A> Prop<A> predicate(Fn1<? super A, Boolean> predicate) {
-        return predicate(name(PredicateProp.class.getSimpleName()), predicate);
-    }
-
-    public static <A> Prop<A> predicate(Name name, Fn1<? super A, Boolean> predicate) {
-        return new PredicateProp<>(name, predicate);
+        return predicate(PredicateProp.class.getSimpleName(), predicate);
     }
 
     public static <A> Prop<A> predicate(String name, Fn1<? super A, Boolean> predicate) {
-        return predicate(name(name), predicate);
+        return new PredicateProp<>(name, predicate);
     }
 
     public static <A> Prop<A> prop(Fn1<? super A, BasicPropResult> evaluator) {
-        return new BasicProp<>(name(BasicProp.class.getSimpleName()), evaluator);
-    }
-
-    public static <A> Prop<A> prop(Name name, Fn1<? super A, BasicPropResult> evaluator) {
-        return new BasicProp<>(name, evaluator);
+        return new BasicProp<>(BasicProp.class.getSimpleName(), evaluator);
     }
 
     public static <A> Prop<A> prop(String name, Fn1<? super A, BasicPropResult> evaluator) {
-        return new BasicProp<>(name(name), evaluator);
+        return new BasicProp<>(name, evaluator);
     }
 
     public static <A> Prop<A> pass() {
@@ -83,7 +72,7 @@ public final class Props {
         return new Biconditional<>(antecedent, consequent);
     }
 
-    public static <A> Prop<A> named(Name name, Prop<A> prop) {
+    public static <A> Prop<A> named(String name, Prop<A> prop) {
         while (prop instanceof Renamed<?>) {
             prop = ((Renamed<A>) prop).underlying;
         }

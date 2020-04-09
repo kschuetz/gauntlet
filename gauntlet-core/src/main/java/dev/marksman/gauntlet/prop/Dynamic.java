@@ -3,7 +3,6 @@ package dev.marksman.gauntlet.prop;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.gauntlet.Context;
 import dev.marksman.gauntlet.EvalResult;
-import dev.marksman.gauntlet.Name;
 import dev.marksman.gauntlet.Prop;
 import lombok.AllArgsConstructor;
 
@@ -17,7 +16,7 @@ class Dynamic<A> implements Prop<A> {
     }
 
     @Override
-    public Name getName() {
+    public String getName() {
         return null;
     }
 }

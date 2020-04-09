@@ -2,14 +2,12 @@ package dev.marksman.gauntlet.prop;
 
 import dev.marksman.gauntlet.Context;
 import dev.marksman.gauntlet.EvalResult;
-import dev.marksman.gauntlet.Name;
 import dev.marksman.gauntlet.Prop;
 
 import static dev.marksman.gauntlet.EvalResult.success;
-import static dev.marksman.gauntlet.Name.name;
 
 final class Pass<A> implements Prop<A> {
-    private static final Name NAME = name("Pass");
+    private static final String NAME = "Pass";
     private static final Pass<?> INSTANCE = new Pass<>();
 
     @Override
@@ -18,7 +16,7 @@ final class Pass<A> implements Prop<A> {
     }
 
     @Override
-    public Name getName() {
+    public String getName() {
         return NAME;
     }
 

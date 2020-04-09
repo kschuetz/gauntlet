@@ -3,22 +3,20 @@ package dev.marksman.gauntlet.prop;
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
 import dev.marksman.gauntlet.Context;
 import dev.marksman.gauntlet.EvalResult;
-import dev.marksman.gauntlet.Name;
 import dev.marksman.gauntlet.Prop;
 
 import static dev.marksman.gauntlet.EvalResult.evalResult;
 import static dev.marksman.gauntlet.Failure.failure;
-import static dev.marksman.gauntlet.Name.name;
 
 
 final class Disjunction<A> implements Prop<A> {
     private final ImmutableNonEmptyFiniteIterable<Prop<A>> operands;
-    private final Name name;
+    private final String name;
 
     Disjunction(ImmutableNonEmptyFiniteIterable<Prop<A>> operands) {
         this.operands = operands;
-        this.name = name(String.join(" ∨ ",
-                operands.fmap(p -> p.getName().getValue())));
+        this.name = String.join(" ∨ ",
+                operands.fmap(Prop::getName));
     }
 
     @Override
@@ -54,7 +52,7 @@ final class Disjunction<A> implements Prop<A> {
     }
 
     @Override
-    public Name getName() {
+    public String getName() {
         return name;
     }
 }

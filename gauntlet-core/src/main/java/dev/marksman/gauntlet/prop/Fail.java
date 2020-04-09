@@ -1,13 +1,15 @@
 package dev.marksman.gauntlet.prop;
 
-import dev.marksman.gauntlet.*;
+import dev.marksman.gauntlet.Context;
+import dev.marksman.gauntlet.EvalResult;
+import dev.marksman.gauntlet.Failure;
+import dev.marksman.gauntlet.Prop;
 
 import static dev.marksman.gauntlet.EvalResult.evalResult;
 import static dev.marksman.gauntlet.Failure.failure;
-import static dev.marksman.gauntlet.Name.name;
 
 final class Fail<A> implements Prop<A> {
-    private static final Name NAME = name("Fail");
+    private static final String NAME = "Fail";
     private static final String DEFAULT_FAILURE_REASON = "Always fails";
     private static final Fail<?> INSTANCE = new Fail<>(DEFAULT_FAILURE_REASON);
 
@@ -23,7 +25,7 @@ final class Fail<A> implements Prop<A> {
     }
 
     @Override
-    public Name getName() {
+    public String getName() {
         return NAME;
     }
 

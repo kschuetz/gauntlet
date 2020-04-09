@@ -22,10 +22,6 @@ public interface GeneratorTestApi<A> {
         mustSatisfy(Prop.predicate(predicate));
     }
 
-    default void mustSatisfy(Name name, Fn1<? super A, Boolean> predicate) {
-        mustSatisfy(Prop.predicate(name, predicate));
-    }
-
     default void mustSatisfy(String name, Fn1<? super A, Boolean> predicate) {
         mustSatisfy(predicate(name, predicate));
     }

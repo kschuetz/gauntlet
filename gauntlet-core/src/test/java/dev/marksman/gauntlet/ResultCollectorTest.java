@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ResultCollectorTest {
 
-    private static final Prop<Integer> failureProp = Prop.<Integer>fail().rename(Name.name("prop"));
+    private static final Prop<Integer> failureProp = Prop.<Integer>fail().rename("prop");
     private static final Failure failure = failure(failureProp, "failed");
 
     private ImmutableVector<Integer> samples;
