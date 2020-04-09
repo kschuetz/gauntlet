@@ -11,10 +11,10 @@ import static lombok.AccessLevel.PRIVATE;
 
 @AllArgsConstructor(access = PRIVATE)
 @Value
-public final class Failure {
-    private final Named propertyName;
-    private final ImmutableNonEmptyFiniteIterable<String> failureReasons;
-    private final ImmutableFiniteIterable<Failure> causes;
+public class Failure {
+    Named propertyName;
+    ImmutableNonEmptyFiniteIterable<String> failureReasons;
+    ImmutableFiniteIterable<Failure> causes;
 
     public Failure addCause(Failure failure) {
         return new Failure(propertyName, failureReasons, causes.append(failure));

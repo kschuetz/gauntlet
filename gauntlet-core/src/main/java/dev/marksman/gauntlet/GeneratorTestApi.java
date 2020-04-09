@@ -5,7 +5,7 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import java.time.Duration;
 import java.util.Set;
 
-import static dev.marksman.gauntlet.Prop.prop;
+import static dev.marksman.gauntlet.Prop.predicate;
 
 public interface GeneratorTestApi<A> {
     GeneratorTestApi<A> withInitialSeed(long initialSeed);
@@ -19,14 +19,14 @@ public interface GeneratorTestApi<A> {
     void mustSatisfy(Prop<A> prop);
 
     default void mustSatisfy(Fn1<? super A, Boolean> predicate) {
-        mustSatisfy(prop(predicate));
+        mustSatisfy(Prop.predicate(predicate));
     }
 
     default void mustSatisfy(Name name, Fn1<? super A, Boolean> predicate) {
-        mustSatisfy(prop(name, predicate));
+        mustSatisfy(Prop.predicate(name, predicate));
     }
 
     default void mustSatisfy(String name, Fn1<? super A, Boolean> predicate) {
-        mustSatisfy(prop(name, predicate));
+        mustSatisfy(predicate(name, predicate));
     }
 }

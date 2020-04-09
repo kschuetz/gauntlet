@@ -48,16 +48,28 @@ public interface Prop<A> extends Contravariant<A, Prop<?>>, Named {
         return Props.safe(this);
     }
 
-    static <A> Prop<A> prop(Fn1<? super A, Boolean> predicate) {
-        return Props.prop(predicate);
+    static <A> Prop<A> predicate(Fn1<? super A, Boolean> predicate) {
+        return Props.predicate(predicate);
     }
 
-    static <A> Prop<A> prop(Name name, Fn1<? super A, Boolean> predicate) {
-        return Props.prop(name, predicate);
+    static <A> Prop<A> predicate(Name name, Fn1<? super A, Boolean> predicate) {
+        return Props.predicate(name, predicate);
     }
 
-    static <A> Prop<A> prop(String name, Fn1<? super A, Boolean> predicate) {
-        return prop(Name.name(name), predicate);
+    static <A> Prop<A> predicate(String name, Fn1<? super A, Boolean> predicate) {
+        return Props.predicate(name, predicate);
+    }
+
+    static <A> Prop<A> prop(Fn1<? super A, BasicPropResult> evaluator) {
+        return Props.prop(evaluator);
+    }
+
+    static <A> Prop<A> prop(Name name, Fn1<? super A, BasicPropResult> evaluator) {
+        return Props.prop(name, evaluator);
+    }
+
+    static <A> Prop<A> prop(String name, Fn1<? super A, BasicPropResult> evaluator) {
+        return Props.prop(name, evaluator);
     }
 
     static <A> Prop<A> pass() {
