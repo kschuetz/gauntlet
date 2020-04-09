@@ -1,7 +1,6 @@
 package dev.marksman.gauntlet.prop;
 
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
-import dev.marksman.gauntlet.Context;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
@@ -27,10 +26,10 @@ final class Disjunction<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(Context context, A data) {
+    public EvalResult test(A data) {
         EvalResult result = evalResult(failure(this, "All disjuncts failed."));
         for (Prop<A> prop : operands) {
-            EvalResult test = prop.test(context, data);
+            EvalResult test = prop.test(data);
             if (test.isSuccess()) {
                 return test;
             } else {

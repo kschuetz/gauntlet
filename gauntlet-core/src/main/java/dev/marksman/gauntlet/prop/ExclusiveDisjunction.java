@@ -1,6 +1,5 @@
 package dev.marksman.gauntlet.prop;
 
-import dev.marksman.gauntlet.Context;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
@@ -20,17 +19,17 @@ class ExclusiveDisjunction<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(Context context, A data) {
+    public EvalResult test(A data) {
         // success + success -> failure
         // success + failure -> success
         // failure + success -> success
         // failure + failure -> failure
-        return p.test(context, data)
-                .match(success -> q.test(context, data)
+        return p.test(data)
+                .match(success -> q.test(data)
                                 .match(__ -> evalResult(failure(this, "xor failed")
                                                 .addCause(failure(q, "Expected failure"))),
                                         f1 -> success()),
-                        failure -> q.test(context, data)
+                        failure -> q.test(data)
                                 .match(EvalResult::evalResult,
                                         f1 -> evalResult(failure(this, "xor failed")
                                                 .addCause(failure)

@@ -1,6 +1,5 @@
 package dev.marksman.gauntlet.hamcrest;
 
-import dev.marksman.gauntlet.Context;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Failure;
 import dev.marksman.gauntlet.Prop;
@@ -18,7 +17,7 @@ public final class Matches<A> implements Prop<A> {
     private final Matcher<A> matcher;
 
     @Override
-    public EvalResult test(Context context, A data) {
+    public EvalResult test(A data) {
         if (matcher.matches(data)) {
             return EvalResult.success();
         } else {

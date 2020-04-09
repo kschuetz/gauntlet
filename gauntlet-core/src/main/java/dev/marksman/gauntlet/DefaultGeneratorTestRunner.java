@@ -30,7 +30,6 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     public <A> GeneratorTestResult<A> run(GeneratorTestExecutionParameters executionParameters, GeneratorTest<A> testData) {
         Executor executor = executionParameters.getExecutor();
         Maybe<AscribedFailure<A>> result = nothing();
-        Context context = new Context();
         long initialSeedValue = testData.getInitialSeed().orElseGet(seedGenerator::nextLong);
         Seed initialSeed = Seed.create(initialSeedValue);
         Arbitrary<A> arbitrary = testData.getArbitrary();
@@ -41,7 +40,7 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
         int actualSampleCount = samples.size();
         ResultCollector<A> collector = universalResultCollector(dataSet.getValues());
         for (int sampleIndex = 0; sampleIndex < actualSampleCount; sampleIndex++) {
-            EvaluateSampleTask<A> task = testSampleTask(context, collector, testData.getProperty(), sampleIndex, samples.unsafeGet(sampleIndex));
+            EvaluateSampleTask<A> task = testSampleTask(collector, testData.getProperty(), sampleIndex, samples.unsafeGet(sampleIndex));
             executor.execute(task);
         }
         // TODO: handle supply failure

@@ -18,14 +18,12 @@ class EvaluateSampleTaskTest {
     private static final Prop<Integer> isOdd = Prop.predicate(n -> n % 2 == 1);
 
     @Mock
-    Context context;
-    @Mock
     ResultReceiver receiver;
 
     @Test
     void successfulCase() {
         when(receiver.shouldRun(0)).thenReturn(true);
-        EvaluateSampleTask<Integer> task = testSampleTask(context, receiver, isOdd, 0, 1);
+        EvaluateSampleTask<Integer> task = testSampleTask(receiver, isOdd, 0, 1);
 
         task.run();
 
@@ -36,7 +34,7 @@ class EvaluateSampleTaskTest {
     @Test
     void failureCase() {
         when(receiver.shouldRun(0)).thenReturn(true);
-        EvaluateSampleTask<Integer> task = testSampleTask(context, receiver, isOdd, 0, 2);
+        EvaluateSampleTask<Integer> task = testSampleTask(receiver, isOdd, 0, 2);
 
         task.run();
 
@@ -47,7 +45,7 @@ class EvaluateSampleTaskTest {
     @Test
     void errorCase() {
         when(receiver.shouldRun(0)).thenReturn(true);
-        EvaluateSampleTask<Integer> task = testSampleTask(context, receiver, Prop.predicate(n -> {
+        EvaluateSampleTask<Integer> task = testSampleTask(receiver, Prop.predicate(n -> {
             throw new Exception("error!");
         }), 0, 2);
 
@@ -62,7 +60,7 @@ class EvaluateSampleTaskTest {
         Prop<Integer> prop = (Prop<Integer>) mock(Prop.class);
 
         when(receiver.shouldRun(0)).thenReturn(false);
-        EvaluateSampleTask<Integer> task = testSampleTask(context, receiver, prop, 0, 2);
+        EvaluateSampleTask<Integer> task = testSampleTask(receiver, prop, 0, 2);
 
         task.run();
 

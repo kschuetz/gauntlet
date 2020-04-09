@@ -1,6 +1,5 @@
 package dev.marksman.gauntlet.prop;
 
-import dev.marksman.gauntlet.Context;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Failure;
 import dev.marksman.gauntlet.Prop;
@@ -21,17 +20,17 @@ class Biconditional<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(Context context, A data) {
+    public EvalResult test(A data) {
         // success + success -> success
         // success + failure -> failure
         // failure + success -> failure
         // failure + failure -> success
-        return antecedent.test(context, data)
-                .match(success -> consequent.test(context, data)
+        return antecedent.test(data)
+                .match(success -> consequent.test(data)
                                 .match(EvalResult::evalResult,
                                         f1 -> evalResult(createFailure()
                                                 .addCause(f1))),
-                        failure -> consequent.test(context, data)
+                        failure -> consequent.test(data)
                                 .match(__ -> evalResult(createFailure()
                                                 .addCause(failure)),
                                         __ -> success()));

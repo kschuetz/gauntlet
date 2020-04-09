@@ -1,7 +1,6 @@
 package dev.marksman.gauntlet.prop;
 
 import com.jnape.palatable.lambda.functions.Fn1;
-import dev.marksman.gauntlet.Context;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
@@ -26,9 +25,9 @@ final class ThrowsExceptionMatching<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(Context context, A data) {
+    public EvalResult test(A data) {
         try {
-            underlying.test(context, data);
+            underlying.test(data);
             return evalResult(failure(this, "Did not throw an exception"));
         } catch (Exception e) {
             if (exceptionMatcher.apply(e)) {

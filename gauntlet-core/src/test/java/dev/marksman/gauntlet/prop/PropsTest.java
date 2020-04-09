@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static dev.marksman.gauntlet.Context.context;
 import static dev.marksman.gauntlet.prop.Props.whenExecuting;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static testsupport.matchers.EvalResultFailureMatcher.isEvalResultFailure;
@@ -27,7 +26,7 @@ class PropsTest {
             void successCase() {
                 assertThat(whenExecuting(throwingConsumer(ExceptionA::new))
                                 .throwsClass(ExceptionA.class)
-                                .test(context(), 0),
+                                .test(0),
                         isEvalResultSuccess());
             }
 
@@ -35,7 +34,7 @@ class PropsTest {
             void throwsButClassDoesNotMatch() {
                 assertThat(whenExecuting(throwingConsumer(ExceptionB::new))
                                 .throwsClass(ExceptionA.class)
-                                .test(context(), 0),
+                                .test(0),
                         isEvalResultFailure());
             }
 
@@ -44,7 +43,7 @@ class PropsTest {
             void doesNotThrow() {
                 assertThat(whenExecuting(nonThrowingConsumer())
                                 .throwsClass(ExceptionA.class)
-                                .test(context(), 0),
+                                .test(0),
                         isEvalResultFailure());
             }
 
@@ -58,7 +57,7 @@ class PropsTest {
             void successCase() {
                 assertThat(whenExecuting(throwingConsumer(() -> new RuntimeException("message")))
                                 .throwsExceptionMatching(e -> e.getMessage().equals("message"))
-                                .test(context(), 0),
+                                .test(0),
                         isEvalResultSuccess());
             }
 
@@ -66,7 +65,7 @@ class PropsTest {
             void throwsButClassDoesNotMatch() {
                 assertThat(whenExecuting(throwingConsumer(() -> new RuntimeException("something else")))
                                 .throwsExceptionMatching(e -> e.getMessage().equals("message"))
-                                .test(context(), 0),
+                                .test(0),
                         isEvalResultFailure());
             }
 
@@ -75,7 +74,7 @@ class PropsTest {
             void doesNotThrow() {
                 assertThat(whenExecuting(nonThrowingConsumer())
                                 .throwsExceptionMatching(e -> e.getMessage().equals("message"))
-                                .test(context(), 0),
+                                .test(0),
                         isEvalResultFailure());
             }
 
@@ -89,7 +88,7 @@ class PropsTest {
             void successCase() {
                 assertThat(whenExecuting(nonThrowingConsumer())
                                 .doesNotThrow()
-                                .test(context(), 0),
+                                .test(0),
                         isEvalResultSuccess());
             }
 
@@ -97,7 +96,7 @@ class PropsTest {
             void failureCase() {
                 assertThat(whenExecuting(throwingConsumer(RuntimeException::new))
                                 .doesNotThrow()
-                                .test(context(), 0),
+                                .test(0),
                         isEvalResultFailure());
             }
 

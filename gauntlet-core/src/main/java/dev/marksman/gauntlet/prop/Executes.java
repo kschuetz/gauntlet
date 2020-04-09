@@ -1,6 +1,5 @@
 package dev.marksman.gauntlet.prop;
 
-import dev.marksman.gauntlet.Context;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
@@ -16,7 +15,7 @@ final class Executes<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(Context context, A data) {
+    public EvalResult test(A data) {
         executable.accept(data);
         return EvalResult.success();
     }

@@ -1,7 +1,6 @@
 package dev.marksman.gauntlet.prop;
 
 import com.jnape.palatable.lambda.functions.Fn1;
-import dev.marksman.gauntlet.Context;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
@@ -15,8 +14,8 @@ class Mapped<A, B> implements Prop<B> {
     }
 
     @Override
-    public EvalResult test(Context context, B data) {
-        return underlying.test(context, fn.apply(data));
+    public EvalResult test(B data) {
+        return underlying.test(fn.apply(data));
     }
 
     @Override

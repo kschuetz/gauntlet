@@ -1,7 +1,6 @@
 package dev.marksman.gauntlet.prop;
 
 import com.jnape.palatable.lambda.functions.Fn1;
-import dev.marksman.gauntlet.Context;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
@@ -16,9 +15,9 @@ final class Safe<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(Context context, A data) {
+    public EvalResult test(A data) {
         try {
-            return underlying.test(context, data);
+            return underlying.test(data);
         } catch (Exception e) {
             return evalResult(failure(underlying, "Threw an exception: " + e));
         }

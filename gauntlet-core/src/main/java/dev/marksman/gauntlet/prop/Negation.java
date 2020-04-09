@@ -1,6 +1,5 @@
 package dev.marksman.gauntlet.prop;
 
-import dev.marksman.gauntlet.Context;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
@@ -23,11 +22,11 @@ final class Negation<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(Context context, A data) {
+    public EvalResult test(A data) {
         // success -> failure
         // failure -> success
 
-        return operand.test(context, data)
+        return operand.test(data)
                 .match(__ -> evalResult(failure(this, "Failure expected.")),
                         __ -> success());
     }

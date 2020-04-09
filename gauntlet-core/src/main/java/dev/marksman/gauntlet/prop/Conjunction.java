@@ -1,7 +1,6 @@
 package dev.marksman.gauntlet.prop;
 
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
-import dev.marksman.gauntlet.Context;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
@@ -28,8 +27,8 @@ final class Conjunction<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(Context context, A data) {
-        return operands.foldLeft((acc, operand) -> combine(acc, operand.test(context, data)),
+    public EvalResult test(A data) {
+        return operands.foldLeft((acc, operand) -> combine(acc, operand.test(data)),
                 success());
     }
 

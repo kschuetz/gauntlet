@@ -1,6 +1,5 @@
 package dev.marksman.gauntlet.prop;
 
-import dev.marksman.gauntlet.Context;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
@@ -20,13 +19,13 @@ class Implication<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(Context context, A data) {
+    public EvalResult test(A data) {
         // success + success -> success
         // success + failure -> failure
         // failure + _ -> success
 
-        return antecedent.test(context, data)
-                .match(success -> consequent.test(context, data)
+        return antecedent.test(data)
+                .match(success -> consequent.test(data)
                                 .match(EvalResult::evalResult,
                                         f1 -> evalResult(failure(this, "Implication failed.")
                                                 .addCause(f1))),

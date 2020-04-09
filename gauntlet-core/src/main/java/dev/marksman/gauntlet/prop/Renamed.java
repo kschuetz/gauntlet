@@ -1,6 +1,5 @@
 package dev.marksman.gauntlet.prop;
 
-import dev.marksman.gauntlet.Context;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 import lombok.AccessLevel;
@@ -12,8 +11,8 @@ final class Renamed<A> implements Prop<A> {
     final Prop<A> underlying;
 
     @Override
-    public EvalResult test(Context context, A data) {
-        return underlying.test(context, data);
+    public EvalResult test(A data) {
+        return underlying.test(data);
     }
 
     @Override

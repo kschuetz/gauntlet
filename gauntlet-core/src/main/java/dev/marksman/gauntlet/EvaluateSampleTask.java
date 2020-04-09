@@ -7,7 +7,6 @@ import static dev.marksman.gauntlet.TestTaskResult.error;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class EvaluateSampleTask<A> implements Runnable {
-    private final Context context;
     private final ResultReceiver receiver;
     private final Prop<A> property;
     private final int sampleIndex;
@@ -17,7 +16,7 @@ public class EvaluateSampleTask<A> implements Runnable {
     public void run() {
         if (receiver.shouldRun(sampleIndex)) {
             try {
-                EvalResult evalResult = property.test(context, sample);
+                EvalResult evalResult = property.test(sample);
                 receiver.reportResult(sampleIndex, TestTaskResult.testTaskResult(evalResult));
             } catch (Exception error) {
                 receiver.reportResult(sampleIndex, error(error));
@@ -25,7 +24,7 @@ public class EvaluateSampleTask<A> implements Runnable {
         }
     }
 
-    public static <A> EvaluateSampleTask<A> testSampleTask(Context context, ResultReceiver receiver, Prop<A> property, int sampleIndex, A sample) {
-        return new EvaluateSampleTask<>(context, receiver, property, sampleIndex, sample);
+    public static <A> EvaluateSampleTask<A> testSampleTask(ResultReceiver receiver, Prop<A> property, int sampleIndex, A sample) {
+        return new EvaluateSampleTask<>(receiver, property, sampleIndex, sample);
     }
 }
