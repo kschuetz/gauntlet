@@ -25,9 +25,9 @@ final class ThrowsExceptionMatching<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(A data) {
+    public EvalResult evaluate(A data) {
         try {
-            underlying.test(data);
+            underlying.evaluate(data);
             return EvalFailure.evalFailure(this, failureReasons("Did not throw an exception"));
         } catch (Exception e) {
             if (exceptionMatcher.apply(e)) {

@@ -18,7 +18,7 @@ final class AlwaysFail<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(A data) {
+    public EvalResult evaluate(A data) {
         return EvalFailure.evalFailure(this, failureReasons);
     }
 

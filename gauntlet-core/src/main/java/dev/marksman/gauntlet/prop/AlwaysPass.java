@@ -10,7 +10,7 @@ final class AlwaysPass<A> implements Prop<A> {
     private static final AlwaysPass<?> INSTANCE = new AlwaysPass<>();
 
     @Override
-    public EvalResult test(A data) {
+    public EvalResult evaluate(A data) {
         return evalSuccess();
     }
 

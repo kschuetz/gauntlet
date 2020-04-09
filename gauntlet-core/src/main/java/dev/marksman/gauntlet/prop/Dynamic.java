@@ -10,8 +10,8 @@ class Dynamic<A> implements Prop<A> {
     private final Fn1<A, Prop<A>> selector;
 
     @Override
-    public EvalResult test(A data) {
-        return selector.apply(data).test(data);
+    public EvalResult evaluate(A data) {
+        return selector.apply(data).evaluate(data);
     }
 
     @Override

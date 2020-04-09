@@ -27,8 +27,8 @@ final class Conjunction<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(A data) {
-        return operands.foldLeft((acc, operand) -> combine(acc, operand.test(data)),
+    public EvalResult evaluate(A data) {
+        return operands.foldLeft((acc, operand) -> combine(acc, operand.evaluate(data)),
                 (EvalResult) evalSuccess());
     }
 

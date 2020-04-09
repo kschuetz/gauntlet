@@ -1,7 +1,9 @@
 package dev.marksman.gauntlet;
 
-public interface ResultReceiver {
+import com.jnape.palatable.lambda.adt.Either;
+
+interface ResultReceiver {
     boolean shouldRun(int sampleIndex);
 
-    void reportResult(int sampleIndex, TestTaskResult result);
+    void reportResult(int sampleIndex, Either<Throwable, EvalResult> result);
 }

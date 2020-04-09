@@ -17,7 +17,7 @@ final class Executes<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(A data) {
+    public EvalResult evaluate(A data) {
         executable.accept(data);
         return evalSuccess();
     }

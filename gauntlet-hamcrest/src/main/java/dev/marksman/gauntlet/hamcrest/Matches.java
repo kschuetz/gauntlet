@@ -1,6 +1,5 @@
 package dev.marksman.gauntlet.hamcrest;
 
-import dev.marksman.gauntlet.EvalFailure;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 import lombok.AccessLevel;
@@ -9,6 +8,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.StringDescription;
 
+import static dev.marksman.gauntlet.EvalFailure.evalFailure;
 import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
 import static dev.marksman.gauntlet.FailureReasons.failureReasons;
 
@@ -20,13 +20,13 @@ public final class Matches<A> implements Prop<A> {
     private final Matcher<A> matcher;
 
     @Override
-    public EvalResult test(A data) {
+    public EvalResult evaluate(A data) {
         if (matcher.matches(data)) {
             return evalSuccess();
         } else {
             Description description = new StringDescription();
             matcher.describeMismatch(data, description);
-            return EvalFailure.evalFailure(this, failureReasons(description.toString()));
+            return evalFailure(this, failureReasons(description.toString()));
         }
     }
 

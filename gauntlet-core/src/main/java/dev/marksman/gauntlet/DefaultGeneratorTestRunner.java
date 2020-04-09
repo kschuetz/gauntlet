@@ -9,7 +9,7 @@ import java.util.Random;
 import java.util.concurrent.Executor;
 
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
-import static dev.marksman.gauntlet.EvaluateSampleTask.testSampleTask;
+import static dev.marksman.gauntlet.EvaluateSampleTask.evaluateSampleTask;
 import static dev.marksman.gauntlet.GeneratedDataSet.generatedDataSet;
 import static dev.marksman.gauntlet.GeneratorTestResult.generatorTestResult;
 import static dev.marksman.gauntlet.ResultCollector.universalResultCollector;
@@ -39,7 +39,7 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
         int actualSampleCount = samples.size();
         ResultCollector<A> collector = universalResultCollector(dataSet.getValues());
         for (int sampleIndex = 0; sampleIndex < actualSampleCount; sampleIndex++) {
-            EvaluateSampleTask<A> task = testSampleTask(collector, testData.getProperty(), sampleIndex, samples.unsafeGet(sampleIndex));
+            EvaluateSampleTask<A> task = evaluateSampleTask(collector, testData.getProperty(), sampleIndex, samples.unsafeGet(sampleIndex));
             executor.execute(task);
         }
         // TODO: handle supply failure

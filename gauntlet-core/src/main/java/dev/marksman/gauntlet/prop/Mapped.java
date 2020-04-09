@@ -14,8 +14,8 @@ class Mapped<A, B> implements Prop<B> {
     }
 
     @Override
-    public EvalResult test(B data) {
-        return underlying.test(fn.apply(data));
+    public EvalResult evaluate(B data) {
+        return underlying.evaluate(fn.apply(data));
     }
 
     @Override

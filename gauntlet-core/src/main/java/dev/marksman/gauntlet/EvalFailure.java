@@ -22,6 +22,11 @@ public class EvalFailure extends EvalResult {
         return false;
     }
 
+    @Override
+    public boolean isFailure() {
+        return true;
+    }
+
     public EvalFailure addCause(EvalFailure failure) {
         return new EvalFailure(propertyName, failureReasons, causes.append(failure));
     }

@@ -19,7 +19,7 @@ final class PredicateProp<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(A data) {
+    public EvalResult evaluate(A data) {
         return predicate.apply(data)
                 ? evalSuccess()
                 : EvalFailure.evalFailure(this, failureReasons("Predicate failed."));

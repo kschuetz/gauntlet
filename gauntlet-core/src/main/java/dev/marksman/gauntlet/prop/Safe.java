@@ -15,9 +15,9 @@ final class Safe<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(A data) {
+    public EvalResult evaluate(A data) {
         try {
-            return underlying.test(data);
+            return underlying.evaluate(data);
         } catch (Exception e) {
             return EvalFailure.evalFailure(underlying, failureReasons("Threw an exception: " + e));
         }

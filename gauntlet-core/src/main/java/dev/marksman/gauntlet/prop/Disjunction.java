@@ -27,10 +27,10 @@ final class Disjunction<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(A data) {
+    public EvalResult evaluate(A data) {
         EvalResult result = EvalFailure.evalFailure(this, failureReasons("All disjuncts failed."));
         for (Prop<A> prop : operands) {
-            EvalResult test = prop.test(data);
+            EvalResult test = prop.evaluate(data);
             if (test.isSuccess()) {
                 return test;
             } else {

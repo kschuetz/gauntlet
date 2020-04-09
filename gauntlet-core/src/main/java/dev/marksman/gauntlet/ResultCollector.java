@@ -1,5 +1,6 @@
 package dev.marksman.gauntlet;
 
+import com.jnape.palatable.lambda.adt.Either;
 import com.jnape.palatable.lambda.adt.Unit;
 import com.jnape.palatable.lambda.adt.choice.Choice3;
 import dev.marksman.collectionviews.ImmutableVector;
@@ -45,7 +46,7 @@ abstract class ResultCollector<A> implements ResultReceiver {
     }
 
     @Override
-    public void reportResult(int sampleIndex, TestTaskResult result) {
+    public void reportResult(int sampleIndex, Either<Throwable, EvalResult> result) {
         lock.lock();
         try {
             if (sampleIndex >= cutoffIndex) {
@@ -54,18 +55,19 @@ abstract class ResultCollector<A> implements ResultReceiver {
 
             reported.mark(sampleIndex);
 
-            result.match(__ -> {
-                        handleSuccess(sampleIndex);
-                        return UNIT;
-                    },
-                    failure -> {
-                        handleFailure(sampleIndex, failure);
-                        return UNIT;
-                    },
-                    error -> {
+            result.match(error -> {
                         handleError(sampleIndex, error);
                         return UNIT;
-                    });
+                    },
+                    evalResult ->
+                            evalResult.match(__ -> {
+                                        handleSuccess(sampleIndex);
+                                        return UNIT;
+                                    },
+                                    failure -> {
+                                        handleFailure(sampleIndex, failure);
+                                        return UNIT;
+                                    }));
 
             checkIfDone();
         } finally {
@@ -202,9 +204,9 @@ abstract class ResultCollector<A> implements ResultReceiver {
                 boolean finishedOnTime = await(timeout);
                 return status.match(__ ->
                                 finishedOnTime
-                                        ? unproved(getFailedSamples())
+                                        ? unproved(getCounterexamples())
                                         : timedOut(Vector.empty(), timeout),
-                        passedSample -> proved(passedSample, getFailedSamples()),
+                        passedSample -> proved(passedSample, getCounterexamples()),
                         error -> error(Vector.empty(), samples.unsafeGet(cutoffIndex), error));
             } catch (InterruptedException e) {
                 return TestResult.interrupted(Vector.empty(), maybe(e.getMessage()));
@@ -213,7 +215,7 @@ abstract class ResultCollector<A> implements ResultReceiver {
             }
         }
 
-        private ImmutableVector<Counterexample<A>> getFailedSamples() {
+        private ImmutableVector<Counterexample<A>> getCounterexamples() {
             VectorBuilder<Counterexample<A>> builder = Vector.builder();
             for (int idx = 0; idx < samples.size(); idx++) {
                 EvalFailure failure = collectedFailures[idx];

@@ -6,4 +6,6 @@ public abstract class EvalResult implements CoProduct2<EvalSuccess, EvalFailure,
 
     public abstract boolean isSuccess();
 
+    public abstract boolean isFailure();
+
 }

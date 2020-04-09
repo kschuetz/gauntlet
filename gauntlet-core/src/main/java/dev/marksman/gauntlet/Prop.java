@@ -7,7 +7,7 @@ import dev.marksman.gauntlet.prop.Props;
 import static dev.marksman.gauntlet.prop.Props.*;
 
 public interface Prop<A> extends Contravariant<A, Prop<?>>, Named {
-    EvalResult test(A data);
+    EvalResult evaluate(A data);
 
     String getName();
 

@@ -22,11 +22,11 @@ final class Negation<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(A data) {
+    public EvalResult evaluate(A data) {
         // success -> failure
         // failure -> success
 
-        return operand.test(data)
+        return operand.evaluate(data)
                 .match(__ -> EvalFailure.evalFailure(this, FailureReasons.failureReasons("Failure expected.")),
                         __ -> evalSuccess());
     }

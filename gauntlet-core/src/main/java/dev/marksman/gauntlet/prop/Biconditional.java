@@ -20,16 +20,16 @@ class Biconditional<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(A data) {
+    public EvalResult evaluate(A data) {
         // success + success -> success
         // success + failure -> failure
         // failure + success -> failure
         // failure + failure -> success
-        return antecedent.test(data)
-                .match(success -> consequent.test(data)
+        return antecedent.evaluate(data)
+                .match(success -> consequent.evaluate(data)
                                 .match(id(),
                                         f1 -> createFailure().addCause(f1)),
-                        failure -> consequent.test(data)
+                        failure -> consequent.evaluate(data)
                                 .match(__ -> createFailure().addCause(failure),
                                         __ -> evalSuccess()));
     }

@@ -20,17 +20,17 @@ class ExclusiveDisjunction<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(A data) {
+    public EvalResult evaluate(A data) {
         // success + success -> failure
         // success + failure -> success
         // failure + success -> success
         // failure + failure -> failure
-        return p.test(data)
-                .match(success -> q.test(data)
+        return p.evaluate(data)
+                .match(success -> q.evaluate(data)
                                 .match(__ -> EvalFailure.evalFailure(this, failureReasons("xor failed"))
                                                 .addCause(EvalFailure.evalFailure(q, failureReasons("Expected failure"))),
                                         f1 -> evalSuccess()),
-                        failure -> q.test(data)
+                        failure -> q.evaluate(data)
                                 .match(id(),
                                         f1 -> EvalFailure.evalFailure(this, failureReasons("xor failed"))
                                                 .addCause(failure)

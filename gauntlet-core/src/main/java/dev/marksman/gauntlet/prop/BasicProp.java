@@ -18,7 +18,7 @@ final class BasicProp<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(A data) {
+    public EvalResult evaluate(A data) {
         return evaluator.apply(data)
                 .match(__ -> evalSuccess(),
                         fail -> EvalFailure.evalFailure(this, fail.getReasons()));

@@ -20,13 +20,13 @@ class Implication<A> implements Prop<A> {
     }
 
     @Override
-    public EvalResult test(A data) {
+    public EvalResult evaluate(A data) {
         // success + success -> success
         // success + failure -> failure
         // failure + _ -> success
 
-        return antecedent.test(data)
-                .match(success -> consequent.test(data)
+        return antecedent.evaluate(data)
+                .match(success -> consequent.evaluate(data)
                                 .match(id(),
                                         f1 -> EvalFailure.evalFailure(this, failureReasons("Implication failed."))
                                                 .addCause(f1)),

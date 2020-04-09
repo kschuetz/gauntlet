@@ -11,8 +11,8 @@ final class Renamed<A> implements Prop<A> {
     final Prop<A> underlying;
 
     @Override
-    public EvalResult test(A data) {
-        return underlying.test(data);
+    public EvalResult evaluate(A data) {
+        return underlying.evaluate(data);
     }
 
     @Override
