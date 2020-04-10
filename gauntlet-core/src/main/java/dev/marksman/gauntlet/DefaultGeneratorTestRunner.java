@@ -35,9 +35,9 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
         ValueSupplier<A> valueSupplier = arbitrary.prepare(executionParameters.getGeneratorParameters());
         GeneratedDataSet<A> dataSet = generateDataSet(initialSeed, valueSupplier, testData.getSampleCount());
 
-        ImmutableVector<A> samples = dataSet.getValues();
+        ImmutableVector<A> samples = dataSet.getSamples();
         int actualSampleCount = samples.size();
-        ResultCollector<A> collector = universalResultCollector(dataSet.getValues());
+        ResultCollector<A> collector = universalResultCollector(dataSet.getSamples());
         for (int sampleIndex = 0; sampleIndex < actualSampleCount; sampleIndex++) {
             EvaluateSampleTask<A> task = evaluateSampleTask(collector, testData.getProperty(), sampleIndex, samples.unsafeGet(sampleIndex));
             executor.execute(task);
