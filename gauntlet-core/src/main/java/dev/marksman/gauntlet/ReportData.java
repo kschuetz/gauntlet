@@ -14,11 +14,11 @@ public final class ReportData<A> {
     @Getter
     private final TestResult<A> result;
     @Getter
-    private final Fn1<A, String> prettyPrinter;
+    private final Fn1<? super A, String> prettyPrinter;
     @Getter
     private final Maybe<Long> initialSeedValue;
 
-    public static <A> ReportData<A> reportData(Prop<A> prop, TestResult<A> testResult, Fn1<A, String> prettyPrinter, Maybe<Long> initialSeedValue) {
+    public static <A> ReportData<A> reportData(Prop<A> prop, TestResult<A> testResult, Fn1<? super A, String> prettyPrinter, Maybe<Long> initialSeedValue) {
         return new ReportData<>(prop, testResult, prettyPrinter, initialSeedValue);
     }
 

@@ -1,10 +1,15 @@
 package dev.marksman.gauntlet;
 
+import dev.marksman.collectionviews.NonEmptyVector;
 import dev.marksman.collectionviews.Vector;
 
 import static dev.marksman.gauntlet.Domain.domain;
 
 public final class Domains {
+
+    private static final Domain<Character> ASCII = domain(NonEmptyVector.lazyFill(128, idx -> (char) ((int) idx)));
+
+    private static final Domain<Character> ASCII_PRINTABLE = domain(NonEmptyVector.lazyFill(95, idx -> (char) (32 + idx)));
 
     private Domains() {
 
@@ -28,6 +33,14 @@ public final class Domains {
                 return buildIntegerDomain(lower, upper);
             }
         };
+    }
+
+    public static Domain<Character> asciiCharacters() {
+        return ASCII;
+    }
+
+    public static Domain<Character> asciiPrintableCharacters() {
+        return ASCII_PRINTABLE;
     }
 
     private static Domain<Integer> buildIntegerDomain(int lower, int upperExclusive) {

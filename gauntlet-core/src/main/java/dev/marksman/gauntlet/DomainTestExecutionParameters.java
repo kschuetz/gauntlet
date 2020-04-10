@@ -14,8 +14,8 @@ public class DomainTestExecutionParameters {
     private final Executor executor;
     private final Duration defaultTimeout;
 
-    public static DomainTestExecutionParameters generatorTestExecutionParameters(Executor executor,
-                                                                                 Duration defaultTimeout) {
+    public static DomainTestExecutionParameters domainTestExecutionParameters(Executor executor,
+                                                                              Duration defaultTimeout) {
         return new DomainTestExecutionParameters(executor, defaultTimeout);
     }
 }

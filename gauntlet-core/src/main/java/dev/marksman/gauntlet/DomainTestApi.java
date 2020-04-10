@@ -12,4 +12,8 @@ public interface DomainTestApi<A> {
     DomainTestApi<A> classifyUsing(Fn1<A, Set<String>> classifier);
 
     void mustSatisfy(Prop<A> prop);
+
+    default void mustNotSatisfy(Prop<A> prop) {
+        mustSatisfy(prop.not());
+    }
 }

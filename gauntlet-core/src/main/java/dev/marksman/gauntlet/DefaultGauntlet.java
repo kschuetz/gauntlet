@@ -13,6 +13,7 @@ import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.gauntlet.ConcreteDomainTestApi.concreteGeneratorTestApi;
 import static dev.marksman.gauntlet.ConcreteGeneratorTestApi.concreteGeneratorTestApi;
+import static dev.marksman.gauntlet.DomainTestExecutionParameters.domainTestExecutionParameters;
 import static dev.marksman.gauntlet.DomainTestParameters.domainTestParameters;
 import static dev.marksman.gauntlet.GeneratorTestExecutionParameters.generatorTestExecutionParameters;
 import static dev.marksman.gauntlet.GeneratorTestParameters.generatorTestParameters;
@@ -179,7 +180,14 @@ class DefaultGauntlet implements GauntletApi {
     }
 
     private <A> void runDomainTest(DomainTest<A> domainTest) {
-        throw new UnsupportedOperationException("TODO");
+        DomainTestResult<A> result = domainTestRunner.run(
+                domainTestExecutionParameters(getExecutor(), defaultTimeout),
+                domainTest);
+        ReportData<A> reportData = reportData(domainTest.getProperty(),
+                result.getResult(),
+                domainTest.getDomain().getPrettyPrinter(),
+                nothing());
+        reporter.report(reportData);
     }
 
     private <A> DomainTestApi<A> createDomainTestApi(Quantifier quantifier, Domain<A> domain) {
