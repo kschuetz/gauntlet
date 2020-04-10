@@ -1,6 +1,7 @@
 package dev.marksman.gauntlet;
 
 import dev.marksman.collectionviews.ImmutableVector;
+import dev.marksman.collectionviews.Vector;
 
 import java.util.concurrent.Executor;
 
@@ -17,7 +18,7 @@ public final class DefaultDomainTestRunner implements DomainTestRunner {
     public <A> DomainTestResult<A> run(DomainTestExecutionParameters executionParameters, DomainTest<A> testData) {
         Executor executor = executionParameters.getExecutor();
         Domain<A> domain = testData.getDomain();
-        ImmutableVector<A> elements = domain.getElements();
+        ImmutableVector<A> elements = Vector.copyFrom(domain.getElements());
         ResultCollector<A> collector = testData.getQuantifier() == EXISTENTIAL
                 ? existentialResultCollector(elements)
                 : universalResultCollector(elements);
