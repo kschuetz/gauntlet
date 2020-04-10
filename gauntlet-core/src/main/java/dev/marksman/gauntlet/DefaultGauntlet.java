@@ -24,14 +24,16 @@ import static dev.marksman.gauntlet.ReportData.reportData;
 class DefaultGauntlet implements GauntletApi {
     private final Executor executor;
     private final GeneratorTestRunner generatorTestRunner;
+    private final DomainTestRunner domainTestRunner;
     private final Reporter reporter;
     private final GeneratorParameters generatorParameters;
     private final int defaultSampleCount;
     private final Duration defaultTimeout;
 
-    public DefaultGauntlet(Executor executor, GeneratorTestRunner generatorTestRunner, Reporter reporter, GeneratorParameters generatorParameters, int defaultSampleCount, Duration defaultTimeout) {
+    public DefaultGauntlet(Executor executor, GeneratorTestRunner generatorTestRunner, DomainTestRunner domainTestRunner, Reporter reporter, GeneratorParameters generatorParameters, int defaultSampleCount, Duration defaultTimeout) {
         this.executor = executor;
         this.generatorTestRunner = generatorTestRunner;
+        this.domainTestRunner = domainTestRunner;
         this.reporter = reporter;
         this.generatorParameters = generatorParameters;
         this.defaultSampleCount = defaultSampleCount;
@@ -46,6 +48,11 @@ class DefaultGauntlet implements GauntletApi {
     @Override
     public GeneratorTestRunner getGeneratorTestRunner() {
         return generatorTestRunner;
+    }
+
+    @Override
+    public DomainTestRunner getDomainTestRunner() {
+        return domainTestRunner;
     }
 
     @Override
@@ -70,32 +77,37 @@ class DefaultGauntlet implements GauntletApi {
 
     @Override
     public GauntletApi withDefaultSampleCount(int sampleCount) {
-        return new DefaultGauntlet(executor, generatorTestRunner, reporter, generatorParameters, sampleCount, defaultTimeout);
+        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, reporter, generatorParameters, sampleCount, defaultTimeout);
     }
 
     @Override
     public GauntletApi withExecutor(Executor executor) {
-        return new DefaultGauntlet(executor, generatorTestRunner, reporter, generatorParameters, defaultSampleCount, defaultTimeout);
+        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, reporter, generatorParameters, defaultSampleCount, defaultTimeout);
     }
 
     @Override
     public GauntletApi withGeneratorTestRunner(GeneratorTestRunner testRunner) {
-        return new DefaultGauntlet(executor, testRunner, reporter, generatorParameters, defaultSampleCount, defaultTimeout);
+        return new DefaultGauntlet(executor, testRunner, domainTestRunner, reporter, generatorParameters, defaultSampleCount, defaultTimeout);
+    }
+
+    @Override
+    public GauntletApi withDomainTestRunner(DomainTestRunner testRunner) {
+        return new DefaultGauntlet(executor, generatorTestRunner, testRunner, reporter, generatorParameters, defaultSampleCount, defaultTimeout);
     }
 
     @Override
     public GauntletApi withGeneratorParameters(GeneratorParameters generatorParameters) {
-        return new DefaultGauntlet(executor, generatorTestRunner, reporter, generatorParameters, defaultSampleCount, defaultTimeout);
+        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, reporter, generatorParameters, defaultSampleCount, defaultTimeout);
     }
 
     @Override
     public GauntletApi withReporter(Reporter reporter) {
-        return new DefaultGauntlet(executor, generatorTestRunner, reporter, generatorParameters, defaultSampleCount, defaultTimeout);
+        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, reporter, generatorParameters, defaultSampleCount, defaultTimeout);
     }
 
     @Override
     public GauntletApi withDefaultTimeout(Duration timeout) {
-        return new DefaultGauntlet(executor, generatorTestRunner, reporter, generatorParameters, defaultSampleCount, timeout);
+        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, reporter, generatorParameters, defaultSampleCount, timeout);
     }
 
     @Override

@@ -113,6 +113,11 @@ public abstract class GauntletApiBase implements GauntletApi {
     }
 
     @Override
+    public DomainTestRunner getDomainTestRunner() {
+        return getApi().getDomainTestRunner();
+    }
+
+    @Override
     public Reporter getReporter() {
         return getApi().getReporter();
     }
@@ -140,6 +145,11 @@ public abstract class GauntletApiBase implements GauntletApi {
     @Override
     public GauntletApi withGeneratorTestRunner(GeneratorTestRunner testRunner) {
         return getApi().withGeneratorTestRunner(testRunner);
+    }
+
+    @Override
+    public GauntletApi withDomainTestRunner(DomainTestRunner testRunner) {
+        return getApi().withDomainTestRunner(testRunner);
     }
 
     @Override
