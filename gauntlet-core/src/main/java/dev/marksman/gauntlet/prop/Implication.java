@@ -8,7 +8,7 @@ import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
 import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
 import static dev.marksman.gauntlet.FailureReasons.failureReasons;
 
-class Implication<A> implements Prop<A> {
+final class Implication<A> implements Prop<A> {
     final Prop<A> antecedent;
     final Prop<A> consequent;
     private final String name;

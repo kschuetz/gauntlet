@@ -6,7 +6,7 @@ import dev.marksman.gauntlet.Prop;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-class Dynamic<A> implements Prop<A> {
+final class Dynamic<A> implements Prop<A> {
     private final Fn1<A, Prop<A>> selector;
 
     @Override

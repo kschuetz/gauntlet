@@ -8,7 +8,11 @@ import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmuta
 import static dev.marksman.gauntlet.shrink.LazyConcat.lazyConcat;
 import static dev.marksman.gauntlet.shrink.LazyCons.lazyCons;
 
-public class ShrinkResult {
+public final class ShrinkResult {
+
+    private ShrinkResult() {
+
+    }
 
     public static <A> ImmutableFiniteIterable<A> empty() {
         return emptyImmutableFiniteIterable();
@@ -91,4 +95,5 @@ public class ShrinkResult {
                                                         Fn0<ImmutableFiniteIterable<A>> ys8) {
         return concat(xs, () -> concat(ys1.apply(), ys2, ys3, ys4, ys5, ys6, ys7, ys8));
     }
+
 }

@@ -3,7 +3,7 @@ package dev.marksman.gauntlet.shrink;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 
-class FilterShrink<A> implements Shrink<A> {
+final class FilterShrink<A> implements Shrink<A> {
     private final Shrink<A> underlying;
     private final Fn1<? super A, Boolean> predicate;
 

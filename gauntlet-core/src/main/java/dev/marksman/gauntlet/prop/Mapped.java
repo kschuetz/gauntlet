@@ -4,7 +4,7 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
-class Mapped<A, B> implements Prop<B> {
+final class Mapped<A, B> implements Prop<B> {
     private final Fn1<? super B, ? extends A> fn;
     private final Prop<A> underlying;
 

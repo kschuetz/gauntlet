@@ -8,7 +8,7 @@ import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
 import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
 import static dev.marksman.gauntlet.FailureReasons.failureReasons;
 
-class ExclusiveDisjunction<A> implements Prop<A> {
+final class ExclusiveDisjunction<A> implements Prop<A> {
     final Prop<A> p;
     final Prop<A> q;
     private final String name;
