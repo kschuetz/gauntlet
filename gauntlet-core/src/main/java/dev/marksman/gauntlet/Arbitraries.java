@@ -31,7 +31,6 @@ public final class Arbitraries {
         return arbitraryInt(frequencyMap.toGenerator());
     }
 
-
     public static <A, B> Arbitrary<Tuple2<A, B>> combine(Arbitrary<A> a,
                                                          Arbitrary<B> b) {
         return CompositeArbitraries.combine(a, b);
@@ -43,5 +42,8 @@ public final class Arbitraries {
         return CompositeArbitraries.combine(a, b, c);
     }
 
+    public static <A extends Comparable<A>> Arbitrary<Tuple2<A, A>> arbitraryOrderedPair(Arbitrary<A> a) {
+        return a.pair().mapPreFilterOutput(t -> t._1().compareTo(t._2()) > 0 ? t.invert() : t);
+    }
 
 }

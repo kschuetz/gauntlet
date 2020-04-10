@@ -102,6 +102,16 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
     }
 
     @Override
+    public Arbitrary<A> mapPreFilterOutput(Fn1<A, A> f) {
+        return new ConcreteArbitrary<>(generator.fmap(vs -> vs.fmap(f)),
+                parameterTransforms,
+                filter,
+                shrink,
+                prettyPrinter,
+                maxDiscards);
+    }
+
+    @Override
     public <B> Arbitrary<B> convert(Fn1<A, B> ab, Fn1<B, A> ba) {
         return new ConcreteArbitrary<>(generator.fmap(vs -> vs.fmap(ab)),
                 parameterTransforms,
