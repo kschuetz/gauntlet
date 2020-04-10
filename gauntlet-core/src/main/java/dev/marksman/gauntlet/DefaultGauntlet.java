@@ -13,7 +13,6 @@ import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.gauntlet.ConcreteDomainTestApi.concreteGeneratorTestApi;
 import static dev.marksman.gauntlet.ConcreteGeneratorTestApi.concreteGeneratorTestApi;
-import static dev.marksman.gauntlet.Domain.combineDomains;
 import static dev.marksman.gauntlet.DomainTestParameters.domainTestParameters;
 import static dev.marksman.gauntlet.GeneratorTestExecutionParameters.generatorTestExecutionParameters;
 import static dev.marksman.gauntlet.GeneratorTestParameters.generatorTestParameters;
@@ -132,17 +131,17 @@ class DefaultGauntlet implements GauntletApi {
 
     @Override
     public <A, B> DomainTestApi<Tuple2<A, B>> all(Domain<A> domainA, Domain<B> domainB) {
-        return createDomainTestApi(UNIVERSAL, combineDomains(domainA, domainB));
+        return createDomainTestApi(UNIVERSAL, Domain.cartesianProduct(domainA, domainB));
     }
 
     @Override
     public <A, B, C> DomainTestApi<Tuple3<A, B, C>> all(Domain<A> domainA, Domain<B> domainB, Domain<C> domainC) {
-        return createDomainTestApi(UNIVERSAL, combineDomains(domainA, domainB, domainC));
+        return createDomainTestApi(UNIVERSAL, Domain.cartesianProduct(domainA, domainB, domainC));
     }
 
     @Override
     public <A, B, C, D> DomainTestApi<Tuple4<A, B, C, D>> all(Domain<A> domainA, Domain<B> domainB, Domain<C> domainC, Domain<D> domainD) {
-        return createDomainTestApi(UNIVERSAL, combineDomains(domainA, domainB, domainC, domainD));
+        return createDomainTestApi(UNIVERSAL, Domain.cartesianProduct(domainA, domainB, domainC, domainD));
     }
 
     @Override
@@ -152,17 +151,17 @@ class DefaultGauntlet implements GauntletApi {
 
     @Override
     public <A, B> DomainTestApi<Tuple2<A, B>> some(Domain<A> domainA, Domain<B> domainB) {
-        return createDomainTestApi(EXISTENTIAL, combineDomains(domainA, domainB));
+        return createDomainTestApi(EXISTENTIAL, Domain.cartesianProduct(domainA, domainB));
     }
 
     @Override
     public <A, B, C> DomainTestApi<Tuple3<A, B, C>> some(Domain<A> domainA, Domain<B> domainB, Domain<C> domainC) {
-        return createDomainTestApi(EXISTENTIAL, combineDomains(domainA, domainB, domainC));
+        return createDomainTestApi(EXISTENTIAL, Domain.cartesianProduct(domainA, domainB, domainC));
     }
 
     @Override
     public <A, B, C, D> DomainTestApi<Tuple4<A, B, C, D>> some(Domain<A> domainA, Domain<B> domainB, Domain<C> domainC, Domain<D> domainD) {
-        return createDomainTestApi(EXISTENTIAL, combineDomains(domainA, domainB, domainC, domainD));
+        return createDomainTestApi(EXISTENTIAL, Domain.cartesianProduct(domainA, domainB, domainC, domainD));
     }
 
     private <A> GeneratorTestApi<A> createGeneratorTestApi(Arbitrary<A> generator) {
