@@ -6,7 +6,7 @@ import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.filter.Filter;
 
 import static com.jnape.palatable.lambda.optics.functions.View.view;
-import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
+import static dev.marksman.gauntlet.shrink.ShrinkNone.shrinkNone;
 
 @FunctionalInterface
 public interface Shrink<A> {
@@ -26,6 +26,6 @@ public interface Shrink<A> {
     }
 
     static <A> Shrink<A> none() {
-        return input -> emptyImmutableFiniteIterable();
+        return shrinkNone();
     }
 }
