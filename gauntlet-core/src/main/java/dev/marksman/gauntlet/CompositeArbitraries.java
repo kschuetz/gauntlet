@@ -4,14 +4,12 @@ import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.adt.hlist.HList;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
-import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.Fn2;
 import com.jnape.palatable.lambda.functions.Fn3;
 import dev.marksman.gauntlet.shrink.Shrink;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
-import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
 import static dev.marksman.gauntlet.ConcreteArbitrary.concreteArbitrary;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkProducts.shrink2;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkProducts.shrink3;
@@ -27,7 +25,7 @@ final class CompositeArbitraries {
                         b.prepare(parameters),
                         toFn),
                 combineShrinks(a.getShrink(), b.getShrink(), toFn),
-                combinePrettyPrinters(a.getPrettyPrinter(), b.getPrettyPrinter()));
+                PrettyPrinting.<A, B>product2PrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter()));
     }
 
     static <A, B, C> Arbitrary<Tuple3<A, B, C>> combine(Arbitrary<A> a,
@@ -41,7 +39,7 @@ final class CompositeArbitraries {
                         c.prepare(parameters),
                         toFn),
                 combineShrinks(a.getShrink(), b.getShrink(), c.getShrink(), toFn),
-                combinePrettyPrinters(a.getPrettyPrinter(), b.getPrettyPrinter(), c.getPrettyPrinter()));
+                PrettyPrinting.<A, B, C>product3PrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter(), c.getPrettyPrinter()));
     }
 
 
@@ -73,17 +71,6 @@ final class CompositeArbitraries {
 
     private static <A> boolean isNothing(Maybe<A> ma) {
         return ma.match(__ -> true, __ -> false);
-    }
-
-    private static <A, B> Fn1<Tuple2<A, B>, String> combinePrettyPrinters(Fn1<A, String> ppA,
-                                                                          Fn1<B, String> ppB) {
-        return t -> tuple(ppA.apply(t._1()), ppB.apply(t._2())).toString();
-    }
-
-    private static <A, B, C> Fn1<Tuple3<A, B, C>, String> combinePrettyPrinters(Fn1<A, String> ppA,
-                                                                                Fn1<B, String> ppB,
-                                                                                Fn1<C, String> ppC) {
-        return t -> tuple(ppA.apply(t._1()), ppB.apply(t._2()), ppC.apply(t._3())).toString();
     }
 
 }

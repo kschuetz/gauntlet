@@ -29,13 +29,13 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
     private final ImmutableFiniteIterable<Fn1<GeneratorParameters, GeneratorParameters>> parameterTransforms;
     private final Filter<A> filter;
     private final Maybe<Shrink<A>> shrink;
-    private final Fn1<A, String> prettyPrinter;
+    private final Fn1<? super A, String> prettyPrinter;
     private final int maxDiscards;
 
     private ConcreteArbitrary(Fn1<GeneratorParameters, ValueSupplier<A>> generator,
                               ImmutableFiniteIterable<Fn1<GeneratorParameters, GeneratorParameters>> parameterTransforms,
                               Filter<A> filter, Maybe<Shrink<A>> shrink,
-                              Fn1<A, String> prettyPrinter,
+                              Fn1<? super A, String> prettyPrinter,
                               int maxDiscards) {
         this.generator = generator;
         this.parameterTransforms = parameterTransforms;
@@ -62,7 +62,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
     }
 
     @Override
-    public Fn1<A, String> getPrettyPrinter() {
+    public Fn1<? super A, String> getPrettyPrinter() {
         return prettyPrinter;
     }
 
@@ -96,7 +96,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
     }
 
     @Override
-    public Arbitrary<A> withPrettyPrinter(Fn1<A, String> prettyPrinter) {
+    public Arbitrary<A> withPrettyPrinter(Fn1<? super A, String> prettyPrinter) {
         return new ConcreteArbitrary<>(generator, parameterTransforms, filter, shrink, prettyPrinter, maxDiscards);
     }
 
@@ -218,7 +218,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
 
     static <A> ConcreteArbitrary<A> concreteArbitrary(Fn1<GeneratorParameters, ValueSupplier<A>> generator,
                                                       Maybe<Shrink<A>> shrink,
-                                                      Fn1<A, String> prettyPrinter) {
+                                                      Fn1<? super A, String> prettyPrinter) {
         return new ConcreteArbitrary<>(generator, emptyImmutableFiniteIterable(), Filter.emptyFilter(), shrink, prettyPrinter, Gauntlet.DEFAULT_MAX_DISCARDS);
     }
 

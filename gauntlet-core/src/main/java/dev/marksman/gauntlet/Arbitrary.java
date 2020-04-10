@@ -23,7 +23,7 @@ public interface Arbitrary<A> {
 
     Maybe<Shrink<A>> getShrink();
 
-    Fn1<A, String> getPrettyPrinter();
+    Fn1<? super A, String> getPrettyPrinter();
 
     Arbitrary<A> withShrink(Shrink<A> shrink);
 
@@ -33,7 +33,7 @@ public interface Arbitrary<A> {
 
     Arbitrary<A> withMaxDiscards(int maxDiscards);
 
-    Arbitrary<A> withPrettyPrinter(Fn1<A, String> prettyPrinter);
+    Arbitrary<A> withPrettyPrinter(Fn1<? super A, String> prettyPrinter);
 
     <B> Arbitrary<B> convert(Fn1<A, B> ab, Fn1<B, A> ba);
 
