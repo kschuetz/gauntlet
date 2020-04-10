@@ -63,7 +63,7 @@ public final class DefaultReporter implements Reporter {
     }
 
     private <A> void handleError(ReportData<A> reportData, TestResult.Error<A> error) {
-        throw new AssertionError("Test threw an error");
+        throw new AssertionError("Test threw an error: " + error.getError());
     }
 
     private <A> void handleSupplyFailure(ReportData<A> reportData, TestResult.SupplyFailed<A> supplyFailed) {

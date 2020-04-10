@@ -3,6 +3,7 @@ package dev.marksman.gauntlet.shrink;
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.optics.Iso;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
+import dev.marksman.gauntlet.filter.Filter;
 
 import static com.jnape.palatable.lambda.optics.functions.View.view;
 import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
@@ -12,7 +13,7 @@ public interface Shrink<A> {
     ImmutableFiniteIterable<A> apply(A input);
 
     default Shrink<A> filter(Fn1<? super A, Boolean> predicate) {
-        return new FilterShrink<>(this, predicate);
+        return new FilterShrink<>(this, Filter.filter(predicate));
     }
 
     default <B> Shrink<B> convert(Iso<A, A, B, B> iso) {

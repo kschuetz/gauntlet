@@ -79,7 +79,8 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
 
     @Override
     public Arbitrary<A> suchThat(Fn1<? super A, Boolean> predicate) {
-        return new ConcreteArbitrary<>(generator, parameterTransforms, filter.add(predicate), shrink, prettyPrinter, maxDiscards);
+        return new ConcreteArbitrary<>(generator, parameterTransforms, filter.add(predicate), shrink.fmap(s -> s.filter(predicate)),
+                prettyPrinter, maxDiscards);
 
     }
 

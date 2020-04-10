@@ -16,6 +16,6 @@ final class Dynamic<A> implements Prop<A> {
 
     @Override
     public String getName() {
-        return null;
+        return "Dynamic - TODO";
     }
 }

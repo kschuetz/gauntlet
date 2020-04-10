@@ -24,7 +24,7 @@ public final class Arbitraries {
     }
 
     public static Arbitrary<Integer> arbitraryInt(int min, int max) {
-        return arbitraryInt(generateInt(min, max));
+        return arbitrary(generateInt(min, max)).withShrink(shrinkInt(min, max));
     }
 
     public static Arbitrary<Integer> arbitraryInt(FrequencyMap<Integer> frequencyMap) {
