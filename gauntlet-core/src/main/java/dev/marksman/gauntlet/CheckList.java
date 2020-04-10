@@ -14,7 +14,7 @@ final class CheckList {
     }
 
     void mark(int index) {
-        if (index < size) {
+        if (index >= 0 && index < size) {
             markedIndices.set(index);
             if (firstUnmarkedIndex == index) {
                 int idx = index + 1;
@@ -23,6 +23,8 @@ final class CheckList {
                 }
                 firstUnmarkedIndex = idx;
             }
+        } else {
+            throw new IndexOutOfBoundsException();
         }
     }
 
