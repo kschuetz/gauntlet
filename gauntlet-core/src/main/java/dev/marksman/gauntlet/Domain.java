@@ -23,8 +23,12 @@ public interface Domain<A> {
     }
 
     @SafeVarargs
-    static <A> Domain<A> of(A first, A... more) {
+    static <A> Domain<A> values(A first, A... more) {
         return concreteDomain(Vector.of(first, more));
+    }
+
+    static <A extends Enum<A>> Domain<A> domainFromEnum(Class<A> enumType) {
+        return concreteDomain(Vector.copyFrom(enumType.getEnumConstants()));
     }
 
     static <A, B> Domain<Tuple2<A, B>> cartesianProduct(Domain<A> domainA,
