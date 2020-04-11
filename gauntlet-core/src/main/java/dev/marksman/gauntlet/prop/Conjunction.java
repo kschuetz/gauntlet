@@ -1,12 +1,15 @@
 package dev.marksman.gauntlet.prop;
 
+import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
 import dev.marksman.gauntlet.EvalFailure;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
+import static dev.marksman.gauntlet.EvalFailure.evalFailure;
 import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
 import static dev.marksman.gauntlet.FailureReasons.failureReasons;
+import static dev.marksman.gauntlet.prop.Accumulator.accumulator;
 
 
 final class Conjunction<A> implements Prop<A> {
@@ -26,26 +29,27 @@ final class Conjunction<A> implements Prop<A> {
                 : operands.append(other));
     }
 
+    // success + success -> success
+    // success + failure -> failure
+    // failure + success -> failure
+    // failure + failure -> failure
+
     @Override
     public EvalResult evaluate(A data) {
-        return operands.foldLeft((acc, operand) -> combine(acc, operand.evaluate(data)),
-                (EvalResult) evalSuccess());
-    }
+        ImmutableNonEmptyFiniteIterable<EvalResult> results = operands.fmap(p -> p.evaluate(data));
 
-    private EvalResult combine(EvalResult acc, EvalResult item) {
-        // success + success -> success
-        // success + failure -> failure
-        // failure + success -> failure
-        // failure + failure -> failure
+        Accumulator combined = results.foldLeft((acc, result) -> result.match(__ -> acc.addSuccess(), acc::addFailure),
+                accumulator());
+        ImmutableVector<EvalFailure> causes = combined.getFailures().build();
 
-        return acc
-                .match(success -> item
-                                .match(__ -> item,
-                                        f1 -> EvalFailure.evalFailure(this, failureReasons("Conjuncts failed."))
-                                                .addCause(f1)),
-
-                        f1 -> item.match(__ -> f1,
-                                f1::addCause));
+        if (causes.isEmpty()) {
+            return evalSuccess();
+        } else {
+            int failureCount = causes.size();
+            int totalCount = combined.getSuccessCount() + failureCount;
+            String message = "Conjuncts failed (" + failureCount + " of " + totalCount + ")";
+            return evalFailure(this, failureReasons(message), causes);
+        }
     }
 
     @Override

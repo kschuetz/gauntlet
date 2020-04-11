@@ -1,5 +1,8 @@
 package dev.marksman.gauntlet;
 
+import com.jnape.palatable.lambda.functions.Fn1;
+import dev.marksman.collectionviews.ImmutableNonEmptyVector;
+
 import static com.jnape.palatable.lambda.adt.Unit.UNIT;
 
 public final class DefaultReporter implements Reporter {
@@ -52,9 +55,8 @@ public final class DefaultReporter implements Reporter {
     }
 
     private <A> void handleFalsified(ReportData<A> reportData, TestResult.Falsified<A> falsified) {
-        throw new AssertionError("Failed property '" + reportData.getProp().getName() + "' " +
-                "with value '" + reportData.getPrettyPrinter().apply(falsified.getCounterexample().getSample()) + "'. " +
-                "reasons: " + falsified.getCounterexample().getFailure().getFailureReasons());
+        String content = buildReportForFalsified(reportData, falsified);
+        throw new AssertionError(content);
     }
 
     private <A> void handleUnproved(ReportData<A> reportData, TestResult.Unproved<A> proved) {
@@ -76,6 +78,75 @@ public final class DefaultReporter implements Reporter {
 
     private <A> void handleInterrupted(ReportData<A> reportData, TestResult.Interrupted<A> interrupted) {
         throw new AssertionError("Interrupted");
+    }
+
+    // TODO: maybe use a state or writer monad for this
+    private <A> String buildReportForFalsified(ReportData<A> reportData, TestResult.Falsified<A> result) {
+        Fn1<? super A, String> prettyPrinter = reportData.getPrettyPrinter();
+        MutableReportBuilder output = new MutableReportBuilder();
+        output.write("Counterexample found after ");
+        int successCount = result.getSuccessCount();
+        output.write(successCount);
+        output.write(successCount == 1 ? " success" : " successes");
+        reportData.getInitialSeedValue().toOptional().ifPresent(seed -> {
+            output.write(" using seed ");
+            output.write(seed);
+        });
+        output.newLine();
+        Counterexample<A> counterexample = result.getRefinedCounterexample()
+                .match(__ -> result.getCounterexample(), RefinedCounterexample::getCounterexample);
+        output.write("Counterexample: ");
+        output.write(prettyPrinter.apply(counterexample.getSample()));
+        output.newLine();
+        result.getRefinedCounterexample().toOptional().ifPresent(rc -> {
+            output.indent();
+            output.write("(refined in ");
+            output.write(rc.getShrinkCount());
+            output.write(rc.getShrinkCount() == 1 ? " shrink" : " shrinks");
+            output.write(" from original: ");
+            output.write(prettyPrinter.apply(result.getCounterexample().getSample()));
+            output.write(")");
+            output.newLine();
+        });
+        outputEvalFailure(output, counterexample.getFailure(), 0);
+        return output.render();
+    }
+
+    private void outputEvalFailure(MutableReportBuilder output, EvalFailure failure, int depth) {
+        if (depth > 0) {
+            output.write("- ");
+        }
+        output.write("Property: \"");
+        output.write(failure.getPropertyName().getName());
+        output.write("\"");
+        output.newLine();
+        if (depth > 0) {
+            output.write("  ");
+        }
+        ImmutableNonEmptyVector<String> reasons = failure.getFailureReasons().getItems();
+        if (reasons.size() == 1) {
+            output.write("Reason: ");
+        } else {
+            output.write("Reasons: ");
+        }
+        boolean inner = false;
+        for (String reason : reasons) {
+            if (inner) {
+                output.write("; ");
+            } else {
+                inner = true;
+            }
+            output.write(reason);
+        }
+        output.newLine();
+        output.indent();
+        try {
+            for (EvalFailure cause : failure.getCauses()) {
+                outputEvalFailure(output, cause, depth + 1);
+            }
+        } finally {
+            output.unindent();
+        }
     }
 
     public static DefaultReporter defaultReporter() {

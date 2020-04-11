@@ -4,13 +4,14 @@ import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.adt.coproduct.CoProduct8;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.ImmutableVector;
-import dev.marksman.collectionviews.Vector;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 import java.time.Duration;
 
+import static com.jnape.palatable.lambda.adt.Maybe.just;
+import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static lombok.AccessLevel.PRIVATE;
 
 @EqualsAndHashCode
@@ -54,7 +55,15 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
     public static class Falsified<A> extends TestResult<A> {
         ImmutableVector<A> passedSamples;
         Counterexample<A> counterexample;
-        ImmutableVector<A> shrinks;
+        Maybe<RefinedCounterexample<A>> refinedCounterexample;
+
+        public int getSuccessCount() {
+            return passedSamples.size();
+        }
+
+        public Falsified<A> withRefinedCounterexample(RefinedCounterexample<A> refinedCounterexample) {
+            return new Falsified<>(passedSamples, counterexample, just(refinedCounterexample));
+        }
 
         @Override
         public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
@@ -147,14 +156,14 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
     }
 
     public static <A> Falsified<A> falsified(ImmutableVector<A> passedSamples,
-                                             Counterexample<A> counterexample,
-                                             ImmutableVector<A> shrinks) {
-        return new Falsified<>(passedSamples, counterexample, shrinks);
+                                             Counterexample<A> counterexample) {
+        return new Falsified<>(passedSamples, counterexample, nothing());
     }
 
     public static <A> Falsified<A> falsified(ImmutableVector<A> passedSamples,
-                                             Counterexample<A> counterexample) {
-        return new Falsified<>(passedSamples, counterexample, Vector.empty());
+                                             Counterexample<A> counterexample,
+                                             Maybe<RefinedCounterexample<A>> refinedCounterexample) {
+        return new Falsified<>(passedSamples, counterexample, refinedCounterexample);
     }
 
     public static <A> Unproved<A> unproved(ImmutableVector<Counterexample<A>> counterexamples) {
