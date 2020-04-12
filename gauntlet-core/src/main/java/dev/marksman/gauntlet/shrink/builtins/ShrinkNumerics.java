@@ -1,18 +1,10 @@
 package dev.marksman.gauntlet.shrink.builtins;
 
-import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
-import dev.marksman.gauntlet.Prop;
 import dev.marksman.gauntlet.shrink.Shrink;
 import dev.marksman.gauntlet.shrink.ShrinkResult;
-
-import java.util.HashSet;
-
-import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
-import static dev.marksman.gauntlet.Prop.prop;
-import static dev.marksman.gauntlet.SimpleResult.fail;
-import static dev.marksman.gauntlet.SimpleResult.pass;
+import dev.marksman.kraftwerk.constraints.IntRange;
 
 public final class ShrinkNumerics {
 
@@ -20,7 +12,7 @@ public final class ShrinkNumerics {
 
     }
 
-    private static Shrink<Integer> INT = input -> {
+    private static final Shrink<Integer> INT = input -> {
         if (input < 0) {
             int high = input == Integer.MIN_VALUE ? Integer.MAX_VALUE : -input;
             return ShrinkResult.cons(high, () -> series(0, high).fmap(n -> -n));
@@ -29,7 +21,7 @@ public final class ShrinkNumerics {
         }
     };
 
-    private static Shrink<Long> LONG = input -> {
+    private static final Shrink<Long> LONG = input -> {
         if (input < 0) {
             long high = input == Long.MIN_VALUE ? Long.MAX_VALUE : -input;
             return ShrinkResult.cons(high, () -> series(0, high).fmap(n -> -n));
@@ -38,7 +30,7 @@ public final class ShrinkNumerics {
         }
     };
 
-    private static Shrink<Short> SHORT = input -> {
+    private static final Shrink<Short> SHORT = input -> {
         if (input < 0) {
             short high = input == Short.MIN_VALUE ? Short.MAX_VALUE : (short) (-input);
             return ShrinkResult.cons(high, () -> series((short) 0, high).fmap(n -> (short) -n));
@@ -47,7 +39,7 @@ public final class ShrinkNumerics {
         }
     };
 
-    private static Shrink<Byte> BYTE = input -> {
+    private static final Shrink<Byte> BYTE = input -> {
         if (input < 0) {
             byte high = input == Byte.MIN_VALUE ? Byte.MAX_VALUE : (byte) (-input);
             return ShrinkResult.cons(high, () -> series((byte) 0, high).fmap(n -> (byte) -n));
@@ -86,19 +78,18 @@ public final class ShrinkNumerics {
 
     /**
      * Returns a shrinking strategy that shrinks integers, but limits values in the output to a given range.
-     *
-     * @param min minimum value (inclusive) allowed in the output
-     * @param max maximum value (inclusive) allowed in the output
      */
-    public static Shrink<Integer> shrinkInt(int min, int max) {
+    public static Shrink<Integer> shrinkInt(IntRange range) {
+        int min = range.minInclusive();
+        int max = range.maxInclusive();
         if (min >= max) {
             return Shrink.none();
         } else if (min < 0 && max < 0) {
             // all negative
-            return clamped(min, max, input -> series(-max, -input).fmap(n -> -n));
+            return clamped(range, input -> series(-max, -input).fmap(n -> -n));
         } else if (min < 0) {
             // negative and positive
-            return clamped(min, max, input -> {
+            return clamped(range, input -> {
                 if (input < 0) {
                     int high = Math.min(-input, max);
                     return ShrinkResult.cons(high, () -> series(0, high).fmap(n -> -n));
@@ -108,13 +99,14 @@ public final class ShrinkNumerics {
             });
         } else {
             // non-negative
-            return clamped(min, max, input -> series(min, input));
+            return clamped(range, input -> series(min, input));
         }
     }
 
-    private static Shrink<Integer> clamped(int min, int max, Fn1<Integer, ImmutableFiniteIterable<Integer>> f) {
-        return input -> (input < min || input > max)
-                ? ShrinkResult.empty() : f.apply(input);
+    private static Shrink<Integer> clamped(IntRange range, Fn1<Integer, ImmutableFiniteIterable<Integer>> f) {
+        return input -> range.contains(input)
+                ? f.apply(input)
+                : ShrinkResult.empty();
     }
 
     private static ImmutableFiniteIterable<Integer> series(int low, int high) {
@@ -159,39 +151,6 @@ public final class ShrinkNumerics {
             int middle = low + ((high - low) / 2);
             return ShrinkResult.cons(low, () -> series((byte) middle, high));
         }
-    }
-
-    private static <A> Prop<Tuple2<A, ImmutableFiniteIterable<A>>> neverRepeatsAnElement_1() {
-        return prop("never repeats an element",
-                testCase -> {
-                    HashSet<A> seen = new HashSet<>();
-                    seen.add(testCase._1());
-                    int i = 0;
-                    for (A element : testCase._2()) {
-                        if (seen.contains(element)) {
-                            return fail("repeated element " + element + " in position " + i);
-                        }
-                        i++;
-                        seen.add(element);
-                    }
-                    return pass();
-                });
-    }
-
-    public static void main(String[] args) {
-        Prop<Tuple2<Integer, ImmutableFiniteIterable<Integer>>> prop = neverRepeatsAnElement_1();
-
-        int input = -1946546245;
-
-        Shrink<Integer> shrinker = shrinkInt(-2094167625, -1946546245);
-
-        ImmutableFiniteIterable<Integer> xs = shrinker.apply(input);
-
-        System.out.println(prop.evaluate(tuple(input, xs)));
-
-        xs.forEach(System.out::println);
-
-
     }
 
 }
