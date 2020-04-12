@@ -104,7 +104,7 @@ public final class ShrinkNumerics {
     }
 
     private static Shrink<Integer> clamped(IntRange range, Fn1<Integer, ImmutableFiniteIterable<Integer>> f) {
-        return input -> range.contains(input)
+        return input -> range.includes(input)
                 ? f.apply(input)
                 : ShrinkResult.empty();
     }

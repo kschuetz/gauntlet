@@ -1,20 +1,17 @@
 package testsupport.shrink;
 
-import com.jnape.palatable.lambda.adt.hlist.Tuple2;
-import com.jnape.palatable.lambda.functions.Fn2;
+import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.Arbitrary;
 import dev.marksman.gauntlet.Prop;
 import dev.marksman.gauntlet.shrink.Shrink;
 import dev.marksman.kraftwerk.Generator;
+import dev.marksman.kraftwerk.constraints.Constraint;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 
 import java.util.HashSet;
 
-import static com.jnape.palatable.lambda.functions.builtin.fn2.GT.gt;
-import static com.jnape.palatable.lambda.functions.builtin.fn2.Into.into;
-import static com.jnape.palatable.lambda.functions.builtin.fn2.LT.lt;
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 import static dev.marksman.gauntlet.Prop.prop;
 import static dev.marksman.gauntlet.SimpleResult.fail;
@@ -26,15 +23,14 @@ import static lombok.AccessLevel.PRIVATE;
 public class ShrinkTestCase<A> {
     A input;
     ImmutableFiniteIterable<A> output;
-    A min;
-    A max;
+    Constraint<A> constraint;
 
     public static <A> ShrinkTestCase<A> shrinkTestCase(A input, ImmutableFiniteIterable<A> output) {
-        return new ShrinkTestCase<>(input, output, null, null);
+        return new ShrinkTestCase<>(input, output, null);
     }
 
-    public static <A> ShrinkTestCase<A> shrinkTestCase(A input, ImmutableFiniteIterable<A> output, A min, A max) {
-        return new ShrinkTestCase<>(input, output, min, max);
+    public static <A> ShrinkTestCase<A> shrinkTestCase(A input, ImmutableFiniteIterable<A> output, Constraint<A> constraint) {
+        return new ShrinkTestCase<>(input, output, constraint);
     }
 
     public static <A> Arbitrary<ShrinkTestCase<A>> shrinkTestCases(Generator<A> generator,
@@ -42,16 +38,16 @@ public class ShrinkTestCase<A> {
         return arbitrary(generator.fmap(x -> shrinkTestCase(x, shrink.apply(x))));
     }
 
-    // Generates min:max pair using domainGenerator.
+    // Generates min:max pair using constraintGenerator.
     // inputSupplier and shrinkSupplier will use the min:max pair to provided a shrink and generator for the test case's inputs.
-    public static <A extends Comparable<A>> Arbitrary<ShrinkTestCase<A>> clampedShrinkTestCases(Generator<Tuple2<A, A>> domainGenerator,
-                                                                                                Fn2<A, A, Generator<A>> inputSupplier,
-                                                                                                Fn2<A, A, Shrink<A>> shrinkSupplier) {
-        return arbitrary(domainGenerator.flatMap(into((min, max) -> {
-            Shrink<A> shrink = shrinkSupplier.apply(min, max);
-            return inputSupplier.apply(min, max)
-                    .fmap(x -> shrinkTestCase(x, shrink.apply(x), min, max));
-        })));
+    public static <A extends Comparable<A>, C extends Constraint<A>> Arbitrary<ShrinkTestCase<A>> constrainedShrinkTestCase(Generator<C> constraintGenerator,
+                                                                                                                            Fn1<C, Generator<A>> inputSupplier,
+                                                                                                                            Fn1<C, Shrink<A>> shrinkSupplier) {
+        return arbitrary(constraintGenerator.flatMap(c -> {
+            Shrink<A> shrink = shrinkSupplier.apply(c);
+            return inputSupplier.apply(c)
+                    .fmap(x -> shrinkTestCase(x, shrink.apply(x), c));
+        }));
     }
 
     public static <A> Prop<ShrinkTestCase<A>> neverRepeatsAnElement() {
@@ -73,31 +69,10 @@ public class ShrinkTestCase<A> {
         return prop("all elements within domain",
                 testCase -> {
                     int idx = 0;
-                    A min = testCase.getMin();
-                    A max = testCase.getMax();
+                    Constraint<A> constraint = testCase.getConstraint();
                     for (A element : testCase.getOutput()) {
-                        if (element.compareTo(min) < 0) {
-                            return fail("element '" + element + "' at index " + idx + " is less than minimum (" + min + ")");
-                        } else if (element.compareTo(max) > 0) {
-                            return fail("element '" + element + "' at index " + idx + " is greater than maximum (" + max + ")");
-                        }
-                        idx += 1;
-                    }
-                    return pass();
-                });
-    }
-
-    public static <A extends Comparable<A>> Prop<ShrinkTestCase<A>> noShrinksWithInputOutsideOfDomain() {
-        return prop("all elements within domain",
-                testCase -> {
-                    int idx = 0;
-                    A min = testCase.getMin();
-                    A max = testCase.getMax();
-                    for (A element : testCase.getOutput()) {
-                        if (lt(min, element)) {
-                            return fail("element '" + element + "' at index " + idx + " is less than minimum (" + min + ")");
-                        } else if (gt(max, element)) {
-                            return fail("element '" + element + "' at index " + idx + " is greater than maximum (" + max + ")");
+                        if (!constraint.includes(element)) {
+                            return fail("element '" + element + "' at index " + idx + " is outside of the domain");
                         }
                         idx += 1;
                     }
@@ -113,7 +88,7 @@ public class ShrinkTestCase<A> {
 
     private static <A extends Comparable<A>> Prop<ShrinkTestCase<A>> inputOutsideOfShrinkDomain() {
         return Prop.predicate("input outside of shrink domain",
-                t -> lt(t.getMin(), t.getInput()) || gt(t.getMax(), t.getInput()));
+                t -> !t.getConstraint().includes(t.getInput()));
     }
 
     private static <A> Prop<ShrinkTestCase<A>> shrinkOutputIsEmpty() {
