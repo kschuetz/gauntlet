@@ -12,27 +12,27 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Value
 @AllArgsConstructor(access = PRIVATE)
-public class FailureReasons {
+public class Reasons {
     ImmutableNonEmptyVector<String> items;
 
     public String getPrimary() {
         return items.head();
     }
 
-    public static FailureReasons failureReasons(String primaryReason, String... additional) {
+    public static Reasons reasons(String primaryReason, String... additional) {
         if (additional.length == 0) {
-            return new FailureReasons(Vector.of(primaryReason));
+            return new Reasons(Vector.of(primaryReason));
         } else {
             NonEmptyVectorBuilder<String> builder = NonEmptyVector.builder(primaryReason);
             for (String reason : additional) {
                 builder = builder.add(reason);
             }
-            return new FailureReasons(builder.build());
+            return new Reasons(builder.build());
         }
     }
 
-    public static FailureReasons failureReasons(NonEmptyIterable<String> reasons) {
-        return new FailureReasons(NonEmptyVector.nonEmptyCopyFrom(reasons));
+    public static Reasons reasons(NonEmptyIterable<String> reasons) {
+        return new Reasons(NonEmptyVector.nonEmptyCopyFrom(reasons));
     }
 
 }

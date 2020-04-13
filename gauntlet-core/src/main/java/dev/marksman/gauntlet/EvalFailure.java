@@ -14,8 +14,8 @@ import static lombok.AccessLevel.PRIVATE;
 @AllArgsConstructor(access = PRIVATE)
 public class EvalFailure extends EvalResult {
     Named propertyName;
-    FailureReasons failureReasons;
-    ImmutableFiniteIterable<EvalFailure> causes;
+    Reasons reasons;
+    ImmutableFiniteIterable<Cause> causes;
 
     @Override
     public boolean isSuccess() {
@@ -27,8 +27,8 @@ public class EvalFailure extends EvalResult {
         return true;
     }
 
-    public EvalFailure addCause(EvalFailure failure) {
-        return new EvalFailure(propertyName, failureReasons, causes.append(failure));
+    public EvalFailure addCause(Cause failure) {
+        return new EvalFailure(propertyName, reasons, causes.append(failure));
     }
 
     @Override
@@ -37,13 +37,13 @@ public class EvalFailure extends EvalResult {
     }
 
     public static EvalFailure evalFailure(Named propertyName,
-                                          FailureReasons failureReasons) {
-        return new EvalFailure(propertyName, failureReasons, Vector.empty());
+                                          Reasons reasons) {
+        return new EvalFailure(propertyName, reasons, Vector.empty());
     }
 
     public static EvalFailure evalFailure(Named propertyName,
-                                          FailureReasons failureReasons,
-                                          Iterable<EvalFailure> causes) {
-        return new EvalFailure(propertyName, failureReasons, Vector.copyFrom(causes));
+                                          Reasons reasons,
+                                          Iterable<Cause> causes) {
+        return new EvalFailure(propertyName, reasons, Vector.copyFrom(causes));
     }
 }

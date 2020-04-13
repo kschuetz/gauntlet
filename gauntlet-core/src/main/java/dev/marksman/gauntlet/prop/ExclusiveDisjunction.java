@@ -5,8 +5,10 @@ import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
+import static dev.marksman.gauntlet.Cause.propertyFailed;
+import static dev.marksman.gauntlet.Cause.propertyPassed;
 import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
-import static dev.marksman.gauntlet.FailureReasons.failureReasons;
+import static dev.marksman.gauntlet.Reasons.reasons;
 
 final class ExclusiveDisjunction<A> implements Prop<A> {
     final Prop<A> p;
@@ -26,15 +28,18 @@ final class ExclusiveDisjunction<A> implements Prop<A> {
         // failure + success -> success
         // failure + failure -> failure
         return p.evaluate(data)
-                .match(success -> q.evaluate(data)
-                                .match(__ -> EvalFailure.evalFailure(this, failureReasons("xor failed"))
-                                                .addCause(EvalFailure.evalFailure(q, failureReasons("Expected failure"))),
+                .match(pass1 -> q.evaluate(data)
+                                .match(__ -> EvalFailure.evalFailure(this, reasons("xor failed",
+                                        "both properties passed"))
+                                                .addCause(propertyPassed(p))
+                                                .addCause(propertyPassed(q)),
                                         f1 -> evalSuccess()),
-                        failure -> q.evaluate(data)
+                        f1 -> q.evaluate(data)
                                 .match(id(),
-                                        f1 -> EvalFailure.evalFailure(this, failureReasons("xor failed"))
-                                                .addCause(failure)
-                                                .addCause(f1)));
+                                        f2 -> EvalFailure.evalFailure(this, reasons("xor failed",
+                                                "both properties failed"))
+                                                .addCause(propertyFailed(f1))
+                                                .addCause(propertyFailed(f2))));
     }
 
     @Override

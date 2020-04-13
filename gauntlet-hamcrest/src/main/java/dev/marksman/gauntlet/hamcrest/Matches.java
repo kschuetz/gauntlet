@@ -10,7 +10,7 @@ import org.hamcrest.StringDescription;
 
 import static dev.marksman.gauntlet.EvalFailure.evalFailure;
 import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
-import static dev.marksman.gauntlet.FailureReasons.failureReasons;
+import static dev.marksman.gauntlet.Reasons.reasons;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Matches<A> implements Prop<A> {
@@ -26,7 +26,7 @@ public final class Matches<A> implements Prop<A> {
         } else {
             Description description = new StringDescription();
             matcher.describeMismatch(data, description);
-            return evalFailure(this, failureReasons(description.toString()));
+            return evalFailure(this, reasons(description.toString()));
         }
     }
 

@@ -5,7 +5,7 @@ import dev.marksman.gauntlet.EvalFailure;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
-import static dev.marksman.gauntlet.FailureReasons.failureReasons;
+import static dev.marksman.gauntlet.Reasons.reasons;
 
 final class Safe<A> implements Prop<A> {
     private final Prop<A> underlying;
@@ -19,7 +19,7 @@ final class Safe<A> implements Prop<A> {
         try {
             return underlying.evaluate(data);
         } catch (Exception e) {
-            return EvalFailure.evalFailure(underlying, failureReasons("Threw an exception: " + e));
+            return EvalFailure.evalFailure(underlying, reasons("Threw an exception: " + e));
         }
     }
 

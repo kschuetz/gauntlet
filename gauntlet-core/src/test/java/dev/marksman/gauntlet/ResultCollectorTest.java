@@ -13,16 +13,23 @@ import static com.jnape.palatable.lambda.adt.Either.left;
 import static com.jnape.palatable.lambda.adt.Either.right;
 import static dev.marksman.gauntlet.Counterexample.counterexample;
 import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
-import static dev.marksman.gauntlet.FailureReasons.failureReasons;
+import static dev.marksman.gauntlet.Reasons.reasons;
 import static dev.marksman.gauntlet.ResultCollector.existentialResultCollector;
 import static dev.marksman.gauntlet.ResultCollector.universalResultCollector;
-import static dev.marksman.gauntlet.TestResult.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static dev.marksman.gauntlet.TestResult.error;
+import static dev.marksman.gauntlet.TestResult.falsified;
+import static dev.marksman.gauntlet.TestResult.passed;
+import static dev.marksman.gauntlet.TestResult.proved;
+import static dev.marksman.gauntlet.TestResult.timedOut;
+import static dev.marksman.gauntlet.TestResult.unproved;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ResultCollectorTest {
 
     private static final Prop<Integer> failureProp = Prop.<Integer>alwaysFail().rename("prop");
-    private static final EvalFailure failure = EvalFailure.evalFailure(failureProp, failureReasons("failed"));
+    private static final EvalFailure failure = EvalFailure.evalFailure(failureProp, reasons("failed"));
 
     private ImmutableVector<Integer> samples;
     private int sampleCount;

@@ -1,25 +1,25 @@
 package dev.marksman.gauntlet.prop;
 
-import dev.marksman.gauntlet.EvalFailure;
 import dev.marksman.gauntlet.EvalResult;
-import dev.marksman.gauntlet.FailureReasons;
 import dev.marksman.gauntlet.Prop;
+import dev.marksman.gauntlet.Reasons;
 
-import static dev.marksman.gauntlet.FailureReasons.failureReasons;
+import static dev.marksman.gauntlet.EvalFailure.evalFailure;
+import static dev.marksman.gauntlet.Reasons.reasons;
 
 final class AlwaysFail<A> implements Prop<A> {
     private static final String NAME = "Fail";
-    private static final AlwaysFail<?> INSTANCE = new AlwaysFail<>(failureReasons("Always fails"));
+    private static final AlwaysFail<?> INSTANCE = new AlwaysFail<>(reasons("Always fails"));
 
-    private final FailureReasons failureReasons;
+    private final Reasons reasons;
 
-    AlwaysFail(FailureReasons failureReasons) {
-        this.failureReasons = failureReasons;
+    AlwaysFail(Reasons reasons) {
+        this.reasons = reasons;
     }
 
     @Override
     public EvalResult evaluate(A data) {
-        return EvalFailure.evalFailure(this, failureReasons);
+        return evalFailure(this, reasons);
     }
 
     @Override
@@ -27,8 +27,8 @@ final class AlwaysFail<A> implements Prop<A> {
         return NAME;
     }
 
-    static <A> AlwaysFail<A> alwaysFail(FailureReasons failureReasons) {
-        return new AlwaysFail<>(failureReasons);
+    static <A> AlwaysFail<A> alwaysFail(Reasons reasons) {
+        return new AlwaysFail<>(reasons);
     }
 
     @SuppressWarnings("unchecked")

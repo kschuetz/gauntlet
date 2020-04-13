@@ -1,12 +1,14 @@
 package dev.marksman.gauntlet.prop;
 
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
-import dev.marksman.gauntlet.EvalFailure;
+import dev.marksman.gauntlet.Cause;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
-import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
-import static dev.marksman.gauntlet.FailureReasons.failureReasons;
+import static dev.marksman.gauntlet.EvalFailure.evalFailure;
+import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
+import static dev.marksman.gauntlet.Reasons.reasons;
+import static dev.marksman.gauntlet.prop.Accumulator.accumulator;
 
 
 final class Disjunction<A> implements Prop<A> {
@@ -26,29 +28,20 @@ final class Disjunction<A> implements Prop<A> {
                 : operands.append(other));
     }
 
+    // success + _ -> success
+    // failure + success -> success
+    // failure + failure -> failure
     @Override
     public EvalResult evaluate(A data) {
-        EvalResult result = EvalFailure.evalFailure(this, failureReasons("All disjuncts failed."));
-        for (Prop<A> prop : operands) {
-            EvalResult test = prop.evaluate(data);
-            if (test.isSuccess()) {
-                return test;
-            } else {
-                result = combine(result, test);
+        Accumulator accumulator = accumulator();
+        for (Prop<A> operand : operands) {
+            accumulator = accumulator.add(operand.evaluate(data));
+            if (accumulator.getSuccessCount() > 0) {
+                return evalSuccess();
             }
         }
-        return result;
-    }
-
-    private EvalResult combine(EvalResult acc, EvalResult item) {
-        // success + _ -> success
-        // failure + success -> success
-        // failure + failure -> failure
-
-        return acc
-                .match(id(),
-                        f1 -> item.match(id(),
-                                f1::addCause));
+        return evalFailure(this, reasons("All properties in disjunction failed"),
+                accumulator.getFailures().build().fmap(Cause::propertyFailed));
     }
 
     @Override

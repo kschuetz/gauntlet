@@ -108,29 +108,57 @@ public final class DefaultReporter implements Reporter {
             output.write(")");
             output.newLine();
         });
-        outputEvalFailure(output, counterexample.getFailure(), 0);
+        writeEvalFailure(output, counterexample.getFailure(), 0);
         return output.render();
     }
 
-    private void outputEvalFailure(MutableReportBuilder output, EvalFailure failure, int depth) {
+    private void writeEvalFailure(MutableReportBuilder output, EvalFailure failure, int depth) {
+        writeProperty(output, failure.getPropertyName(), depth);
+        writeReasons(output, failure.getReasons(), depth);
+        output.indent();
+        try {
+            for (Cause cause : failure.getCauses()) {
+                cause.match(explanation -> {
+                            writeExplanation(output, explanation, depth + 1);
+                            return UNIT;
+                        },
+                        propertyFailed -> {
+                            writeEvalFailure(output, propertyFailed.getFailure(), depth + 1);
+                            return UNIT;
+                        });
+            }
+        } finally {
+            output.unindent();
+        }
+    }
+
+    private void writeExplanation(MutableReportBuilder output, Cause.Explanation explanation, int depth) {
+        writeProperty(output, explanation.getPropertyName(), depth);
+        writeReasons(output, explanation.getReasons(), depth);
+    }
+
+    private void writeProperty(MutableReportBuilder output, Named property, int depth) {
         if (depth > 0) {
             output.write("- ");
         }
         output.write("Property: \"");
-        output.write(failure.getPropertyName().getName());
+        output.write(property.getName());
         output.write("\"");
         output.newLine();
+    }
+
+    private void writeReasons(MutableReportBuilder output, Reasons reasons, int depth) {
         if (depth > 0) {
             output.write("  ");
         }
-        ImmutableNonEmptyVector<String> reasons = failure.getFailureReasons().getItems();
-        if (reasons.size() == 1) {
+        ImmutableNonEmptyVector<String> items = reasons.getItems();
+        if (items.size() == 1) {
             output.write("Reason: ");
         } else {
             output.write("Reasons: ");
         }
         boolean inner = false;
-        for (String reason : reasons) {
+        for (String reason : items) {
             if (inner) {
                 output.write("; ");
             } else {
@@ -139,15 +167,8 @@ public final class DefaultReporter implements Reporter {
             output.write(reason);
         }
         output.newLine();
-        output.indent();
-        try {
-            for (EvalFailure cause : failure.getCauses()) {
-                outputEvalFailure(output, cause, depth + 1);
-            }
-        } finally {
-            output.unindent();
-        }
     }
+
 
     public static DefaultReporter defaultReporter() {
         return INSTANCE;

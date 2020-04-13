@@ -2,13 +2,14 @@ package dev.marksman.gauntlet.prop;
 
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
+import dev.marksman.gauntlet.Cause;
 import dev.marksman.gauntlet.EvalFailure;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 
 import static dev.marksman.gauntlet.EvalFailure.evalFailure;
 import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
-import static dev.marksman.gauntlet.FailureReasons.failureReasons;
+import static dev.marksman.gauntlet.Reasons.reasons;
 import static dev.marksman.gauntlet.prop.Accumulator.accumulator;
 
 
@@ -47,8 +48,8 @@ final class Conjunction<A> implements Prop<A> {
         } else {
             int failureCount = causes.size();
             int totalCount = combined.getSuccessCount() + failureCount;
-            String message = "Conjuncts failed (" + failureCount + " of " + totalCount + ")";
-            return evalFailure(this, failureReasons(message), causes);
+            String message = "Some properties in conjunction failed (" + failureCount + " of " + totalCount + ")";
+            return evalFailure(this, reasons(message), causes.fmap(Cause::propertyFailed));
         }
     }
 

@@ -4,13 +4,13 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.NonEmptyVector;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
-import dev.marksman.gauntlet.FailureReasons;
 import dev.marksman.gauntlet.Prop;
+import dev.marksman.gauntlet.Reasons;
 import dev.marksman.gauntlet.SimpleResult;
 
 import java.util.function.Consumer;
 
-import static dev.marksman.gauntlet.FailureReasons.failureReasons;
+import static dev.marksman.gauntlet.Reasons.reasons;
 import static dev.marksman.gauntlet.prop.Executes.executes;
 
 public final class Props {
@@ -40,11 +40,11 @@ public final class Props {
     }
 
     public static <A> Prop<A> alwaysFail(String failureReason) {
-        return AlwaysFail.alwaysFail(failureReasons(failureReason));
+        return AlwaysFail.alwaysFail(reasons(failureReason));
     }
 
-    public static <A> Prop<A> alwaysFail(FailureReasons failureReasons) {
-        return AlwaysFail.alwaysFail(failureReasons);
+    public static <A> Prop<A> alwaysFail(Reasons reasons) {
+        return AlwaysFail.alwaysFail(reasons);
     }
 
     @SafeVarargs

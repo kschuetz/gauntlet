@@ -1,11 +1,11 @@
 package dev.marksman.gauntlet.prop;
 
 import com.jnape.palatable.lambda.functions.Fn1;
-import dev.marksman.gauntlet.EvalFailure;
 import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 import dev.marksman.gauntlet.SimpleResult;
 
+import static dev.marksman.gauntlet.EvalFailure.evalFailure;
 import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
 
 final class BasicProp<A> implements Prop<A> {
@@ -21,7 +21,7 @@ final class BasicProp<A> implements Prop<A> {
     public EvalResult evaluate(A data) {
         return evaluator.apply(data)
                 .match(__ -> evalSuccess(),
-                        fail -> EvalFailure.evalFailure(this, fail.getReasons()));
+                        fail -> evalFailure(this, fail.getReasons()));
     }
 
     @Override

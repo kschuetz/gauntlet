@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
-import static dev.marksman.gauntlet.FailureReasons.failureReasons;
+import static dev.marksman.gauntlet.Reasons.reasons;
 import static lombok.AccessLevel.PRIVATE;
 
 public abstract class SimpleResult implements CoProduct2<SimpleResult.Pass, SimpleResult.Fail, SimpleResult> {
@@ -27,7 +27,7 @@ public abstract class SimpleResult implements CoProduct2<SimpleResult.Pass, Simp
     @Value
     @AllArgsConstructor(access = PRIVATE)
     public static class Fail extends SimpleResult {
-        FailureReasons reasons;
+        Reasons reasons;
 
         public String getPrimaryReason() {
             return reasons.getPrimary();
@@ -44,11 +44,11 @@ public abstract class SimpleResult implements CoProduct2<SimpleResult.Pass, Simp
     }
 
     public static Fail fail(String primaryReason) {
-        return new Fail(failureReasons(primaryReason));
+        return new Fail(reasons(primaryReason));
     }
 
-    public static Fail fail(FailureReasons failureReasons) {
-        return new Fail(failureReasons);
+    public static Fail fail(Reasons reasons) {
+        return new Fail(reasons);
     }
 
 }
