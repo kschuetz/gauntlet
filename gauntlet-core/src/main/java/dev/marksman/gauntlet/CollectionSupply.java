@@ -5,6 +5,8 @@ import dev.marksman.kraftwerk.Result;
 import dev.marksman.kraftwerk.Seed;
 import dev.marksman.kraftwerk.aggregator.Aggregator;
 
+import static dev.marksman.gauntlet.SupplyTree.collection;
+
 final class CollectionSupply<A, Builder, Out> implements Supply<Out> {
     private final Supply<A> elementSupplier;
     private final Generate<Integer> sizeGenerator;
@@ -27,7 +29,7 @@ final class CollectionSupply<A, Builder, Out> implements Supply<Out> {
             GeneratorOutput<A> current = elementSupplier.getNext(state);
             state = current.getNextState();
             if (current.isFailure()) {
-                return GeneratorOutput.failure(state, SupplyFailure.supplyFailure(getSupplyTree()));
+                return GeneratorOutput.failure(state, current.getValue().projectA().orElseThrow(AssertionError::new));
             }
             builder = aggregator.add(builder, current.getValue().orThrow(AssertionError::new));
             size--;
@@ -39,6 +41,6 @@ final class CollectionSupply<A, Builder, Out> implements Supply<Out> {
 
     @Override
     public SupplyTree getSupplyTree() {
-        return null;
+        return collection(elementSupplier.getSupplyTree());
     }
 }

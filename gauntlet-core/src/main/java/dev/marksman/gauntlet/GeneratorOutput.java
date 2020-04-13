@@ -14,9 +14,9 @@ import static com.jnape.palatable.lambda.adt.Either.right;
 
 @Value
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class GeneratorOutput<A> implements Functor<A, GeneratorOutput<?>> {
-    private final Seed nextState;
-    private final Either<SupplyFailure, A> value;
+public class GeneratorOutput<A> implements Functor<A, GeneratorOutput<?>> {
+    Seed nextState;
+    Either<SupplyFailure, A> value;
 
     public final boolean isFailure() {
         return value.match(__ -> true, __ -> false);

@@ -3,16 +3,14 @@ package dev.marksman.gauntlet;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Value;
-import lombok.experimental.Wither;
 
 @Value
-@Wither
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class SupplyFailure {
+public class SupplyFailure {
+    int discardCount;
+    SupplyTree tree;
 
-    private final SupplyTree tree;
-
-    public static SupplyFailure supplyFailure(SupplyTree tree) {
-        return new SupplyFailure(tree);
+    public static SupplyFailure supplyFailure(int discardCount, SupplyTree tree) {
+        return new SupplyFailure(discardCount, tree);
     }
 }

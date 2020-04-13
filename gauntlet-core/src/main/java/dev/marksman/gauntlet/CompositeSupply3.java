@@ -4,6 +4,7 @@ import com.jnape.palatable.lambda.functions.Fn3;
 import dev.marksman.kraftwerk.Seed;
 
 import static dev.marksman.gauntlet.CompositeSupply2.threadSeed;
+import static dev.marksman.gauntlet.SupplyTree.composite;
 
 final class CompositeSupply3<A, B, C, Out> implements Supply<Out> {
     private final Supply<A> vsA;
@@ -20,7 +21,7 @@ final class CompositeSupply3<A, B, C, Out> implements Supply<Out> {
 
     @Override
     public SupplyTree getSupplyTree() {
-        return SupplyTree.composite(vsA.getSupplyTree(), vsB.getSupplyTree(), vsC.getSupplyTree());
+        return composite(vsA.getSupplyTree(), vsB.getSupplyTree(), vsC.getSupplyTree());
     }
 
     @Override

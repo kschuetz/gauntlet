@@ -4,6 +4,8 @@ import com.jnape.palatable.lambda.functions.Fn0;
 import dev.marksman.kraftwerk.Generate;
 import dev.marksman.kraftwerk.Seed;
 
+import static dev.marksman.gauntlet.SupplyTree.leaf;
+
 final class UnfilteredSupply<A> implements Supply<A> {
     private final Generate<A> generateFn;
     private final Fn0<String> labelSupplier;
@@ -15,7 +17,7 @@ final class UnfilteredSupply<A> implements Supply<A> {
 
     @Override
     public SupplyTree getSupplyTree() {
-        return SupplyTree.leaf(labelSupplier.apply());
+        return leaf(labelSupplier.apply());
     }
 
     @Override

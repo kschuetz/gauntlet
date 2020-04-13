@@ -4,7 +4,6 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.kraftwerk.Seed;
 
 import static dev.marksman.gauntlet.SupplyFailure.supplyFailure;
-import static dev.marksman.gauntlet.SupplyTree.failedFilter;
 
 final class FilteredSupply<A> implements Supply<A> {
     private final Supply<A> underlying;
@@ -19,7 +18,7 @@ final class FilteredSupply<A> implements Supply<A> {
 
     @Override
     public SupplyTree getSupplyTree() {
-        return SupplyTree.filter(underlying.getSupplyTree());
+        return underlying.getSupplyTree();
     }
 
     @Override
@@ -42,14 +41,6 @@ final class FilteredSupply<A> implements Supply<A> {
             }
         }
 
-        return GeneratorOutput.failure(state, supplyFailure(failedFilter(maxDiscards, underlying.getSupplyTree())));
+        return GeneratorOutput.failure(state, supplyFailure(maxDiscards, underlying.getSupplyTree()));
     }
-
-    // TODO: use types to build a path rather than using labels
-
-    // TODO: redesign ValueSupplier
-
-    // TODO: replace Ascription with a tree representing pipeline and failure points
-
-    // TODO: consider adding FilterGenerator to kraftwerk
 }
