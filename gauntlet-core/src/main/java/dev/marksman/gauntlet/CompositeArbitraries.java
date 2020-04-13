@@ -21,8 +21,8 @@ final class CompositeArbitraries {
 
         Fn2<A, B, Tuple2<A, B>> toFn = HList::tuple;
 
-        return concreteArbitrary(parameters -> new CompositeValueSupplier2<>(a.prepare(parameters),
-                        b.prepare(parameters),
+        return concreteArbitrary(parameters -> new CompositeSupply2<>(a.createSupply(parameters),
+                        b.createSupply(parameters),
                         toFn),
                 combineShrinks(a.getShrink(), b.getShrink(), toFn),
                 PrettyPrinting.<A, B>product2PrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter()));
@@ -34,9 +34,9 @@ final class CompositeArbitraries {
 
         Fn3<A, B, C, Tuple3<A, B, C>> toFn = HList::tuple;
 
-        return concreteArbitrary(parameters -> new CompositeValueSupplier3<>(a.prepare(parameters),
-                        b.prepare(parameters),
-                        c.prepare(parameters),
+        return concreteArbitrary(parameters -> new CompositeSupply3<>(a.createSupply(parameters),
+                        b.createSupply(parameters),
+                        c.createSupply(parameters),
                         toFn),
                 combineShrinks(a.getShrink(), b.getShrink(), c.getShrink(), toFn),
                 PrettyPrinting.<A, B, C>product3PrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter(), c.getPrettyPrinter()));

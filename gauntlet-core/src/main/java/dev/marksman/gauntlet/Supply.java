@@ -4,16 +4,16 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functor.Functor;
 import dev.marksman.kraftwerk.Seed;
 
-import static dev.marksman.gauntlet.MappedValueSupplier.mappedValueSupplier;
+import static dev.marksman.gauntlet.MappedSupply.mappedSupply;
 
-public interface ValueSupplier<A> extends Functor<A, ValueSupplier<?>> {
+public interface Supply<A> extends Functor<A, Supply<?>> {
 
     GeneratorOutput<A> getNext(Seed input);
 
     SupplyTree getSupplyTree();
 
     @Override
-    default <B> ValueSupplier<B> fmap(Fn1<? super A, ? extends B> fn) {
-        return mappedValueSupplier(fn, this);
+    default <B> Supply<B> fmap(Fn1<? super A, ? extends B> fn) {
+        return mappedSupply(fn, this);
     }
 }

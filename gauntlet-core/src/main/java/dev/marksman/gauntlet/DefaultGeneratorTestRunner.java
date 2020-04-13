@@ -32,8 +32,8 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
         long initialSeedValue = testData.getInitialSeed().orElseGet(seedGenerator::nextLong);
         Seed initialSeed = Seed.create(initialSeedValue);
         Arbitrary<A> arbitrary = testData.getArbitrary();
-        ValueSupplier<A> valueSupplier = arbitrary.prepare(executionParameters.getGeneratorParameters());
-        GeneratedDataSet<A> dataSet = generateDataSet(initialSeed, valueSupplier, testData.getSampleCount());
+        Supply<A> supply = arbitrary.createSupply(executionParameters.getGeneratorParameters());
+        GeneratedDataSet<A> dataSet = generateDataSet(initialSeed, supply, testData.getSampleCount());
 
         ImmutableVector<A> samples = dataSet.getSamples();
         int actualSampleCount = samples.size();
@@ -49,13 +49,13 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     }
 
     private <A> GeneratedDataSet<A> generateDataSet(Seed initialSeed,
-                                                    ValueSupplier<A> valueSupplier,
+                                                    Supply<A> supply,
                                                     int sampleCount) {
         Maybe<SupplyFailure> supplyFailure = nothing();
         ArrayList<A> values = new ArrayList<>(sampleCount);
         Seed state = initialSeed;
         for (int i = 0; i < sampleCount; i++) {
-            GeneratorOutput<A> next = valueSupplier.getNext(state);
+            GeneratorOutput<A> next = supply.getNext(state);
             supplyFailure = next.getValue()
                     .match(Maybe::just,
                             value -> {

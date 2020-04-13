@@ -19,7 +19,7 @@ import static dev.marksman.gauntlet.CompositeArbitraries.combine;
 import static dev.marksman.gauntlet.ConcreteArbitrary.concreteArbitrary;
 
 public interface Arbitrary<A> {
-    ValueSupplier<A> prepare(GeneratorParameters parameters);
+    Supply<A> createSupply(GeneratorParameters parameters);
 
     Maybe<Shrink<A>> getShrink();
 

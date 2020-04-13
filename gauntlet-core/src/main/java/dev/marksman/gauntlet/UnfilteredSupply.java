@@ -4,11 +4,11 @@ import com.jnape.palatable.lambda.functions.Fn0;
 import dev.marksman.kraftwerk.Generate;
 import dev.marksman.kraftwerk.Seed;
 
-final class UnfilteredValueSupplier<A> implements ValueSupplier<A> {
+final class UnfilteredSupply<A> implements Supply<A> {
     private final Generate<A> generateFn;
     private final Fn0<String> labelSupplier;
 
-    UnfilteredValueSupplier(Generate<A> generateFn, Fn0<String> labelSupplier) {
+    UnfilteredSupply(Generate<A> generateFn, Fn0<String> labelSupplier) {
         this.generateFn = generateFn;
         this.labelSupplier = labelSupplier;
     }

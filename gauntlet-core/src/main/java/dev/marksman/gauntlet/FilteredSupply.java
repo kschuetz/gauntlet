@@ -6,12 +6,12 @@ import dev.marksman.kraftwerk.Seed;
 import static dev.marksman.gauntlet.SupplyFailure.supplyFailure;
 import static dev.marksman.gauntlet.SupplyTree.failedFilter;
 
-final class FilteredValueSupplier<A> implements ValueSupplier<A> {
-    private final ValueSupplier<A> underlying;
+final class FilteredSupply<A> implements Supply<A> {
+    private final Supply<A> underlying;
     private final Fn1<? super A, Boolean> filter;
     private final int maxDiscards;
 
-    FilteredValueSupplier(ValueSupplier<A> underlying, Fn1<? super A, Boolean> filter, int maxDiscards) {
+    FilteredSupply(Supply<A> underlying, Fn1<? super A, Boolean> filter, int maxDiscards) {
         this.underlying = underlying;
         this.filter = filter;
         this.maxDiscards = maxDiscards;

@@ -3,12 +3,12 @@ package dev.marksman.gauntlet;
 import com.jnape.palatable.lambda.functions.Fn2;
 import dev.marksman.kraftwerk.Seed;
 
-final class CompositeValueSupplier2<A, B, Out> implements ValueSupplier<Out> {
-    private final ValueSupplier<A> vsA;
-    private final ValueSupplier<B> vsB;
+final class CompositeSupply2<A, B, Out> implements Supply<Out> {
+    private final Supply<A> vsA;
+    private final Supply<B> vsB;
     private final Fn2<A, B, Out> fn;
 
-    CompositeValueSupplier2(ValueSupplier<A> vsA, ValueSupplier<B> vsB, Fn2<A, B, Out> fn) {
+    CompositeSupply2(Supply<A> vsA, Supply<B> vsB, Fn2<A, B, Out> fn) {
         this.vsA = vsA;
         this.vsB = vsB;
         this.fn = fn;

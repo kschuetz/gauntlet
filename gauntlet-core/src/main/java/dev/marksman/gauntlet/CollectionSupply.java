@@ -5,12 +5,12 @@ import dev.marksman.kraftwerk.Result;
 import dev.marksman.kraftwerk.Seed;
 import dev.marksman.kraftwerk.aggregator.Aggregator;
 
-final class CollectionValueSupplier<A, Builder, Out> implements ValueSupplier<Out> {
-    private final ValueSupplier<A> elementSupplier;
+final class CollectionSupply<A, Builder, Out> implements Supply<Out> {
+    private final Supply<A> elementSupplier;
     private final Generate<Integer> sizeGenerator;
     private final Aggregator<A, Builder, Out> aggregator;
 
-    CollectionValueSupplier(ValueSupplier<A> elementSupplier, Generate<Integer> sizeGenerator, Aggregator<A, Builder, Out> aggregator) {
+    CollectionSupply(Supply<A> elementSupplier, Generate<Integer> sizeGenerator, Aggregator<A, Builder, Out> aggregator) {
         this.elementSupplier = elementSupplier;
         this.sizeGenerator = sizeGenerator;
         this.aggregator = aggregator;

@@ -3,15 +3,15 @@ package dev.marksman.gauntlet;
 import com.jnape.palatable.lambda.functions.Fn3;
 import dev.marksman.kraftwerk.Seed;
 
-import static dev.marksman.gauntlet.CompositeValueSupplier2.threadSeed;
+import static dev.marksman.gauntlet.CompositeSupply2.threadSeed;
 
-final class CompositeValueSupplier3<A, B, C, Out> implements ValueSupplier<Out> {
-    private final ValueSupplier<A> vsA;
-    private final ValueSupplier<B> vsB;
-    private final ValueSupplier<C> vsC;
+final class CompositeSupply3<A, B, C, Out> implements Supply<Out> {
+    private final Supply<A> vsA;
+    private final Supply<B> vsB;
+    private final Supply<C> vsC;
     private final Fn3<A, B, C, Out> fn;
 
-    CompositeValueSupplier3(ValueSupplier<A> vsA, ValueSupplier<B> vsB, ValueSupplier<C> vsC, Fn3<A, B, C, Out> fn) {
+    CompositeSupply3(Supply<A> vsA, Supply<B> vsB, Supply<C> vsC, Fn3<A, B, C, Out> fn) {
         this.vsA = vsA;
         this.vsB = vsB;
         this.vsC = vsC;
