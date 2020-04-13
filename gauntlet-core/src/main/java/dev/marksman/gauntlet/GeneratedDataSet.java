@@ -11,13 +11,15 @@ import lombok.Value;
 @Value
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 class GeneratedDataSet<A> {
+    long initialSeedValue;
     ImmutableVector<A> samples;
     Maybe<SupplyFailure> supplyFailure;
     Seed outputSeed;
 
-    public static <A> GeneratedDataSet<A> generatedDataSet(Iterable<A> values,
+    public static <A> GeneratedDataSet<A> generatedDataSet(long initialSeedValue,
+                                                           Iterable<A> values,
                                                            Maybe<SupplyFailure> supplyFailure,
                                                            Seed outputSeed) {
-        return new GeneratedDataSet<>(Vector.copyFrom(values), supplyFailure, outputSeed);
+        return new GeneratedDataSet<>(initialSeedValue, Vector.copyFrom(values), supplyFailure, outputSeed);
     }
 }

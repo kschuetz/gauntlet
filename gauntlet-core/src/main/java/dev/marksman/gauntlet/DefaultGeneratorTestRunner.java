@@ -1,7 +1,9 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Maybe;
+import com.jnape.palatable.lambda.io.IO;
 import dev.marksman.collectionviews.ImmutableVector;
+import dev.marksman.kraftwerk.GeneratorParameters;
 import dev.marksman.kraftwerk.Seed;
 
 import java.util.ArrayList;
@@ -9,6 +11,7 @@ import java.util.Random;
 import java.util.concurrent.Executor;
 
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
+import static com.jnape.palatable.lambda.io.IO.io;
 import static dev.marksman.gauntlet.EvaluateSampleTask.evaluateSampleTask;
 import static dev.marksman.gauntlet.GeneratedDataSet.generatedDataSet;
 import static dev.marksman.gauntlet.GeneratorTestResult.generatorTestResult;
@@ -25,35 +28,67 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     // if all inputs can be generated, submit test tasks to executor along with sample index
     // if failure is found, run tests on shrinks
 
-
     @Override
     public <A> GeneratorTestResult<A> run(GeneratorTestExecutionParameters executionParameters, GeneratorTest<A> testData) {
-        Executor executor = executionParameters.getExecutor();
-        long initialSeedValue = testData.getInitialSeed().orElseGet(seedGenerator::nextLong);
-        Seed initialSeed = Seed.create(initialSeedValue);
-        Arbitrary<A> arbitrary = testData.getArbitrary();
-        Supply<A> supply = arbitrary.createSupply(executionParameters.getGeneratorParameters());
-        GeneratedDataSet<A> dataSet = generateDataSet(initialSeed, supply, testData.getSampleCount());
-
-        ImmutableVector<A> samples = dataSet.getSamples();
-        int actualSampleCount = samples.size();
-        ResultCollector<A> collector = universalResultCollector(dataSet.getSamples());
-        for (int sampleIndex = 0; sampleIndex < actualSampleCount; sampleIndex++) {
-            EvaluateSampleTask<A> task = evaluateSampleTask(collector, testData.getProperty(), sampleIndex, samples.unsafeGet(sampleIndex));
-            executor.execute(task);
-        }
-        // TODO: handle supply failure
-        // TODO: handle shrinks
-        return generatorTestResult(collector.getResultBlocking(testData.getTimeout().orElse(executionParameters.getDefaultTimeout())),
-                initialSeedValue);
+        return generateDataSet(executionParameters.getGeneratorParameters(), testData)
+                .flatMap(dataSet -> runTest(executionParameters, testData, dataSet))
+                .flatMap(initialResult -> runShrinks(executionParameters, testData, initialResult))
+                .unsafePerformIO();
     }
 
-    private <A> GeneratedDataSet<A> generateDataSet(Seed initialSeed,
-                                                    Supply<A> supply,
-                                                    int sampleCount) {
+    private IO<Long> getInitialSeedValue(Maybe<Long> suppliedSeedValue) {
+        return suppliedSeedValue.match(__ -> io(seedGenerator::nextLong), IO::io);
+    }
+
+    private <A> IO<GeneratorTestResult<A>> runTest(GeneratorTestExecutionParameters executionParameters,
+                                                   GeneratorTest<A> testData,
+                                                   GeneratedDataSet<A> dataSet) {
+        return io(() -> {
+            Executor executor = executionParameters.getExecutor();
+            ImmutableVector<A> samples = dataSet.getSamples();
+            int actualSampleCount = samples.size();
+            ResultCollector<A> collector = universalResultCollector(dataSet.getSamples());
+            for (int sampleIndex = 0; sampleIndex < actualSampleCount; sampleIndex++) {
+                EvaluateSampleTask<A> task = evaluateSampleTask(collector, testData.getProperty(), sampleIndex, samples.unsafeGet(sampleIndex));
+                executor.execute(task);
+            }
+            TestResult<A> initialResult = collector.getResultBlocking(testData.getTimeout().orElse(executionParameters.getDefaultTimeout()));
+            return generatorTestResult(maybeApplySupplyFailure(dataSet.getSupplyFailure(), initialResult),
+                    dataSet.getInitialSeedValue());
+        });
+    }
+
+
+    private <A> TestResult<A> maybeApplySupplyFailure(Maybe<SupplyFailure> supplyFailureMaybe, TestResult<A> input) {
+        // supply failure only matters if test has passed
+        return supplyFailureMaybe
+                .match(__ -> input,
+                        supplyFailure -> input.projectA()
+                                .match(__ -> input,
+                                        passed -> TestResult.supplyFailed(passed.getPassedSamples(), supplyFailure)));
+    }
+
+    private <A> IO<GeneratorTestResult<A>> runShrinks(GeneratorTestExecutionParameters executionParameters,
+                                                      GeneratorTest<A> testData,
+                                                      GeneratorTestResult<A> initialResult) {
+        // TODO: handle shrinks
+        return io(initialResult);
+    }
+
+    private <A> IO<GeneratedDataSet<A>> generateDataSet(GeneratorParameters generatorParameters,
+                                                        GeneratorTest<A> testData) {
+        return getInitialSeedValue(testData.getInitialSeed())
+                .flatMap(isv -> io(() ->
+                        buildDataSetFromSupply(isv, testData.getArbitrary().createSupply(generatorParameters),
+                                testData.getSampleCount())));
+    }
+
+    private <A> GeneratedDataSet<A> buildDataSetFromSupply(long initialSeedValue,
+                                                           Supply<A> supply,
+                                                           int sampleCount) {
         Maybe<SupplyFailure> supplyFailure = nothing();
         ArrayList<A> values = new ArrayList<>(sampleCount);
-        Seed state = initialSeed;
+        Seed state = Seed.create(initialSeedValue);
         for (int i = 0; i < sampleCount; i++) {
             GeneratorOutput<A> next = supply.getNext(state);
             supplyFailure = next.getValue()
@@ -67,10 +102,11 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
                 break;
             }
         }
-        return generatedDataSet(values, supplyFailure, state);
+        return generatedDataSet(initialSeedValue, values, supplyFailure, state);
     }
 
     public static DefaultGeneratorTestRunner defaultGeneratorTestRunner() {
         return INSTANCE;
     }
+
 }
