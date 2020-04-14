@@ -1,6 +1,5 @@
 package dev.marksman.gauntlet;
 
-import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import lombok.AllArgsConstructor;
@@ -20,7 +19,7 @@ public final class DomainTest<A> {
     @Getter
     private final ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers;
     @Getter
-    private final Maybe<Duration> timeout;
+    private final Duration timeout;
     @Getter
     private final Prop<A> property;
 

@@ -1,6 +1,5 @@
 package dev.marksman.gauntlet;
 
-import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import lombok.AccessLevel;
@@ -18,7 +17,7 @@ public final class DomainTestParameters<A> {
     private final Domain<A> domain;
     private final Quantifier quantifier;
     private final ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers;
-    private final Maybe<Duration> timeout;
+    private final Duration timeout;
 
     public DomainTestParameters<A> addClassifier(Fn1<A, Set<String>> classifier) {
         return new DomainTestParameters<>(domain, quantifier, classifiers.prepend(classifier), timeout);
@@ -27,7 +26,7 @@ public final class DomainTestParameters<A> {
     public static <A> DomainTestParameters<A> domainTestParameters(Domain<A> domain,
                                                                    Quantifier quantifier,
                                                                    ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers,
-                                                                   Maybe<Duration> timeout) {
+                                                                   Duration timeout) {
         return new DomainTestParameters<>(domain, quantifier, classifiers, timeout);
     }
 }

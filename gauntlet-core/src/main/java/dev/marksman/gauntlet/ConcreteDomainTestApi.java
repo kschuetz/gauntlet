@@ -7,7 +7,6 @@ import java.time.Duration;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static dev.marksman.gauntlet.DomainTest.domainTest;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -18,7 +17,7 @@ final class ConcreteDomainTestApi<A> implements DomainTestApi<A> {
 
     @Override
     public DomainTestApi<A> withTimeout(Duration timeout) {
-        return new ConcreteDomainTestApi<>(runner, parameters.withTimeout(just(timeout)));
+        return new ConcreteDomainTestApi<>(runner, parameters.withTimeout(timeout));
     }
 
     @Override
@@ -31,7 +30,7 @@ final class ConcreteDomainTestApi<A> implements DomainTestApi<A> {
         runner.accept(domainTest(parameters, property));
     }
 
-    static <A> ConcreteDomainTestApi<A> concreteGeneratorTestApi(Consumer<DomainTest<A>> runner, DomainTestParameters<A> parameters) {
+    static <A> ConcreteDomainTestApi<A> concreteDomainTestApi(Consumer<DomainTest<A>> runner, DomainTestParameters<A> parameters) {
         return new ConcreteDomainTestApi<>(runner, parameters);
     }
 

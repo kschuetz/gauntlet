@@ -61,6 +61,8 @@ public interface GauntletApi {
 
     int getDefaultSampleCount();
 
+    int getDefaultMaximumShrinkCount();
+
     GauntletApi withExecutor(Executor executor);
 
     GauntletApi withGeneratorTestRunner(GeneratorTestRunner testRunner);
@@ -70,6 +72,8 @@ public interface GauntletApi {
     GauntletApi withReporter(Reporter reporter);
 
     GauntletApi withDefaultSampleCount(int sampleCount);
+
+    GauntletApi withDefaultMaximumShrinkCount(int maximumShrinkCount);
 
     GauntletApi withGeneratorParameters(GeneratorParameters generatorParameters);
 

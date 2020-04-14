@@ -18,18 +18,21 @@ public final class GeneratorTestParameters<A> {
     private final Arbitrary<A> arbitrary;
     private final Maybe<Long> initialSeed;
     private final int sampleCount;
+    private final int maximumShrinkCount;
     private final ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers;
-    private final Maybe<Duration> timeout;
+    private final Duration timeout;
 
     public GeneratorTestParameters<A> addClassifier(Fn1<A, Set<String>> classifier) {
-        return new GeneratorTestParameters<>(arbitrary, initialSeed, sampleCount, classifiers.prepend(classifier), timeout);
+        return new GeneratorTestParameters<>(arbitrary, initialSeed, sampleCount, maximumShrinkCount,
+                classifiers.prepend(classifier), timeout);
     }
 
     public static <A> GeneratorTestParameters<A> generatorTestParameters(Arbitrary<A> arbitrary,
                                                                          Maybe<Long> initialSeed,
                                                                          int sampleCount,
+                                                                         int maximumShrinkCount,
                                                                          ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers,
-                                                                         Maybe<Duration> timeout) {
-        return new GeneratorTestParameters<>(arbitrary, initialSeed, sampleCount, classifiers, timeout);
+                                                                         Duration timeout) {
+        return new GeneratorTestParameters<>(arbitrary, initialSeed, maximumShrinkCount, sampleCount, classifiers, timeout);
     }
 }

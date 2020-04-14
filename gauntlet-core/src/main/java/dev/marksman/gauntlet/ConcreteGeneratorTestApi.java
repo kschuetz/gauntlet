@@ -27,8 +27,13 @@ final class ConcreteGeneratorTestApi<A> implements GeneratorTestApi<A> {
     }
 
     @Override
+    public GeneratorTestApi<A> withMaximumShrinkCount(int maximumShrinkCount) {
+        return new ConcreteGeneratorTestApi<>(runner, parameters.withMaximumShrinkCount(maximumShrinkCount));
+    }
+
+    @Override
     public GeneratorTestApi<A> withTimeout(Duration timeout) {
-        return new ConcreteGeneratorTestApi<>(runner, parameters.withTimeout(just(timeout)));
+        return new ConcreteGeneratorTestApi<>(runner, parameters.withTimeout(timeout));
     }
 
     @Override

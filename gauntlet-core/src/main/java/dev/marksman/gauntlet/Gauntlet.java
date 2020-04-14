@@ -13,6 +13,7 @@ public final class Gauntlet {
 
     public static final int DEFAULT_SAMPLE_COUNT = 100;
     public static final int DEFAULT_MAX_DISCARDS = 100;
+    public static final int DEFAULT_MAXIMUM_SHRINK_COUNT = 1000;
     public static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(30);  // TODO: default timeout
 
     private Gauntlet() {
@@ -32,6 +33,7 @@ public final class Gauntlet {
                             defaultGeneratorParameters()
                                     .withBiasSettings(defaultPropertyTestBiasSettings()),
                             DEFAULT_SAMPLE_COUNT,
+                            DEFAULT_MAXIMUM_SHRINK_COUNT,
                             DEFAULT_TIMEOUT);
                 }
             }

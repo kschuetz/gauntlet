@@ -27,7 +27,7 @@ public final class DefaultDomainTestRunner implements DomainTestRunner {
             EvaluateSampleTask<A> task = evaluateSampleTask(collector, testData.getProperty(), elementIndex, elements.unsafeGet(elementIndex));
             executor.execute(task);
         }
-        return domainTestResult(collector.getResultBlocking(testData.getTimeout().orElse(executionParameters.getDefaultTimeout())));
+        return domainTestResult(collector.getResultBlocking(testData.getTimeout()));
     }
 
 

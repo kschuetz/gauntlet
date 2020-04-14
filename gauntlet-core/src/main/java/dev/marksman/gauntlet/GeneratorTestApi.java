@@ -10,6 +10,8 @@ public interface GeneratorTestApi<A> {
 
     GeneratorTestApi<A> withSampleCount(int sampleCount);
 
+    GeneratorTestApi<A> withMaximumShrinkCount(int maximumShrinkCount);
+
     GeneratorTestApi<A> withTimeout(Duration timeout);
 
     GeneratorTestApi<A> classifyUsing(Fn1<A, Set<String>> classifier);

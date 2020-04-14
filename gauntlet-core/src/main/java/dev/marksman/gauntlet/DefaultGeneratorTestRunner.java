@@ -32,7 +32,7 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     public <A> GeneratorTestResult<A> run(GeneratorTestExecutionParameters executionParameters, GeneratorTest<A> testData) {
         return generateDataSet(executionParameters.getGeneratorParameters(), testData)
                 .flatMap(dataSet -> runTest(executionParameters, testData, dataSet))
-                .flatMap(initialResult -> runShrinks(executionParameters, testData, initialResult))
+                .flatMap(initialResult -> refineResult(executionParameters, testData, initialResult))
                 .unsafePerformIO();
     }
 
@@ -52,7 +52,7 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
                 EvaluateSampleTask<A> task = evaluateSampleTask(collector, testData.getProperty(), sampleIndex, samples.unsafeGet(sampleIndex));
                 executor.execute(task);
             }
-            TestResult<A> initialResult = collector.getResultBlocking(testData.getTimeout().orElse(executionParameters.getDefaultTimeout()));
+            TestResult<A> initialResult = collector.getResultBlocking(testData.getTimeout());
             return generatorTestResult(maybeApplySupplyFailure(dataSet.getSupplyFailure(), initialResult),
                     dataSet.getInitialSeedValue());
         });
@@ -68,9 +68,18 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
                                         passed -> TestResult.supplyFailed(passed.getPassedSamples(), supplyFailure)));
     }
 
+    private <A> IO<GeneratorTestResult<A>> refineResult(GeneratorTestExecutionParameters executionParameters,
+                                                        GeneratorTest<A> testData,
+                                                        GeneratorTestResult<A> initialResult) {
+        return initialResult.getResult().projectC()
+                .match(__ -> io(initialResult),
+                        falsified -> runShrinks(executionParameters, testData, initialResult, falsified));
+    }
+
     private <A> IO<GeneratorTestResult<A>> runShrinks(GeneratorTestExecutionParameters executionParameters,
                                                       GeneratorTest<A> testData,
-                                                      GeneratorTestResult<A> initialResult) {
+                                                      GeneratorTestResult<A> initialResult,
+                                                      TestResult.Falsified<A> falsified) {
         // TODO: handle shrinks
         return io(initialResult);
     }
@@ -108,5 +117,7 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     public static DefaultGeneratorTestRunner defaultGeneratorTestRunner() {
         return INSTANCE;
     }
+
+//    private
 
 }

@@ -138,6 +138,11 @@ public abstract class GauntletApiBase implements GauntletApi {
     }
 
     @Override
+    public int getDefaultMaximumShrinkCount() {
+        return getApi().getDefaultMaximumShrinkCount();
+    }
+
+    @Override
     public GauntletApi withExecutor(Executor executor) {
         return getApi().withExecutor(executor);
     }
@@ -160,6 +165,11 @@ public abstract class GauntletApiBase implements GauntletApi {
     @Override
     public GauntletApi withDefaultSampleCount(int sampleCount) {
         return getApi().withDefaultSampleCount(sampleCount);
+    }
+
+    @Override
+    public GauntletApi withDefaultMaximumShrinkCount(int maximumShrinkCount) {
+        return getApi().withDefaultMaximumShrinkCount(maximumShrinkCount);
     }
 
     @Override
