@@ -6,12 +6,12 @@ import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.experimental.Wither;
+import lombok.With;
 
 import java.time.Duration;
 import java.util.Set;
 
-@Wither
+@With
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GeneratorTestParameters<A> {
