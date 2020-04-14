@@ -26,14 +26,11 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     //    - test all anyway.  if falsified, fail as normal.
     //    - if cannot falsify, fail with SupplyFailure
     // if all inputs can be generated, submit test tasks to executor along with sample index
-    // if failure is found, run tests on shrinks
 
     @Override
-    public <A> GeneratorTestResult<A> run(GeneratorTestExecutionParameters executionParameters, GeneratorTest<A> testData) {
+    public <A> IO<GeneratorTestResult<A>> run(GeneratorTestExecutionParameters executionParameters, GeneratorTest<A> testData) {
         return generateDataSet(executionParameters.getGeneratorParameters(), testData)
-                .flatMap(dataSet -> runTest(executionParameters, testData, dataSet))
-                .flatMap(initialResult -> refineResult(executionParameters, testData, initialResult))
-                .unsafePerformIO();
+                .flatMap(dataSet -> runTest(executionParameters, testData, dataSet));
     }
 
     private IO<Long> getInitialSeedValue(Maybe<Long> suppliedSeedValue) {
@@ -66,22 +63,6 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
                         supplyFailure -> input.projectA()
                                 .match(__ -> input,
                                         passed -> TestResult.supplyFailed(passed.getPassedSamples(), supplyFailure)));
-    }
-
-    private <A> IO<GeneratorTestResult<A>> refineResult(GeneratorTestExecutionParameters executionParameters,
-                                                        GeneratorTest<A> testData,
-                                                        GeneratorTestResult<A> initialResult) {
-        return initialResult.getResult().projectC()
-                .match(__ -> io(initialResult),
-                        falsified -> runShrinks(executionParameters, testData, initialResult, falsified));
-    }
-
-    private <A> IO<GeneratorTestResult<A>> runShrinks(GeneratorTestExecutionParameters executionParameters,
-                                                      GeneratorTest<A> testData,
-                                                      GeneratorTestResult<A> initialResult,
-                                                      TestResult.Falsified<A> falsified) {
-        // TODO: handle shrinks
-        return io(initialResult);
     }
 
     private <A> IO<GeneratedDataSet<A>> generateDataSet(GeneratorParameters generatorParameters,

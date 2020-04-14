@@ -188,7 +188,8 @@ class DefaultGauntlet implements GauntletApi {
     private <A> void runGeneratorTest(GeneratorTest<A> generatorTest) {
         GeneratorTestResult<A> result = generatorTestRunner.run(
                 generatorTestExecutionParameters(getExecutor(), getGeneratorParameters()),
-                generatorTest);
+                generatorTest)
+                .unsafePerformIO();
         ReportData<A> reportData = reportData(generatorTest.getProperty(), result.getResult(), generatorTest.getArbitrary().getPrettyPrinter(),
                 just(result.getInitialSeedValue()));
         reporter.report(reportData);
@@ -197,7 +198,8 @@ class DefaultGauntlet implements GauntletApi {
     private <A> void runDomainTest(DomainTest<A> domainTest) {
         DomainTestResult<A> result = domainTestRunner.run(
                 domainTestExecutionParameters(getExecutor()),
-                domainTest);
+                domainTest)
+                .unsafePerformIO();
         ReportData<A> reportData = reportData(domainTest.getProperty(),
                 result.getResult(),
                 domainTest.getDomain().getPrettyPrinter(),
@@ -209,5 +211,29 @@ class DefaultGauntlet implements GauntletApi {
         return concreteDomainTestApi(this::runDomainTest,
                 domainTestParameters(domain, quantifier, Vector.empty(), defaultTimeout));
     }
+    
+    /*
+    private <A> IO<GeneratorTestResult<A>> refineResult(GeneratorTestExecutionParameters executionParameters,
+                                                        GeneratorTest<A> testData,
+                                                        GeneratorTestResult<A> initialResult) {
+        return initialResult.getResult().projectC()
+                .match(__ -> io(initialResult),
+                        falsified -> runShrinks(executionParameters, testData, initialResult, falsified));
+    }
+
+    private <A> IO<GeneratorTestResult<A>> runShrinks(GeneratorTestExecutionParameters executionParameters,
+                                                      GeneratorTest<A> testData,
+                                                      GeneratorTestResult<A> initialResult,
+                                                      TestResult.Falsified<A> falsified) {
+        int maximumShrinkCount = testData.getMaximumShrinkCount();
+        Shrink<A> shrink = testData.getArbitrary().getShrink().orElse(null);
+        if (maximumShrinkCount <= 0 || shrink == null) {
+            return io(initialResult);
+        }
+
+        // TODO: handle shrinks
+        return io(initialResult);
+    }
+     */
 
 }
