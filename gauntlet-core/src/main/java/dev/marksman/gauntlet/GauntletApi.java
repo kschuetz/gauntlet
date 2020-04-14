@@ -53,6 +53,8 @@ public interface GauntletApi {
 
     DomainTestRunner getDomainTestRunner();
 
+    ShrinkTestRunner getShrinkTestRunner();
+
     Reporter getReporter();
 
     GeneratorParameters getGeneratorParameters();
@@ -68,6 +70,8 @@ public interface GauntletApi {
     GauntletApi withGeneratorTestRunner(GeneratorTestRunner testRunner);
 
     GauntletApi withDomainTestRunner(DomainTestRunner testRunner);
+
+    GauntletApi withShrinkTestRunner(ShrinkTestRunner testRunner);
 
     GauntletApi withReporter(Reporter reporter);
 
