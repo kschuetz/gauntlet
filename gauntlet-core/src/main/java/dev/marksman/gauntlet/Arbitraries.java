@@ -2,6 +2,8 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
+import com.jnape.palatable.lambda.adt.hlist.Tuple4;
+import com.jnape.palatable.lambda.adt.hlist.Tuple5;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.constraints.IntRange;
 import dev.marksman.kraftwerk.frequency.FrequencyMap;
@@ -41,6 +43,21 @@ public final class Arbitraries {
                                                                Arbitrary<B> b,
                                                                Arbitrary<C> c) {
         return CompositeArbitraries.combine(a, b, c);
+    }
+
+    public static <A, B, C, D> Arbitrary<Tuple4<A, B, C, D>> combine(Arbitrary<A> a,
+                                                                     Arbitrary<B> b,
+                                                                     Arbitrary<C> c,
+                                                                     Arbitrary<D> d) {
+        return CompositeArbitraries.combine(a, b, c, d);
+    }
+
+    public static <A, B, C, D, E> Arbitrary<Tuple5<A, B, C, D, E>> combine(Arbitrary<A> a,
+                                                                           Arbitrary<B> b,
+                                                                           Arbitrary<C> c,
+                                                                           Arbitrary<D> d,
+                                                                           Arbitrary<E> e) {
+        return CompositeArbitraries.combine(a, b, c, d, e);
     }
 
     public static <A extends Comparable<A>> Arbitrary<Tuple2<A, A>> arbitraryOrderedPair(Arbitrary<A> a) {
