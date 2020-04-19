@@ -4,15 +4,18 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
 import com.jnape.palatable.lambda.adt.hlist.Tuple5;
+import com.jnape.palatable.lambda.adt.hlist.Tuple6;
 import com.jnape.palatable.lambda.adt.product.Product2;
 import com.jnape.palatable.lambda.adt.product.Product3;
 import com.jnape.palatable.lambda.adt.product.Product4;
 import com.jnape.palatable.lambda.adt.product.Product5;
+import com.jnape.palatable.lambda.adt.product.Product6;
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.Fn2;
 import com.jnape.palatable.lambda.functions.Fn3;
 import com.jnape.palatable.lambda.functions.Fn4;
 import com.jnape.palatable.lambda.functions.Fn5;
+import com.jnape.palatable.lambda.functions.Fn6;
 import com.jnape.palatable.lambda.optics.Iso;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.shrink.Shrink;
@@ -23,6 +26,7 @@ import static com.jnape.palatable.lambda.functions.builtin.fn2.Into.into;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Into3.into3;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Into4.into4;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Into5.into5;
+import static com.jnape.palatable.lambda.functions.builtin.fn2.Into6.into6;
 import static com.jnape.palatable.lambda.optics.functions.View.view;
 
 public final class ShrinkProduct {
@@ -217,6 +221,114 @@ public final class ShrinkProduct {
                 view(iso.mirror()));
     }
 
+    public static <A, B, C, D, E, F, T> Shrink<T> shrinkProduct(Shrink<A> sa,
+                                                                Shrink<B> sb,
+                                                                Shrink<C> sc,
+                                                                Shrink<D> sd,
+                                                                Shrink<E> se,
+                                                                Shrink<F> sf,
+                                                                Fn6<A, B, C, D, E, F, T> f1,
+                                                                Fn1<T, Product6<A, B, C, D, E, F>> f2) {
+        return input -> {
+            Product6<A, B, C, D, E, F> p = f2.apply(input);
+            A constantA = p._1();
+            B constantB = p._2();
+            C constantC = p._3();
+            D constantD = p._4();
+            E constantE = p._5();
+            F constantF = p._6();
+
+            ImmutableFiniteIterable<A> as = sa.apply(constantA);
+            ImmutableFiniteIterable<B> bs = sb.apply(constantB);
+            ImmutableFiniteIterable<C> cs = sc.apply(constantC);
+            ImmutableFiniteIterable<D> ds = sd.apply(constantD);
+            ImmutableFiniteIterable<E> es = se.apply(constantE);
+            ImmutableFiniteIterable<F> fs = sf.apply(constantF);
+
+            return ShrinkResult.concat(
+                    zip6(as, bs, cs, ds, es, fs).fmap(into6(f1::apply)),
+
+                    () -> zip5(as, bs, cs, ds, es).fmap(into5((a, b, c, d, e) -> f1.apply(a, b, c, d, e, constantF))),
+                    () -> zip5(as, bs, cs, ds, fs).fmap(into5((a, b, c, d, f) -> f1.apply(a, b, c, d, constantE, f))),
+                    () -> zip5(as, bs, cs, es, fs).fmap(into5((a, b, c, e, f) -> f1.apply(a, b, c, constantD, e, f))),
+                    () -> zip5(as, bs, ds, es, fs).fmap(into5((a, b, d, e, f) -> f1.apply(a, b, constantC, d, e, f))),
+                    () -> zip5(as, cs, ds, es, fs).fmap(into5((a, c, d, e, f) -> f1.apply(a, constantB, c, d, e, f))),
+                    () -> zip5(bs, cs, ds, es, fs).fmap(into5((b, c, d, e, f) -> f1.apply(constantA, b, c, d, e, f))),
+
+                    () -> zip4(as, bs, cs, ds).fmap(into4((a, b, c, d) -> f1.apply(a, b, c, d, constantE, constantF))),
+                    () -> zip4(as, bs, cs, es).fmap(into4((a, b, c, e) -> f1.apply(a, b, c, constantD, e, constantF))),
+                    () -> zip4(as, bs, cs, fs).fmap(into4((a, b, c, f) -> f1.apply(a, b, c, constantD, constantE, f))),
+                    () -> zip4(as, bs, ds, es).fmap(into4((a, b, d, e) -> f1.apply(a, b, constantC, d, e, constantF))),
+                    () -> zip4(as, bs, ds, fs).fmap(into4((a, b, d, f) -> f1.apply(a, b, constantC, d, constantE, f))),
+                    () -> zip4(as, bs, es, fs).fmap(into4((a, b, e, f) -> f1.apply(a, b, constantC, constantD, e, f))),
+                    () -> zip4(as, cs, ds, es).fmap(into4((a, c, d, e) -> f1.apply(a, constantB, c, d, e, constantF))),
+                    () -> zip4(as, cs, ds, fs).fmap(into4((a, c, d, f) -> f1.apply(a, constantB, c, d, constantE, f))),
+                    () -> zip4(as, cs, es, fs).fmap(into4((a, c, e, f) -> f1.apply(a, constantB, c, constantD, e, f))),
+                    () -> zip4(as, ds, es, fs).fmap(into4((a, d, e, f) -> f1.apply(a, constantB, constantC, d, e, f))),
+                    () -> zip4(bs, cs, ds, es).fmap(into4((b, c, d, e) -> f1.apply(constantA, b, c, d, e, constantF))),
+                    () -> zip4(bs, cs, ds, fs).fmap(into4((b, c, d, f) -> f1.apply(constantA, b, c, d, constantE, f))),
+                    () -> zip4(bs, cs, es, fs).fmap(into4((b, c, e, f) -> f1.apply(constantA, b, c, constantD, e, f))),
+                    () -> zip4(bs, ds, es, fs).fmap(into4((b, d, e, f) -> f1.apply(constantA, b, constantC, d, e, f))),
+                    () -> zip4(cs, ds, es, fs).fmap(into4((c, d, e, f) -> f1.apply(constantA, constantB, c, d, e, f))),
+
+                    () -> zip3(as, bs, cs).fmap(into3((a, b, c) -> f1.apply(a, b, c, constantD, constantE, constantF))),
+                    () -> zip3(as, bs, ds).fmap(into3((a, b, d) -> f1.apply(a, b, constantC, d, constantE, constantF))),
+                    () -> zip3(as, bs, es).fmap(into3((a, b, e) -> f1.apply(a, b, constantC, constantD, e, constantF))),
+                    () -> zip3(as, bs, fs).fmap(into3((a, b, f) -> f1.apply(a, b, constantC, constantD, constantE, f))),
+                    () -> zip3(as, cs, ds).fmap(into3((a, c, d) -> f1.apply(a, constantB, c, d, constantE, constantF))),
+                    () -> zip3(as, cs, es).fmap(into3((a, c, e) -> f1.apply(a, constantB, c, constantD, e, constantF))),
+                    () -> zip3(as, cs, fs).fmap(into3((a, c, f) -> f1.apply(a, constantB, c, constantD, constantE, f))),
+                    () -> zip3(as, ds, es).fmap(into3((a, d, e) -> f1.apply(a, constantB, constantC, d, e, constantF))),
+                    () -> zip3(as, ds, fs).fmap(into3((a, d, f) -> f1.apply(a, constantB, constantC, d, constantE, f))),
+                    () -> zip3(as, es, fs).fmap(into3((a, e, f) -> f1.apply(a, constantB, constantC, constantD, e, f))),
+                    () -> zip3(bs, cs, ds).fmap(into3((b, c, d) -> f1.apply(constantA, b, c, d, constantE, constantF))),
+                    () -> zip3(bs, cs, es).fmap(into3((b, c, e) -> f1.apply(constantA, b, c, constantD, e, constantF))),
+                    () -> zip3(bs, cs, fs).fmap(into3((b, c, f) -> f1.apply(constantA, b, c, constantD, constantE, f))),
+                    () -> zip3(bs, ds, es).fmap(into3((b, d, e) -> f1.apply(constantA, b, constantC, d, e, constantF))),
+                    () -> zip3(bs, ds, fs).fmap(into3((b, d, f) -> f1.apply(constantA, b, constantC, d, constantE, f))),
+                    () -> zip3(bs, es, fs).fmap(into3((b, e, f) -> f1.apply(constantA, b, constantC, constantD, e, f))),
+                    () -> zip3(cs, ds, es).fmap(into3((c, d, e) -> f1.apply(constantA, constantB, c, d, e, constantF))),
+                    () -> zip3(cs, ds, fs).fmap(into3((c, d, f) -> f1.apply(constantA, constantB, c, d, constantE, f))),
+                    () -> zip3(cs, es, fs).fmap(into3((c, e, f) -> f1.apply(constantA, constantB, c, constantD, e, f))),
+                    () -> zip3(ds, es, fs).fmap(into3((d, e, f) -> f1.apply(constantA, constantB, constantC, d, e, f))),
+
+                    () -> zip2(as, bs).fmap(into((a, b) -> f1.apply(a, b, constantC, constantD, constantE, constantF))),
+                    () -> zip2(as, cs).fmap(into((a, c) -> f1.apply(a, constantB, c, constantD, constantE, constantF))),
+                    () -> zip2(as, ds).fmap(into((a, d) -> f1.apply(a, constantB, constantC, d, constantE, constantF))),
+                    () -> zip2(as, es).fmap(into((a, e) -> f1.apply(a, constantB, constantC, constantD, e, constantF))),
+                    () -> zip2(as, fs).fmap(into((a, f) -> f1.apply(a, constantB, constantC, constantD, constantE, f))),
+                    () -> zip2(bs, cs).fmap(into((b, c) -> f1.apply(constantA, b, c, constantD, constantE, constantF))),
+                    () -> zip2(bs, ds).fmap(into((b, d) -> f1.apply(constantA, b, constantC, d, constantE, constantF))),
+                    () -> zip2(bs, es).fmap(into((b, e) -> f1.apply(constantA, b, constantC, constantD, e, constantF))),
+                    () -> zip2(bs, fs).fmap(into((b, f) -> f1.apply(constantA, b, constantC, constantD, constantE, f))),
+                    () -> zip2(cs, ds).fmap(into((c, d) -> f1.apply(constantA, constantB, c, d, constantE, constantF))),
+                    () -> zip2(cs, es).fmap(into((c, e) -> f1.apply(constantA, constantB, c, constantD, e, constantF))),
+                    () -> zip2(cs, fs).fmap(into((c, f) -> f1.apply(constantA, constantB, c, constantD, constantE, f))),
+                    () -> zip2(ds, es).fmap(into((d, e) -> f1.apply(constantA, constantB, constantC, d, e, constantF))),
+                    () -> zip2(ds, fs).fmap(into((d, f) -> f1.apply(constantA, constantB, constantC, d, constantE, f))),
+                    () -> zip2(es, fs).fmap(into((e, f) -> f1.apply(constantA, constantB, constantC, constantD, e, f))),
+
+                    () -> as.fmap(a -> f1.apply(a, constantB, constantC, constantD, constantE, constantF)),
+                    () -> bs.fmap(b -> f1.apply(constantA, b, constantC, constantD, constantE, constantF)),
+                    () -> cs.fmap(c -> f1.apply(constantA, constantB, c, constantD, constantE, constantF)),
+                    () -> ds.fmap(d -> f1.apply(constantA, constantB, constantC, d, constantE, constantF)),
+                    () -> es.fmap(e -> f1.apply(constantA, constantB, constantC, constantD, e, constantF)),
+                    () -> fs.fmap(f -> f1.apply(constantA, constantB, constantC, constantD, constantE, f)));
+        };
+    }
+
+    public static <A, B, C, D, E, F, T> Shrink<T> shrinkProduct(Shrink<A> sa,
+                                                                Shrink<B> sb,
+                                                                Shrink<C> sc,
+                                                                Shrink<D> sd,
+                                                                Shrink<E> se,
+                                                                Shrink<F> sf,
+                                                                Iso<Product6<A, B, C, D, E, F>, Product6<A, B, C, D, E, F>, T, T> iso) {
+        return shrinkProduct(sa, sb, sc, sd, se, sf,
+                (a, b, c, d, e, f) -> view(iso).apply(tuple(a, b, c, d, e, f)),
+                view(iso.mirror()));
+    }
+
 
     private static <A, B> ImmutableFiniteIterable<Tuple2<A, B>> zip2(ImmutableFiniteIterable<A> as,
                                                                      ImmutableFiniteIterable<B> bs) {
@@ -247,6 +359,18 @@ public final class ShrinkProduct {
                                                                                        ImmutableFiniteIterable<E> es) {
         return as.zipWith(Tuple2::tuple, bs.zipWith(Tuple2::tuple, cs.zipWith(Tuple2::tuple, ds.zipWith(Tuple2::tuple, es))))
                 .fmap(x -> tuple(x._1(), x._2()._1(), x._2()._2()._1(), x._2()._2()._2()._1(), x._2()._2()._2()._2()));
+    }
+
+    private static <A, B, C, D, E, F> ImmutableFiniteIterable<Tuple6<A, B, C, D, E, F>> zip6(ImmutableFiniteIterable<A> as,
+                                                                                             ImmutableFiniteIterable<B> bs,
+                                                                                             ImmutableFiniteIterable<C> cs,
+                                                                                             ImmutableFiniteIterable<D> ds,
+                                                                                             ImmutableFiniteIterable<E> es,
+                                                                                             ImmutableFiniteIterable<F> fs) {
+        return as.zipWith(Tuple2::tuple, bs.zipWith(Tuple2::tuple, cs.zipWith(Tuple2::tuple, ds.zipWith(Tuple2::tuple,
+                es.zipWith(Tuple2::tuple, fs)))))
+                .fmap(x -> tuple(x._1(), x._2()._1(), x._2()._2()._1(), x._2()._2()._2()._1(),
+                        x._2()._2()._2()._2()._1(), x._2()._2()._2()._2()._2()));
     }
 
 }
