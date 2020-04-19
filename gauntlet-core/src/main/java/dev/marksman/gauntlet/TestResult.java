@@ -26,6 +26,10 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
     public static class Passed<A> extends TestResult<A> {
         ImmutableVector<A> passedSamples;
 
+        public int getSuccessCount() {
+            return passedSamples.size();
+        }
+
         @Override
         public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
             return aFn.apply(this);
