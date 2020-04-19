@@ -4,7 +4,6 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
 import com.jnape.palatable.lambda.adt.hlist.Tuple5;
-import com.jnape.palatable.lambda.adt.hlist.Tuple6;
 import com.jnape.palatable.lambda.adt.product.Product2;
 import com.jnape.palatable.lambda.adt.product.Product3;
 import com.jnape.palatable.lambda.adt.product.Product4;
@@ -247,18 +246,6 @@ public final class ShrinkProduct {
                                                                                        ImmutableFiniteIterable<E> es) {
         return as.zipWith(Tuple2::tuple, bs.zipWith(Tuple2::tuple, cs.zipWith(Tuple2::tuple, ds.zipWith(Tuple2::tuple, es))))
                 .fmap(x -> tuple(x._1(), x._2()._1(), x._2()._2()._1(), x._2()._2()._2()._1(), x._2()._2()._2()._2()));
-    }
-
-    private static <A, B, C, D, E, F> ImmutableFiniteIterable<Tuple6<A, B, C, D, E, F>> zip6(ImmutableFiniteIterable<A> as,
-                                                                                             ImmutableFiniteIterable<B> bs,
-                                                                                             ImmutableFiniteIterable<C> cs,
-                                                                                             ImmutableFiniteIterable<D> ds,
-                                                                                             ImmutableFiniteIterable<E> es,
-                                                                                             ImmutableFiniteIterable<F> fs) {
-        return as.zipWith(Tuple2::tuple, bs.zipWith(Tuple2::tuple, cs.zipWith(Tuple2::tuple, ds.zipWith(Tuple2::tuple,
-                es.zipWith(Tuple2::tuple, fs)))))
-                .fmap(x -> tuple(x._1(), x._2()._1(), x._2()._2()._1(), x._2()._2()._2()._1(),
-                        x._2()._2()._2()._2()._1(), x._2()._2()._2()._2()._2()));
     }
 
 }
