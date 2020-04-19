@@ -46,24 +46,11 @@ final class ShrinkProduct5 {
             ImmutableFiniteIterable<E> es = se.apply(constantE);
 
             return ShrinkResult.concat(
-                    zip5(as, bs, cs, ds, es).fmap(into5(fromProduct::apply)),
-
-                    () -> zip4(as, bs, cs, ds).fmap(into4((a, b, c, d) -> fromProduct.apply(a, b, c, d, constantE))),
-                    () -> zip4(as, bs, cs, es).fmap(into4((a, b, c, e) -> fromProduct.apply(a, b, c, constantD, e))),
-                    () -> zip4(as, bs, ds, es).fmap(into4((a, b, d, e) -> fromProduct.apply(a, b, constantC, d, e))),
-                    () -> zip4(as, cs, ds, es).fmap(into4((a, c, d, e) -> fromProduct.apply(a, constantB, c, d, e))),
-                    () -> zip4(bs, cs, ds, es).fmap(into4((b, c, d, e) -> fromProduct.apply(constantA, b, c, d, e))),
-
-                    () -> zip3(as, bs, cs).fmap(into3((a, b, c) -> fromProduct.apply(a, b, c, constantD, constantE))),
-                    () -> zip3(as, bs, ds).fmap(into3((a, b, d) -> fromProduct.apply(a, b, constantC, d, constantE))),
-                    () -> zip3(as, bs, es).fmap(into3((a, b, e) -> fromProduct.apply(a, b, constantC, constantD, e))),
-                    () -> zip3(as, cs, ds).fmap(into3((a, c, d) -> fromProduct.apply(a, constantB, c, d, constantE))),
-                    () -> zip3(as, cs, es).fmap(into3((a, c, e) -> fromProduct.apply(a, constantB, c, constantD, e))),
-                    () -> zip3(as, ds, es).fmap(into3((a, d, e) -> fromProduct.apply(a, constantB, constantC, d, e))),
-                    () -> zip3(bs, cs, ds).fmap(into3((b, c, d) -> fromProduct.apply(constantA, b, c, d, constantE))),
-                    () -> zip3(bs, cs, es).fmap(into3((b, c, e) -> fromProduct.apply(constantA, b, c, constantD, e))),
-                    () -> zip3(bs, ds, es).fmap(into3((b, d, e) -> fromProduct.apply(constantA, b, constantC, d, e))),
-                    () -> zip3(cs, ds, es).fmap(into3((c, d, e) -> fromProduct.apply(constantA, constantB, c, d, e))),
+                    as.fmap(a -> fromProduct.apply(a, constantB, constantC, constantD, constantE)),
+                    () -> bs.fmap(b -> fromProduct.apply(constantA, b, constantC, constantD, constantE)),
+                    () -> cs.fmap(c -> fromProduct.apply(constantA, constantB, c, constantD, constantE)),
+                    () -> ds.fmap(d -> fromProduct.apply(constantA, constantB, constantC, d, constantE)),
+                    () -> es.fmap(e -> fromProduct.apply(constantA, constantB, constantC, constantD, e)),
 
                     () -> zip2(as, bs).fmap(into((a, b) -> fromProduct.apply(a, b, constantC, constantD, constantE))),
                     () -> zip2(as, cs).fmap(into((a, c) -> fromProduct.apply(a, constantB, c, constantD, constantE))),
@@ -76,11 +63,24 @@ final class ShrinkProduct5 {
                     () -> zip2(cs, es).fmap(into((c, e) -> fromProduct.apply(constantA, constantB, c, constantD, e))),
                     () -> zip2(ds, es).fmap(into((d, e) -> fromProduct.apply(constantA, constantB, constantC, d, e))),
 
-                    () -> as.fmap(a -> fromProduct.apply(a, constantB, constantC, constantD, constantE)),
-                    () -> bs.fmap(b -> fromProduct.apply(constantA, b, constantC, constantD, constantE)),
-                    () -> cs.fmap(c -> fromProduct.apply(constantA, constantB, c, constantD, constantE)),
-                    () -> ds.fmap(d -> fromProduct.apply(constantA, constantB, constantC, d, constantE)),
-                    () -> es.fmap(e -> fromProduct.apply(constantA, constantB, constantC, constantD, e)));
+                    () -> zip3(as, bs, cs).fmap(into3((a, b, c) -> fromProduct.apply(a, b, c, constantD, constantE))),
+                    () -> zip3(as, bs, ds).fmap(into3((a, b, d) -> fromProduct.apply(a, b, constantC, d, constantE))),
+                    () -> zip3(as, bs, es).fmap(into3((a, b, e) -> fromProduct.apply(a, b, constantC, constantD, e))),
+                    () -> zip3(as, cs, ds).fmap(into3((a, c, d) -> fromProduct.apply(a, constantB, c, d, constantE))),
+                    () -> zip3(as, cs, es).fmap(into3((a, c, e) -> fromProduct.apply(a, constantB, c, constantD, e))),
+                    () -> zip3(as, ds, es).fmap(into3((a, d, e) -> fromProduct.apply(a, constantB, constantC, d, e))),
+                    () -> zip3(bs, cs, ds).fmap(into3((b, c, d) -> fromProduct.apply(constantA, b, c, d, constantE))),
+                    () -> zip3(bs, cs, es).fmap(into3((b, c, e) -> fromProduct.apply(constantA, b, c, constantD, e))),
+                    () -> zip3(bs, ds, es).fmap(into3((b, d, e) -> fromProduct.apply(constantA, b, constantC, d, e))),
+                    () -> zip3(cs, ds, es).fmap(into3((c, d, e) -> fromProduct.apply(constantA, constantB, c, d, e))),
+
+                    () -> zip4(as, bs, cs, ds).fmap(into4((a, b, c, d) -> fromProduct.apply(a, b, c, d, constantE))),
+                    () -> zip4(as, bs, cs, es).fmap(into4((a, b, c, e) -> fromProduct.apply(a, b, c, constantD, e))),
+                    () -> zip4(as, bs, ds, es).fmap(into4((a, b, d, e) -> fromProduct.apply(a, b, constantC, d, e))),
+                    () -> zip4(as, cs, ds, es).fmap(into4((a, c, d, e) -> fromProduct.apply(a, constantB, c, d, e))),
+                    () -> zip4(bs, cs, ds, es).fmap(into4((b, c, d, e) -> fromProduct.apply(constantA, b, c, d, e))),
+
+                    () -> zip5(as, bs, cs, ds, es).fmap(into5(fromProduct::apply)));
         };
     }
 

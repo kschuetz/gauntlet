@@ -36,15 +36,15 @@ final class ShrinkProduct3 {
             ImmutableFiniteIterable<C> cs = sc.apply(constantC);
 
             return ShrinkResult.concat(
-                    zip3(as, bs, cs).fmap(into3(fromProduct::apply)),
+                    as.fmap(a -> fromProduct.apply(a, constantB, constantC)),
+                    () -> bs.fmap(b -> fromProduct.apply(constantA, b, constantC)),
+                    () -> cs.fmap(c -> fromProduct.apply(constantA, constantB, c)),
 
                     () -> zip2(as, bs).fmap(into((a, b) -> fromProduct.apply(a, b, constantC))),
                     () -> zip2(as, cs).fmap(into((a, c) -> fromProduct.apply(a, constantB, c))),
                     () -> zip2(bs, cs).fmap(into((b, c) -> fromProduct.apply(constantA, b, c))),
 
-                    () -> as.fmap(a -> fromProduct.apply(a, constantB, constantC)),
-                    () -> bs.fmap(b -> fromProduct.apply(constantA, b, constantC)),
-                    () -> cs.fmap(c -> fromProduct.apply(constantA, constantB, c)));
+                    () -> zip3(as, bs, cs).fmap(into3(fromProduct::apply)));
         };
     }
 
