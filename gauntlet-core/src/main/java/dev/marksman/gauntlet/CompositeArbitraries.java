@@ -11,14 +11,11 @@ import com.jnape.palatable.lambda.functions.Fn3;
 import com.jnape.palatable.lambda.functions.Fn4;
 import com.jnape.palatable.lambda.functions.Fn5;
 import dev.marksman.gauntlet.shrink.Shrink;
+import dev.marksman.gauntlet.shrink.builtins.ShrinkProduct;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.gauntlet.ConcreteArbitrary.concreteArbitrary;
-import static dev.marksman.gauntlet.shrink.builtins.ShrinkProducts.shrink2;
-import static dev.marksman.gauntlet.shrink.builtins.ShrinkProducts.shrink3;
-import static dev.marksman.gauntlet.shrink.builtins.ShrinkProducts.shrink4;
-import static dev.marksman.gauntlet.shrink.builtins.ShrinkProducts.shrink5;
 
 final class CompositeArbitraries {
 
@@ -31,7 +28,7 @@ final class CompositeArbitraries {
                         b.createSupply(parameters),
                         toFn),
                 combineShrinks(a.getShrink(), b.getShrink(), toFn),
-                PrettyPrinting.<A, B>product2PrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter()));
+                PrettyPrinting.<A, B>productPrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter()));
     }
 
     static <A, B, C> Arbitrary<Tuple3<A, B, C>> combine(Arbitrary<A> a,
@@ -45,7 +42,7 @@ final class CompositeArbitraries {
                         c.createSupply(parameters),
                         toFn),
                 combineShrinks(a.getShrink(), b.getShrink(), c.getShrink(), toFn),
-                PrettyPrinting.<A, B, C>product3PrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter(), c.getPrettyPrinter()));
+                PrettyPrinting.<A, B, C>productPrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter(), c.getPrettyPrinter()));
     }
 
     static <A, B, C, D> Arbitrary<Tuple4<A, B, C, D>> combine(Arbitrary<A> a,
@@ -61,7 +58,7 @@ final class CompositeArbitraries {
                         d.createSupply(parameters),
                         toFn),
                 combineShrinks(a.getShrink(), b.getShrink(), c.getShrink(), d.getShrink(), toFn),
-                PrettyPrinting.<A, B, C, D>product4PrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter(),
+                PrettyPrinting.<A, B, C, D>productPrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter(),
                         c.getPrettyPrinter(), d.getPrettyPrinter()));
     }
 
@@ -80,7 +77,7 @@ final class CompositeArbitraries {
                         e.createSupply(parameters),
                         toFn),
                 combineShrinks(a.getShrink(), b.getShrink(), c.getShrink(), d.getShrink(), e.getShrink(), toFn),
-                PrettyPrinting.<A, B, C, D, E>product5PrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter(),
+                PrettyPrinting.<A, B, C, D, E>productPrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter(),
                         c.getPrettyPrinter(), d.getPrettyPrinter(), e.getPrettyPrinter()));
     }
 
@@ -91,7 +88,7 @@ final class CompositeArbitraries {
         if (isNothing(shrinkA) && isNothing(shrinkB)) {
             return nothing();
         } else {
-            return just(shrink2(shrinkA.orElse(Shrink.none()),
+            return just(ShrinkProduct.shrinkProduct(shrinkA.orElse(Shrink.none()),
                     shrinkB.orElse(Shrink.none()),
                     toFn, t -> t));
         }
@@ -104,7 +101,7 @@ final class CompositeArbitraries {
         if (isNothing(shrinkA) && isNothing(shrinkB) && isNothing(shrinkC)) {
             return nothing();
         } else {
-            return just(shrink3(shrinkA.orElse(Shrink.none()),
+            return just(ShrinkProduct.shrinkProduct(shrinkA.orElse(Shrink.none()),
                     shrinkB.orElse(Shrink.none()),
                     shrinkC.orElse(Shrink.none()),
                     toFn, t -> t));
@@ -119,7 +116,7 @@ final class CompositeArbitraries {
         if (isNothing(shrinkA) && isNothing(shrinkB) && isNothing(shrinkC) && isNothing(shrinkD)) {
             return nothing();
         } else {
-            return just(shrink4(shrinkA.orElse(Shrink.none()),
+            return just(ShrinkProduct.shrinkProduct(shrinkA.orElse(Shrink.none()),
                     shrinkB.orElse(Shrink.none()),
                     shrinkC.orElse(Shrink.none()),
                     shrinkD.orElse(Shrink.none()),
@@ -136,7 +133,7 @@ final class CompositeArbitraries {
         if (isNothing(shrinkA) && isNothing(shrinkB) && isNothing(shrinkC) && isNothing(shrinkD) && isNothing(shrinkE)) {
             return nothing();
         } else {
-            return just(shrink5(shrinkA.orElse(Shrink.none()),
+            return just(ShrinkProduct.shrinkProduct(shrinkA.orElse(Shrink.none()),
                     shrinkB.orElse(Shrink.none()),
                     shrinkC.orElse(Shrink.none()),
                     shrinkD.orElse(Shrink.none()),

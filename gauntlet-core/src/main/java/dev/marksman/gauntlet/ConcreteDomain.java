@@ -12,7 +12,7 @@ import lombok.Getter;
 
 import java.util.Objects;
 
-import static dev.marksman.gauntlet.PrettyPrinting.*;
+import static dev.marksman.gauntlet.PrettyPrinting.productPrettyPrinter;
 import static dev.marksman.gauntlet.filter.Filter.filter;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
@@ -39,7 +39,7 @@ final class ConcreteDomain<A> implements Domain<A> {
     static <A, B> ConcreteDomain<Tuple2<A, B>> cartesianProduct(Domain<A> domainA,
                                                                 Domain<B> domainB) {
         ImmutableVector<Tuple2<A, B>> newElements = domainA.getElements().cross(domainB.getElements());
-        Fn1<? super Tuple2<A, B>, String> newPrettyPrinter = product2PrettyPrinter(domainA.getPrettyPrinter(),
+        Fn1<? super Tuple2<A, B>, String> newPrettyPrinter = productPrettyPrinter(domainA.getPrettyPrinter(),
                 domainB.getPrettyPrinter());
         return new ConcreteDomain<>(newElements,
                 newPrettyPrinter);
@@ -53,7 +53,7 @@ final class ConcreteDomain<A> implements Domain<A> {
                         t._1(),
                         t._2()._1(),
                         t._2()._2()));
-        Fn1<? super Tuple3<A, B, C>, String> newPrettyPrinter = product3PrettyPrinter(domainA.getPrettyPrinter(),
+        Fn1<? super Tuple3<A, B, C>, String> newPrettyPrinter = PrettyPrinting.productPrettyPrinter(domainA.getPrettyPrinter(),
                 domainB.getPrettyPrinter(),
                 domainC.getPrettyPrinter());
         return new ConcreteDomain<>(newElements, newPrettyPrinter);
@@ -72,7 +72,7 @@ final class ConcreteDomain<A> implements Domain<A> {
                         t._2()._1(),
                         t._2()._2()._1(),
                         t._2()._2()._2()));
-        Fn1<? super Tuple4<A, B, C, D>, String> newPrettyPrinter = product4PrettyPrinter(domainA.getPrettyPrinter(),
+        Fn1<? super Tuple4<A, B, C, D>, String> newPrettyPrinter = PrettyPrinting.productPrettyPrinter(domainA.getPrettyPrinter(),
                 domainB.getPrettyPrinter(),
                 domainC.getPrettyPrinter(),
                 domainD.getPrettyPrinter());
