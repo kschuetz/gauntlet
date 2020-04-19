@@ -6,17 +6,23 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple4;
 import com.jnape.palatable.lambda.adt.hlist.Tuple5;
 import dev.marksman.gauntlet.shrink.Shrink;
 
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct.shrinkProduct;
+
 public final class ShrinkTuple {
+
+    private ShrinkTuple() {
+    }
+
     public static <A, B> Shrink<Tuple2<A, B>> shrinkTuple(Shrink<A> sa,
                                                           Shrink<B> sb) {
-        return ShrinkProduct.shrinkProduct(sa, sb,
+        return shrinkProduct(sa, sb,
                 Tuple2::tuple, t -> t);
     }
 
     public static <A, B, C> Shrink<Tuple3<A, B, C>> shrinkTuple(Shrink<A> sa,
                                                                 Shrink<B> sb,
                                                                 Shrink<C> sc) {
-        return ShrinkProduct.shrinkProduct(sa, sb, sc,
+        return shrinkProduct(sa, sb, sc,
                 Tuple3::tuple, t -> t);
     }
 
@@ -24,7 +30,7 @@ public final class ShrinkTuple {
                                                                       Shrink<B> sb,
                                                                       Shrink<C> sc,
                                                                       Shrink<D> sd) {
-        return ShrinkProduct.shrinkProduct(sa, sb, sc, sd,
+        return shrinkProduct(sa, sb, sc, sd,
                 Tuple4::tuple, t -> t);
     }
 
@@ -33,7 +39,7 @@ public final class ShrinkTuple {
                                                                             Shrink<C> sc,
                                                                             Shrink<D> sd,
                                                                             Shrink<E> se) {
-        return ShrinkProduct.shrinkProduct(sa, sb, sc, sd, se,
+        return shrinkProduct(sa, sb, sc, sd, se,
                 Tuple4::tuple, t -> t);
     }
 }
