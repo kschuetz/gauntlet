@@ -21,7 +21,6 @@ import static dev.marksman.gauntlet.RefinedCounterexample.refinedCounterexample;
 import static dev.marksman.gauntlet.ResultCollector.universalResultCollector;
 
 public final class DefaultShrinkTestRunner implements ShrinkTestRunner {
-    private static final int BLOCK_SIZE = 16;
     private static final DefaultShrinkTestRunner INSTANCE = new DefaultShrinkTestRunner();
     public static final Duration TIMEOUT_TODO = Duration.ofMinutes(1);
 
@@ -33,7 +32,7 @@ public final class DefaultShrinkTestRunner implements ShrinkTestRunner {
 
             Session<A> session = new Session<>(executionParameters.getExecutor(),
                     testData.getShrink(), testData.getProperty(), testData.getMaximumShrinkCount(),
-                    deadline);
+                    deadline, executionParameters.getBlockSize());
 
             return session.run(testData.getSample());
         });
@@ -45,13 +44,15 @@ public final class DefaultShrinkTestRunner implements ShrinkTestRunner {
         private final Prop<A> property;
         private final int maximumShrinkCount;
         private final LocalDateTime deadline;
+        private final int blockSize;
 
-        private Session(Executor executor, Shrink<A> shrink, Prop<A> property, int maximumShrinkCount, LocalDateTime deadline) {
+        private Session(Executor executor, Shrink<A> shrink, Prop<A> property, int maximumShrinkCount, LocalDateTime deadline, int blockSize) {
             this.executor = executor;
             this.shrink = shrink;
             this.property = property;
             this.maximumShrinkCount = maximumShrinkCount;
             this.deadline = deadline;
+            this.blockSize = blockSize;
         }
 
         Maybe<RefinedCounterexample<A>> run(A initialSample) {
@@ -81,8 +82,8 @@ public final class DefaultShrinkTestRunner implements ShrinkTestRunner {
 
             Iterator<A> source = shrink.apply(sample).iterator();
             while (shrinkCount < maximumShrinkCount) {
-                int blockSize = Math.min(BLOCK_SIZE, maximumShrinkCount - shrinkCount);
-                ImmutableVector<A> block = readBlock(blockSize, source);
+                int actualBlockSize = Math.min(blockSize, maximumShrinkCount - shrinkCount);
+                ImmutableVector<A> block = readBlock(actualBlockSize, source);
                 if (block.isEmpty()) {
                     return nothing();
                 }
@@ -90,7 +91,7 @@ public final class DefaultShrinkTestRunner implements ShrinkTestRunner {
 
                 if (result instanceof TestResult.Falsified<?>) {
                     TestResult.Falsified<A> falsified = (TestResult.Falsified<A>) result;
-                    return just(refinedCounterexample(falsified.getCounterexample(), shrinkCount + falsified.getSuccessCount()));
+                    return just(refinedCounterexample(falsified.getCounterexample(), 1 + shrinkCount + falsified.getSuccessCount()));
                 } else if (result instanceof TestResult.Passed<?>) {
                     TestResult.Passed<A> passed = (TestResult.Passed<A>) result;
                     shrinkCount += passed.getSuccessCount();

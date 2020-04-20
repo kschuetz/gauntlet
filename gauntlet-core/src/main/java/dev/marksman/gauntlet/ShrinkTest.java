@@ -13,19 +13,20 @@ public final class ShrinkTest<A> {
     @Getter
     private final Shrink<A> shrink;
     @Getter
+    private final Prop<A> property;
+    @Getter
     private final A sample;
     @Getter
     private final int maximumShrinkCount;
     @Getter
     private final Duration timeout;
-    @Getter
-    private final Prop<A> property;
 
     public static <A> ShrinkTest<A> shrinkTest(Shrink<A> shrink,
+                                               Prop<A> property,
                                                A sample,
                                                int maximumShrinkCount,
-                                               Duration timeout,
-                                               Prop<A> property) {
-        return new ShrinkTest<>(shrink, sample, maximumShrinkCount, timeout, property);
+                                               Duration timeout) {
+        return new ShrinkTest<>(shrink, property, sample, maximumShrinkCount, timeout);
     }
+
 }

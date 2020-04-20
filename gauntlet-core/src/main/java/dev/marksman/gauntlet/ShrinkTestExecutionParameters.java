@@ -10,9 +10,12 @@ import static lombok.AccessLevel.PRIVATE;
 @AllArgsConstructor(access = PRIVATE)
 @Getter
 public class ShrinkTestExecutionParameters {
-    private final Executor executor;
+    private static final int DEFAULT_BLOCK_SIZE = 16;
 
-    public static ShrinkTestExecutionParameters shrinkTestExecutionParameters(Executor executor) {
-        return new ShrinkTestExecutionParameters(executor);
+    private final Executor executor;
+    private final int blockSize;
+
+    public static ShrinkTestExecutionParameters shrinkTestExecutionParameters(Executor executor, int blockSize) {
+        return new ShrinkTestExecutionParameters(executor, blockSize);
     }
 }
