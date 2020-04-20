@@ -56,8 +56,7 @@ class DefaultShrinkTestRunnerTest {
 
     @Test
     void doesNotFind() {
-        ShrinkTest<Integer> testParams = shrinkTest(shrinkInt(), Prop.predicate("< 100", n -> n < 100),
-                100, 1000, timeout);
+        ShrinkTest<Integer> testParams = shrinkTest(shrinkInt(), lessThan100, 100, 1000, timeout);
 
         Maybe<RefinedCounterexample<Integer>> result = runner.run(executionParameters, testParams)
                 .unsafePerformIO();
@@ -67,8 +66,7 @@ class DefaultShrinkTestRunnerTest {
 
     @Test
     void returnsBestCandidateWhenShrinkCountExceeded() {
-        ShrinkTest<Integer> testParams = shrinkTest(shrinkInt(), Prop.predicate("< 100", n -> n < 100),
-                105, 10, timeout);
+        ShrinkTest<Integer> testParams = shrinkTest(shrinkInt(), lessThan100, 105, 10, timeout);
 
         RefinedCounterexample<Integer> result = runner.run(executionParameters, testParams)
                 .unsafePerformIO().orElseThrow(AssertionError::new);
