@@ -4,7 +4,10 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.shrink.Shrink;
 import dev.marksman.gauntlet.shrink.ShrinkResult;
+import dev.marksman.kraftwerk.constraints.ByteRange;
 import dev.marksman.kraftwerk.constraints.IntRange;
+import dev.marksman.kraftwerk.constraints.LongRange;
+import dev.marksman.kraftwerk.constraints.ShortRange;
 
 public final class ShrinkNumerics {
 
@@ -103,7 +106,106 @@ public final class ShrinkNumerics {
         }
     }
 
+    /**
+     * Returns a shrinking strategy that shrinks longs, but limits values in the output to a given range.
+     */
+    public static Shrink<Long> shrinkLong(LongRange range) {
+        long min = range.minInclusive();
+        long max = range.maxInclusive();
+        if (min >= max) {
+            return Shrink.none();
+        } else if (min < 0 && max < 0) {
+            // all negative
+            return clamped(range, input -> series(-max, -input).fmap(n -> -n));
+        } else if (min < 0) {
+            // negative and positive
+            return clamped(range, input -> {
+                if (input < 0) {
+                    long high = Math.min(-input, max);
+                    return ShrinkResult.cons(high, () -> series(0, high).fmap(n -> -n));
+                } else {
+                    return series(0, input);
+                }
+            });
+        } else {
+            // non-negative
+            return clamped(range, input -> series(min, input));
+        }
+    }
+
+    /**
+     * Returns a shrinking strategy that shrinks shorts, but limits values in the output to a given range.
+     */
+    public static Shrink<Short> shrinkShort(ShortRange range) {
+        short min = range.minInclusive();
+        short max = range.maxInclusive();
+        if (min >= max) {
+            return Shrink.none();
+        } else if (min < 0 && max < 0) {
+            // all negative
+            return clamped(range, input -> series(-max, -input).fmap(n -> (short) (-n)));
+        } else if (min < 0) {
+            // negative and positive
+            return clamped(range, input -> {
+                if (input < 0) {
+                    short high = (short) Math.min(-input, max);
+                    return ShrinkResult.cons(high, () -> series((short) 0, high).fmap(n -> (short) (-n)));
+                } else {
+                    return series((short) 0, input);
+                }
+            });
+        } else {
+            // non-negative
+            return clamped(range, input -> series(min, input));
+        }
+    }
+
+    /**
+     * Returns a shrinking strategy that shrinks bytes, but limits values in the output to a given range.
+     */
+    public static Shrink<Byte> shrinkByte(ByteRange range) {
+        byte min = range.minInclusive();
+        byte max = range.maxInclusive();
+        if (min >= max) {
+            return Shrink.none();
+        } else if (min < 0 && max < 0) {
+            // all negative
+            return clamped(range, input -> series(-max, -input).fmap(n -> (byte) (-n)));
+        } else if (min < 0) {
+            // negative and positive
+            return clamped(range, input -> {
+                if (input < 0) {
+                    byte high = (byte) Math.min(-input, max);
+                    return ShrinkResult.cons(high, () -> series((byte) 0, high).fmap(n -> (byte) (-n)));
+                } else {
+                    return series((byte) 0, input);
+                }
+            });
+        } else {
+            // non-negative
+            return clamped(range, input -> series(min, input));
+        }
+    }
+
     private static Shrink<Integer> clamped(IntRange range, Fn1<Integer, ImmutableFiniteIterable<Integer>> f) {
+        return input -> range.includes(input)
+                ? f.apply(input)
+                : ShrinkResult.empty();
+    }
+
+    private static Shrink<Long> clamped(LongRange range, Fn1<Long, ImmutableFiniteIterable<Long>> f) {
+        return input -> range.includes(input)
+                ? f.apply(input)
+                : ShrinkResult.empty();
+    }
+
+    private static Shrink<Short> clamped(ShortRange range, Fn1<Short, ImmutableFiniteIterable<Short>> f) {
+        return input -> range.includes(input)
+                ? f.apply(input)
+                : ShrinkResult.empty();
+    }
+
+    private static Shrink<Byte> clamped(ByteRange range, Fn1<Byte, ImmutableFiniteIterable<Byte>> f) {
         return input -> range.includes(input)
                 ? f.apply(input)
                 : ShrinkResult.empty();

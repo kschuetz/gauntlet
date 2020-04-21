@@ -5,12 +5,21 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
 import com.jnape.palatable.lambda.adt.hlist.Tuple5;
 import dev.marksman.kraftwerk.Generator;
+import dev.marksman.kraftwerk.constraints.ByteRange;
 import dev.marksman.kraftwerk.constraints.IntRange;
+import dev.marksman.kraftwerk.constraints.LongRange;
+import dev.marksman.kraftwerk.constraints.ShortRange;
 import dev.marksman.kraftwerk.frequency.FrequencyMap;
 
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkByte;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkInt;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkLong;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkShort;
+import static dev.marksman.kraftwerk.Generators.generateByte;
 import static dev.marksman.kraftwerk.Generators.generateInt;
+import static dev.marksman.kraftwerk.Generators.generateLong;
+import static dev.marksman.kraftwerk.Generators.generateShort;
 
 public final class Arbitraries {
 
@@ -32,6 +41,54 @@ public final class Arbitraries {
 
     public static Arbitrary<Integer> arbitraryInt(FrequencyMap<Integer> frequencyMap) {
         return arbitraryInt(frequencyMap.toGenerator());
+    }
+
+    public static Arbitrary<Long> arbitraryLong(Generator<Long> generator) {
+        return arbitrary(generator).withShrink(shrinkLong());
+    }
+
+    public static Arbitrary<Long> arbitraryLong() {
+        return arbitraryLong(generateLong());
+    }
+
+    public static Arbitrary<Long> arbitraryLong(LongRange range) {
+        return arbitrary(generateLong(range)).withShrink(shrinkLong(range));
+    }
+
+    public static Arbitrary<Long> arbitraryLong(FrequencyMap<Long> frequencyMap) {
+        return arbitraryLong(frequencyMap.toGenerator());
+    }
+
+    public static Arbitrary<Short> arbitraryShort(Generator<Short> generator) {
+        return arbitrary(generator).withShrink(shrinkShort());
+    }
+
+    public static Arbitrary<Short> arbitraryShort() {
+        return arbitraryShort(generateShort());
+    }
+
+    public static Arbitrary<Short> arbitraryShort(ShortRange range) {
+        return arbitrary(generateShort(range)).withShrink(shrinkShort(range));
+    }
+
+    public static Arbitrary<Short> arbitraryShort(FrequencyMap<Short> frequencyMap) {
+        return arbitraryShort(frequencyMap.toGenerator());
+    }
+
+    public static Arbitrary<Byte> arbitraryByte(Generator<Byte> generator) {
+        return arbitrary(generator).withShrink(shrinkByte());
+    }
+
+    public static Arbitrary<Byte> arbitraryByte() {
+        return arbitraryByte(generateByte());
+    }
+
+    public static Arbitrary<Byte> arbitraryByte(ByteRange range) {
+        return arbitrary(generateByte(range)).withShrink(shrinkByte(range));
+    }
+
+    public static Arbitrary<Byte> arbitraryByte(FrequencyMap<Byte> frequencyMap) {
+        return arbitraryByte(frequencyMap.toGenerator());
     }
 
     public static <A, B> Arbitrary<Tuple2<A, B>> combine(Arbitrary<A> a,
