@@ -25,6 +25,14 @@ public final class ShrinkResult {
         return lazyCons(head, tailSupplier);
     }
 
+    public static <A> Fn0<ImmutableFiniteIterable<A>> maybeCons(boolean condition, Fn0<A> headSupplier, Fn0<ImmutableFiniteIterable<A>> tailSupplier) {
+        if (condition) {
+            return () -> cons(headSupplier.apply(), tailSupplier);
+        } else {
+            return tailSupplier;
+        }
+    }
+
     public static <A> ImmutableFiniteIterable<A> concat(ImmutableFiniteIterable<A> xs,
                                                         Fn0<ImmutableFiniteIterable<A>> other) {
         return xs.concat(() -> other.apply().iterator());
