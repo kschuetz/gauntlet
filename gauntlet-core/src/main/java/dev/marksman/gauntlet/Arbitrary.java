@@ -35,16 +35,6 @@ public interface Arbitrary<A> {
 
     Arbitrary<A> withPrettyPrinter(Fn1<? super A, String> prettyPrinter);
 
-    /**
-     * EXPERIMENTAL
-     * <p>
-     * Adds a function to apply to the output of the internal generator.
-     * Filters and shrinks remain unaffected.
-     * <p>
-     * All such functions are applied _before_ any filters are applied, even if `suchThat` calls were made earlier.
-     */
-    Arbitrary<A> mapPreFilterOutput(Fn1<A, A> f);
-
     <B> Arbitrary<B> convert(Fn1<A, B> ab, Fn1<B, A> ba);
 
     Arbitrary<A> modifyGeneratorParameters(Fn1<GeneratorParameters, GeneratorParameters> modifyFn);

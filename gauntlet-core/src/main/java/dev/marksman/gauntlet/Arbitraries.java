@@ -60,8 +60,4 @@ public final class Arbitraries {
         return CompositeArbitraries.combine(a, b, c, d, e);
     }
 
-    public static <A extends Comparable<A>> Arbitrary<Tuple2<A, A>> arbitraryOrderedPair(Arbitrary<A> a) {
-        return a.pair().mapPreFilterOutput(t -> t._1().compareTo(t._2()) > 0 ? t.invert() : t);
-    }
-
 }
