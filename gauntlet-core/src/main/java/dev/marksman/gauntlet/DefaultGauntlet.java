@@ -3,7 +3,9 @@ package dev.marksman.gauntlet;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
+import com.jnape.palatable.lambda.io.IO;
 import dev.marksman.collectionviews.Vector;
+import dev.marksman.gauntlet.shrink.Shrink;
 import dev.marksman.kraftwerk.GeneratorParameters;
 
 import java.time.Duration;
@@ -11,6 +13,7 @@ import java.util.concurrent.Executor;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
+import static com.jnape.palatable.lambda.io.IO.io;
 import static dev.marksman.gauntlet.ConcreteDomainTestApi.concreteDomainTestApi;
 import static dev.marksman.gauntlet.ConcreteGeneratorTestApi.concreteGeneratorTestApi;
 import static dev.marksman.gauntlet.DomainTestExecutionParameters.domainTestExecutionParameters;
@@ -20,6 +23,8 @@ import static dev.marksman.gauntlet.GeneratorTestParameters.generatorTestParamet
 import static dev.marksman.gauntlet.Quantifier.EXISTENTIAL;
 import static dev.marksman.gauntlet.Quantifier.UNIVERSAL;
 import static dev.marksman.gauntlet.ReportData.reportData;
+import static dev.marksman.gauntlet.ShrinkTest.shrinkTest;
+import static dev.marksman.gauntlet.ShrinkTestExecutionParameters.shrinkTestExecutionParameters;
 
 class DefaultGauntlet implements GauntletApi {
     private final Executor executor;
@@ -201,6 +206,7 @@ class DefaultGauntlet implements GauntletApi {
         GeneratorTestResult<A> result = generatorTestRunner.run(
                 generatorTestExecutionParameters(getExecutor(), getGeneratorParameters()),
                 generatorTest)
+                .flatMap(res -> refineResult(generatorTest, res))
                 .unsafePerformIO();
         ReportData<A> reportData = reportData(generatorTest.getProperty(), result.getResult(), generatorTest.getArbitrary().getPrettyPrinter(),
                 just(result.getInitialSeedValue()));
@@ -223,29 +229,24 @@ class DefaultGauntlet implements GauntletApi {
         return concreteDomainTestApi(this::runDomainTest,
                 domainTestParameters(domain, quantifier, Vector.empty(), defaultTimeout));
     }
-    
-    /*
-    private <A> IO<GeneratorTestResult<A>> refineResult(GeneratorTestExecutionParameters executionParameters,
-                                                        GeneratorTest<A> testData,
-                                                        GeneratorTestResult<A> initialResult) {
-        return initialResult.getResult().projectC()
-                .match(__ -> io(initialResult),
-                        falsified -> runShrinks(executionParameters, testData, initialResult, falsified));
-    }
 
-    private <A> IO<GeneratorTestResult<A>> runShrinks(GeneratorTestExecutionParameters executionParameters,
-                                                      GeneratorTest<A> testData,
-                                                      GeneratorTestResult<A> initialResult,
-                                                      TestResult.Falsified<A> falsified) {
-        int maximumShrinkCount = testData.getMaximumShrinkCount();
-        Shrink<A> shrink = testData.getArbitrary().getShrink().orElse(null);
-        if (maximumShrinkCount <= 0 || shrink == null) {
+    private <A> IO<GeneratorTestResult<A>> refineResult(GeneratorTest<A> testData,
+                                                        GeneratorTestResult<A> initialResult) {
+        if (!(initialResult.getResult() instanceof TestResult.Falsified<?>)) {
             return io(initialResult);
         }
-
-        // TODO: handle shrinks
-        return io(initialResult);
+        TestResult.Falsified<A> falsified = (TestResult.Falsified<A>) initialResult.getResult();
+        Shrink<A> shrink = testData.getArbitrary().getShrink().orElse(null);
+        if (shrink == null) {
+            return io(initialResult);
+        }
+        return shrinkTestRunner
+                .run(shrinkTestExecutionParameters(executor),
+                        shrinkTest(shrink, testData.getProperty(), falsified.getCounterexample().getSample(),
+                                testData.getMaximumShrinkCount(), testData.getTimeout()))
+                .fmap(maybeRefinedResult -> maybeRefinedResult
+                        .match(__ -> initialResult,
+                                refined -> initialResult.withResult(falsified.withRefinedCounterexample(refined))));
     }
-     */
 
 }
