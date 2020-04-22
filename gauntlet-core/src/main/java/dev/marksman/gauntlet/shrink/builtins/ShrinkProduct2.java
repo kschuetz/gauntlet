@@ -6,7 +6,7 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.Fn2;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.shrink.Shrink;
-import dev.marksman.gauntlet.shrink.ShrinkResult;
+import dev.marksman.gauntlet.shrink.ShrinkResultBuilder;
 
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Into.into;
 
@@ -28,10 +28,11 @@ final class ShrinkProduct2 {
             ImmutableFiniteIterable<A> as = sa.apply(constantA);
             ImmutableFiniteIterable<B> bs = sb.apply(constantB);
 
-            return ShrinkResult.concat(
-                    as.fmap(a -> fromProduct.apply(a, constantB)),
-                    () -> bs.fmap(b -> fromProduct.apply(constantA, b)),
-                    () -> zip2(as, bs).fmap(into(fromProduct::apply)));
+            return ShrinkResultBuilder.<T>shrinkResultBuilder()
+                    .lazyConcat(() -> as.fmap(a -> fromProduct.apply(a, constantB)))
+                    .lazyConcat(() -> bs.fmap(b -> fromProduct.apply(constantA, b)))
+                    .lazyConcat(() -> zip2(as, bs).fmap(into(fromProduct::apply)))
+                    .build();
         };
     }
 

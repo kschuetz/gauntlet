@@ -7,7 +7,7 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.Fn3;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.shrink.Shrink;
-import dev.marksman.gauntlet.shrink.ShrinkResult;
+import dev.marksman.gauntlet.shrink.ShrinkResultBuilder;
 
 import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Into.into;
@@ -35,16 +35,15 @@ final class ShrinkProduct3 {
             ImmutableFiniteIterable<B> bs = sb.apply(constantB);
             ImmutableFiniteIterable<C> cs = sc.apply(constantC);
 
-            return ShrinkResult.concat(
-                    as.fmap(a -> fromProduct.apply(a, constantB, constantC)),
-                    () -> bs.fmap(b -> fromProduct.apply(constantA, b, constantC)),
-                    () -> cs.fmap(c -> fromProduct.apply(constantA, constantB, c)),
-
-                    () -> zip2(as, bs).fmap(into((a, b) -> fromProduct.apply(a, b, constantC))),
-                    () -> zip2(as, cs).fmap(into((a, c) -> fromProduct.apply(a, constantB, c))),
-                    () -> zip2(bs, cs).fmap(into((b, c) -> fromProduct.apply(constantA, b, c))),
-
-                    () -> zip3(as, bs, cs).fmap(into3(fromProduct::apply)));
+            return ShrinkResultBuilder.<T>shrinkResultBuilder()
+                    .lazyConcat(() -> as.fmap(a -> fromProduct.apply(a, constantB, constantC)))
+                    .lazyConcat(() -> bs.fmap(b -> fromProduct.apply(constantA, b, constantC)))
+                    .lazyConcat(() -> cs.fmap(c -> fromProduct.apply(constantA, constantB, c)))
+                    .lazyConcat(() -> zip2(as, bs).fmap(into((a, b) -> fromProduct.apply(a, b, constantC))))
+                    .lazyConcat(() -> zip2(as, cs).fmap(into((a, c) -> fromProduct.apply(a, constantB, c))))
+                    .lazyConcat(() -> zip2(bs, cs).fmap(into((b, c) -> fromProduct.apply(constantA, b, c))))
+                    .lazyConcat(() -> zip3(as, bs, cs).fmap(into3(fromProduct::apply)))
+                    .build();
         };
     }
 
