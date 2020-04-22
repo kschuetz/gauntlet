@@ -10,7 +10,7 @@ final class LazyCons {
 
     }
 
-    static <A> ImmutableNonEmptyFiniteIterable<A> lazyCons(A head, Fn0<ImmutableFiniteIterable<A>> tailSupplier) {
+    static <A> ImmutableNonEmptyFiniteIterable<A> lazyTail(A head, Fn0<ImmutableFiniteIterable<A>> tailSupplier) {
         return new ImmutableNonEmptyFiniteIterable<A>() {
             @Override
             public ImmutableFiniteIterable<A> tail() {
@@ -20,6 +20,20 @@ final class LazyCons {
             @Override
             public A head() {
                 return head;
+            }
+        };
+    }
+
+    static <A> ImmutableNonEmptyFiniteIterable<A> lazyHeadLazyTail(Fn0<A> headSupplier, Fn0<ImmutableFiniteIterable<A>> tailSupplier) {
+        return new ImmutableNonEmptyFiniteIterable<A>() {
+            @Override
+            public ImmutableFiniteIterable<A> tail() {
+                return tailSupplier.apply();
+            }
+
+            @Override
+            public A head() {
+                return headSupplier.apply();
             }
         };
     }

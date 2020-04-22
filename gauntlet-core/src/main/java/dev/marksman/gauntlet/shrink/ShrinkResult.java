@@ -5,7 +5,7 @@ import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
 
 import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
-import static dev.marksman.gauntlet.shrink.LazyCons.lazyCons;
+import static dev.marksman.gauntlet.shrink.LazyCons.lazyTail;
 
 public final class ShrinkResult {
 
@@ -22,7 +22,7 @@ public final class ShrinkResult {
     }
 
     public static <A> ImmutableNonEmptyFiniteIterable<A> cons(A head, Fn0<ImmutableFiniteIterable<A>> tailSupplier) {
-        return lazyCons(head, tailSupplier);
+        return lazyTail(head, tailSupplier);
     }
 
     public static <A> Fn0<ImmutableFiniteIterable<A>> maybeCons(boolean condition, Fn0<A> headSupplier, Fn0<ImmutableFiniteIterable<A>> tailSupplier) {

@@ -5,6 +5,7 @@ import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.gauntlet.shrink.Shrink;
 import dev.marksman.gauntlet.shrink.ShrinkResult;
+import dev.marksman.gauntlet.shrink.ShrinkResultBuilder;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -52,9 +53,11 @@ public class ShrinkCollections {
                 return ShrinkResult.empty();
             }
             // TODO: implement ShrinkVector.  This is a start.
-            return ShrinkResult.<ImmutableVector<A>>maybeCons(minimumSize == 0, Vector::empty,
-                    () -> ShrinkResult.cons(evenElements(input),
-                            () -> ShrinkResult.singleton(oddElements(input)))).apply();
+            return ShrinkResultBuilder.<ImmutableVector<A>>shrinkResultBuilder()
+                    .when(minimumSize == 0, b -> b.append(Vector.empty()))
+                    .lazyAppend(() -> evenElements(input))
+                    .lazyAppend(() -> oddElements(input))
+                    .build();
         };
     }
 
