@@ -16,23 +16,33 @@ public class ShrinkCollections {
     }
 
     public static <A> Shrink<ImmutableNonEmptyVector<A>> shrinkNonEmptyVector(Shrink<A> element) {
-        return Shrink.none();
+        return shrinkVector(1, element)
+                .convert(ImmutableVector::toNonEmptyOrThrow,
+                        vector -> vector);
     }
 
     public static <A> Shrink<ArrayList<A>> shrinkArrayList(Shrink<A> element) {
-        return Shrink.none();
+        return shrinkVector(element)
+                .convert(vector -> vector.toCollection(ArrayList::new),
+                        Vector::copyFrom);
     }
 
     public static <A> Shrink<ArrayList<A>> shrinkNonEmptyArrayList(Shrink<A> element) {
-        return Shrink.none();
+        return shrinkNonEmptyVector(element)
+                .convert(vector -> vector.toCollection(ArrayList::new),
+                        arrayList -> Vector.copyFrom(arrayList).toNonEmptyOrThrow());
     }
 
     public static <A> Shrink<HashSet<A>> shrinkHashSet(Shrink<A> element) {
-        return Shrink.none();
+        return shrinkVector(element)
+                .convert(vector -> vector.toCollection(HashSet::new),
+                        Vector::copyFrom);
     }
 
     public static <A> Shrink<HashSet<A>> shrinkNonEmptyHashSet(Shrink<A> element) {
-        return Shrink.none();
+        return shrinkNonEmptyVector(element)
+                .convert(vector -> vector.toCollection(HashSet::new),
+                        hashSet -> Vector.copyFrom(hashSet).toNonEmptyOrThrow());
     }
 
     public static <A> Shrink<ImmutableVector<A>> shrinkVector(int minimumSize, Shrink<A> element) {
