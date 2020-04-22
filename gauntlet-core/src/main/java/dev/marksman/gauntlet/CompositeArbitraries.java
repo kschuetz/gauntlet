@@ -1,6 +1,7 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Maybe;
+import com.jnape.palatable.lambda.adt.choice.Choice2;
 import com.jnape.palatable.lambda.adt.hlist.HList;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
@@ -80,6 +81,11 @@ final class CompositeArbitraries {
                         d.getShrinkStrategy(), e.getShrinkStrategy(), toFn),
                 PrettyPrinting.<A, B, C, D, E>productPrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter(),
                         c.getPrettyPrinter(), d.getPrettyPrinter(), e.getPrettyPrinter()));
+    }
+
+    static <A, B> Arbitrary<Choice2<A, B>> arbitraryChoice2(Arbitrary<A> a,
+                                                            Arbitrary<B> b) {
+        return null;
     }
 
 

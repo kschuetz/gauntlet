@@ -1,5 +1,6 @@
 package dev.marksman.gauntlet;
 
+import com.jnape.palatable.lambda.adt.choice.Choice2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
@@ -115,6 +116,11 @@ public final class Arbitraries {
                                                                            Arbitrary<D> d,
                                                                            Arbitrary<E> e) {
         return CompositeArbitraries.combine(a, b, c, d, e);
+    }
+
+    public static <A, B> Arbitrary<Choice2<A, B>> arbitraryChoice(Weighted<Arbitrary<A>> a,
+                                                                  Weighted<Arbitrary<B>> b) {
+        return ChoiceArbitraries.arbitraryChoice2(a, b);
     }
 
 }

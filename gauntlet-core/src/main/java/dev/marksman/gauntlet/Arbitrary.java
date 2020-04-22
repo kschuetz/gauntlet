@@ -57,6 +57,14 @@ public interface Arbitrary<A> {
 
     Arbitrary<HashSet<A>> nonEmptyHashSet();
 
+    default Weighted<Arbitrary<A>> weighted() {
+        return Weighted.weighted(1, this);
+    }
+
+    default Weighted<Arbitrary<A>> weighted(int weight) {
+        return Weighted.weighted(weight, this);
+    }
+
     default <B> Arbitrary<B> convert(Iso<A, A, B, B> iso) {
         return convert(view(iso), view(iso.mirror()));
     }
