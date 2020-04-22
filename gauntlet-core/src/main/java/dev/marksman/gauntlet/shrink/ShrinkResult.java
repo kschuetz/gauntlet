@@ -1,6 +1,7 @@
 package dev.marksman.gauntlet.shrink;
 
 import com.jnape.palatable.lambda.functions.Fn0;
+import dev.marksman.collectionviews.Vector;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
 
@@ -25,22 +26,9 @@ public final class ShrinkResult {
         return lazyTail(head, tailSupplier);
     }
 
-    public static <A> ImmutableFiniteIterable<A> concat(ImmutableFiniteIterable<A> xs,
-                                                        Fn0<ImmutableFiniteIterable<A>> other) {
-        return xs.concat(() -> other.apply().iterator());
-    }
-
     @SafeVarargs
-    public static <A> ImmutableFiniteIterable<A> concat(ImmutableFiniteIterable<A> xs,
-                                                        Fn0<ImmutableFiniteIterable<A>> first,
-                                                        Fn0<ImmutableFiniteIterable<A>> second,
-                                                        Fn0<ImmutableFiniteIterable<A>>... more) {
-        ImmutableFiniteIterable<A> result = xs.concat(() -> first.apply().iterator())
-                .concat(() -> second.apply().iterator());
-        for (Fn0<ImmutableFiniteIterable<A>> f : more) {
-            result = result.concat(() -> f.apply().iterator());
-        }
-        return result;
+    public static <A> ImmutableNonEmptyFiniteIterable<A> of(A firstElement, A... more) {
+        return Vector.of(firstElement, more);
     }
 
 }

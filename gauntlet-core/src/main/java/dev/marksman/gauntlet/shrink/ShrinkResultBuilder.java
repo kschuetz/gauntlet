@@ -4,7 +4,6 @@ import com.jnape.palatable.lambda.functions.Fn0;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 
-import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
 import static dev.marksman.gauntlet.shrink.LazyCons.lazyHeadLazyTail;
 
 public final class ShrinkResultBuilder<A> {
@@ -15,7 +14,12 @@ public final class ShrinkResultBuilder<A> {
     }
 
     public static <A> ShrinkResultBuilder<A> shrinkResultBuilder() {
-        return new ShrinkResultBuilder<>(emptyImmutableFiniteIterable());
+        return new ShrinkResultBuilder<>(ShrinkResult.empty());
+    }
+
+    @SafeVarargs
+    public static <A> ShrinkResultBuilder<A> shrinkResultBuilder(A firstElement, A... moreElements) {
+        return new ShrinkResultBuilder<>(ShrinkResult.of(firstElement, moreElements));
     }
 
     public ShrinkResultBuilder<A> prepend(A element) {
@@ -35,7 +39,7 @@ public final class ShrinkResultBuilder<A> {
     }
 
     public ShrinkResultBuilder<A> lazyAppend(Fn0<A> elementSupplier) {
-        return new ShrinkResultBuilder<>(result.concat(() -> ImmutableFiniteIterable.of(elementSupplier.apply()).iterator()));
+        return new ShrinkResultBuilder<>(result.concat(() -> ShrinkResult.singleton(elementSupplier.apply()).iterator()));
     }
 
     public ShrinkResultBuilder<A> lazyConcat(Fn0<ImmutableFiniteIterable<A>> elementsSupplier) {
