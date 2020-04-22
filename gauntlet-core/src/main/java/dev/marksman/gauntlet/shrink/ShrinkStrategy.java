@@ -6,26 +6,26 @@ import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.filter.Filter;
 
 import static com.jnape.palatable.lambda.optics.functions.View.view;
-import static dev.marksman.gauntlet.shrink.ShrinkNone.shrinkNone;
+import static dev.marksman.gauntlet.shrink.ShrinkStrategyNone.shrinkNone;
 
 @FunctionalInterface
-public interface Shrink<A> {
+public interface ShrinkStrategy<A> {
     ImmutableFiniteIterable<A> apply(A input);
 
-    default Shrink<A> filter(Fn1<? super A, Boolean> predicate) {
-        return new FilterShrink<>(this, Filter.filter(predicate));
+    default ShrinkStrategy<A> filter(Fn1<? super A, Boolean> predicate) {
+        return new FilterShrinkStrategy<>(this, Filter.filter(predicate));
     }
 
-    default <B> Shrink<B> convert(Iso<A, A, B, B> iso) {
+    default <B> ShrinkStrategy<B> convert(Iso<A, A, B, B> iso) {
         return convert(view(iso), view(iso.mirror()));
     }
 
-    default <B> Shrink<B> convert(Fn1<A, B> ab, Fn1<B, A> ba) {
-        Shrink<A> orig = this;
+    default <B> ShrinkStrategy<B> convert(Fn1<A, B> ab, Fn1<B, A> ba) {
+        ShrinkStrategy<A> orig = this;
         return input -> orig.apply(ba.apply(input)).fmap(ab);
     }
 
-    static <A> Shrink<A> none() {
+    static <A> ShrinkStrategy<A> none() {
         return shrinkNone();
     }
 }

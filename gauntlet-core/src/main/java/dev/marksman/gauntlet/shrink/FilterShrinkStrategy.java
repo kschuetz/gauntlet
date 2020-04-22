@@ -4,18 +4,18 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.filter.Filter;
 
-final class FilterShrink<A> implements Shrink<A> {
-    private final Shrink<A> underlying;
+final class FilterShrinkStrategy<A> implements ShrinkStrategy<A> {
+    private final ShrinkStrategy<A> underlying;
     private final Filter<A> filter;
 
-    FilterShrink(Shrink<A> underlying, Filter<A> filter) {
+    FilterShrinkStrategy(ShrinkStrategy<A> underlying, Filter<A> filter) {
         this.underlying = underlying;
         this.filter = filter;
     }
 
     @Override
-    public Shrink<A> filter(Fn1<? super A, Boolean> predicate) {
-        return new FilterShrink<>(underlying, filter.add(predicate));
+    public ShrinkStrategy<A> filter(Fn1<? super A, Boolean> predicate) {
+        return new FilterShrinkStrategy<>(underlying, filter.add(predicate));
     }
 
     @Override

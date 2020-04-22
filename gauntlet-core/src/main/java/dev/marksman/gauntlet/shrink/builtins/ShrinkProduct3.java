@@ -6,8 +6,8 @@ import com.jnape.palatable.lambda.adt.product.Product3;
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.Fn3;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
-import dev.marksman.gauntlet.shrink.Shrink;
 import dev.marksman.gauntlet.shrink.ShrinkResultBuilder;
+import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 
 import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Into.into;
@@ -20,11 +20,11 @@ final class ShrinkProduct3 {
 
     }
 
-    static <A, B, C, T> Shrink<T> shrinkProduct3(Shrink<A> sa,
-                                                 Shrink<B> sb,
-                                                 Shrink<C> sc,
-                                                 Fn3<A, B, C, T> fromProduct,
-                                                 Fn1<T, Product3<A, B, C>> toProduct) {
+    static <A, B, C, T> ShrinkStrategy<T> shrinkProduct3(ShrinkStrategy<A> sa,
+                                                         ShrinkStrategy<B> sb,
+                                                         ShrinkStrategy<C> sc,
+                                                         Fn3<A, B, C, T> fromProduct,
+                                                         Fn1<T, Product3<A, B, C>> toProduct) {
         return input -> {
             Product3<A, B, C> p = toProduct.apply(input);
             A constantA = p._1();

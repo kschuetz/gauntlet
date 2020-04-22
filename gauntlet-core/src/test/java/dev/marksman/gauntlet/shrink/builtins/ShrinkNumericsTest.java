@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import testsupport.shrink.ShrinkTestCase;
+import testsupport.shrink.ShrinkStrategyTestCase;
 
 import static dev.marksman.gauntlet.prop.Props.allOf;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkByte;
@@ -22,11 +22,11 @@ import static dev.marksman.kraftwerk.Generators.generateLong;
 import static dev.marksman.kraftwerk.Generators.generateOrderedPair;
 import static dev.marksman.kraftwerk.Generators.generateShort;
 import static dev.marksman.kraftwerk.frequency.FrequencyMap.frequencyMap;
-import static testsupport.shrink.ShrinkTestCase.allElementsWithinDomain;
-import static testsupport.shrink.ShrinkTestCase.constrainedShrinkTestCase;
-import static testsupport.shrink.ShrinkTestCase.neverRepeatsAnElement;
-import static testsupport.shrink.ShrinkTestCase.shrinkOutputEmptyWhenInputOutsideOfDomain;
-import static testsupport.shrink.ShrinkTestCase.shrinkTestCases;
+import static testsupport.shrink.ShrinkStrategyTestCase.allElementsWithinDomain;
+import static testsupport.shrink.ShrinkStrategyTestCase.constrainedShrinkTestCase;
+import static testsupport.shrink.ShrinkStrategyTestCase.neverRepeatsAnElement;
+import static testsupport.shrink.ShrinkStrategyTestCase.shrinkOutputEmptyWhenInputOutsideOfDomain;
+import static testsupport.shrink.ShrinkStrategyTestCase.shrinkTestCases;
 
 class ShrinkNumericsTest extends GauntletApiBase {
 
@@ -60,7 +60,7 @@ class ShrinkNumericsTest extends GauntletApiBase {
                     ShrinkNumericsTest::generateMostlyInDomain,
                     ShrinkNumerics::shrinkInt))
                     .mustSatisfy(allOf(
-                            ShrinkTestCase.<Integer>neverRepeatsAnElement(),
+                            ShrinkStrategyTestCase.<Integer>neverRepeatsAnElement(),
                             allElementsWithinDomain(),
                             shrinkOutputEmptyWhenInputOutsideOfDomain()
                     ));

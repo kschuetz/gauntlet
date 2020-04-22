@@ -7,7 +7,7 @@ import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.filter.Filter;
-import dev.marksman.gauntlet.shrink.Shrink;
+import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.gauntlet.shrink.builtins.ShrinkCollections;
 import dev.marksman.kraftwerk.Generate;
 import dev.marksman.kraftwerk.Generator;
@@ -28,19 +28,19 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
     private final Fn1<GeneratorParameters, Supply<A>> generator;
     private final ImmutableFiniteIterable<Fn1<GeneratorParameters, GeneratorParameters>> parameterTransforms;
     private final Filter<A> filter;
-    private final Maybe<Shrink<A>> shrink;
+    private final Maybe<ShrinkStrategy<A>> shrinkStrategy;
     private final Fn1<? super A, String> prettyPrinter;
     private final int maxDiscards;
 
     private ConcreteArbitrary(Fn1<GeneratorParameters, Supply<A>> generator,
                               ImmutableFiniteIterable<Fn1<GeneratorParameters, GeneratorParameters>> parameterTransforms,
-                              Filter<A> filter, Maybe<Shrink<A>> shrink,
+                              Filter<A> filter, Maybe<ShrinkStrategy<A>> shrinkStrategy,
                               Fn1<? super A, String> prettyPrinter,
                               int maxDiscards) {
         this.generator = generator;
         this.parameterTransforms = parameterTransforms;
         this.filter = filter;
-        this.shrink = shrink;
+        this.shrinkStrategy = shrinkStrategy;
         this.prettyPrinter = prettyPrinter;
         this.maxDiscards = maxDiscards;
     }
@@ -57,8 +57,8 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
     }
 
     @Override
-    public Maybe<Shrink<A>> getShrink() {
-        return shrink;
+    public Maybe<ShrinkStrategy<A>> getShrinkStrategy() {
+        return shrinkStrategy;
     }
 
     @Override
@@ -67,19 +67,19 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
     }
 
     @Override
-    public Arbitrary<A> withShrink(Shrink<A> shrink) {
-        return new ConcreteArbitrary<>(generator, parameterTransforms, filter, just(shrink), prettyPrinter, maxDiscards);
+    public Arbitrary<A> withShrinkStrategy(ShrinkStrategy<A> shrinkStrategy) {
+        return new ConcreteArbitrary<>(generator, parameterTransforms, filter, just(shrinkStrategy), prettyPrinter, maxDiscards);
     }
 
     @Override
-    public Arbitrary<A> withNoShrink() {
-        return shrink.match(__ -> this,
+    public Arbitrary<A> withNoShrinkStrategy() {
+        return shrinkStrategy.match(__ -> this,
                 __ -> new ConcreteArbitrary<>(generator, parameterTransforms, filter, nothing(), prettyPrinter, maxDiscards));
     }
 
     @Override
     public Arbitrary<A> suchThat(Fn1<? super A, Boolean> predicate) {
-        return new ConcreteArbitrary<>(generator, parameterTransforms, filter.add(predicate), shrink.fmap(s -> s.filter(predicate)),
+        return new ConcreteArbitrary<>(generator, parameterTransforms, filter.add(predicate), shrinkStrategy.fmap(s -> s.filter(predicate)),
                 prettyPrinter, maxDiscards);
 
     }
@@ -90,7 +90,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
             maxDiscards = 0;
         }
         if (maxDiscards != this.maxDiscards) {
-            return new ConcreteArbitrary<>(generator, parameterTransforms, filter, shrink, prettyPrinter, maxDiscards);
+            return new ConcreteArbitrary<>(generator, parameterTransforms, filter, shrinkStrategy, prettyPrinter, maxDiscards);
         } else {
             return this;
         }
@@ -98,7 +98,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
 
     @Override
     public Arbitrary<A> withPrettyPrinter(Fn1<? super A, String> prettyPrinter) {
-        return new ConcreteArbitrary<>(generator, parameterTransforms, filter, shrink, prettyPrinter, maxDiscards);
+        return new ConcreteArbitrary<>(generator, parameterTransforms, filter, shrinkStrategy, prettyPrinter, maxDiscards);
     }
 
     @Override
@@ -106,7 +106,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
         return new ConcreteArbitrary<>(generator.fmap(vs -> vs.fmap(ab)),
                 parameterTransforms,
                 filter.contraMap(ba),
-                shrink.fmap(s -> s.convert(ab, ba)),
+                shrinkStrategy.fmap(s -> s.convert(ab, ba)),
                 prettyPrinter.contraMap(ba),
                 maxDiscards);
 
@@ -117,7 +117,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                         new CollectionSupply<>(createSupply(parameters),
                                 sizeGenerator(parameters),
                                 vectorAggregator()),
-                shrink.fmap(ShrinkCollections::shrinkVector),
+                shrinkStrategy.fmap(ShrinkCollections::shrinkVector),
                 // TODO: prettyPrinter
                 Object::toString);
     }
@@ -127,7 +127,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                         new CollectionSupply<>(createSupply(parameters),
                                 Generators.constant(count).prepare(parameters),
                                 vectorAggregator()),
-                shrink.fmap(ShrinkCollections::shrinkVector),
+                shrinkStrategy.fmap(ShrinkCollections::shrinkVector),
                 // TODO: prettyPrinter
                 Object::toString);
     }
@@ -138,7 +138,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                                 sizeGenerator(1, parameters),
                                 vectorAggregator())
                                 .fmap(ImmutableVector::toNonEmptyOrThrow),
-                shrink.fmap(ShrinkCollections::shrinkNonEmptyVector),
+                shrinkStrategy.fmap(ShrinkCollections::shrinkNonEmptyVector),
                 // TODO: prettyPrinter
                 Object::toString);
     }
@@ -152,7 +152,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                                 Generators.constant(count).prepare(parameters),
                                 vectorAggregator())
                                 .fmap(ImmutableVector::toNonEmptyOrThrow),
-                shrink.fmap(ShrinkCollections::shrinkNonEmptyVector),
+                shrinkStrategy.fmap(ShrinkCollections::shrinkNonEmptyVector),
                 // TODO: prettyPrinter
                 Object::toString);
     }
@@ -163,7 +163,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                         new CollectionSupply<>(createSupply(parameters),
                                 sizeGenerator(parameters),
                                 collectionAggregator(ArrayList::new)),
-                shrink.fmap(ShrinkCollections::shrinkArrayList),
+                shrinkStrategy.fmap(ShrinkCollections::shrinkArrayList),
                 // TODO: prettyPrinter
                 Object::toString);
     }
@@ -174,7 +174,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                         new CollectionSupply<>(createSupply(parameters),
                                 Generators.constant(count).prepare(parameters),
                                 collectionAggregator(ArrayList::new)),
-                shrink.fmap(ShrinkCollections::shrinkArrayList),
+                shrinkStrategy.fmap(ShrinkCollections::shrinkArrayList),
                 // TODO: prettyPrinter
                 Object::toString);
     }
@@ -185,7 +185,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                         new CollectionSupply<>(createSupply(parameters),
                                 sizeGenerator(1, parameters),
                                 collectionAggregator(ArrayList::new)),
-                shrink.fmap(ShrinkCollections::shrinkNonEmptyArrayList),
+                shrinkStrategy.fmap(ShrinkCollections::shrinkNonEmptyArrayList),
                 // TODO: prettyPrinter
                 Object::toString);
     }
@@ -196,7 +196,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                         new CollectionSupply<>(createSupply(parameters),
                                 sizeGenerator(parameters),
                                 collectionAggregator(HashSet::new)),
-                shrink.fmap(ShrinkCollections::shrinkHashSet),
+                shrinkStrategy.fmap(ShrinkCollections::shrinkHashSet),
                 // TODO: prettyPrinter
                 Object::toString);
     }
@@ -207,20 +207,20 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                         new CollectionSupply<>(createSupply(parameters),
                                 sizeGenerator(1, parameters),
                                 collectionAggregator(HashSet::new)),
-                shrink.fmap(ShrinkCollections::shrinkNonEmptyHashSet),
+                shrinkStrategy.fmap(ShrinkCollections::shrinkNonEmptyHashSet),
                 // TODO: prettyPrinter
                 Object::toString);
     }
 
     @Override
     public Arbitrary<A> modifyGeneratorParameters(Fn1<GeneratorParameters, GeneratorParameters> modifyFn) {
-        return new ConcreteArbitrary<>(generator, parameterTransforms.append(modifyFn), filter, shrink, prettyPrinter, maxDiscards);
+        return new ConcreteArbitrary<>(generator, parameterTransforms.append(modifyFn), filter, shrinkStrategy, prettyPrinter, maxDiscards);
     }
 
     static <A> ConcreteArbitrary<A> concreteArbitrary(Fn1<GeneratorParameters, Supply<A>> generator,
-                                                      Maybe<Shrink<A>> shrink,
+                                                      Maybe<ShrinkStrategy<A>> shrinkStrategy,
                                                       Fn1<? super A, String> prettyPrinter) {
-        return new ConcreteArbitrary<>(generator, emptyImmutableFiniteIterable(), Filter.emptyFilter(), shrink, prettyPrinter, Gauntlet.DEFAULT_MAX_DISCARDS);
+        return new ConcreteArbitrary<>(generator, emptyImmutableFiniteIterable(), Filter.emptyFilter(), shrinkStrategy, prettyPrinter, Gauntlet.DEFAULT_MAX_DISCARDS);
     }
 
     static <A> Arbitrary<A> concreteArbitrary(Generator<A> generator) {

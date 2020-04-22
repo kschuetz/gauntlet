@@ -5,7 +5,7 @@ import com.jnape.palatable.lambda.io.IO;
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.collectionviews.VectorBuilder;
-import dev.marksman.gauntlet.shrink.Shrink;
+import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -31,7 +31,7 @@ public final class DefaultShrinkTestRunner implements ShrinkTestRunner {
             LocalDateTime deadline = LocalDateTime.now().plus(testData.getTimeout());
 
             Session<A> session = new Session<>(executionParameters.getExecutor(),
-                    testData.getShrink(), testData.getProperty(), testData.getMaximumShrinkCount(),
+                    testData.getShrinkStrategy(), testData.getProperty(), testData.getMaximumShrinkCount(),
                     deadline, executionParameters.getBlockSize());
 
             return session.run(testData.getSample());
@@ -40,15 +40,15 @@ public final class DefaultShrinkTestRunner implements ShrinkTestRunner {
 
     private static class Session<A> {
         private final Executor executor;
-        private final Shrink<A> shrink;
+        private final ShrinkStrategy<A> shrinkStrategy;
         private final Prop<A> property;
         private final int maximumShrinkCount;
         private final LocalDateTime deadline;
         private final int blockSize;
 
-        private Session(Executor executor, Shrink<A> shrink, Prop<A> property, int maximumShrinkCount, LocalDateTime deadline, int blockSize) {
+        private Session(Executor executor, ShrinkStrategy<A> shrinkStrategy, Prop<A> property, int maximumShrinkCount, LocalDateTime deadline, int blockSize) {
             this.executor = executor;
-            this.shrink = shrink;
+            this.shrinkStrategy = shrinkStrategy;
             this.property = property;
             this.maximumShrinkCount = maximumShrinkCount;
             this.deadline = deadline;
@@ -80,7 +80,7 @@ public final class DefaultShrinkTestRunner implements ShrinkTestRunner {
                 return nothing();
             }
 
-            Iterator<A> source = shrink.apply(sample).iterator();
+            Iterator<A> source = shrinkStrategy.apply(sample).iterator();
             while (shrinkCount < maximumShrinkCount) {
                 int actualBlockSize = Math.min(blockSize, maximumShrinkCount - shrinkCount);
                 ImmutableVector<A> block = readBlock(actualBlockSize, source);

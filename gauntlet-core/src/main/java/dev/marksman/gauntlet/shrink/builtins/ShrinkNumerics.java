@@ -2,8 +2,8 @@ package dev.marksman.gauntlet.shrink.builtins;
 
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
-import dev.marksman.gauntlet.shrink.Shrink;
 import dev.marksman.gauntlet.shrink.ShrinkResult;
+import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.constraints.ByteRange;
 import dev.marksman.kraftwerk.constraints.IntRange;
 import dev.marksman.kraftwerk.constraints.LongRange;
@@ -15,7 +15,7 @@ public final class ShrinkNumerics {
 
     }
 
-    private static final Shrink<Integer> INT = input -> {
+    private static final ShrinkStrategy<Integer> INT = input -> {
         if (input < 0) {
             int high = input == Integer.MIN_VALUE ? Integer.MAX_VALUE : -input;
             return ShrinkResult.cons(high, () -> series(0, high).fmap(n -> -n));
@@ -24,7 +24,7 @@ public final class ShrinkNumerics {
         }
     };
 
-    private static final Shrink<Long> LONG = input -> {
+    private static final ShrinkStrategy<Long> LONG = input -> {
         if (input < 0) {
             long high = input == Long.MIN_VALUE ? Long.MAX_VALUE : -input;
             return ShrinkResult.cons(high, () -> series(0, high).fmap(n -> -n));
@@ -33,7 +33,7 @@ public final class ShrinkNumerics {
         }
     };
 
-    private static final Shrink<Short> SHORT = input -> {
+    private static final ShrinkStrategy<Short> SHORT = input -> {
         if (input < 0) {
             short high = input == Short.MIN_VALUE ? Short.MAX_VALUE : (short) (-input);
             return ShrinkResult.cons(high, () -> series((short) 0, high).fmap(n -> (short) -n));
@@ -42,7 +42,7 @@ public final class ShrinkNumerics {
         }
     };
 
-    private static final Shrink<Byte> BYTE = input -> {
+    private static final ShrinkStrategy<Byte> BYTE = input -> {
         if (input < 0) {
             byte high = input == Byte.MIN_VALUE ? Byte.MAX_VALUE : (byte) (-input);
             return ShrinkResult.cons(high, () -> series((byte) 0, high).fmap(n -> (byte) -n));
@@ -54,39 +54,39 @@ public final class ShrinkNumerics {
     /**
      * Returns a shrinking strategy that shrinks integers.
      */
-    public static Shrink<Integer> shrinkInt() {
+    public static ShrinkStrategy<Integer> shrinkInt() {
         return INT;
     }
 
     /**
      * Returns a shrinking strategy that shrinks longs.
      */
-    public static Shrink<Long> shrinkLong() {
+    public static ShrinkStrategy<Long> shrinkLong() {
         return LONG;
     }
 
     /**
      * Returns a shrinking strategy that shrinks shorts.
      */
-    public static Shrink<Short> shrinkShort() {
+    public static ShrinkStrategy<Short> shrinkShort() {
         return SHORT;
     }
 
     /**
      * Returns a shrinking strategy that shrinks bytes.
      */
-    public static Shrink<Byte> shrinkByte() {
+    public static ShrinkStrategy<Byte> shrinkByte() {
         return BYTE;
     }
 
     /**
      * Returns a shrinking strategy that shrinks integers, but limits values in the output to a given range.
      */
-    public static Shrink<Integer> shrinkInt(IntRange range) {
+    public static ShrinkStrategy<Integer> shrinkInt(IntRange range) {
         int min = range.minInclusive();
         int max = range.maxInclusive();
         if (min >= max) {
-            return Shrink.none();
+            return ShrinkStrategy.none();
         } else if (min < 0 && max < 0) {
             // all negative
             return clamped(range, input -> series(-max, -input).fmap(n -> -n));
@@ -109,11 +109,11 @@ public final class ShrinkNumerics {
     /**
      * Returns a shrinking strategy that shrinks longs, but limits values in the output to a given range.
      */
-    public static Shrink<Long> shrinkLong(LongRange range) {
+    public static ShrinkStrategy<Long> shrinkLong(LongRange range) {
         long min = range.minInclusive();
         long max = range.maxInclusive();
         if (min >= max) {
-            return Shrink.none();
+            return ShrinkStrategy.none();
         } else if (min < 0 && max < 0) {
             // all negative
             return clamped(range, input -> series(-max, -input).fmap(n -> -n));
@@ -136,11 +136,11 @@ public final class ShrinkNumerics {
     /**
      * Returns a shrinking strategy that shrinks shorts, but limits values in the output to a given range.
      */
-    public static Shrink<Short> shrinkShort(ShortRange range) {
+    public static ShrinkStrategy<Short> shrinkShort(ShortRange range) {
         short min = range.minInclusive();
         short max = range.maxInclusive();
         if (min >= max) {
-            return Shrink.none();
+            return ShrinkStrategy.none();
         } else if (min < 0 && max < 0) {
             // all negative
             return clamped(range, input -> series(-max, -input).fmap(n -> (short) (-n)));
@@ -163,11 +163,11 @@ public final class ShrinkNumerics {
     /**
      * Returns a shrinking strategy that shrinks bytes, but limits values in the output to a given range.
      */
-    public static Shrink<Byte> shrinkByte(ByteRange range) {
+    public static ShrinkStrategy<Byte> shrinkByte(ByteRange range) {
         byte min = range.minInclusive();
         byte max = range.maxInclusive();
         if (min >= max) {
-            return Shrink.none();
+            return ShrinkStrategy.none();
         } else if (min < 0 && max < 0) {
             // all negative
             return clamped(range, input -> series(-max, -input).fmap(n -> (byte) (-n)));
@@ -187,25 +187,25 @@ public final class ShrinkNumerics {
         }
     }
 
-    private static Shrink<Integer> clamped(IntRange range, Fn1<Integer, ImmutableFiniteIterable<Integer>> f) {
+    private static ShrinkStrategy<Integer> clamped(IntRange range, Fn1<Integer, ImmutableFiniteIterable<Integer>> f) {
         return input -> range.includes(input)
                 ? f.apply(input)
                 : ShrinkResult.empty();
     }
 
-    private static Shrink<Long> clamped(LongRange range, Fn1<Long, ImmutableFiniteIterable<Long>> f) {
+    private static ShrinkStrategy<Long> clamped(LongRange range, Fn1<Long, ImmutableFiniteIterable<Long>> f) {
         return input -> range.includes(input)
                 ? f.apply(input)
                 : ShrinkResult.empty();
     }
 
-    private static Shrink<Short> clamped(ShortRange range, Fn1<Short, ImmutableFiniteIterable<Short>> f) {
+    private static ShrinkStrategy<Short> clamped(ShortRange range, Fn1<Short, ImmutableFiniteIterable<Short>> f) {
         return input -> range.includes(input)
                 ? f.apply(input)
                 : ShrinkResult.empty();
     }
 
-    private static Shrink<Byte> clamped(ByteRange range, Fn1<Byte, ImmutableFiniteIterable<Byte>> f) {
+    private static ShrinkStrategy<Byte> clamped(ByteRange range, Fn1<Byte, ImmutableFiniteIterable<Byte>> f) {
         return input -> range.includes(input)
                 ? f.apply(input)
                 : ShrinkResult.empty();

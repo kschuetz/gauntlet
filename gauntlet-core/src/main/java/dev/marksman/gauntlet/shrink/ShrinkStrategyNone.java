@@ -6,8 +6,8 @@ import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 
 import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
 
-class ShrinkNone<A> implements Shrink<A> {
-    private static ShrinkNone<?> INSTANCE = new ShrinkNone<>();
+class ShrinkStrategyNone<A> implements ShrinkStrategy<A> {
+    private static final ShrinkStrategyNone<?> INSTANCE = new ShrinkStrategyNone<>();
 
     @Override
     public ImmutableFiniteIterable<A> apply(A input) {
@@ -15,22 +15,22 @@ class ShrinkNone<A> implements Shrink<A> {
     }
 
     @Override
-    public Shrink<A> filter(Fn1<? super A, Boolean> predicate) {
+    public ShrinkStrategy<A> filter(Fn1<? super A, Boolean> predicate) {
         return this;
     }
 
     @Override
-    public <B> Shrink<B> convert(Iso<A, A, B, B> iso) {
+    public <B> ShrinkStrategy<B> convert(Iso<A, A, B, B> iso) {
         return shrinkNone();
     }
 
     @Override
-    public <B> Shrink<B> convert(Fn1<A, B> ab, Fn1<B, A> ba) {
+    public <B> ShrinkStrategy<B> convert(Fn1<A, B> ab, Fn1<B, A> ba) {
         return shrinkNone();
     }
 
     @SuppressWarnings("unchecked")
-    static <A> Shrink<A> shrinkNone() {
-        return (Shrink<A>) INSTANCE;
+    static <A> ShrinkStrategy<A> shrinkNone() {
+        return (ShrinkStrategy<A>) INSTANCE;
     }
 }

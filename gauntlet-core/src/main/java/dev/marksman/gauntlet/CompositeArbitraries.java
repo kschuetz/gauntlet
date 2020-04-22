@@ -10,7 +10,7 @@ import com.jnape.palatable.lambda.functions.Fn2;
 import com.jnape.palatable.lambda.functions.Fn3;
 import com.jnape.palatable.lambda.functions.Fn4;
 import com.jnape.palatable.lambda.functions.Fn5;
-import dev.marksman.gauntlet.shrink.Shrink;
+import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.gauntlet.shrink.builtins.ShrinkProduct;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
@@ -27,7 +27,7 @@ final class CompositeArbitraries {
         return concreteArbitrary(parameters -> new CompositeSupply2<>(a.createSupply(parameters),
                         b.createSupply(parameters),
                         toFn),
-                combineShrinks(a.getShrink(), b.getShrink(), toFn),
+                combineShrinkStrategies(a.getShrinkStrategy(), b.getShrinkStrategy(), toFn),
                 PrettyPrinting.<A, B>productPrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter()));
     }
 
@@ -41,7 +41,7 @@ final class CompositeArbitraries {
                         b.createSupply(parameters),
                         c.createSupply(parameters),
                         toFn),
-                combineShrinks(a.getShrink(), b.getShrink(), c.getShrink(), toFn),
+                combineShrinkStrategies(a.getShrinkStrategy(), b.getShrinkStrategy(), c.getShrinkStrategy(), toFn),
                 PrettyPrinting.<A, B, C>productPrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter(), c.getPrettyPrinter()));
     }
 
@@ -57,7 +57,7 @@ final class CompositeArbitraries {
                         c.createSupply(parameters),
                         d.createSupply(parameters),
                         toFn),
-                combineShrinks(a.getShrink(), b.getShrink(), c.getShrink(), d.getShrink(), toFn),
+                combineShrinkStrategies(a.getShrinkStrategy(), b.getShrinkStrategy(), c.getShrinkStrategy(), d.getShrinkStrategy(), toFn),
                 PrettyPrinting.<A, B, C, D>productPrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter(),
                         c.getPrettyPrinter(), d.getPrettyPrinter()));
     }
@@ -76,68 +76,69 @@ final class CompositeArbitraries {
                         d.createSupply(parameters),
                         e.createSupply(parameters),
                         toFn),
-                combineShrinks(a.getShrink(), b.getShrink(), c.getShrink(), d.getShrink(), e.getShrink(), toFn),
+                combineShrinkStrategies(a.getShrinkStrategy(), b.getShrinkStrategy(), c.getShrinkStrategy(),
+                        d.getShrinkStrategy(), e.getShrinkStrategy(), toFn),
                 PrettyPrinting.<A, B, C, D, E>productPrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter(),
                         c.getPrettyPrinter(), d.getPrettyPrinter(), e.getPrettyPrinter()));
     }
 
 
-    private static <A, B> Maybe<Shrink<Tuple2<A, B>>> combineShrinks(Maybe<Shrink<A>> shrinkA,
-                                                                     Maybe<Shrink<B>> shrinkB,
-                                                                     Fn2<A, B, Tuple2<A, B>> toFn) {
+    private static <A, B> Maybe<ShrinkStrategy<Tuple2<A, B>>> combineShrinkStrategies(Maybe<ShrinkStrategy<A>> shrinkA,
+                                                                                      Maybe<ShrinkStrategy<B>> shrinkB,
+                                                                                      Fn2<A, B, Tuple2<A, B>> toFn) {
         if (isNothing(shrinkA) && isNothing(shrinkB)) {
             return nothing();
         } else {
-            return just(ShrinkProduct.shrinkProduct(shrinkA.orElse(Shrink.none()),
-                    shrinkB.orElse(Shrink.none()),
+            return just(ShrinkProduct.shrinkProduct(shrinkA.orElse(ShrinkStrategy.none()),
+                    shrinkB.orElse(ShrinkStrategy.none()),
                     toFn, t -> t));
         }
     }
 
-    private static <A, B, C> Maybe<Shrink<Tuple3<A, B, C>>> combineShrinks(Maybe<Shrink<A>> shrinkA,
-                                                                           Maybe<Shrink<B>> shrinkB,
-                                                                           Maybe<Shrink<C>> shrinkC,
-                                                                           Fn3<A, B, C, Tuple3<A, B, C>> toFn) {
+    private static <A, B, C> Maybe<ShrinkStrategy<Tuple3<A, B, C>>> combineShrinkStrategies(Maybe<ShrinkStrategy<A>> shrinkA,
+                                                                                            Maybe<ShrinkStrategy<B>> shrinkB,
+                                                                                            Maybe<ShrinkStrategy<C>> shrinkC,
+                                                                                            Fn3<A, B, C, Tuple3<A, B, C>> toFn) {
         if (isNothing(shrinkA) && isNothing(shrinkB) && isNothing(shrinkC)) {
             return nothing();
         } else {
-            return just(ShrinkProduct.shrinkProduct(shrinkA.orElse(Shrink.none()),
-                    shrinkB.orElse(Shrink.none()),
-                    shrinkC.orElse(Shrink.none()),
+            return just(ShrinkProduct.shrinkProduct(shrinkA.orElse(ShrinkStrategy.none()),
+                    shrinkB.orElse(ShrinkStrategy.none()),
+                    shrinkC.orElse(ShrinkStrategy.none()),
                     toFn, t -> t));
         }
     }
 
-    private static <A, B, C, D> Maybe<Shrink<Tuple4<A, B, C, D>>> combineShrinks(Maybe<Shrink<A>> shrinkA,
-                                                                                 Maybe<Shrink<B>> shrinkB,
-                                                                                 Maybe<Shrink<C>> shrinkC,
-                                                                                 Maybe<Shrink<D>> shrinkD,
-                                                                                 Fn4<A, B, C, D, Tuple4<A, B, C, D>> toFn) {
+    private static <A, B, C, D> Maybe<ShrinkStrategy<Tuple4<A, B, C, D>>> combineShrinkStrategies(Maybe<ShrinkStrategy<A>> shrinkA,
+                                                                                                  Maybe<ShrinkStrategy<B>> shrinkB,
+                                                                                                  Maybe<ShrinkStrategy<C>> shrinkC,
+                                                                                                  Maybe<ShrinkStrategy<D>> shrinkD,
+                                                                                                  Fn4<A, B, C, D, Tuple4<A, B, C, D>> toFn) {
         if (isNothing(shrinkA) && isNothing(shrinkB) && isNothing(shrinkC) && isNothing(shrinkD)) {
             return nothing();
         } else {
-            return just(ShrinkProduct.shrinkProduct(shrinkA.orElse(Shrink.none()),
-                    shrinkB.orElse(Shrink.none()),
-                    shrinkC.orElse(Shrink.none()),
-                    shrinkD.orElse(Shrink.none()),
+            return just(ShrinkProduct.shrinkProduct(shrinkA.orElse(ShrinkStrategy.none()),
+                    shrinkB.orElse(ShrinkStrategy.none()),
+                    shrinkC.orElse(ShrinkStrategy.none()),
+                    shrinkD.orElse(ShrinkStrategy.none()),
                     toFn, t -> t));
         }
     }
 
-    private static <A, B, C, D, E> Maybe<Shrink<Tuple5<A, B, C, D, E>>> combineShrinks(Maybe<Shrink<A>> shrinkA,
-                                                                                       Maybe<Shrink<B>> shrinkB,
-                                                                                       Maybe<Shrink<C>> shrinkC,
-                                                                                       Maybe<Shrink<D>> shrinkD,
-                                                                                       Maybe<Shrink<E>> shrinkE,
-                                                                                       Fn5<A, B, C, D, E, Tuple5<A, B, C, D, E>> toFn) {
+    private static <A, B, C, D, E> Maybe<ShrinkStrategy<Tuple5<A, B, C, D, E>>> combineShrinkStrategies(Maybe<ShrinkStrategy<A>> shrinkA,
+                                                                                                        Maybe<ShrinkStrategy<B>> shrinkB,
+                                                                                                        Maybe<ShrinkStrategy<C>> shrinkC,
+                                                                                                        Maybe<ShrinkStrategy<D>> shrinkD,
+                                                                                                        Maybe<ShrinkStrategy<E>> shrinkE,
+                                                                                                        Fn5<A, B, C, D, E, Tuple5<A, B, C, D, E>> toFn) {
         if (isNothing(shrinkA) && isNothing(shrinkB) && isNothing(shrinkC) && isNothing(shrinkD) && isNothing(shrinkE)) {
             return nothing();
         } else {
-            return just(ShrinkProduct.shrinkProduct(shrinkA.orElse(Shrink.none()),
-                    shrinkB.orElse(Shrink.none()),
-                    shrinkC.orElse(Shrink.none()),
-                    shrinkD.orElse(Shrink.none()),
-                    shrinkE.orElse(Shrink.none()),
+            return just(ShrinkProduct.shrinkProduct(shrinkA.orElse(ShrinkStrategy.none()),
+                    shrinkB.orElse(ShrinkStrategy.none()),
+                    shrinkC.orElse(ShrinkStrategy.none()),
+                    shrinkD.orElse(ShrinkStrategy.none()),
+                    shrinkE.orElse(ShrinkStrategy.none()),
                     toFn, t -> t));
         }
     }

@@ -28,7 +28,7 @@ public final class Arbitraries {
     }
 
     public static Arbitrary<Integer> arbitraryInt(Generator<Integer> generator) {
-        return arbitrary(generator).withShrink(shrinkInt());
+        return arbitrary(generator).withShrinkStrategy(shrinkInt());
     }
 
     public static Arbitrary<Integer> arbitraryInt() {
@@ -36,7 +36,7 @@ public final class Arbitraries {
     }
 
     public static Arbitrary<Integer> arbitraryInt(IntRange range) {
-        return arbitrary(generateInt(range)).withShrink(shrinkInt(range));
+        return arbitrary(generateInt(range)).withShrinkStrategy(shrinkInt(range));
     }
 
     public static Arbitrary<Integer> arbitraryInt(FrequencyMap<Integer> frequencyMap) {
@@ -44,7 +44,7 @@ public final class Arbitraries {
     }
 
     public static Arbitrary<Long> arbitraryLong(Generator<Long> generator) {
-        return arbitrary(generator).withShrink(shrinkLong());
+        return arbitrary(generator).withShrinkStrategy(shrinkLong());
     }
 
     public static Arbitrary<Long> arbitraryLong() {
@@ -52,7 +52,7 @@ public final class Arbitraries {
     }
 
     public static Arbitrary<Long> arbitraryLong(LongRange range) {
-        return arbitrary(generateLong(range)).withShrink(shrinkLong(range));
+        return arbitrary(generateLong(range)).withShrinkStrategy(shrinkLong(range));
     }
 
     public static Arbitrary<Long> arbitraryLong(FrequencyMap<Long> frequencyMap) {
@@ -60,7 +60,7 @@ public final class Arbitraries {
     }
 
     public static Arbitrary<Short> arbitraryShort(Generator<Short> generator) {
-        return arbitrary(generator).withShrink(shrinkShort());
+        return arbitrary(generator).withShrinkStrategy(shrinkShort());
     }
 
     public static Arbitrary<Short> arbitraryShort() {
@@ -68,7 +68,7 @@ public final class Arbitraries {
     }
 
     public static Arbitrary<Short> arbitraryShort(ShortRange range) {
-        return arbitrary(generateShort(range)).withShrink(shrinkShort(range));
+        return arbitrary(generateShort(range)).withShrinkStrategy(shrinkShort(range));
     }
 
     public static Arbitrary<Short> arbitraryShort(FrequencyMap<Short> frequencyMap) {
@@ -76,7 +76,7 @@ public final class Arbitraries {
     }
 
     public static Arbitrary<Byte> arbitraryByte(Generator<Byte> generator) {
-        return arbitrary(generator).withShrink(shrinkByte());
+        return arbitrary(generator).withShrinkStrategy(shrinkByte());
     }
 
     public static Arbitrary<Byte> arbitraryByte() {
@@ -84,7 +84,7 @@ public final class Arbitraries {
     }
 
     public static Arbitrary<Byte> arbitraryByte(ByteRange range) {
-        return arbitrary(generateByte(range)).withShrink(shrinkByte(range));
+        return arbitrary(generateByte(range)).withShrinkStrategy(shrinkByte(range));
     }
 
     public static Arbitrary<Byte> arbitraryByte(FrequencyMap<Byte> frequencyMap) {

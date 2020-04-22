@@ -3,7 +3,7 @@ package dev.marksman.gauntlet.shrink.builtins;
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
-import dev.marksman.gauntlet.shrink.Shrink;
+import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import org.junit.jupiter.api.Test;
 
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkCollections.shrinkVector;
@@ -14,7 +14,7 @@ class ShrinkCollectionsTest {
 
     @Test
     void shrinkVectorStructure() {
-        Shrink<ImmutableVector<Integer>> shrink = shrinkVector(Shrink.none());
+        ShrinkStrategy<ImmutableVector<Integer>> shrink = shrinkVector(ShrinkStrategy.none());
 
         ImmutableFiniteIterable<ImmutableVector<Integer>> output = shrink.apply(Vector.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
         assertThat(output, contains(

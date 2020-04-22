@@ -5,7 +5,7 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
 import com.jnape.palatable.lambda.io.IO;
 import dev.marksman.collectionviews.Vector;
-import dev.marksman.gauntlet.shrink.Shrink;
+import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.GeneratorParameters;
 
 import java.time.Duration;
@@ -236,13 +236,13 @@ class DefaultGauntlet implements GauntletApi {
             return io(initialResult);
         }
         TestResult.Falsified<A> falsified = (TestResult.Falsified<A>) initialResult.getResult();
-        Shrink<A> shrink = testData.getArbitrary().getShrink().orElse(null);
-        if (shrink == null) {
+        ShrinkStrategy<A> shrinkStrategy = testData.getArbitrary().getShrinkStrategy().orElse(null);
+        if (shrinkStrategy == null) {
             return io(initialResult);
         }
         return shrinkTestRunner
                 .run(shrinkTestExecutionParameters(executor),
-                        shrinkTest(shrink, testData.getProperty(), falsified.getCounterexample().getSample(),
+                        shrinkTest(shrinkStrategy, testData.getProperty(), falsified.getCounterexample().getSample(),
                                 testData.getMaximumShrinkCount(), testData.getTimeout()))
                 .fmap(maybeRefinedResult -> maybeRefinedResult
                         .match(__ -> initialResult,

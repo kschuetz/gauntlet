@@ -7,7 +7,7 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.optics.Iso;
 import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.collectionviews.ImmutableVector;
-import dev.marksman.gauntlet.shrink.Shrink;
+import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.GeneratorParameters;
 
@@ -21,13 +21,13 @@ import static dev.marksman.gauntlet.ConcreteArbitrary.concreteArbitrary;
 public interface Arbitrary<A> {
     Supply<A> createSupply(GeneratorParameters parameters);
 
-    Maybe<Shrink<A>> getShrink();
+    Maybe<ShrinkStrategy<A>> getShrinkStrategy();
 
     Fn1<? super A, String> getPrettyPrinter();
 
-    Arbitrary<A> withShrink(Shrink<A> shrink);
+    Arbitrary<A> withShrinkStrategy(ShrinkStrategy<A> shrinkStrategy);
 
-    Arbitrary<A> withNoShrink();
+    Arbitrary<A> withNoShrinkStrategy();
 
     Arbitrary<A> suchThat(Fn1<? super A, Boolean> predicate);
 
