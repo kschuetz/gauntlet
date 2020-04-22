@@ -4,8 +4,8 @@ import java.time.Duration;
 
 import static dev.marksman.gauntlet.DefaultDomainTestRunner.defaultDomainTestRunner;
 import static dev.marksman.gauntlet.DefaultGeneratorTestRunner.defaultGeneratorTestRunner;
+import static dev.marksman.gauntlet.DefaultRefinementTestRunner.defaultShrinkTestRunner;
 import static dev.marksman.gauntlet.DefaultReporter.defaultReporter;
-import static dev.marksman.gauntlet.DefaultShrinkTestRunner.defaultShrinkTestRunner;
 import static dev.marksman.kraftwerk.StandardGeneratorParameters.defaultGeneratorParameters;
 import static dev.marksman.kraftwerk.bias.DefaultPropertyTestingBiasSettings.defaultPropertyTestBiasSettings;
 import static java.util.concurrent.Executors.newFixedThreadPool;

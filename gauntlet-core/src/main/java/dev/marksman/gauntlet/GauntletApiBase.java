@@ -118,8 +118,8 @@ public abstract class GauntletApiBase implements GauntletApi {
     }
 
     @Override
-    public ShrinkTestRunner getShrinkTestRunner() {
-        return getApi().getShrinkTestRunner();
+    public RefinementTestRunner getRefinementTestRunner() {
+        return getApi().getRefinementTestRunner();
     }
 
     @Override
@@ -163,8 +163,8 @@ public abstract class GauntletApiBase implements GauntletApi {
     }
 
     @Override
-    public GauntletApi withShrinkTestRunner(ShrinkTestRunner testRunner) {
-        return getApi().withShrinkTestRunner(testRunner);
+    public GauntletApi withRefinementTestRunner(RefinementTestRunner testRunner) {
+        return getApi().withRefinementTestRunner(testRunner);
     }
 
     @Override

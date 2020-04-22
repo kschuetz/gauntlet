@@ -20,13 +20,13 @@ import static dev.marksman.gauntlet.EvaluateSampleTask.evaluateSampleTask;
 import static dev.marksman.gauntlet.RefinedCounterexample.refinedCounterexample;
 import static dev.marksman.gauntlet.ResultCollector.universalResultCollector;
 
-public final class DefaultShrinkTestRunner implements ShrinkTestRunner {
-    private static final DefaultShrinkTestRunner INSTANCE = new DefaultShrinkTestRunner();
+public final class DefaultRefinementTestRunner implements RefinementTestRunner {
+    private static final DefaultRefinementTestRunner INSTANCE = new DefaultRefinementTestRunner();
     public static final Duration TIMEOUT_TODO = Duration.ofMinutes(1);
 
     @Override
-    public <A> IO<Maybe<RefinedCounterexample<A>>> run(ShrinkTestExecutionParameters executionParameters,
-                                                       ShrinkTest<A> testData) {
+    public <A> IO<Maybe<RefinedCounterexample<A>>> run(RefinementTestExecutionParameters executionParameters,
+                                                       RefinementTest<A> testData) {
         return io(() -> {
             LocalDateTime deadline = LocalDateTime.now().plus(testData.getTimeout());
 
@@ -129,7 +129,7 @@ public final class DefaultShrinkTestRunner implements ShrinkTestRunner {
         return builder.build();
     }
 
-    public static DefaultShrinkTestRunner defaultShrinkTestRunner() {
+    public static DefaultRefinementTestRunner defaultShrinkTestRunner() {
         return INSTANCE;
     }
 }

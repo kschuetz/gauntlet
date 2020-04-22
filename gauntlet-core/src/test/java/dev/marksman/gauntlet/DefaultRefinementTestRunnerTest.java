@@ -8,31 +8,30 @@ import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
-import static dev.marksman.gauntlet.ShrinkTest.shrinkTest;
-import static dev.marksman.gauntlet.ShrinkTestExecutionParameters.shrinkTestExecutionParameters;
+import static dev.marksman.gauntlet.RefinementTest.refinementTest;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkInt;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class DefaultShrinkTestRunnerTest {
+class DefaultRefinementTestRunnerTest {
 
     private static final Prop<Integer> lessThan100 = Prop.predicate("< 100", n -> n < 100);
     private static final Prop<Integer> odd = Prop.predicate("odd", n -> n % 2 == 1);
 
     private static final Duration timeout = Duration.ofSeconds(5);
-    private ShrinkTestExecutionParameters executionParameters;
-    private DefaultShrinkTestRunner runner;
+    private RefinementTestExecutionParameters executionParameters;
+    private DefaultRefinementTestRunner runner;
 
     @BeforeEach
     void setUp() {
         ExecutorService executorService = newFixedThreadPool(2);
-        executionParameters = shrinkTestExecutionParameters(executorService, 3);
-        runner = DefaultShrinkTestRunner.defaultShrinkTestRunner();
+        executionParameters = RefinementTestExecutionParameters.refinementTestExecutionParameters(executorService, 3);
+        runner = DefaultRefinementTestRunner.defaultShrinkTestRunner();
     }
 
     @Test
     void findsRightAway() {
-        ShrinkTest<Integer> testParams = shrinkTest(shrinkInt(), odd,
+        RefinementTest<Integer> testParams = refinementTest(shrinkInt(), odd,
                 11, 1000, timeout);
 
         RefinedCounterexample<Integer> result = runner.run(executionParameters, testParams)
@@ -44,7 +43,7 @@ class DefaultShrinkTestRunnerTest {
 
     @Test
     void findsEventually() {
-        ShrinkTest<Integer> testParams = shrinkTest(shrinkInt(), lessThan100,
+        RefinementTest<Integer> testParams = refinementTest(shrinkInt(), lessThan100,
                 105, 1000, timeout);
 
         RefinedCounterexample<Integer> result = runner.run(executionParameters, testParams)
@@ -56,7 +55,7 @@ class DefaultShrinkTestRunnerTest {
 
     @Test
     void doesNotFind() {
-        ShrinkTest<Integer> testParams = shrinkTest(shrinkInt(), lessThan100, 100, 1000, timeout);
+        RefinementTest<Integer> testParams = refinementTest(shrinkInt(), lessThan100, 100, 1000, timeout);
 
         Maybe<RefinedCounterexample<Integer>> result = runner.run(executionParameters, testParams)
                 .unsafePerformIO();
@@ -66,7 +65,7 @@ class DefaultShrinkTestRunnerTest {
 
     @Test
     void returnsBestCandidateWhenShrinkCountExceeded() {
-        ShrinkTest<Integer> testParams = shrinkTest(shrinkInt(), lessThan100, 105, 10, timeout);
+        RefinementTest<Integer> testParams = refinementTest(shrinkInt(), lessThan100, 105, 10, timeout);
 
         RefinedCounterexample<Integer> result = runner.run(executionParameters, testParams)
                 .unsafePerformIO().orElseThrow(AssertionError::new);
