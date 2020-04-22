@@ -19,7 +19,6 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct3.zip3;
 final class ShrinkProduct4 {
 
     private ShrinkProduct4() {
-
     }
 
     static <A, B, C, D, T> ShrinkStrategy<T> shrinkProduct4(ShrinkStrategy<A> sa,

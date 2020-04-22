@@ -12,10 +12,10 @@ import dev.marksman.kraftwerk.constraints.ShortRange;
 import dev.marksman.kraftwerk.frequency.FrequencyMap;
 
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
-import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkByte;
-import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkInt;
-import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkLong;
-import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkShort;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkByte;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkInt;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkLong;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkShort;
 import static dev.marksman.kraftwerk.Generators.generateByte;
 import static dev.marksman.kraftwerk.Generators.generateInt;
 import static dev.marksman.kraftwerk.Generators.generateLong;

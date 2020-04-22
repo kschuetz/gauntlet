@@ -9,10 +9,9 @@ import dev.marksman.kraftwerk.constraints.IntRange;
 import dev.marksman.kraftwerk.constraints.LongRange;
 import dev.marksman.kraftwerk.constraints.ShortRange;
 
-public final class ShrinkNumerics {
+final class ShrinkNumerics {
 
     private ShrinkNumerics() {
-
     }
 
     private static final ShrinkStrategy<Integer> INT = input -> {

@@ -8,7 +8,7 @@ import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.filter.Filter;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
-import dev.marksman.gauntlet.shrink.builtins.ShrinkCollections;
+import dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies;
 import dev.marksman.kraftwerk.Generate;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.GeneratorParameters;
@@ -117,7 +117,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                         new CollectionSupply<>(createSupply(parameters),
                                 sizeGenerator(parameters),
                                 vectorAggregator()),
-                shrinkStrategy.fmap(ShrinkCollections::shrinkVector),
+                shrinkStrategy.fmap(ShrinkStrategies::shrinkVector),
                 // TODO: prettyPrinter
                 Object::toString);
     }
@@ -127,7 +127,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                         new CollectionSupply<>(createSupply(parameters),
                                 Generators.constant(count).prepare(parameters),
                                 vectorAggregator()),
-                shrinkStrategy.fmap(ShrinkCollections::shrinkVector),
+                shrinkStrategy.fmap(ShrinkStrategies::shrinkVector),
                 // TODO: prettyPrinter
                 Object::toString);
     }
@@ -138,7 +138,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                                 sizeGenerator(1, parameters),
                                 vectorAggregator())
                                 .fmap(ImmutableVector::toNonEmptyOrThrow),
-                shrinkStrategy.fmap(ShrinkCollections::shrinkNonEmptyVector),
+                shrinkStrategy.fmap(ShrinkStrategies::shrinkNonEmptyVector),
                 // TODO: prettyPrinter
                 Object::toString);
     }
@@ -152,7 +152,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                                 Generators.constant(count).prepare(parameters),
                                 vectorAggregator())
                                 .fmap(ImmutableVector::toNonEmptyOrThrow),
-                shrinkStrategy.fmap(ShrinkCollections::shrinkNonEmptyVector),
+                shrinkStrategy.fmap(ShrinkStrategies::shrinkNonEmptyVector),
                 // TODO: prettyPrinter
                 Object::toString);
     }
@@ -163,7 +163,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                         new CollectionSupply<>(createSupply(parameters),
                                 sizeGenerator(parameters),
                                 collectionAggregator(ArrayList::new)),
-                shrinkStrategy.fmap(ShrinkCollections::shrinkArrayList),
+                shrinkStrategy.fmap(ShrinkStrategies::shrinkArrayList),
                 // TODO: prettyPrinter
                 Object::toString);
     }
@@ -174,7 +174,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                         new CollectionSupply<>(createSupply(parameters),
                                 Generators.constant(count).prepare(parameters),
                                 collectionAggregator(ArrayList::new)),
-                shrinkStrategy.fmap(ShrinkCollections::shrinkArrayList),
+                shrinkStrategy.fmap(ShrinkStrategies::shrinkArrayList),
                 // TODO: prettyPrinter
                 Object::toString);
     }
@@ -185,7 +185,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                         new CollectionSupply<>(createSupply(parameters),
                                 sizeGenerator(1, parameters),
                                 collectionAggregator(ArrayList::new)),
-                shrinkStrategy.fmap(ShrinkCollections::shrinkNonEmptyArrayList),
+                shrinkStrategy.fmap(ss -> ShrinkStrategies.shrinkArrayList(1, ss)),
                 // TODO: prettyPrinter
                 Object::toString);
     }
@@ -196,7 +196,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                         new CollectionSupply<>(createSupply(parameters),
                                 sizeGenerator(parameters),
                                 collectionAggregator(HashSet::new)),
-                shrinkStrategy.fmap(ShrinkCollections::shrinkHashSet),
+                shrinkStrategy.fmap(ShrinkStrategies::shrinkHashSet),
                 // TODO: prettyPrinter
                 Object::toString);
     }
@@ -207,7 +207,7 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
                         new CollectionSupply<>(createSupply(parameters),
                                 sizeGenerator(1, parameters),
                                 collectionAggregator(HashSet::new)),
-                shrinkStrategy.fmap(ShrinkCollections::shrinkNonEmptyHashSet),
+                shrinkStrategy.fmap(ss -> ShrinkStrategies.shrinkHashSet(1, ss)),
                 // TODO: prettyPrinter
                 Object::toString);
     }

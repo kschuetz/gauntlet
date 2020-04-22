@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutorService;
 
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.gauntlet.RefinementTest.refinementTest;
-import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkInt;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkInt;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

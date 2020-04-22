@@ -13,7 +13,6 @@ import static com.jnape.palatable.lambda.functions.builtin.fn2.Into.into;
 final class ShrinkProduct2 {
 
     private ShrinkProduct2() {
-
     }
 
     static <A, B, T> ShrinkStrategy<T> shrinkProduct2(ShrinkStrategy<A> sa,

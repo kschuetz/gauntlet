@@ -6,7 +6,7 @@ import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import org.junit.jupiter.api.Test;
 
-import static dev.marksman.gauntlet.shrink.builtins.ShrinkCollections.shrinkVector;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkVector;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 

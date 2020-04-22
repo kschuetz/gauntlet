@@ -11,7 +11,7 @@ import com.jnape.palatable.lambda.functions.Fn3;
 import com.jnape.palatable.lambda.functions.Fn4;
 import com.jnape.palatable.lambda.functions.Fn5;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
-import dev.marksman.gauntlet.shrink.builtins.ShrinkProduct;
+import dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
@@ -89,7 +89,7 @@ final class CompositeArbitraries {
         if (isNothing(shrinkA) && isNothing(shrinkB)) {
             return nothing();
         } else {
-            return just(ShrinkProduct.shrinkProduct(shrinkA.orElse(ShrinkStrategy.none()),
+            return just(ShrinkStrategies.shrinkProduct(shrinkA.orElse(ShrinkStrategy.none()),
                     shrinkB.orElse(ShrinkStrategy.none()),
                     toFn, t -> t));
         }
@@ -102,7 +102,7 @@ final class CompositeArbitraries {
         if (isNothing(shrinkA) && isNothing(shrinkB) && isNothing(shrinkC)) {
             return nothing();
         } else {
-            return just(ShrinkProduct.shrinkProduct(shrinkA.orElse(ShrinkStrategy.none()),
+            return just(ShrinkStrategies.shrinkProduct(shrinkA.orElse(ShrinkStrategy.none()),
                     shrinkB.orElse(ShrinkStrategy.none()),
                     shrinkC.orElse(ShrinkStrategy.none()),
                     toFn, t -> t));
@@ -117,7 +117,7 @@ final class CompositeArbitraries {
         if (isNothing(shrinkA) && isNothing(shrinkB) && isNothing(shrinkC) && isNothing(shrinkD)) {
             return nothing();
         } else {
-            return just(ShrinkProduct.shrinkProduct(shrinkA.orElse(ShrinkStrategy.none()),
+            return just(ShrinkStrategies.shrinkProduct(shrinkA.orElse(ShrinkStrategy.none()),
                     shrinkB.orElse(ShrinkStrategy.none()),
                     shrinkC.orElse(ShrinkStrategy.none()),
                     shrinkD.orElse(ShrinkStrategy.none()),
@@ -134,7 +134,7 @@ final class CompositeArbitraries {
         if (isNothing(shrinkA) && isNothing(shrinkB) && isNothing(shrinkC) && isNothing(shrinkD) && isNothing(shrinkE)) {
             return nothing();
         } else {
-            return just(ShrinkProduct.shrinkProduct(shrinkA.orElse(ShrinkStrategy.none()),
+            return just(ShrinkStrategies.shrinkProduct(shrinkA.orElse(ShrinkStrategy.none()),
                     shrinkB.orElse(ShrinkStrategy.none()),
                     shrinkC.orElse(ShrinkStrategy.none()),
                     shrinkD.orElse(ShrinkStrategy.none()),
