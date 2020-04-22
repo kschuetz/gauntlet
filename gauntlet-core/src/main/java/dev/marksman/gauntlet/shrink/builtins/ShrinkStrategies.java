@@ -1,5 +1,9 @@
 package dev.marksman.gauntlet.shrink.builtins;
 
+import com.jnape.palatable.lambda.adt.Either;
+import com.jnape.palatable.lambda.adt.Maybe;
+import com.jnape.palatable.lambda.adt.These;
+import com.jnape.palatable.lambda.adt.choice.Choice2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
@@ -17,6 +21,7 @@ import com.jnape.palatable.lambda.optics.Iso;
 import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.collectionviews.Vector;
+import dev.marksman.gauntlet.shrink.ShrinkResult;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.constraints.ByteRange;
 import dev.marksman.kraftwerk.constraints.IntRange;
@@ -26,7 +31,9 @@ import dev.marksman.kraftwerk.constraints.ShortRange;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
+import static com.jnape.palatable.lambda.functions.builtin.fn2.Into.into;
 import static com.jnape.palatable.lambda.optics.functions.View.view;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkCollection.shrinkCollection;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct2.shrinkProduct2;
@@ -95,6 +102,34 @@ public final class ShrinkStrategies {
         return ShrinkNumerics.shrinkByte(range);
     }
 
+    public static ShrinkStrategy<Boolean> shrinkBoolean() {
+        return input -> input ? ShrinkResult.singleton(false) : ShrinkResult.empty();
+    }
+
+    public static <A> ShrinkStrategy<Maybe<A>> shrinkMaybe(ShrinkStrategy<A> sa) {
+        return input -> input.match(__ -> ShrinkResult.empty(),
+                a -> ShrinkResult.cons(nothing(), () -> sa.apply(a).fmap(Maybe::just)));
+    }
+
+    public static <L, R> ShrinkStrategy<Either<L, R>> shrinkEither(ShrinkStrategy<L> leftStrategy,
+                                                                   ShrinkStrategy<R> rightStrategy) {
+        return input -> input.match(l -> leftStrategy.apply(l).fmap(Either::left),
+                r -> rightStrategy.apply(r).fmap(Either::right));
+    }
+
+    public static <A, B> ShrinkStrategy<Choice2<A, B>> shrinkChoice2(ShrinkStrategy<A> sa,
+                                                                     ShrinkStrategy<B> sb) {
+        return input -> input.match(a -> sa.apply(a).fmap(Choice2::a),
+                b -> sb.apply(b).fmap(Choice2::b));
+    }
+
+    public static <A, B> ShrinkStrategy<These<A, B>> shrinkThese(ShrinkStrategy<A> sa,
+                                                                 ShrinkStrategy<B> sb) {
+        ShrinkStrategy<Tuple2<A, B>> shrinkBoth = shrinkTuple(sa, sb);
+        return input -> input.match(a -> sa.apply(a).fmap(These::a),
+                b -> sb.apply(b).fmap(These::b),
+                both -> shrinkBoth.apply(both).fmap(into(These::both)));
+    }
 
     public static <A, B> ShrinkStrategy<Tuple2<A, B>> shrinkTuple(ShrinkStrategy<A> sa,
                                                                   ShrinkStrategy<B> sb) {
