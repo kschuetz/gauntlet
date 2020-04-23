@@ -39,23 +39,41 @@ public interface Arbitrary<A> {
 
     Arbitrary<A> modifyGeneratorParameters(Fn1<GeneratorParameters, GeneratorParameters> modifyFn);
 
-    Arbitrary<ImmutableVector<A>> vector();
+    default Arbitrary<ImmutableVector<A>> vector() {
+        return CollectionArbitraries.vector(this);
+    }
 
-    Arbitrary<ImmutableVector<A>> vectorOfN(int count);
+    default Arbitrary<ImmutableVector<A>> vectorOfN(int count) {
+        return CollectionArbitraries.vectorOfN(count, this);
+    }
 
-    Arbitrary<ImmutableNonEmptyVector<A>> nonEmptyVector();
+    default Arbitrary<ImmutableNonEmptyVector<A>> nonEmptyVector() {
+        return CollectionArbitraries.nonEmptyVector(this);
+    }
 
-    Arbitrary<ImmutableNonEmptyVector<A>> nonEmptyVectorOfN(int count);
+    default Arbitrary<ImmutableNonEmptyVector<A>> nonEmptyVectorOfN(int count) {
+        return CollectionArbitraries.nonEmptyVectorOfN(count, this);
+    }
 
-    Arbitrary<ArrayList<A>> arrayList();
+    default Arbitrary<ArrayList<A>> arrayList() {
+        return CollectionArbitraries.arrayList(this);
+    }
 
-    Arbitrary<ArrayList<A>> arrayListOfN(int count);
+    default Arbitrary<ArrayList<A>> arrayListOfN(int count) {
+        return CollectionArbitraries.arrayListOfN(count, this);
+    }
 
-    Arbitrary<ArrayList<A>> nonEmptyArrayList();
+    default Arbitrary<ArrayList<A>> nonEmptyArrayList() {
+        return CollectionArbitraries.nonEmptyArrayList(this);
+    }
 
-    Arbitrary<HashSet<A>> hashSet();
+    default Arbitrary<HashSet<A>> hashSet() {
+        return CollectionArbitraries.hashSet(this);
+    }
 
-    Arbitrary<HashSet<A>> nonEmptyHashSet();
+    default Arbitrary<HashSet<A>> nonEmptyHashSet() {
+        return CollectionArbitraries.nonEmptyHashSet(this);
+    }
 
     default Weighted<Arbitrary<A>> weighted() {
         return Weighted.weighted(1, this);

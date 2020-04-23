@@ -5,12 +5,17 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
 import com.jnape.palatable.lambda.adt.hlist.Tuple5;
+import dev.marksman.collectionviews.ImmutableNonEmptyVector;
+import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.constraints.ByteRange;
 import dev.marksman.kraftwerk.constraints.IntRange;
 import dev.marksman.kraftwerk.constraints.LongRange;
 import dev.marksman.kraftwerk.constraints.ShortRange;
 import dev.marksman.kraftwerk.frequency.FrequencyMap;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkByte;
@@ -121,6 +126,42 @@ public final class Arbitraries {
     public static <A, B> Arbitrary<Choice2<A, B>> arbitraryChoice(Weighted<Arbitrary<A>> a,
                                                                   Weighted<Arbitrary<B>> b) {
         return ChoiceArbitraries.arbitraryChoice2(a, b);
+    }
+
+    public static <A> Arbitrary<ImmutableVector<A>> arbitraryVector(Arbitrary<A> elements) {
+        return CollectionArbitraries.vector(elements);
+    }
+
+    public static <A> Arbitrary<ImmutableVector<A>> arbitraryVectorOfN(int count, Arbitrary<A> elements) {
+        return CollectionArbitraries.vectorOfN(count, elements);
+    }
+
+    public static <A> Arbitrary<ImmutableNonEmptyVector<A>> arbitraryNonEmptyVector(Arbitrary<A> elements) {
+        return CollectionArbitraries.nonEmptyVector(elements);
+    }
+
+    public static <A> Arbitrary<ImmutableNonEmptyVector<A>> arbitraryNonEmptyVectorOfN(int count, Arbitrary<A> elements) {
+        return CollectionArbitraries.nonEmptyVectorOfN(count, elements);
+    }
+
+    public static <A> Arbitrary<ArrayList<A>> arbitraryArrayList(Arbitrary<A> elements) {
+        return CollectionArbitraries.arrayList(elements);
+    }
+
+    public static <A> Arbitrary<ArrayList<A>> arbitraryArrayListOfN(int count, Arbitrary<A> elements) {
+        return CollectionArbitraries.arrayListOfN(count, elements);
+    }
+
+    public static <A> Arbitrary<ArrayList<A>> arbitraryNonEmptyArrayList(Arbitrary<A> elements) {
+        return CollectionArbitraries.nonEmptyArrayList(elements);
+    }
+
+    public static <A> Arbitrary<HashSet<A>> arbitraryHashSet(Arbitrary<A> elements) {
+        return CollectionArbitraries.hashSet(elements);
+    }
+
+    public static <A> Arbitrary<HashSet<A>> arbitraryNonEmptyHashSet(Arbitrary<A> elements) {
+        return CollectionArbitraries.nonEmptyHashSet(elements);
     }
 
 }
