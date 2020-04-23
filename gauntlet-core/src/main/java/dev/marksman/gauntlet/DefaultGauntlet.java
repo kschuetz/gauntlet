@@ -32,19 +32,23 @@ class DefaultGauntlet implements GauntletApi {
     private final DomainTestRunner domainTestRunner;
     private final RefinementTestRunner refinementTestRunner;
     private final Reporter reporter;
+    private final ReportSettings reportSettings;
+    private final ReportRenderer reportRenderer;
     private final GeneratorParameters generatorParameters;
     private final int defaultSampleCount;
     private final int defaultMaximumShrinkCount;
     private final Duration defaultTimeout;
 
     public DefaultGauntlet(Executor executor, GeneratorTestRunner generatorTestRunner, DomainTestRunner domainTestRunner,
-                           RefinementTestRunner refinementTestRunner, Reporter reporter, GeneratorParameters generatorParameters,
+                           RefinementTestRunner refinementTestRunner, Reporter reporter, ReportSettings reportSettings, ReportRenderer reportRenderer, GeneratorParameters generatorParameters,
                            int defaultSampleCount, int defaultMaximumShrinkCount, Duration defaultTimeout) {
         this.executor = executor;
         this.generatorTestRunner = generatorTestRunner;
         this.domainTestRunner = domainTestRunner;
         this.refinementTestRunner = refinementTestRunner;
         this.reporter = reporter;
+        this.reportSettings = reportSettings;
+        this.reportRenderer = reportRenderer;
         this.generatorParameters = generatorParameters;
         this.defaultSampleCount = defaultSampleCount;
         this.defaultMaximumShrinkCount = defaultMaximumShrinkCount;
@@ -82,6 +86,16 @@ class DefaultGauntlet implements GauntletApi {
     }
 
     @Override
+    public ReportSettings getReportSettings() {
+        return reportSettings;
+    }
+
+    @Override
+    public ReportRenderer getReportRenderer() {
+        return reportRenderer;
+    }
+
+    @Override
     public Duration getDefaultTimeout() {
         return defaultTimeout;
     }
@@ -98,47 +112,57 @@ class DefaultGauntlet implements GauntletApi {
 
     @Override
     public GauntletApi withDefaultSampleCount(int sampleCount) {
-        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, generatorParameters, sampleCount, defaultMaximumShrinkCount, defaultTimeout);
+        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, sampleCount, defaultMaximumShrinkCount, defaultTimeout);
     }
 
     @Override
     public GauntletApi withDefaultMaximumShrinkCount(int maximumShrinkCount) {
-        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, generatorParameters, defaultSampleCount, maximumShrinkCount, defaultTimeout);
+        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, maximumShrinkCount, defaultTimeout);
     }
 
     @Override
     public GauntletApi withExecutor(Executor executor) {
-        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout);
+        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout);
     }
 
     @Override
     public GauntletApi withGeneratorTestRunner(GeneratorTestRunner testRunner) {
-        return new DefaultGauntlet(executor, testRunner, domainTestRunner, refinementTestRunner, reporter, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout);
+        return new DefaultGauntlet(executor, testRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout);
     }
 
     @Override
     public GauntletApi withDomainTestRunner(DomainTestRunner testRunner) {
-        return new DefaultGauntlet(executor, generatorTestRunner, testRunner, refinementTestRunner, reporter, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout);
+        return new DefaultGauntlet(executor, generatorTestRunner, testRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout);
     }
 
     @Override
     public GauntletApi withRefinementTestRunner(RefinementTestRunner testRunner) {
-        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, testRunner, reporter, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout);
+        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, testRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout);
     }
 
     @Override
     public GauntletApi withGeneratorParameters(GeneratorParameters generatorParameters) {
-        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout);
+        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout);
     }
 
     @Override
     public GauntletApi withReporter(Reporter reporter) {
-        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout);
+        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout);
+    }
+
+    @Override
+    public GauntletApi withReportSettings(ReportSettings reportSettings) {
+        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout);
+    }
+
+    @Override
+    public GauntletApi withReportRenderer(ReportRenderer reportRenderer) {
+        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout);
     }
 
     @Override
     public GauntletApi withDefaultTimeout(Duration timeout) {
-        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, timeout);
+        return new DefaultGauntlet(executor, generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, timeout);
     }
 
     @Override
@@ -210,7 +234,7 @@ class DefaultGauntlet implements GauntletApi {
                 .unsafePerformIO();
         ReportData<A> reportData = reportData(generatorTest.getProperty(), result.getResult(), generatorTest.getArbitrary().getPrettyPrinter(),
                 just(result.getInitialSeedValue()));
-        reporter.report(reportData);
+        reporter.report(reportSettings, reportRenderer, reportData);
     }
 
     private <A> void runDomainTest(DomainTest<A> domainTest) {
@@ -222,7 +246,7 @@ class DefaultGauntlet implements GauntletApi {
                 result.getResult(),
                 domainTest.getDomain().getPrettyPrinter(),
                 nothing());
-        reporter.report(reportData);
+        reporter.report(reportSettings, reportRenderer, reportData);
     }
 
     private <A> DomainTestApi<A> createDomainTestApi(Quantifier quantifier, Domain<A> domain) {

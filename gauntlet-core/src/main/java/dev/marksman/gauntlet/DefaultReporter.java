@@ -10,7 +10,7 @@ public final class DefaultReporter implements Reporter {
     private static final DefaultReporter INSTANCE = new DefaultReporter();
 
     @Override
-    public <A> void report(ReportData<A> reportData) {
+    public <A> void report(ReportSettings reportSettings, ReportRenderer renderer, ReportData<A> reportData) {
         reportData.getResult().match(
                 passed -> {
                     handlePassed(reportData, passed);

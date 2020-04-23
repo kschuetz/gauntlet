@@ -57,6 +57,10 @@ public interface GauntletApi {
 
     Reporter getReporter();
 
+    ReportSettings getReportSettings();
+
+    ReportRenderer getReportRenderer();
+
     GeneratorParameters getGeneratorParameters();
 
     Duration getDefaultTimeout();
@@ -74,6 +78,10 @@ public interface GauntletApi {
     GauntletApi withRefinementTestRunner(RefinementTestRunner testRunner);
 
     GauntletApi withReporter(Reporter reporter);
+
+    GauntletApi withReportSettings(ReportSettings reportSettings);
+
+    GauntletApi withReportRenderer(ReportRenderer renderer);
 
     GauntletApi withDefaultSampleCount(int sampleCount);
 

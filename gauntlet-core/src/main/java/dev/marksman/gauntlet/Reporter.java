@@ -1,5 +1,5 @@
 package dev.marksman.gauntlet;
 
 public interface Reporter {
-    <A> void report(ReportData<A> reportData);
+    <A> void report(ReportSettings reportSettings, ReportRenderer renderer, ReportData<A> reportData);
 }

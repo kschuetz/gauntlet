@@ -128,6 +128,16 @@ public abstract class GauntletApiBase implements GauntletApi {
     }
 
     @Override
+    public ReportSettings getReportSettings() {
+        return getApi().getReportSettings();
+    }
+
+    @Override
+    public ReportRenderer getReportRenderer() {
+        return getApi().getReportRenderer();
+    }
+
+    @Override
     public GeneratorParameters getGeneratorParameters() {
         return getApi().getGeneratorParameters();
     }
@@ -170,6 +180,16 @@ public abstract class GauntletApiBase implements GauntletApi {
     @Override
     public GauntletApi withReporter(Reporter reporter) {
         return getApi().withReporter(reporter);
+    }
+
+    @Override
+    public GauntletApi withReportSettings(ReportSettings reportSettings) {
+        return getApi().withReportSettings(reportSettings);
+    }
+
+    @Override
+    public GauntletApi withReportRenderer(ReportRenderer reportRenderer) {
+        return getApi().withReportRenderer(reportRenderer);
     }
 
     @Override
