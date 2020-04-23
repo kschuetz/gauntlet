@@ -10,6 +10,7 @@ import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.GeneratorParameters;
+import dev.marksman.kraftwerk.weights.MaybeWeights;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -93,6 +94,14 @@ public interface Arbitrary<A> {
 
     default Arbitrary<Tuple3<A, A, A>> triple() {
         return CompositeArbitraries.combine(this, this, this);
+    }
+
+    default Arbitrary<Maybe<A>> maybe() {
+        return CoProductArbitraries.arbitraryMaybe(this);
+    }
+
+    default Arbitrary<Maybe<A>> maybe(MaybeWeights weights) {
+        return CoProductArbitraries.arbitraryMaybe(weights, this);
     }
 
     static <A> Arbitrary<A> arbitrary(Generator<A> generator) {

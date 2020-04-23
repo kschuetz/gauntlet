@@ -1,5 +1,8 @@
 package dev.marksman.gauntlet;
 
+import com.jnape.palatable.lambda.adt.Either;
+import com.jnape.palatable.lambda.adt.Maybe;
+import com.jnape.palatable.lambda.adt.Unit;
 import com.jnape.palatable.lambda.adt.choice.Choice2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
@@ -13,6 +16,8 @@ import dev.marksman.kraftwerk.constraints.IntRange;
 import dev.marksman.kraftwerk.constraints.LongRange;
 import dev.marksman.kraftwerk.constraints.ShortRange;
 import dev.marksman.kraftwerk.frequency.FrequencyMap;
+import dev.marksman.kraftwerk.weights.EitherWeights;
+import dev.marksman.kraftwerk.weights.MaybeWeights;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -123,9 +128,43 @@ public final class Arbitraries {
         return CompositeArbitraries.combine(a, b, c, d, e);
     }
 
+    public static Arbitrary<Unit> arbitraryUnit() {
+        return CoProductArbitraries.arbitraryUnit();
+    }
+
     public static <A, B> Arbitrary<Choice2<A, B>> arbitraryChoice(Weighted<Arbitrary<A>> a,
                                                                   Weighted<Arbitrary<B>> b) {
-        return ChoiceArbitraries.arbitraryChoice2(a, b);
+        return CoProductArbitraries.arbitraryChoice2(a, b);
+    }
+
+    public static <A, B> Arbitrary<Choice2<A, B>> arbitraryChoice(Arbitrary<A> a,
+                                                                  Arbitrary<B> b) {
+        return CoProductArbitraries.arbitraryChoice2(a, b);
+    }
+
+    public static <A> Arbitrary<Maybe<A>> arbitraryMaybe(MaybeWeights weights,
+                                                         Arbitrary<A> a) {
+        return CoProductArbitraries.arbitraryMaybe(weights, a);
+    }
+
+    public static <A> Arbitrary<Maybe<A>> arbitraryMaybe(Arbitrary<A> a) {
+        return CoProductArbitraries.arbitraryMaybe(a);
+    }
+
+    public static <L, R> Arbitrary<Either<L, R>> arbitraryEither(Weighted<Arbitrary<L>> left,
+                                                                 Weighted<Arbitrary<R>> right) {
+        return CoProductArbitraries.arbitraryEither(left, right);
+    }
+
+    public static <L, R> Arbitrary<Either<L, R>> arbitraryEither(Arbitrary<L> left,
+                                                                 Arbitrary<R> right) {
+        return CoProductArbitraries.arbitraryEither(left, right);
+    }
+
+    public static <L, R> Arbitrary<Either<L, R>> arbitraryEither(EitherWeights weights,
+                                                                 Arbitrary<L> left,
+                                                                 Arbitrary<R> right) {
+        return CoProductArbitraries.arbitraryEither(weights, left, right);
     }
 
     public static <A> Arbitrary<ImmutableVector<A>> arbitraryVector(Arbitrary<A> elements) {
