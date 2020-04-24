@@ -19,12 +19,19 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
         TestResult.Falsified<A>, TestResult.Unproved<A>, TestResult.SupplyFailed<A>, TestResult.Error<A>,
         TestResult.TimedOut<A>, TestResult.Interrupted<A>, TestResult<A>> {
 
+    public abstract boolean isSuccess();
+
     // All cases succeeded
     @EqualsAndHashCode(callSuper = true)
     @Value
     @AllArgsConstructor(access = PRIVATE)
     public static class Passed<A> extends TestResult<A> {
         ImmutableVector<A> passedSamples;
+
+        @Override
+        public boolean isSuccess() {
+            return true;
+        }
 
         public int getSuccessCount() {
             return passedSamples.size();
@@ -46,6 +53,11 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
         ImmutableVector<Counterexample<A>> counterexamples;
 
         @Override
+        public boolean isSuccess() {
+            return true;
+        }
+
+        @Override
         public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
             return bFn.apply(this);
         }
@@ -60,6 +72,11 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
         ImmutableVector<A> passedSamples;
         Counterexample<A> counterexample;
         Maybe<RefinedCounterexample<A>> refinedCounterexample;
+
+        @Override
+        public boolean isSuccess() {
+            return false;
+        }
 
         public int getSuccessCount() {
             return passedSamples.size();
@@ -84,6 +101,11 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
         ImmutableVector<Counterexample<A>> counterexamples;
 
         @Override
+        public boolean isSuccess() {
+            return false;
+        }
+
+        @Override
         public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
             return dFn.apply(this);
         }
@@ -97,6 +119,11 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
     public static class SupplyFailed<A> extends TestResult<A> {
         ImmutableVector<A> passedSamples;
         SupplyFailure supplyFailure;
+
+        @Override
+        public boolean isSuccess() {
+            return false;
+        }
 
         @Override
         public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
@@ -115,6 +142,11 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
         Throwable error;
 
         @Override
+        public boolean isSuccess() {
+            return false;
+        }
+
+        @Override
         public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
             return fFn.apply(this);
         }
@@ -130,6 +162,11 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
         Duration duration;
 
         @Override
+        public boolean isSuccess() {
+            return false;
+        }
+
+        @Override
         public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
             return gFn.apply(this);
         }
@@ -143,6 +180,11 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
     public static class Interrupted<A> extends TestResult<A> {
         ImmutableVector<A> passedSamples;
         Maybe<String> message;
+
+        @Override
+        public boolean isSuccess() {
+            return false;
+        }
 
         @Override
         public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
