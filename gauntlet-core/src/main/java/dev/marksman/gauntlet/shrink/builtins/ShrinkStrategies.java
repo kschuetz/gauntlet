@@ -4,6 +4,7 @@ import com.jnape.palatable.lambda.adt.Either;
 import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.adt.These;
 import com.jnape.palatable.lambda.adt.choice.Choice2;
+import com.jnape.palatable.lambda.adt.choice.Choice3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
@@ -121,6 +122,14 @@ public final class ShrinkStrategies {
                                                                      ShrinkStrategy<B> sb) {
         return input -> input.match(a -> sa.apply(a).fmap(Choice2::a),
                 b -> sb.apply(b).fmap(Choice2::b));
+    }
+
+    public static <A, B, C> ShrinkStrategy<Choice3<A, B, C>> shrinkChoice3(ShrinkStrategy<A> sa,
+                                                                           ShrinkStrategy<B> sb,
+                                                                           ShrinkStrategy<C> sc) {
+        return input -> input.match(a -> sa.apply(a).fmap(Choice3::a),
+                b -> sb.apply(b).fmap(Choice3::b),
+                c -> sc.apply(c).fmap(Choice3::c));
     }
 
     public static <A, B> ShrinkStrategy<These<A, B>> shrinkThese(ShrinkStrategy<A> sa,

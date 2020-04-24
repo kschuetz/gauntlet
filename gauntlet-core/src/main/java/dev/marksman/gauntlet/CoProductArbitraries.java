@@ -4,6 +4,7 @@ import com.jnape.palatable.lambda.adt.Either;
 import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.adt.Unit;
 import com.jnape.palatable.lambda.adt.choice.Choice2;
+import com.jnape.palatable.lambda.adt.choice.Choice3;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.Generators;
@@ -15,6 +16,7 @@ import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.adt.Unit.UNIT;
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkChoice2;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkChoice3;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkMaybe;
 import static dev.marksman.kraftwerk.Generators.generateUnit;
 import static dev.marksman.kraftwerk.weights.MaybeWeights.justs;
@@ -41,6 +43,24 @@ final class CoProductArbitraries {
     static <A, B> Arbitrary<Choice2<A, B>> arbitraryChoice2(Arbitrary<A> a,
                                                             Arbitrary<B> b) {
         return arbitraryChoice2(a.weighted(), b.weighted());
+    }
+
+    static <A, B, C> Arbitrary<Choice3<A, B, C>> arbitraryChoice3(Weighted<Arbitrary<A>> a,
+                                                                  Weighted<Arbitrary<B>> b,
+                                                                  Weighted<Arbitrary<C>> c) {
+        Arbitrary<A> arbitraryA = a.getValue();
+        Arbitrary<B> arbitraryB = b.getValue();
+        Arbitrary<C> arbitraryC = c.getValue();
+        ShrinkStrategy<Choice3<A, B, C>> shrinkStrategy = shrinkChoice3(arbitraryA.getShrinkStrategy().orElse(ShrinkStrategy.none()),
+                arbitraryB.getShrinkStrategy().orElse(ShrinkStrategy.none()),
+                arbitraryC.getShrinkStrategy().orElse(ShrinkStrategy.none()));
+        return arbitraryCoProduct3(a, b, c, just(shrinkStrategy));
+    }
+
+    static <A, B, C> Arbitrary<Choice3<A, B, C>> arbitraryChoice3(Arbitrary<A> a,
+                                                                  Arbitrary<B> b,
+                                                                  Arbitrary<C> c) {
+        return arbitraryChoice3(a.weighted(), b.weighted(), c.weighted());
     }
 
     static <A> Arbitrary<Maybe<A>> arbitraryMaybe(MaybeWeights weights,
@@ -76,11 +96,17 @@ final class CoProductArbitraries {
     }
 
     private static Generator<Choice2<Unit, Unit>> generateWhich(int weightA, int weightB) {
-        if (weightA + weightB < 1) {
-            throw new IllegalStateException("total of weights must be >= 1");
-        }
+        validateWeights(weightA + weightB);
         return Generators.choiceBuilderValue(weightA, UNIT)
                 .orValue(weightB, UNIT)
+                .toGenerator();
+    }
+
+    private static Generator<Choice3<Unit, Unit, Unit>> generateWhich(int weightA, int weightB, int weightC) {
+        validateWeights(weightA + weightB + weightC);
+        return Generators.choiceBuilderValue(weightA, UNIT)
+                .orValue(weightB, UNIT)
+                .orValue(weightC, UNIT)
                 .toGenerator();
     }
 
@@ -98,5 +124,30 @@ final class CoProductArbitraries {
                 shrinkStrategy,
                 // TODO: prettyPrinter
                 Object::toString);
+    }
+
+    private static <A, B, C> Arbitrary<Choice3<A, B, C>> arbitraryCoProduct3(Weighted<Arbitrary<A>> a,
+                                                                             Weighted<Arbitrary<B>> b,
+                                                                             Weighted<Arbitrary<C>> c,
+                                                                             Maybe<ShrinkStrategy<Choice3<A, B, C>>> shrinkStrategy) {
+        Generator<Choice3<Unit, Unit, Unit>> generateWhich = generateWhich(a.getWeight(), b.getWeight(), c.getWeight());
+
+        Arbitrary<A> arbitraryA = a.getValue();
+        Arbitrary<B> arbitraryB = b.getValue();
+        Arbitrary<C> arbitraryC = c.getValue();
+        return ConcreteArbitrary.concreteArbitrary(parameters ->
+                        new ChoiceSupply3<>(arbitraryA.createSupply(parameters),
+                                arbitraryB.createSupply(parameters),
+                                arbitraryC.createSupply(parameters),
+                                generateWhich.prepare(parameters)),
+                shrinkStrategy,
+                // TODO: prettyPrinter
+                Object::toString);
+    }
+
+    private static void validateWeights(int sum) {
+        if (sum < 1) {
+            throw new IllegalStateException("total of weights must be >= 1");
+        }
     }
 }
