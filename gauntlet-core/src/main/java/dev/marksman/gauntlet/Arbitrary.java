@@ -20,21 +20,23 @@ import static dev.marksman.gauntlet.CompositeArbitraries.combine;
 import static dev.marksman.gauntlet.ConcreteArbitrary.concreteArbitrary;
 
 /**
- * An Arbitrary&lt;A&gt; differs from a Generator&lt;A&gt; in that an Arbitrary&lt;A&gt; adds the following capabilities:
- * - Can be filtered
- * - Can carry a shrinking strategy
- * - Can carry a custom pretty-printer
+ * An {@code Arbitrary} differs from a {@code Generator} in that an {@code Arbitrary} adds the following capabilities:
+ * <ul>
+ *     <li>Can be filtered
+ *     <li>Can carry a shrinking strategy
+ *     <li>Can carry a custom pretty-printer
+ * </ul>
  * <p>
- * When composing Arbitraries, the underlying filters, shrinking strategies, and pretty-printers will be composed
+ * When composing {@code Arbitrary}s, the underlying filters, shrinking strategies, and pretty-printers will be composed
  * as well.
  * <p>
- * An Arbitrary cannot be fmapped or flatMapped like a Generator can be.  However, if you have an Iso&lt;A, B&gt;, you
- * can convert an Arbitrary&lt;A&gt; to an Arbitrary&lt;B&gt;
+ * An {@code Arbitrary} cannot be fmapped or flatMapped like a Generator can be.  However, if you have an {@code Iso<A, B>}, you
+ * can convert an {@code Arbitrary<A>} to an {@code Arbitrary<B>}.
  * <p>
- * Several built-in Arbitraries can be found in the Arbitraries class.
+ * Several built-in {@code Arbitrary}s can be found in the {@link Arbitraries} class.
  * <p>
- * You can always create an Arbitrary from any Generator, no matter how complex, but you will have to provide your own
- * ShrinkStrategy (if shrinking is desired).
+ * You can always create an {@code Arbitrary} from any {@code Generator}, no matter how complex, but you will have to provide your own
+ * shrink strategy (if shrinking is desired).
  *
  * @param <A>
  */
@@ -46,39 +48,39 @@ public interface Arbitrary<A> {
     Fn1<? super A, String> getPrettyPrinter();
 
     /**
-     * @return a new Arbitrary that is the same as this one, with the shrink strategy changed to the one provided.
+     * @return a new {@code Arbitrary} that is the same as this one, with the shrink strategy changed to the one provided.
      */
     Arbitrary<A> withShrinkStrategy(ShrinkStrategy<A> shrinkStrategy);
 
     /**
-     * @return a new Arbitrary that is the same as this one, with the shrink strategy removed.
+     * @return a new {@code Arbitrary} that is the same as this one, with the shrink strategy removed.
      */
     Arbitrary<A> withNoShrinkStrategy();
 
     /**
-     * Creates a new Arbitrary that filters its output.  Note that a filtered Arbitrary is not guaranteed
+     * Creates a new {@code Arbitrary} that filters its output.  Note that a filtered {@code Arbitrary} is not guaranteed
      * to ever return a value that satisfies its predicate, so some safety mechanisms are in place to
      * prevent it from running infinitely.
      * <p>
-     * If after a number of tries the Arbitrary cannot produce a value, it will fail with a SupplyFailure and
-     * the test will fail abnormally.  The maximum number of tries can be controlled using withMaxDiscards.
+     * If after a number of tries, the {@code Arbitrary} cannot produce a value, it will fail with a {@code SupplyFailure} and
+     * the test will fail abnormally.  The maximum number of tries can be controlled using {@link Arbitrary#withMaxDiscards}.
      *
-     * @return a new Arbitrary that is the same as this one, with the added filter
+     * @return a new {@code Arbitrary} that is the same as this one, with the added filter
      */
     Arbitrary<A> suchThat(Fn1<? super A, Boolean> predicate);
 
     /**
-     * Sets the maximum number of subsequent tries that a filtered Arbitrary will make in order to produce a
-     * value before failing with a SupplyFailure.
+     * Sets the maximum number of successive tries that a filtered Arbitrary will make in order to produce a
+     * single value before failing with a SupplyFailure.  Once a value is produced, the counter will be reset.
      * <p>
-     * This value will be respected even if you set it before any calls to suchThat.
+     * This value will be respected even if you set it before any calls to {@link Arbitrary#suchThat}.
      *
-     * @return a new Arbitrary that is the same as this one, with the max discards set to the provided value
+     * @return a new {@code Arbitrary} that is the same as this one, with the max discards set to the provided value
      */
     Arbitrary<A> withMaxDiscards(int maxDiscards);
 
     /**
-     * @return a new Arbitrary that is the same as this one, with the pretty-printer changed to the one provided.
+     * @return a new {@code Arbitrary} that is the same as this one, with the pretty-printer changed to the one provided.
      */
     Arbitrary<A> withPrettyPrinter(Fn1<? super A, String> prettyPrinter);
 
@@ -151,10 +153,10 @@ public interface Arbitrary<A> {
     }
 
     /**
-     * Create an Arbitrary&lt;A&gt; from a Generator&lt;A&gt;.
+     * Create an {@code Arbitrary<A>} from a {@code Generator<A>}.
      * <p>
-     * The resulting Arbitrary&lt;A&gt; will not have a shrink strategy.  You will need to provided one
-     * yourself (using withShrinkStrategy).
+     * The resulting {@code Arbitrary} will not have a shrink strategy.  You will need to provided one
+     * yourself (using {@link Arbitrary#withShrinkStrategy}).
      */
     static <A> Arbitrary<A> arbitrary(Generator<A> generator) {
         return concreteArbitrary(generator);

@@ -64,7 +64,7 @@ public final class Arbitraries {
     }
 
     /**
-     * An arbitrary that generates an integer (0 <= n < bound) that is intended to be used
+     * An arbitrary that generates an integer (0 &lt;= n &lt; bound) that is intended to be used
      * as an index into a collection or sequence.  Output is uniform and unaffected by bias
      * settings (i.e., there will be no emphasis on edge cases).
      */
@@ -89,7 +89,7 @@ public final class Arbitraries {
     }
 
     /**
-     * An arbitrary that generates a long (0 <= n < bound) that is intended to be used
+     * An arbitrary that generates a long (0 &lt;= n &lt; bound) that is intended to be used
      * as an index into a collection or sequence.  Output is uniform and unaffected by bias
      * settings (i.e., there will be no emphasis on edge cases).
      */
