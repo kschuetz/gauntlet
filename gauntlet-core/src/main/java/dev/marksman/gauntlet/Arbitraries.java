@@ -13,6 +13,8 @@ import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.constraints.ByteRange;
+import dev.marksman.kraftwerk.constraints.DoubleRange;
+import dev.marksman.kraftwerk.constraints.FloatRange;
 import dev.marksman.kraftwerk.constraints.IntRange;
 import dev.marksman.kraftwerk.constraints.LongRange;
 import dev.marksman.kraftwerk.constraints.ShortRange;
@@ -25,10 +27,14 @@ import java.util.HashSet;
 
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkByte;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkDouble;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkFloat;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkInt;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkLong;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkShort;
 import static dev.marksman.kraftwerk.Generators.generateByte;
+import static dev.marksman.kraftwerk.Generators.generateDouble;
+import static dev.marksman.kraftwerk.Generators.generateFloat;
 import static dev.marksman.kraftwerk.Generators.generateInt;
 import static dev.marksman.kraftwerk.Generators.generateLong;
 import static dev.marksman.kraftwerk.Generators.generateShort;
@@ -101,6 +107,38 @@ public final class Arbitraries {
 
     public static Arbitrary<Byte> arbitraryByte(FrequencyMap<Byte> frequencyMap) {
         return arbitraryByte(frequencyMap.toGenerator());
+    }
+
+    public static Arbitrary<Float> arbitraryFloat(Generator<Float> generator) {
+        return arbitrary(generator).withShrinkStrategy(shrinkFloat());
+    }
+
+    public static Arbitrary<Float> arbitraryFloat() {
+        return arbitraryFloat(generateFloat());
+    }
+
+    public static Arbitrary<Float> arbitraryFloat(FloatRange range) {
+        return arbitrary(generateFloat(range)).withShrinkStrategy(shrinkFloat(range));
+    }
+
+    public static Arbitrary<Float> arbitraryFloat(FrequencyMap<Float> frequencyMap) {
+        return arbitraryFloat(frequencyMap.toGenerator());
+    }
+
+    public static Arbitrary<Double> arbitraryDouble(Generator<Double> generator) {
+        return arbitrary(generator).withShrinkStrategy(shrinkDouble());
+    }
+
+    public static Arbitrary<Double> arbitraryDouble() {
+        return arbitraryDouble(generateDouble());
+    }
+
+    public static Arbitrary<Double> arbitraryDouble(DoubleRange range) {
+        return arbitrary(generateDouble(range)).withShrinkStrategy(shrinkDouble(range));
+    }
+
+    public static Arbitrary<Double> arbitraryDouble(FrequencyMap<Double> frequencyMap) {
+        return arbitraryDouble(frequencyMap.toGenerator());
     }
 
     public static <A, B> Arbitrary<Tuple2<A, B>> combine(Arbitrary<A> a,

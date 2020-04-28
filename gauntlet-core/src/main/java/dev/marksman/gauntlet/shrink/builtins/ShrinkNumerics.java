@@ -5,6 +5,8 @@ import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.shrink.ShrinkResult;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.constraints.ByteRange;
+import dev.marksman.kraftwerk.constraints.DoubleRange;
+import dev.marksman.kraftwerk.constraints.FloatRange;
 import dev.marksman.kraftwerk.constraints.IntRange;
 import dev.marksman.kraftwerk.constraints.LongRange;
 import dev.marksman.kraftwerk.constraints.ShortRange;
@@ -53,35 +55,43 @@ final class ShrinkNumerics {
     /**
      * Returns a shrinking strategy that shrinks integers.
      */
-    public static ShrinkStrategy<Integer> shrinkInt() {
+    static ShrinkStrategy<Integer> shrinkInt() {
         return INT;
     }
 
     /**
      * Returns a shrinking strategy that shrinks longs.
      */
-    public static ShrinkStrategy<Long> shrinkLong() {
+    static ShrinkStrategy<Long> shrinkLong() {
         return LONG;
     }
 
     /**
      * Returns a shrinking strategy that shrinks shorts.
      */
-    public static ShrinkStrategy<Short> shrinkShort() {
+    static ShrinkStrategy<Short> shrinkShort() {
         return SHORT;
     }
 
     /**
      * Returns a shrinking strategy that shrinks bytes.
      */
-    public static ShrinkStrategy<Byte> shrinkByte() {
+    static ShrinkStrategy<Byte> shrinkByte() {
         return BYTE;
+    }
+
+    static ShrinkStrategy<Float> shrinkFloat() {
+        return shrinkFloat(FloatRange.fullRange());
+    }
+
+    static ShrinkStrategy<Double> shrinkDouble() {
+        return shrinkDouble(DoubleRange.fullRange());
     }
 
     /**
      * Returns a shrinking strategy that shrinks integers, but limits values in the output to a given range.
      */
-    public static ShrinkStrategy<Integer> shrinkInt(IntRange range) {
+    static ShrinkStrategy<Integer> shrinkInt(IntRange range) {
         int min = range.minInclusive();
         int max = range.maxInclusive();
         if (min >= max) {
@@ -108,7 +118,7 @@ final class ShrinkNumerics {
     /**
      * Returns a shrinking strategy that shrinks longs, but limits values in the output to a given range.
      */
-    public static ShrinkStrategy<Long> shrinkLong(LongRange range) {
+    static ShrinkStrategy<Long> shrinkLong(LongRange range) {
         long min = range.minInclusive();
         long max = range.maxInclusive();
         if (min >= max) {
@@ -135,7 +145,7 @@ final class ShrinkNumerics {
     /**
      * Returns a shrinking strategy that shrinks shorts, but limits values in the output to a given range.
      */
-    public static ShrinkStrategy<Short> shrinkShort(ShortRange range) {
+    static ShrinkStrategy<Short> shrinkShort(ShortRange range) {
         short min = range.minInclusive();
         short max = range.maxInclusive();
         if (min >= max) {
@@ -162,7 +172,7 @@ final class ShrinkNumerics {
     /**
      * Returns a shrinking strategy that shrinks bytes, but limits values in the output to a given range.
      */
-    public static ShrinkStrategy<Byte> shrinkByte(ByteRange range) {
+    static ShrinkStrategy<Byte> shrinkByte(ByteRange range) {
         byte min = range.minInclusive();
         byte max = range.maxInclusive();
         if (min >= max) {
@@ -178,6 +188,54 @@ final class ShrinkNumerics {
                     return ShrinkResult.cons(high, () -> series((byte) 0, high).fmap(n -> (byte) (-n)));
                 } else {
                     return series((byte) 0, input);
+                }
+            });
+        } else {
+            // non-negative
+            return clamped(range, input -> series(min, input));
+        }
+    }
+
+    static ShrinkStrategy<Float> shrinkFloat(FloatRange range) {
+        float min = range.minInclusive();
+        float max = range.maxInclusive();
+        if (min >= max) {
+            return ShrinkStrategy.none();
+        } else if (min < 0 && max < 0) {
+            // all negative
+            return clamped(range, input -> series(-max, -input).fmap(n -> -n));
+        } else if (min < 0) {
+            // negative and positive
+            return clamped(range, input -> {
+                if (input < 0) {
+                    float high = Math.min(-input, max);
+                    return ShrinkResult.cons(high, () -> series(0f, high).fmap(n -> -n));
+                } else {
+                    return series(0f, input);
+                }
+            });
+        } else {
+            // non-negative
+            return clamped(range, input -> series(min, input));
+        }
+    }
+
+    static ShrinkStrategy<Double> shrinkDouble(DoubleRange range) {
+        double min = range.minInclusive();
+        double max = range.maxInclusive();
+        if (min >= max) {
+            return ShrinkStrategy.none();
+        } else if (min < 0 && max < 0) {
+            // all negative
+            return clamped(range, input -> series(-max, -input).fmap(n -> -n));
+        } else if (min < 0) {
+            // negative and positive
+            return clamped(range, input -> {
+                if (input < 0) {
+                    double high = Math.min(-input, max);
+                    return ShrinkResult.cons(high, () -> series(0d, high).fmap(n -> -n));
+                } else {
+                    return series(0d, input);
                 }
             });
         } else {
@@ -205,6 +263,18 @@ final class ShrinkNumerics {
     }
 
     private static ShrinkStrategy<Byte> clamped(ByteRange range, Fn1<Byte, ImmutableFiniteIterable<Byte>> f) {
+        return input -> range.includes(input)
+                ? f.apply(input)
+                : ShrinkResult.empty();
+    }
+
+    private static ShrinkStrategy<Float> clamped(FloatRange range, Fn1<Float, ImmutableFiniteIterable<Float>> f) {
+        return input -> range.includes(input)
+                ? f.apply(input)
+                : ShrinkResult.empty();
+    }
+
+    private static ShrinkStrategy<Double> clamped(DoubleRange range, Fn1<Double, ImmutableFiniteIterable<Double>> f) {
         return input -> range.includes(input)
                 ? f.apply(input)
                 : ShrinkResult.empty();
@@ -251,6 +321,36 @@ final class ShrinkNumerics {
         } else {
             int middle = low + ((high - low) / 2);
             return ShrinkResult.cons(low, () -> series((byte) middle, high));
+        }
+    }
+
+    private static ImmutableFiniteIterable<Float> series(float low, float high) {
+        if (low >= high) {
+            return ShrinkResult.empty();
+        } else if (low >= high - 0.0001f) {
+            if (high != 0.000001f) {
+                return ShrinkResult.singleton(low + 0.000001f);
+            } else {
+                return ShrinkResult.empty();
+            }
+        } else {
+            float middle = low + ((high - low) / 2);
+            return ShrinkResult.cons(low, () -> series(middle, high));
+        }
+    }
+
+    private static ImmutableFiniteIterable<Double> series(double low, double high) {
+        if (low >= high) {
+            return ShrinkResult.empty();
+        } else if (low >= high - 0.0001d) {
+            if (high != 0.000001d) {
+                return ShrinkResult.singleton(low + 0.000001d);
+            } else {
+                return ShrinkResult.empty();
+            }
+        } else {
+            double middle = low + ((high - low) / 2);
+            return ShrinkResult.cons(low, () -> series(middle, high));
         }
     }
 

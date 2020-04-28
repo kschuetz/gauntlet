@@ -25,6 +25,8 @@ import dev.marksman.collectionviews.Vector;
 import dev.marksman.gauntlet.shrink.ShrinkResult;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.constraints.ByteRange;
+import dev.marksman.kraftwerk.constraints.DoubleRange;
+import dev.marksman.kraftwerk.constraints.FloatRange;
 import dev.marksman.kraftwerk.constraints.IntRange;
 import dev.marksman.kraftwerk.constraints.LongRange;
 import dev.marksman.kraftwerk.constraints.ShortRange;
@@ -76,6 +78,20 @@ public final class ShrinkStrategies {
     }
 
     /**
+     * Returns a shrinking strategy that shrinks floats.
+     */
+    public static ShrinkStrategy<Float> shrinkFloat() {
+        return ShrinkNumerics.shrinkFloat();
+    }
+
+    /**
+     * Returns a shrinking strategy that shrinks doubles.
+     */
+    public static ShrinkStrategy<Double> shrinkDouble() {
+        return ShrinkNumerics.shrinkDouble();
+    }
+
+    /**
      * Returns a shrinking strategy that shrinks integers, but limits values in the output to a given range.
      */
     public static ShrinkStrategy<Integer> shrinkInt(IntRange range) {
@@ -101,6 +117,20 @@ public final class ShrinkStrategies {
      */
     public static ShrinkStrategy<Byte> shrinkByte(ByteRange range) {
         return ShrinkNumerics.shrinkByte(range);
+    }
+
+    /**
+     * Returns a shrinking strategy that shrinks floats, but limits values in the output to a given range.
+     */
+    public static ShrinkStrategy<Float> shrinkFloat(FloatRange range) {
+        return ShrinkNumerics.shrinkFloat(range);
+    }
+
+    /**
+     * Returns a shrinking strategy that shrinks doubles, but limits values in the output to a given range.
+     */
+    public static ShrinkStrategy<Double> shrinkDouble(DoubleRange range) {
+        return ShrinkNumerics.shrinkDouble(range);
     }
 
     public static ShrinkStrategy<Boolean> shrinkBoolean() {
