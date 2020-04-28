@@ -36,7 +36,9 @@ import static dev.marksman.kraftwerk.Generators.generateByte;
 import static dev.marksman.kraftwerk.Generators.generateDouble;
 import static dev.marksman.kraftwerk.Generators.generateFloat;
 import static dev.marksman.kraftwerk.Generators.generateInt;
+import static dev.marksman.kraftwerk.Generators.generateIntIndex;
 import static dev.marksman.kraftwerk.Generators.generateLong;
+import static dev.marksman.kraftwerk.Generators.generateLongIndex;
 import static dev.marksman.kraftwerk.Generators.generateShort;
 
 public final class Arbitraries {
@@ -61,6 +63,15 @@ public final class Arbitraries {
         return arbitraryInt(frequencyMap.toGenerator());
     }
 
+    /**
+     * An arbitrary that generates an integer (0 <= n < bound) that is intended to be used
+     * as an index into a collection or sequence.  Output is uniform and unaffected by bias
+     * settings (i.e., there will be no emphasis on edge cases).
+     */
+    public static Arbitrary<Integer> arbitraryIntIndex(int bound) {
+        return arbitrary(generateIntIndex(bound));
+    }
+
     public static Arbitrary<Long> arbitraryLong(Generator<Long> generator) {
         return arbitrary(generator).withShrinkStrategy(shrinkLong());
     }
@@ -75,6 +86,15 @@ public final class Arbitraries {
 
     public static Arbitrary<Long> arbitraryLong(FrequencyMap<Long> frequencyMap) {
         return arbitraryLong(frequencyMap.toGenerator());
+    }
+
+    /**
+     * An arbitrary that generates a long (0 <= n < bound) that is intended to be used
+     * as an index into a collection or sequence.  Output is uniform and unaffected by bias
+     * settings (i.e., there will be no emphasis on edge cases).
+     */
+    public static Arbitrary<Long> arbitraryLongIndex(long bound) {
+        return arbitrary(generateLongIndex(bound));
     }
 
     public static Arbitrary<Short> arbitraryShort(Generator<Short> generator) {
