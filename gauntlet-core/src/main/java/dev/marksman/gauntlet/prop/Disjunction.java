@@ -48,4 +48,5 @@ final class Disjunction<A> implements Prop<A> {
     public String getName() {
         return name;
     }
+
 }

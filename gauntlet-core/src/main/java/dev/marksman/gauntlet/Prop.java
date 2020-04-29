@@ -4,7 +4,14 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functor.Contravariant;
 import dev.marksman.gauntlet.prop.Props;
 
-import static dev.marksman.gauntlet.prop.Props.*;
+import static dev.marksman.gauntlet.prop.Props.biconditional;
+import static dev.marksman.gauntlet.prop.Props.conjunction;
+import static dev.marksman.gauntlet.prop.Props.disjunction;
+import static dev.marksman.gauntlet.prop.Props.exclusiveDisjunction;
+import static dev.marksman.gauntlet.prop.Props.implication;
+import static dev.marksman.gauntlet.prop.Props.mapped;
+import static dev.marksman.gauntlet.prop.Props.named;
+import static dev.marksman.gauntlet.prop.Props.negation;
 
 public interface Prop<A> extends Contravariant<A, Prop<?>>, Named {
     EvalResult evaluate(A data);
@@ -64,7 +71,7 @@ public interface Prop<A> extends Contravariant<A, Prop<?>>, Named {
         return Props.prop(name, evaluator);
     }
 
-    static <A> Prop<A> pass() {
+    static <A> Prop<A> alwaysPass() {
         return Props.alwaysPass();
     }
 
