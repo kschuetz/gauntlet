@@ -1,5 +1,7 @@
 # gauntlet
 
+[![CircleCI](https://circleci.com/gh/kschuetz/gauntlet.svg?style=svg)](https://circleci.com/gh/kschuetz/gauntlet)
+
 WORK IN PROGRESS
 
 # <a name="license">License</a>
