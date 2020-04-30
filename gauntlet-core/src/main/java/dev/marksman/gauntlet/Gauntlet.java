@@ -2,6 +2,7 @@ package dev.marksman.gauntlet;
 
 import java.time.Duration;
 
+import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.gauntlet.DefaultDomainTestRunner.defaultDomainTestRunner;
 import static dev.marksman.gauntlet.DefaultGeneratorTestRunner.defaultGeneratorTestRunner;
 import static dev.marksman.gauntlet.DefaultRefinementTestRunner.defaultShrinkTestRunner;
@@ -10,7 +11,6 @@ import static dev.marksman.gauntlet.DefaultReporter.defaultReporter;
 import static dev.marksman.gauntlet.ReportSettings.defaultReportSettings;
 import static dev.marksman.kraftwerk.StandardGeneratorParameters.defaultGeneratorParameters;
 import static dev.marksman.kraftwerk.bias.DefaultPropertyTestingBiasSettings.defaultPropertyTestBiasSettings;
-import static java.util.concurrent.Executors.newFixedThreadPool;
 
 public final class Gauntlet {
 
@@ -29,8 +29,7 @@ public final class Gauntlet {
         if (INSTANCE == null) {
             synchronized (Gauntlet.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new DefaultGauntlet(newFixedThreadPool(Runtime.getRuntime().availableProcessors()),
-                            defaultGeneratorTestRunner(),
+                    INSTANCE = new DefaultGauntlet(defaultGeneratorTestRunner(),
                             defaultDomainTestRunner(),
                             defaultShrinkTestRunner(),
                             defaultReporter(),
@@ -40,7 +39,8 @@ public final class Gauntlet {
                                     .withBiasSettings(defaultPropertyTestBiasSettings()),
                             DEFAULT_SAMPLE_COUNT,
                             DEFAULT_MAXIMUM_SHRINK_COUNT,
-                            DEFAULT_TIMEOUT);
+                            DEFAULT_TIMEOUT,
+                            nothing());
                 }
             }
         }
