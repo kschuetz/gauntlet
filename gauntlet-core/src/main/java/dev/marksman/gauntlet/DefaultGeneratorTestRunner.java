@@ -21,11 +21,9 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     private static final Random seedGenerator = new Random();
     private static final DefaultGeneratorTestRunner INSTANCE = new DefaultGeneratorTestRunner();
 
-    // generate all inputs
-    // if generator fails early:
-    //    - test all anyway.  if falsified, fail as normal.
-    //    - if cannot falsify, fail with SupplyFailure
-    // if all inputs can be generated, submit test tasks to executor along with sample index
+    public static DefaultGeneratorTestRunner defaultGeneratorTestRunner() {
+        return INSTANCE;
+    }
 
     @Override
     public <A> IO<GeneratorTestResult<A>> run(GeneratorTest<A> generatorTest) {
@@ -36,6 +34,12 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     private IO<Long> getInitialSeedValue(Maybe<Long> suppliedSeedValue) {
         return suppliedSeedValue.match(__ -> io(seedGenerator::nextLong), IO::io);
     }
+
+    // generate all inputs
+    // if generator fails early:
+    //    - test all anyway.  if falsified, fail as normal.
+    //    - if cannot falsify, fail with SupplyFailure
+    // if all inputs can be generated, submit test tasks to executor along with sample index
 
     private <A> IO<GeneratorTestResult<A>> runTest(GeneratorTest<A> generatorTest,
                                                    GeneratedDataSet<A> dataSet) {
@@ -53,7 +57,6 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
                     dataSet.getInitialSeedValue());
         });
     }
-
 
     private <A> TestResult<A> maybeApplySupplyFailure(Maybe<SupplyFailure> supplyFailureMaybe, TestResult<A> input) {
         // supply failure only matters if test has passed
@@ -92,10 +95,6 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
             }
         }
         return generatedDataSet(initialSeedValue, values, supplyFailure, state);
-    }
-
-    public static DefaultGeneratorTestRunner defaultGeneratorTestRunner() {
-        return INSTANCE;
     }
 
 //    private

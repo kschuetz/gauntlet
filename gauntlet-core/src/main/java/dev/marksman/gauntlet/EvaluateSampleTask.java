@@ -13,6 +13,10 @@ public class EvaluateSampleTask<A> implements Runnable {
     private final int sampleIndex;
     private final A sample;
 
+    public static <A> EvaluateSampleTask<A> evaluateSampleTask(ResultReceiver receiver, Prop<A> property, int sampleIndex, A sample) {
+        return new EvaluateSampleTask<>(receiver, property, sampleIndex, sample);
+    }
+
     @Override
     public void run() {
         if (receiver.shouldRun(sampleIndex)) {
@@ -23,9 +27,5 @@ public class EvaluateSampleTask<A> implements Runnable {
                 receiver.reportResult(sampleIndex, left(error));
             }
         }
-    }
-
-    public static <A> EvaluateSampleTask<A> evaluateSampleTask(ResultReceiver receiver, Prop<A> property, int sampleIndex, A sample) {
-        return new EvaluateSampleTask<>(receiver, property, sampleIndex, sample);
     }
 }

@@ -10,14 +10,6 @@ import dev.marksman.collectionviews.Vector;
 import static dev.marksman.gauntlet.ConcreteDomain.concreteDomain;
 
 public interface Domain<A> {
-    ImmutableVector<A> getElements();
-
-    Fn1<? super A, String> getPrettyPrinter();
-
-    Domain<A> withPrettyPrinter(Fn1<? super A, String> prettyPrinter);
-
-    Domain<A> suchThat(Fn1<? super A, Boolean> predicate);
-
     static <A> Domain<A> domain(Iterable<A> elements) {
         return concreteDomain(elements);
     }
@@ -48,4 +40,12 @@ public interface Domain<A> {
                                                                     Domain<D> domainD) {
         return ConcreteDomain.cartesianProduct(domainA, domainB, domainC, domainD);
     }
+
+    ImmutableVector<A> getElements();
+
+    Fn1<? super A, String> getPrettyPrinter();
+
+    Domain<A> withPrettyPrinter(Fn1<? super A, String> prettyPrinter);
+
+    Domain<A> suchThat(Fn1<? super A, Boolean> predicate);
 }

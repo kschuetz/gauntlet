@@ -19,6 +19,12 @@ final class ThrowsExceptionMatching<A> implements Prop<A> {
         this.underlying = underlying;
     }
 
+    static <A> ThrowsExceptionMatching<A> throwsExceptionMatching(String name,
+                                                                  Fn1<? super Throwable, Boolean> exceptionMatcher,
+                                                                  Prop<A> underlying) {
+        return new ThrowsExceptionMatching<>(name, exceptionMatcher, underlying);
+    }
+
     @Override
     public Prop<A> safe() {
         return this;
@@ -41,11 +47,5 @@ final class ThrowsExceptionMatching<A> implements Prop<A> {
     @Override
     public String getName() {
         return name;
-    }
-
-    static <A> ThrowsExceptionMatching<A> throwsExceptionMatching(String name,
-                                                                  Fn1<? super Throwable, Boolean> exceptionMatcher,
-                                                                  Prop<A> underlying) {
-        return new ThrowsExceptionMatching<>(name, exceptionMatcher, underlying);
     }
 }

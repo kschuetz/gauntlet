@@ -22,16 +22,6 @@ final class ConcreteDomain<A> implements Domain<A> {
     @Getter
     Fn1<? super A, String> prettyPrinter;
 
-    @Override
-    public Domain<A> withPrettyPrinter(Fn1<? super A, String> prettyPrinter) {
-        return new ConcreteDomain<>(elements, prettyPrinter);
-    }
-
-    @Override
-    public Domain<A> suchThat(Fn1<? super A, Boolean> predicate) {
-        return new LazilyFilteredDomain<>(elements, filter(predicate), prettyPrinter);
-    }
-
     static <A> ConcreteDomain<A> concreteDomain(Iterable<A> elements) {
         return new ConcreteDomain<>(Vector.copyFrom(elements), Objects::toString);
     }
@@ -77,6 +67,16 @@ final class ConcreteDomain<A> implements Domain<A> {
                 domainC.getPrettyPrinter(),
                 domainD.getPrettyPrinter());
         return new ConcreteDomain<>(newElements, newPrettyPrinter);
+    }
+
+    @Override
+    public Domain<A> withPrettyPrinter(Fn1<? super A, String> prettyPrinter) {
+        return new ConcreteDomain<>(elements, prettyPrinter);
+    }
+
+    @Override
+    public Domain<A> suchThat(Fn1<? super A, Boolean> predicate) {
+        return new LazilyFilteredDomain<>(elements, filter(predicate), prettyPrinter);
     }
 
 }

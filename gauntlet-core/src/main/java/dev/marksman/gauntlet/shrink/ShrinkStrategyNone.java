@@ -9,6 +9,11 @@ import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmuta
 class ShrinkStrategyNone<A> implements ShrinkStrategy<A> {
     private static final ShrinkStrategyNone<?> INSTANCE = new ShrinkStrategyNone<>();
 
+    @SuppressWarnings("unchecked")
+    static <A> ShrinkStrategy<A> shrinkNone() {
+        return (ShrinkStrategy<A>) INSTANCE;
+    }
+
     @Override
     public ImmutableFiniteIterable<A> apply(A input) {
         return emptyImmutableFiniteIterable();
@@ -27,10 +32,5 @@ class ShrinkStrategyNone<A> implements ShrinkStrategy<A> {
     @Override
     public <B> ShrinkStrategy<B> convert(Fn1<A, B> ab, Fn1<B, A> ba) {
         return shrinkNone();
-    }
-
-    @SuppressWarnings("unchecked")
-    static <A> ShrinkStrategy<A> shrinkNone() {
-        return (ShrinkStrategy<A>) INSTANCE;
     }
 }

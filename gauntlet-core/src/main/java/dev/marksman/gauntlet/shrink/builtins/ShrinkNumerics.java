@@ -13,9 +13,6 @@ import dev.marksman.kraftwerk.constraints.ShortRange;
 
 final class ShrinkNumerics {
 
-    private ShrinkNumerics() {
-    }
-
     private static final ShrinkStrategy<Integer> INT = input -> {
         if (input < 0) {
             int high = input == Integer.MIN_VALUE ? Integer.MAX_VALUE : -input;
@@ -24,7 +21,6 @@ final class ShrinkNumerics {
             return series(0, input);
         }
     };
-
     private static final ShrinkStrategy<Long> LONG = input -> {
         if (input < 0) {
             long high = input == Long.MIN_VALUE ? Long.MAX_VALUE : -input;
@@ -33,7 +29,6 @@ final class ShrinkNumerics {
             return series(0, input);
         }
     };
-
     private static final ShrinkStrategy<Short> SHORT = input -> {
         if (input < 0) {
             short high = input == Short.MIN_VALUE ? Short.MAX_VALUE : (short) (-input);
@@ -42,7 +37,6 @@ final class ShrinkNumerics {
             return series((short) 0, input);
         }
     };
-
     private static final ShrinkStrategy<Byte> BYTE = input -> {
         if (input < 0) {
             byte high = input == Byte.MIN_VALUE ? Byte.MAX_VALUE : (byte) (-input);
@@ -51,6 +45,9 @@ final class ShrinkNumerics {
             return series((byte) 0, input);
         }
     };
+
+    private ShrinkNumerics() {
+    }
 
     /**
      * Returns a shrinking strategy that shrinks integers.

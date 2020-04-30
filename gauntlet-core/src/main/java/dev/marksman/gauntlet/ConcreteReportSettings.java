@@ -11,6 +11,10 @@ class ConcreteReportSettings implements ReportSettings {
     VerbosityLevel failureVerbosity;
     VerbosityLevel successVerbosity;
 
+    static ReportSettings concreteReportSettings(VerbosityLevel failureVerbosity, VerbosityLevel successVerbosity) {
+        return new ConcreteReportSettings(failureVerbosity, successVerbosity);
+    }
+
     @Override
     public ReportSettings withSuccessVerbosity(VerbosityLevel successVerbosity) {
         return concreteReportSettings(failureVerbosity, successVerbosity);
@@ -19,10 +23,6 @@ class ConcreteReportSettings implements ReportSettings {
     @Override
     public ReportSettings withFailureVerbosity(VerbosityLevel failureVerbosity) {
         return concreteReportSettings(failureVerbosity, successVerbosity);
-    }
-
-    static ReportSettings concreteReportSettings(VerbosityLevel failureVerbosity, VerbosityLevel successVerbosity) {
-        return new ConcreteReportSettings(failureVerbosity, successVerbosity);
     }
 
 }

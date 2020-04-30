@@ -16,17 +16,16 @@ final class CompositeSupply2<A, B, Out> implements Supply<Out> {
         this.fn = fn;
     }
 
-    @Override
-    public SupplyTree getSupplyTree() {
-        return composite(vsA.getSupplyTree(), vsB.getSupplyTree());
+    static <A, B> GeneratorOutput<B> threadSeed(int posIndex,
+                                                GeneratorOutput<A> ra,
+                                                Fn2<A, Seed, GeneratorOutput<B>> f) {
+        return ra.getValue()
+                .match(gf -> GeneratorOutput.failure(ra.getNextState(), gf),
+                        a -> f.apply(a, ra.getNextState()));
     }
 
-    @Override
-    public GeneratorOutput<Out> getNext(Seed input) {
-        return threadSeed(0,
-                vsA.getNext(input), (a, s1) -> threadSeed(1, vsB.getNext(s1),
-                        (b, s2) -> GeneratorOutput.success(s2, fn.apply(a, b))));
-
+    private static String positionName(int posIndex) {
+        return "position " + (posIndex + 1);
     }
 
     // TODO: find another way to build SupplyTree because this is going to be way too ugly
@@ -48,15 +47,16 @@ final class CompositeSupply2<A, B, Out> implements Supply<Out> {
 //                        });
 //    }
 
-    static <A, B> GeneratorOutput<B> threadSeed(int posIndex,
-                                                GeneratorOutput<A> ra,
-                                                Fn2<A, Seed, GeneratorOutput<B>> f) {
-        return ra.getValue()
-                .match(gf -> GeneratorOutput.failure(ra.getNextState(), gf),
-                        a -> f.apply(a, ra.getNextState()));
+    @Override
+    public SupplyTree getSupplyTree() {
+        return composite(vsA.getSupplyTree(), vsB.getSupplyTree());
     }
 
-    private static String positionName(int posIndex) {
-        return "position " + (posIndex + 1);
+    @Override
+    public GeneratorOutput<Out> getNext(Seed input) {
+        return threadSeed(0,
+                vsA.getNext(input), (a, s1) -> threadSeed(1, vsB.getNext(s1),
+                        (b, s2) -> GeneratorOutput.success(s2, fn.apply(a, b))));
+
     }
 }

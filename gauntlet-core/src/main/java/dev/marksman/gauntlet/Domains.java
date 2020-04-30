@@ -15,12 +15,6 @@ public final class Domains {
 
     }
 
-    public interface UpperBoundApi<A> {
-        Domain<A> to(A upper);
-
-        Domain<A> until(A upper);
-    }
-
     public static UpperBoundApi<Integer> integersFrom(int lower) {
         return new UpperBoundApi<Integer>() {
             @Override
@@ -52,6 +46,12 @@ public final class Domains {
         } else {
             return domain(Vector.range(upperExclusive - lower).fmap(n -> n + lower));
         }
+    }
+
+    public interface UpperBoundApi<A> {
+        Domain<A> to(A upper);
+
+        Domain<A> until(A upper);
     }
 
 }

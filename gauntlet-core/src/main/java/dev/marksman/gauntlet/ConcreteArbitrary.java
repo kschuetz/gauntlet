@@ -34,6 +34,18 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
         this.maxDiscards = maxDiscards;
     }
 
+    static <A> ConcreteArbitrary<A> concreteArbitrary(Fn1<GeneratorParameters, Supply<A>> generator,
+                                                      Maybe<ShrinkStrategy<A>> shrinkStrategy,
+                                                      Fn1<? super A, String> prettyPrinter) {
+        return new ConcreteArbitrary<>(generator, emptyImmutableFiniteIterable(), Filter.emptyFilter(), shrinkStrategy, prettyPrinter, Gauntlet.DEFAULT_MAX_DISCARDS);
+    }
+
+    static <A> Arbitrary<A> concreteArbitrary(Generator<A> generator) {
+        Fn0<String> labelSupplier = () -> generator.getLabel().orElseGet(generator::toString);
+        return concreteArbitrary(p -> new UnfilteredSupply<>(generator.prepare(p), labelSupplier),
+                nothing(), Object::toString);
+    }
+
     @Override
     public Supply<A> createSupply(GeneratorParameters parameters) {
         GeneratorParameters transformedParameters = parameterTransforms.foldLeft((acc, f) -> f.apply(acc), parameters);
@@ -104,18 +116,6 @@ final class ConcreteArbitrary<A> implements Arbitrary<A> {
     @Override
     public Arbitrary<A> modifyGeneratorParameters(Fn1<GeneratorParameters, GeneratorParameters> modifyFn) {
         return new ConcreteArbitrary<>(generator, parameterTransforms.append(modifyFn), filter, shrinkStrategy, prettyPrinter, maxDiscards);
-    }
-
-    static <A> ConcreteArbitrary<A> concreteArbitrary(Fn1<GeneratorParameters, Supply<A>> generator,
-                                                      Maybe<ShrinkStrategy<A>> shrinkStrategy,
-                                                      Fn1<? super A, String> prettyPrinter) {
-        return new ConcreteArbitrary<>(generator, emptyImmutableFiniteIterable(), Filter.emptyFilter(), shrinkStrategy, prettyPrinter, Gauntlet.DEFAULT_MAX_DISCARDS);
-    }
-
-    static <A> Arbitrary<A> concreteArbitrary(Generator<A> generator) {
-        Fn0<String> labelSupplier = () -> generator.getLabel().orElseGet(generator::toString);
-        return concreteArbitrary(p -> new UnfilteredSupply<>(generator.prepare(p), labelSupplier),
-                nothing(), Object::toString);
     }
 
 }

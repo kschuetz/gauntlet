@@ -15,14 +15,17 @@ import java.util.concurrent.locks.ReentrantLock;
 import static com.jnape.palatable.lambda.adt.Maybe.maybe;
 import static com.jnape.palatable.lambda.adt.Unit.UNIT;
 import static dev.marksman.gauntlet.Counterexample.counterexample;
-import static dev.marksman.gauntlet.TestResult.*;
+import static dev.marksman.gauntlet.TestResult.error;
+import static dev.marksman.gauntlet.TestResult.proved;
+import static dev.marksman.gauntlet.TestResult.timedOut;
+import static dev.marksman.gauntlet.TestResult.unproved;
 
 abstract class ResultCollector<A> implements ResultReceiver {
     protected final ImmutableVector<A> samples;
     protected final ReentrantLock lock;
     protected final CheckList reported;
-    protected volatile int cutoffIndex;
     private final Condition doneLatch;
+    protected volatile int cutoffIndex;
     private volatile boolean done;
 
     public ResultCollector(ImmutableVector<A> samples) {
@@ -33,6 +36,14 @@ abstract class ResultCollector<A> implements ResultReceiver {
         this.doneLatch = lock.newCondition();
         this.done = false;
         this.reported = new CheckList(sampleCount);
+    }
+
+    static <A> ResultCollector<A> universalResultCollector(ImmutableVector<A> samples) {
+        return new UniversalResultCollector<>(samples);
+    }
+
+    static <A> ResultCollector<A> existentialResultCollector(ImmutableVector<A> samples) {
+        return new ExistentialResultCollector<>(samples);
     }
 
     @Override
@@ -225,14 +236,6 @@ abstract class ResultCollector<A> implements ResultReceiver {
             }
             return builder.build();
         }
-    }
-
-    static <A> ResultCollector<A> universalResultCollector(ImmutableVector<A> samples) {
-        return new UniversalResultCollector<>(samples);
-    }
-
-    static <A> ResultCollector<A> existentialResultCollector(ImmutableVector<A> samples) {
-        return new ExistentialResultCollector<>(samples);
     }
 
 }

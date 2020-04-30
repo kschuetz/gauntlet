@@ -13,6 +13,12 @@ final class MappedSupply<A, B> implements Supply<B> {
         this.mapperChain = mapperChain;
     }
 
+    @SuppressWarnings("unchecked")
+    static <A, B> Supply<B> mappedSupply(Fn1<? super A, ? extends B> fn,
+                                         Supply<A> underlying) {
+        return new MappedSupply<>(underlying, MapperChain.mapperChain((Fn1<Object, Object>) fn));
+    }
+
     @Override
     public SupplyTree getSupplyTree() {
         return underlying.getSupplyTree();
@@ -29,11 +35,5 @@ final class MappedSupply<A, B> implements Supply<B> {
     @Override
     public <B1> Supply<B1> fmap(Fn1<? super B, ? extends B1> fn) {
         return new MappedSupply<>(underlying, mapperChain.append((Fn1<Object, Object>) fn));
-    }
-
-    @SuppressWarnings("unchecked")
-    static <A, B> Supply<B> mappedSupply(Fn1<? super A, ? extends B> fn,
-                                         Supply<A> underlying) {
-        return new MappedSupply<>(underlying, MapperChain.mapperChain((Fn1<Object, Object>) fn));
     }
 }

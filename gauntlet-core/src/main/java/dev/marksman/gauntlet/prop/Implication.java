@@ -11,8 +11,8 @@ import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
 import static dev.marksman.gauntlet.Reasons.reasons;
 
 final class Implication<A> implements Prop<A> {
-    final Prop<A> antecedent;
-    final Prop<A> consequent;
+    private final Prop<A> antecedent;
+    private final Prop<A> consequent;
     private final String name;
 
     Implication(Prop<A> antecedent, Prop<A> consequent) {

@@ -13,6 +13,10 @@ import static lombok.AccessLevel.PRIVATE;
 public class EvalSuccess extends EvalResult {
     private static EvalSuccess INSTANCE = new EvalSuccess();
 
+    public static EvalSuccess evalSuccess() {
+        return INSTANCE;
+    }
+
     @Override
     public boolean isSuccess() {
         return true;
@@ -26,10 +30,6 @@ public class EvalSuccess extends EvalResult {
     @Override
     public <R> R match(Fn1<? super EvalSuccess, ? extends R> aFn, Fn1<? super EvalFailure, ? extends R> bFn) {
         return aFn.apply(this);
-    }
-
-    public static EvalSuccess evalSuccess() {
-        return INSTANCE;
     }
 
 }

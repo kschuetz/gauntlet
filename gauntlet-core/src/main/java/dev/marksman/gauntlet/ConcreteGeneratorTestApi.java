@@ -19,6 +19,12 @@ final class ConcreteGeneratorTestApi<A> implements GeneratorTestApi<A> {
     private final Consumer<GeneratorTest<A>> runner;
     private final GeneratorTestParameters<A> parameters;
 
+    static <A> ConcreteGeneratorTestApi<A> concreteGeneratorTestApi(Fn0<Executor> getParentExecutor,
+                                                                    Consumer<GeneratorTest<A>> runner,
+                                                                    GeneratorTestParameters<A> parameters) {
+        return new ConcreteGeneratorTestApi<>(getParentExecutor, runner, parameters);
+    }
+
     @Override
     public GeneratorTestApi<A> withSampleCount(int sampleCount) {
         return new ConcreteGeneratorTestApi<>(getParentExecutor, runner, parameters.withSampleCount(sampleCount));
@@ -55,12 +61,6 @@ final class ConcreteGeneratorTestApi<A> implements GeneratorTestApi<A> {
                 parameters.getMaximumShrinkCount(), parameters.getClassifiers(), parameters.getTimeout(),
                 parameters.getExecutorOverride().orElseGet(getParentExecutor), parameters.getGeneratorParameters());
         runner.accept(generatorTest);
-    }
-
-    static <A> ConcreteGeneratorTestApi<A> concreteGeneratorTestApi(Fn0<Executor> getParentExecutor,
-                                                                    Consumer<GeneratorTest<A>> runner,
-                                                                    GeneratorTestParameters<A> parameters) {
-        return new ConcreteGeneratorTestApi<>(getParentExecutor, runner, parameters);
     }
 
 }

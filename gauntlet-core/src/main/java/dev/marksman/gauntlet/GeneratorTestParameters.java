@@ -16,7 +16,7 @@ import java.util.concurrent.Executor;
 @With
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class GeneratorTestParameters<A> {
+final class GeneratorTestParameters<A> {
     private final Arbitrary<A> arbitrary;
     private final Maybe<Long> initialSeed;
     private final int sampleCount;
@@ -25,11 +25,6 @@ public final class GeneratorTestParameters<A> {
     private final Duration timeout;
     private final Maybe<Executor> executorOverride;
     private final GeneratorParameters generatorParameters;
-
-    public GeneratorTestParameters<A> addClassifier(Fn1<A, Set<String>> classifier) {
-        return new GeneratorTestParameters<>(arbitrary, initialSeed, sampleCount, maximumShrinkCount,
-                classifiers.prepend(classifier), timeout, executorOverride, generatorParameters);
-    }
 
     public static <A> GeneratorTestParameters<A> generatorTestParameters(Arbitrary<A> arbitrary,
                                                                          Maybe<Long> initialSeed,
@@ -41,5 +36,10 @@ public final class GeneratorTestParameters<A> {
                                                                          GeneratorParameters generatorParameters) {
         return new GeneratorTestParameters<>(arbitrary, initialSeed, maximumShrinkCount, sampleCount, classifiers,
                 timeout, executorOverride, generatorParameters);
+    }
+
+    public GeneratorTestParameters<A> addClassifier(Fn1<A, Set<String>> classifier) {
+        return new GeneratorTestParameters<>(arbitrary, initialSeed, sampleCount, maximumShrinkCount,
+                classifiers.prepend(classifier), timeout, executorOverride, generatorParameters);
     }
 }

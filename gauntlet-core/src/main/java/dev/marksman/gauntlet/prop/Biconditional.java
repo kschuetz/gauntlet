@@ -13,8 +13,8 @@ import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
 import static dev.marksman.gauntlet.Reasons.reasons;
 
 final class Biconditional<A> implements Prop<A> {
-    final Prop<A> antecedent;
-    final Prop<A> consequent;
+    private final Prop<A> antecedent;
+    private final Prop<A> consequent;
     private final String name;
 
     Biconditional(Prop<A> antecedent, Prop<A> consequent) {

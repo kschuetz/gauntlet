@@ -21,8 +21,22 @@ import static dev.marksman.gauntlet.RefinedCounterexample.refinedCounterexample;
 import static dev.marksman.gauntlet.ResultCollector.universalResultCollector;
 
 public final class DefaultRefinementTestRunner implements RefinementTestRunner {
-    private static final DefaultRefinementTestRunner INSTANCE = new DefaultRefinementTestRunner();
     public static final Duration TIMEOUT_TODO = Duration.ofMinutes(1);
+    private static final DefaultRefinementTestRunner INSTANCE = new DefaultRefinementTestRunner();
+
+    private static <A> ImmutableVector<A> readBlock(int size, Iterator<A> source) {
+        VectorBuilder<A> builder = Vector.builder(size);
+        int i = 0;
+        while (i < size && source.hasNext()) {
+            builder = builder.add(source.next());
+            i += 1;
+        }
+        return builder.build();
+    }
+
+    public static DefaultRefinementTestRunner defaultShrinkTestRunner() {
+        return INSTANCE;
+    }
 
     @Override
     public <A> IO<Maybe<RefinedCounterexample<A>>> run(RefinementTestExecutionParameters executionParameters,
@@ -117,19 +131,5 @@ public final class DefaultRefinementTestRunner implements RefinementTestRunner {
             }
             return collector.getResultBlocking(timeout);
         }
-    }
-
-    private static <A> ImmutableVector<A> readBlock(int size, Iterator<A> source) {
-        VectorBuilder<A> builder = Vector.builder(size);
-        int i = 0;
-        while (i < size && source.hasNext()) {
-            builder = builder.add(source.next());
-            i += 1;
-        }
-        return builder.build();
-    }
-
-    public static DefaultRefinementTestRunner defaultShrinkTestRunner() {
-        return INSTANCE;
     }
 }

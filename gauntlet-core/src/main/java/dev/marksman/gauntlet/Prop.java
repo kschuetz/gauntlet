@@ -14,6 +14,38 @@ import static dev.marksman.gauntlet.prop.Props.named;
 import static dev.marksman.gauntlet.prop.Props.negation;
 
 public interface Prop<A> extends Contravariant<A, Prop<?>>, Named {
+    static <A> Prop<A> predicate(Fn1<? super A, Boolean> predicate) {
+        return Props.predicate(predicate);
+    }
+
+    static <A> Prop<A> predicate(String name, Fn1<? super A, Boolean> predicate) {
+        return Props.predicate(name, predicate);
+    }
+
+    static <A> Prop<A> prop(Fn1<? super A, SimpleResult> evaluator) {
+        return Props.prop(evaluator);
+    }
+
+    static <A> Prop<A> prop(String name, Fn1<? super A, SimpleResult> evaluator) {
+        return Props.prop(name, evaluator);
+    }
+
+    static <A> Prop<A> alwaysPass() {
+        return Props.alwaysPass();
+    }
+
+    static <A> Prop<A> alwaysFail() {
+        return Props.alwaysFail();
+    }
+
+    static <A> Prop<A> alwaysFail(String failureReason) {
+        return Props.alwaysFail(failureReason);
+    }
+
+    static <A> Prop<A> dynamic(Fn1<A, Prop<A>> selector) {
+        return Props.dynamic(selector);
+    }
+
     EvalResult evaluate(A data);
 
     String getName();
@@ -53,37 +85,5 @@ public interface Prop<A> extends Contravariant<A, Prop<?>>, Named {
 
     default Prop<A> safe() {
         return Props.safe(this);
-    }
-
-    static <A> Prop<A> predicate(Fn1<? super A, Boolean> predicate) {
-        return Props.predicate(predicate);
-    }
-
-    static <A> Prop<A> predicate(String name, Fn1<? super A, Boolean> predicate) {
-        return Props.predicate(name, predicate);
-    }
-
-    static <A> Prop<A> prop(Fn1<? super A, SimpleResult> evaluator) {
-        return Props.prop(evaluator);
-    }
-
-    static <A> Prop<A> prop(String name, Fn1<? super A, SimpleResult> evaluator) {
-        return Props.prop(name, evaluator);
-    }
-
-    static <A> Prop<A> alwaysPass() {
-        return Props.alwaysPass();
-    }
-
-    static <A> Prop<A> alwaysFail() {
-        return Props.alwaysFail();
-    }
-
-    static <A> Prop<A> alwaysFail(String failureReason) {
-        return Props.alwaysFail(failureReason);
-    }
-
-    static <A> Prop<A> dynamic(Fn1<A, Prop<A>> selector) {
-        return Props.dynamic(selector);
     }
 }

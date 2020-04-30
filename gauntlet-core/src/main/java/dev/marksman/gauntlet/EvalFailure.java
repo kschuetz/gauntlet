@@ -17,6 +17,17 @@ public class EvalFailure extends EvalResult {
     Reasons reasons;
     ImmutableFiniteIterable<Cause> causes;
 
+    public static EvalFailure evalFailure(Named propertyName,
+                                          Reasons reasons) {
+        return new EvalFailure(propertyName, reasons, Vector.empty());
+    }
+
+    public static EvalFailure evalFailure(Named propertyName,
+                                          Reasons reasons,
+                                          Iterable<Cause> causes) {
+        return new EvalFailure(propertyName, reasons, Vector.copyFrom(causes));
+    }
+
     @Override
     public boolean isSuccess() {
         return false;
@@ -34,16 +45,5 @@ public class EvalFailure extends EvalResult {
     @Override
     public <R> R match(Fn1<? super EvalSuccess, ? extends R> aFn, Fn1<? super EvalFailure, ? extends R> bFn) {
         return bFn.apply(this);
-    }
-
-    public static EvalFailure evalFailure(Named propertyName,
-                                          Reasons reasons) {
-        return new EvalFailure(propertyName, reasons, Vector.empty());
-    }
-
-    public static EvalFailure evalFailure(Named propertyName,
-                                          Reasons reasons,
-                                          Iterable<Cause> causes) {
-        return new EvalFailure(propertyName, reasons, Vector.copyFrom(causes));
     }
 }

@@ -5,6 +5,10 @@ import static dev.marksman.gauntlet.VerbosityLevel.NORMAL;
 import static dev.marksman.gauntlet.VerbosityLevel.QUIET;
 
 public interface ReportSettings {
+    static ReportSettings defaultReportSettings() {
+        return concreteReportSettings(NORMAL, QUIET);
+    }
+
     VerbosityLevel getSuccessVerbosity();
 
     VerbosityLevel getFailureVerbosity();
@@ -12,8 +16,4 @@ public interface ReportSettings {
     ReportSettings withSuccessVerbosity(VerbosityLevel verbosityLevel);
 
     ReportSettings withFailureVerbosity(VerbosityLevel verbosityLevel);
-
-    static ReportSettings defaultReportSettings() {
-        return concreteReportSettings(NORMAL, QUIET);
-    }
 }

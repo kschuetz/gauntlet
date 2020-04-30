@@ -15,10 +15,6 @@ import static lombok.AccessLevel.PRIVATE;
 public class Reasons {
     ImmutableNonEmptyVector<String> items;
 
-    public String getPrimary() {
-        return items.head();
-    }
-
     public static Reasons reasons(String primaryReason, String... additional) {
         if (additional.length == 0) {
             return new Reasons(Vector.of(primaryReason));
@@ -33,6 +29,10 @@ public class Reasons {
 
     public static Reasons reasons(NonEmptyIterable<String> reasons) {
         return new Reasons(NonEmptyVector.nonEmptyCopyFrom(reasons));
+    }
+
+    public String getPrimary() {
+        return items.head();
     }
 
 }

@@ -11,8 +11,8 @@ import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
 import static dev.marksman.gauntlet.Reasons.reasons;
 
 final class ExclusiveDisjunction<A> implements Prop<A> {
-    final Prop<A> p;
-    final Prop<A> q;
+    private final Prop<A> p;
+    private final Prop<A> q;
     private final String name;
 
     ExclusiveDisjunction(Prop<A> p, Prop<A> q) {

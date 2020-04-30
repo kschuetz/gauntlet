@@ -19,11 +19,11 @@ public final class Gauntlet {
     public static final int DEFAULT_MAXIMUM_SHRINK_COUNT = 1000;
     public static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(30);  // TODO: default timeout
 
+    private static GauntletApi INSTANCE;
+
     private Gauntlet() {
 
     }
-
-    private static GauntletApi INSTANCE;
 
     public static GauntletApi gauntlet() {
         if (INSTANCE == null) {

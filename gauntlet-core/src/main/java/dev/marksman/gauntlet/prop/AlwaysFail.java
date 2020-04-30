@@ -17,6 +17,15 @@ final class AlwaysFail<A> implements Prop<A> {
         this.reasons = reasons;
     }
 
+    static <A> AlwaysFail<A> alwaysFail(Reasons reasons) {
+        return new AlwaysFail<>(reasons);
+    }
+
+    @SuppressWarnings("unchecked")
+    static <A> AlwaysFail<A> alwaysFail() {
+        return (AlwaysFail<A>) INSTANCE;
+    }
+
     @Override
     public EvalResult evaluate(A data) {
         return evalFailure(this, reasons);
@@ -25,15 +34,6 @@ final class AlwaysFail<A> implements Prop<A> {
     @Override
     public String getName() {
         return NAME;
-    }
-
-    static <A> AlwaysFail<A> alwaysFail(Reasons reasons) {
-        return new AlwaysFail<>(reasons);
-    }
-
-    @SuppressWarnings("unchecked")
-    static <A> AlwaysFail<A> alwaysFail() {
-        return (AlwaysFail<A>) INSTANCE;
     }
 
 }

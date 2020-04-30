@@ -12,6 +12,18 @@ import lombok.Value;
 
 public abstract class SupplyTree implements CoProduct3<SupplyTree.Leaf, SupplyTree.Composite, SupplyTree.Collection, SupplyTree> {
 
+    public static SupplyTree leaf(String name) {
+        return new Leaf(name);
+    }
+
+    public static SupplyTree collection(SupplyTree child) {
+        return new Collection(child);
+    }
+
+    public static SupplyTree composite(SupplyTree first, SupplyTree second, SupplyTree... rest) {
+        return new Composite(Vector.of(first, second).concat(Vector.copyFrom(rest)));
+    }
+
     @EqualsAndHashCode(callSuper = true)
     @Value
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -46,17 +58,5 @@ public abstract class SupplyTree implements CoProduct3<SupplyTree.Leaf, SupplyTr
         public <R> R match(Fn1<? super Leaf, ? extends R> aFn, Fn1<? super Composite, ? extends R> bFn, Fn1<? super Collection, ? extends R> cFn) {
             return cFn.apply(this);
         }
-    }
-
-    public static SupplyTree leaf(String name) {
-        return new Leaf(name);
-    }
-
-    public static SupplyTree collection(SupplyTree child) {
-        return new Collection(child);
-    }
-
-    public static SupplyTree composite(SupplyTree first, SupplyTree second, SupplyTree... rest) {
-        return new Composite(Vector.of(first, second).concat(Vector.copyFrom(rest)));
     }
 }

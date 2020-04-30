@@ -9,10 +9,10 @@ import static dev.marksman.gauntlet.filter.Filter.filter;
 
 class LazilyFilteredDomain<A> implements Domain<A> {
     private final Object lock;
+    private final Fn1<? super A, String> prettyPrinter;
     private ImmutableVector<A> sourceElements;
     private Filter<A> filter;
     private volatile ImmutableVector<A> filteredElements;
-    private final Fn1<? super A, String> prettyPrinter;
 
     LazilyFilteredDomain(ImmutableVector<A> sourceElements, Filter<A> filter, Fn1<? super A, String> prettyPrinter) {
         this.lock = new Object();

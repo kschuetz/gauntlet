@@ -10,6 +10,11 @@ import static dev.marksman.gauntlet.shrink.ShrinkStrategyNone.shrinkNone;
 
 @FunctionalInterface
 public interface ShrinkStrategy<A> {
+
+    static <A> ShrinkStrategy<A> none() {
+        return shrinkNone();
+    }
+
     ImmutableFiniteIterable<A> apply(A input);
 
     default ShrinkStrategy<A> filter(Fn1<? super A, Boolean> predicate) {
@@ -23,9 +28,5 @@ public interface ShrinkStrategy<A> {
     default <B> ShrinkStrategy<B> convert(Fn1<A, B> ab, Fn1<B, A> ba) {
         ShrinkStrategy<A> orig = this;
         return input -> orig.apply(ba.apply(input)).fmap(ab);
-    }
-
-    static <A> ShrinkStrategy<A> none() {
-        return shrinkNone();
     }
 }

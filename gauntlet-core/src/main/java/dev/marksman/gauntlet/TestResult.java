@@ -19,6 +19,45 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
         TestResult.Falsified<A>, TestResult.Unproved<A>, TestResult.SupplyFailed<A>, TestResult.Error<A>,
         TestResult.TimedOut<A>, TestResult.Interrupted<A>, TestResult<A>> {
 
+    public static <A> Passed<A> passed(ImmutableVector<A> passedSamples) {
+        return new Passed<>(passedSamples);
+    }
+
+    public static <A> Proved<A> proved(A passedSample, ImmutableVector<Counterexample<A>> counterexamples) {
+        return new Proved<>(passedSample, counterexamples);
+    }
+
+    public static <A> Falsified<A> falsified(ImmutableVector<A> passedSamples,
+                                             Counterexample<A> counterexample) {
+        return new Falsified<>(passedSamples, counterexample, nothing());
+    }
+
+    public static <A> Falsified<A> falsified(ImmutableVector<A> passedSamples,
+                                             Counterexample<A> counterexample,
+                                             Maybe<RefinedCounterexample<A>> refinedCounterexample) {
+        return new Falsified<>(passedSamples, counterexample, refinedCounterexample);
+    }
+
+    public static <A> Unproved<A> unproved(ImmutableVector<Counterexample<A>> counterexamples) {
+        return new Unproved<>(counterexamples);
+    }
+
+    public static <A> SupplyFailed<A> supplyFailed(ImmutableVector<A> passedSamples, SupplyFailure supplyFailure) {
+        return new SupplyFailed<>(passedSamples, supplyFailure);
+    }
+
+    public static <A> Error<A> error(ImmutableVector<A> passedSamples, A errorSample, Throwable error) {
+        return new Error<>(passedSamples, errorSample, error);
+    }
+
+    public static <A> TimedOut<A> timedOut(ImmutableVector<A> passedSamples, Duration duration) {
+        return new TimedOut<>(passedSamples, duration);
+    }
+
+    public static <A> Interrupted<A> interrupted(ImmutableVector<A> passedSamples, Maybe<String> message) {
+        return new Interrupted<>(passedSamples, message);
+    }
+
     public abstract boolean isSuccess();
 
     // All cases succeeded
@@ -191,45 +230,6 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
             return hFn.apply(this);
         }
 
-    }
-
-    public static <A> Passed<A> passed(ImmutableVector<A> passedSamples) {
-        return new Passed<>(passedSamples);
-    }
-
-    public static <A> Proved<A> proved(A passedSample, ImmutableVector<Counterexample<A>> counterexamples) {
-        return new Proved<>(passedSample, counterexamples);
-    }
-
-    public static <A> Falsified<A> falsified(ImmutableVector<A> passedSamples,
-                                             Counterexample<A> counterexample) {
-        return new Falsified<>(passedSamples, counterexample, nothing());
-    }
-
-    public static <A> Falsified<A> falsified(ImmutableVector<A> passedSamples,
-                                             Counterexample<A> counterexample,
-                                             Maybe<RefinedCounterexample<A>> refinedCounterexample) {
-        return new Falsified<>(passedSamples, counterexample, refinedCounterexample);
-    }
-
-    public static <A> Unproved<A> unproved(ImmutableVector<Counterexample<A>> counterexamples) {
-        return new Unproved<>(counterexamples);
-    }
-
-    public static <A> SupplyFailed<A> supplyFailed(ImmutableVector<A> passedSamples, SupplyFailure supplyFailure) {
-        return new SupplyFailed<>(passedSamples, supplyFailure);
-    }
-
-    public static <A> Error<A> error(ImmutableVector<A> passedSamples, A errorSample, Throwable error) {
-        return new Error<>(passedSamples, errorSample, error);
-    }
-
-    public static <A> TimedOut<A> timedOut(ImmutableVector<A> passedSamples, Duration duration) {
-        return new TimedOut<>(passedSamples, duration);
-    }
-
-    public static <A> Interrupted<A> interrupted(ImmutableVector<A> passedSamples, Maybe<String> message) {
-        return new Interrupted<>(passedSamples, message);
     }
 
 }

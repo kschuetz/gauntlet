@@ -14,6 +14,10 @@ class Accumulator {
     VectorBuilder<EvalFailure> failures;
     int successCount;
 
+    static Accumulator accumulator() {
+        return new Accumulator(VectorBuilder.builder(), 0);
+    }
+
     Accumulator addSuccess() {
         return new Accumulator(failures, successCount + 1);
     }
@@ -24,9 +28,5 @@ class Accumulator {
 
     Accumulator add(EvalResult result) {
         return result.match(__ -> addSuccess(), this::addFailure);
-    }
-
-    static Accumulator accumulator() {
-        return new Accumulator(VectorBuilder.builder(), 0);
     }
 }

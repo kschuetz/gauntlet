@@ -89,7 +89,7 @@ public final class Props {
 
     public static <A> Prop<A> negation(Prop<A> operand) {
         if (operand instanceof Negation<?>) {
-            return ((Negation<A>) operand).operand;
+            return ((Negation<A>) operand).getOperand();
         } else {
             return new Negation<>(operand);
         }
@@ -105,7 +105,7 @@ public final class Props {
 
     public static <A> Prop<A> named(String name, Prop<A> prop) {
         while (prop instanceof Renamed<?>) {
-            prop = ((Renamed<A>) prop).underlying;
+            prop = ((Renamed<A>) prop).getUnderlying();
         }
         return new Renamed<>(name, prop);
     }

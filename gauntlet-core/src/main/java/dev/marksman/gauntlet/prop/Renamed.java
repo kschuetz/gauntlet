@@ -4,11 +4,13 @@ import dev.marksman.gauntlet.EvalResult;
 import dev.marksman.gauntlet.Prop;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 final class Renamed<A> implements Prop<A> {
     private final String name;
-    final Prop<A> underlying;
+    @Getter
+    private final Prop<A> underlying;
 
     @Override
     public EvalResult evaluate(A data) {
