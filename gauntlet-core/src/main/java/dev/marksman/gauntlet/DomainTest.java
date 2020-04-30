@@ -7,26 +7,32 @@ import lombok.Getter;
 
 import java.time.Duration;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 import static lombok.AccessLevel.PRIVATE;
 
 @AllArgsConstructor(access = PRIVATE)
 public final class DomainTest<A> {
     @Getter
+    private final Quantifier quantifier;
+    @Getter
     private final Domain<A> domain;
     @Getter
-    private final Quantifier quantifier;
+    private final Prop<A> property;
     @Getter
     private final ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers;
     @Getter
     private final Duration timeout;
     @Getter
-    private final Prop<A> property;
+    private final Executor executor;
 
-    public static <A> DomainTest<A> domainTest(DomainTestParameters<A> parameters,
-                                               Prop<A> property) {
-        return new DomainTest<>(parameters.getDomain(), parameters.getQuantifier(),
-                parameters.getClassifiers(), parameters.getTimeout(), property);
+    static <A> DomainTest<A> domainTest(Quantifier quantifier,
+                                        Domain<A> domain,
+                                        Prop<A> property,
+                                        ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers,
+                                        Duration timeout,
+                                        Executor executor) {
+        return new DomainTest<>(quantifier, domain, property, classifiers, timeout, executor);
     }
 
 }

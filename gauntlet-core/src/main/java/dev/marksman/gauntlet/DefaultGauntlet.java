@@ -17,7 +17,6 @@ import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.io.IO.io;
 import static dev.marksman.gauntlet.ConcreteDomainTestApi.concreteDomainTestApi;
 import static dev.marksman.gauntlet.ConcreteGeneratorTestApi.concreteGeneratorTestApi;
-import static dev.marksman.gauntlet.DomainTestExecutionParameters.domainTestExecutionParameters;
 import static dev.marksman.gauntlet.DomainTestParameters.domainTestParameters;
 import static dev.marksman.gauntlet.GeneratorTestParameters.generatorTestParameters;
 import static dev.marksman.gauntlet.Quantifier.EXISTENTIAL;
@@ -240,9 +239,7 @@ class DefaultGauntlet implements GauntletApi {
     }
 
     private <A> void runDomainTest(DomainTest<A> domainTest) {
-        DomainTestResult<A> result = domainTestRunner.run(
-                domainTestExecutionParameters(getExecutor()),
-                domainTest)
+        DomainTestResult<A> result = domainTestRunner.run(domainTest)
                 .unsafePerformIO();
         ReportData<A> reportData = reportData(domainTest.getProperty(),
                 result.getResult(),
@@ -252,8 +249,8 @@ class DefaultGauntlet implements GauntletApi {
     }
 
     private <A> DomainTestApi<A> createDomainTestApi(Quantifier quantifier, Domain<A> domain) {
-        return concreteDomainTestApi(this::runDomainTest,
-                domainTestParameters(domain, quantifier, Vector.empty(), defaultTimeout));
+        return concreteDomainTestApi(this::getExecutor, this::runDomainTest,
+                domainTestParameters(domain, quantifier, Vector.empty(), defaultTimeout, nothing()));
     }
 
     private <A> IO<GeneratorTestResult<A>> refineResult(GeneratorTest<A> testData,

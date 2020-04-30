@@ -16,26 +16,26 @@ import static dev.marksman.gauntlet.ResultCollector.universalResultCollector;
 public final class DefaultDomainTestRunner implements DomainTestRunner {
     private static final DefaultDomainTestRunner INSTANCE = new DefaultDomainTestRunner();
 
+    public static DefaultDomainTestRunner defaultDomainTestRunner() {
+        return INSTANCE;
+    }
+
     @Override
-    public <A> IO<DomainTestResult<A>> run(DomainTestExecutionParameters executionParameters, DomainTest<A> testData) {
+    public <A> IO<DomainTestResult<A>> run(DomainTest<A> domainTest) {
         return io(() -> {
-            Executor executor = executionParameters.getExecutor();
-            Domain<A> domain = testData.getDomain();
+            Executor executor = domainTest.getExecutor();
+            Domain<A> domain = domainTest.getDomain();
             ImmutableVector<A> elements = Vector.copyFrom(domain.getElements());
-            ResultCollector<A> collector = testData.getQuantifier() == EXISTENTIAL
+            ResultCollector<A> collector = domainTest.getQuantifier() == EXISTENTIAL
                     ? existentialResultCollector(elements)
                     : universalResultCollector(elements);
             int elementCount = elements.size();
             for (int elementIndex = 0; elementIndex < elementCount; elementIndex++) {
-                EvaluateSampleTask<A> task = evaluateSampleTask(collector, testData.getProperty(), elementIndex, elements.unsafeGet(elementIndex));
+                EvaluateSampleTask<A> task = evaluateSampleTask(collector, domainTest.getProperty(), elementIndex, elements.unsafeGet(elementIndex));
                 executor.execute(task);
             }
-            return domainTestResult(collector.getResultBlocking(testData.getTimeout()));
+            return domainTestResult(collector.getResultBlocking(domainTest.getTimeout()));
         });
     }
 
-
-    public static DefaultDomainTestRunner defaultDomainTestRunner() {
-        return INSTANCE;
-    }
 }
