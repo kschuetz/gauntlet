@@ -19,7 +19,6 @@ import static dev.marksman.gauntlet.ConcreteDomainTestApi.concreteDomainTestApi;
 import static dev.marksman.gauntlet.ConcreteGeneratorTestApi.concreteGeneratorTestApi;
 import static dev.marksman.gauntlet.DomainTestExecutionParameters.domainTestExecutionParameters;
 import static dev.marksman.gauntlet.DomainTestParameters.domainTestParameters;
-import static dev.marksman.gauntlet.GeneratorTestExecutionParameters.generatorTestExecutionParameters;
 import static dev.marksman.gauntlet.GeneratorTestParameters.generatorTestParameters;
 import static dev.marksman.gauntlet.Quantifier.EXISTENTIAL;
 import static dev.marksman.gauntlet.Quantifier.UNIVERSAL;
@@ -225,15 +224,14 @@ class DefaultGauntlet implements GauntletApi {
     }
 
     private <A> GeneratorTestApi<A> createGeneratorTestApi(Arbitrary<A> generator) {
-        return concreteGeneratorTestApi(this::runGeneratorTest,
+        return concreteGeneratorTestApi(this::getExecutor, this::runGeneratorTest,
                 generatorTestParameters(generator, nothing(), defaultSampleCount, defaultMaximumShrinkCount,
-                        Vector.empty(), defaultTimeout));
+                        Vector.empty(), defaultTimeout, nothing(), getGeneratorParameters()));
     }
 
     private <A> void runGeneratorTest(GeneratorTest<A> generatorTest) {
-        GeneratorTestResult<A> result = generatorTestRunner.run(
-                generatorTestExecutionParameters(getExecutor(), getGeneratorParameters()),
-                generatorTest)
+
+        GeneratorTestResult<A> result = generatorTestRunner.run(generatorTest)
                 .flatMap(res -> refineResult(generatorTest, res))
                 .unsafePerformIO();
         ReportData<A> reportData = reportData(generatorTest.getProperty(), result.getResult(), generatorTest.getArbitrary().getPrettyPrinter(),

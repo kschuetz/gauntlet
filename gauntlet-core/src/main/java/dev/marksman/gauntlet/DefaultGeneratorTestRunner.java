@@ -28,28 +28,27 @@ public final class DefaultGeneratorTestRunner implements GeneratorTestRunner {
     // if all inputs can be generated, submit test tasks to executor along with sample index
 
     @Override
-    public <A> IO<GeneratorTestResult<A>> run(GeneratorTestExecutionParameters executionParameters, GeneratorTest<A> testData) {
-        return generateDataSet(executionParameters.getGeneratorParameters(), testData)
-                .flatMap(dataSet -> runTest(executionParameters, testData, dataSet));
+    public <A> IO<GeneratorTestResult<A>> run(GeneratorTest<A> generatorTest) {
+        return generateDataSet(generatorTest.getGeneratorParameters(), generatorTest)
+                .flatMap(dataSet -> runTest(generatorTest, dataSet));
     }
 
     private IO<Long> getInitialSeedValue(Maybe<Long> suppliedSeedValue) {
         return suppliedSeedValue.match(__ -> io(seedGenerator::nextLong), IO::io);
     }
 
-    private <A> IO<GeneratorTestResult<A>> runTest(GeneratorTestExecutionParameters executionParameters,
-                                                   GeneratorTest<A> testData,
+    private <A> IO<GeneratorTestResult<A>> runTest(GeneratorTest<A> generatorTest,
                                                    GeneratedDataSet<A> dataSet) {
         return io(() -> {
-            Executor executor = executionParameters.getExecutor();
+            Executor executor = generatorTest.getExecutor();
             ImmutableVector<A> samples = dataSet.getSamples();
             int actualSampleCount = samples.size();
             ResultCollector<A> collector = universalResultCollector(dataSet.getSamples());
             for (int sampleIndex = 0; sampleIndex < actualSampleCount; sampleIndex++) {
-                EvaluateSampleTask<A> task = evaluateSampleTask(collector, testData.getProperty(), sampleIndex, samples.unsafeGet(sampleIndex));
+                EvaluateSampleTask<A> task = evaluateSampleTask(collector, generatorTest.getProperty(), sampleIndex, samples.unsafeGet(sampleIndex));
                 executor.execute(task);
             }
-            TestResult<A> initialResult = collector.getResultBlocking(testData.getTimeout());
+            TestResult<A> initialResult = collector.getResultBlocking(generatorTest.getTimeout());
             return generatorTestResult(maybeApplySupplyFailure(dataSet.getSupplyFailure(), initialResult),
                     dataSet.getInitialSeedValue());
         });

@@ -4,6 +4,7 @@ import com.jnape.palatable.lambda.functions.Fn1;
 
 import java.time.Duration;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 public interface GeneratorTestApi<A> {
     GeneratorTestApi<A> withInitialSeed(long initialSeed);
@@ -15,6 +16,8 @@ public interface GeneratorTestApi<A> {
     GeneratorTestApi<A> withTimeout(Duration timeout);
 
     GeneratorTestApi<A> classifyUsing(Fn1<A, Set<String>> classifier);
+
+    GeneratorTestApi<A> withExecutor(Executor executor);
 
     void mustSatisfy(Prop<A> prop);
 
