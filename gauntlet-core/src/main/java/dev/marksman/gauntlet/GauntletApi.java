@@ -47,8 +47,6 @@ public interface GauntletApi {
                                                         Domain<C> domainC,
                                                         Domain<D> domainD);
 
-    Executor getExecutor();
-
     GeneratorTestRunner getGeneratorTestRunner();
 
     DomainTestRunner getDomainTestRunner();

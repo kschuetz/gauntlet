@@ -56,11 +56,6 @@ class DefaultGauntlet implements GauntletApi {
     }
 
     @Override
-    public Executor getExecutor() {
-        return executor;
-    }
-
-    @Override
     public GeneratorTestRunner getGeneratorTestRunner() {
         return generatorTestRunner;
     }
@@ -271,6 +266,10 @@ class DefaultGauntlet implements GauntletApi {
                 .fmap(maybeRefinedResult -> maybeRefinedResult
                         .match(__ -> initialResult,
                                 refined -> initialResult.withResult(falsified.withRefinedCounterexample(refined))));
+    }
+
+    private Executor getExecutor() {
+        return executor;
     }
 
 }

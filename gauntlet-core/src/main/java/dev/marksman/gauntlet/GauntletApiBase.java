@@ -103,11 +103,6 @@ public abstract class GauntletApiBase implements GauntletApi {
     }
 
     @Override
-    public Executor getExecutor() {
-        return getApi().getExecutor();
-    }
-
-    @Override
     public GeneratorTestRunner getGeneratorTestRunner() {
         return getApi().getGeneratorTestRunner();
     }
