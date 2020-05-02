@@ -29,7 +29,7 @@ public final class Gauntlet {
         if (INSTANCE == null) {
             synchronized (Gauntlet.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new DefaultGauntlet(defaultGeneratorTestRunner(),
+                    INSTANCE = new Core(defaultGeneratorTestRunner(),
                             defaultDomainTestRunner(),
                             defaultShrinkTestRunner(),
                             defaultReporter(),
