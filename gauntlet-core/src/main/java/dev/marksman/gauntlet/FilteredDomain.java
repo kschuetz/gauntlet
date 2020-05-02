@@ -7,14 +7,14 @@ import dev.marksman.gauntlet.filter.Filter;
 
 import static dev.marksman.gauntlet.filter.Filter.filter;
 
-class LazilyFilteredDomain<A> implements Domain<A> {
+final class FilteredDomain<A> implements Domain<A> {
     private final Object lock;
     private final Fn1<? super A, String> prettyPrinter;
     private ImmutableVector<A> sourceElements;
     private Filter<A> filter;
     private volatile ImmutableVector<A> filteredElements;
 
-    LazilyFilteredDomain(ImmutableVector<A> sourceElements, Filter<A> filter, Fn1<? super A, String> prettyPrinter) {
+    FilteredDomain(ImmutableVector<A> sourceElements, Filter<A> filter, Fn1<? super A, String> prettyPrinter) {
         this.lock = new Object();
         this.sourceElements = sourceElements;
         this.filteredElements = null;
@@ -43,9 +43,9 @@ class LazilyFilteredDomain<A> implements Domain<A> {
     public Domain<A> withPrettyPrinter(Fn1<? super A, String> prettyPrinter) {
         synchronized (lock) {
             if (filteredElements == null) {
-                return new LazilyFilteredDomain<>(sourceElements, filter, prettyPrinter);
+                return new FilteredDomain<>(sourceElements, filter, prettyPrinter);
             } else {
-                return new ConcreteDomain<>(filteredElements, prettyPrinter);
+                return new EnumeratedDomain<>(filteredElements, prettyPrinter);
             }
         }
     }
@@ -54,9 +54,9 @@ class LazilyFilteredDomain<A> implements Domain<A> {
     public Domain<A> suchThat(Fn1<? super A, Boolean> predicate) {
         synchronized (lock) {
             if (filteredElements == null) {
-                return new LazilyFilteredDomain<>(sourceElements, filter.add(predicate), prettyPrinter);
+                return new FilteredDomain<>(sourceElements, filter.add(predicate), prettyPrinter);
             } else {
-                return new LazilyFilteredDomain<>(filteredElements, filter(predicate), prettyPrinter);
+                return new FilteredDomain<>(filteredElements, filter(predicate), prettyPrinter);
             }
         }
     }
