@@ -13,20 +13,20 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkInt;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class DefaultRefinementTestRunnerTest {
+class RefinementTestRunnerTest {
 
     private static final Prop<Integer> lessThan100 = Prop.predicate("< 100", n -> n < 100);
     private static final Prop<Integer> odd = Prop.predicate("odd", n -> n % 2 == 1);
 
     private static final Duration timeout = Duration.ofSeconds(5);
     private RefinementTestExecutionParameters executionParameters;
-    private DefaultRefinementTestRunner runner;
+    private RefinementTestRunner runner;
 
     @BeforeEach
     void setUp() {
         ExecutorService executorService = newFixedThreadPool(2);
         executionParameters = RefinementTestExecutionParameters.refinementTestExecutionParameters(executorService, 3);
-        runner = DefaultRefinementTestRunner.defaultShrinkTestRunner();
+        runner = RefinementTestRunner.refinementTestRunner();
     }
 
     @Test
