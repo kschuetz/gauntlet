@@ -1,12 +1,9 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Maybe;
-import com.jnape.palatable.lambda.functions.Fn1;
-import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.kraftwerk.GeneratorParameters;
 
 import java.time.Duration;
-import java.util.Set;
 import java.util.concurrent.Executor;
 
 final class GeneratorTest<A> {
@@ -15,20 +12,18 @@ final class GeneratorTest<A> {
     private final Maybe<Long> initialSeed;
     private final int sampleCount;
     private final int maximumShrinkCount;
-    private final ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers;
     private final Duration timeout;
     private final Executor executor;
     private final GeneratorParameters generatorParameters;
 
     private GeneratorTest(Arbitrary<A> arbitrary, Prop<A> property, Maybe<Long> initialSeed, int sampleCount,
-                          int maximumShrinkCount, ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers,
+                          int maximumShrinkCount,
                           Duration timeout, Executor executor, GeneratorParameters generatorParameters) {
         this.arbitrary = arbitrary;
         this.property = property;
         this.initialSeed = initialSeed;
         this.sampleCount = sampleCount;
         this.maximumShrinkCount = maximumShrinkCount;
-        this.classifiers = classifiers;
         this.timeout = timeout;
         this.executor = executor;
         this.generatorParameters = generatorParameters;
@@ -39,11 +34,10 @@ final class GeneratorTest<A> {
                                               Maybe<Long> initialSeed,
                                               int sampleCount,
                                               int maximumShrinkCount,
-                                              ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers,
                                               Duration timeout,
                                               Executor executor,
                                               GeneratorParameters generatorParameters) {
-        return new GeneratorTest<>(arbitrary, property, initialSeed, sampleCount, maximumShrinkCount, classifiers,
+        return new GeneratorTest<>(arbitrary, property, initialSeed, sampleCount, maximumShrinkCount,
                 timeout, executor, generatorParameters);
     }
 
@@ -65,10 +59,6 @@ final class GeneratorTest<A> {
 
     public int getMaximumShrinkCount() {
         return this.maximumShrinkCount;
-    }
-
-    public ImmutableFiniteIterable<Fn1<A, Set<String>>> getClassifiers() {
-        return this.classifiers;
     }
 
     public Duration getTimeout() {

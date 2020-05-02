@@ -196,7 +196,7 @@ final class Core implements GauntletApi {
     private <A> GeneratorTestApi<A> createGeneratorTestApi(Arbitrary<A> generator) {
         return generatorTestApi(this::getExecutor, this::runGeneratorTest,
                 generatorTestParameters(generator, nothing(), defaultSampleCount, defaultMaximumShrinkCount,
-                        Vector.empty(), defaultTimeout, nothing(), getGeneratorParameters()));
+                        defaultTimeout, nothing(), getGeneratorParameters()));
     }
 
     private <A> void runGeneratorTest(GeneratorTest<A> generatorTest) {

@@ -1,10 +1,8 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.functions.Fn0;
-import com.jnape.palatable.lambda.functions.Fn1;
 
 import java.time.Duration;
-import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
@@ -44,18 +42,14 @@ public final class GeneratorTestApi<A> {
         return new GeneratorTestApi<>(getParentExecutor, runner, parameters.withTimeout(timeout));
     }
 
-    public GeneratorTestApi<A> classifyUsing(Fn1<A, Set<String>> classifier) {
-        return new GeneratorTestApi<>(getParentExecutor, runner, parameters.addClassifier(classifier));
-    }
-
     public GeneratorTestApi<A> withExecutor(Executor executor) {
         return new GeneratorTestApi<>(getParentExecutor, runner, parameters.withExecutorOverride(just(executor)));
     }
 
     public void mustSatisfy(Prop<A> property) {
         GeneratorTest<A> generatorTest = generatorTest(parameters.getArbitrary(), property, parameters.getInitialSeed(), parameters.getSampleCount(),
-                parameters.getMaximumShrinkCount(), parameters.getClassifiers(), parameters.getTimeout(),
-                parameters.getExecutorOverride().orElseGet(getParentExecutor), parameters.getGeneratorParameters());
+                parameters.getMaximumShrinkCount(), parameters.getTimeout(), parameters.getExecutorOverride().orElseGet(getParentExecutor),
+                parameters.getGeneratorParameters());
         runner.accept(generatorTest);
     }
 
