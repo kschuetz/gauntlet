@@ -22,10 +22,11 @@ import static dev.marksman.gauntlet.GeneratorTestParameters.generatorTestParamet
 import static dev.marksman.gauntlet.Quantifier.EXISTENTIAL;
 import static dev.marksman.gauntlet.Quantifier.UNIVERSAL;
 import static dev.marksman.gauntlet.RefinementTest.refinementTest;
-import static dev.marksman.gauntlet.RefinementTestExecutionParameters.refinementTestExecutionParameters;
 import static dev.marksman.gauntlet.ReportData.reportData;
 
 final class Core implements GauntletApi {
+    private static final int REFINEMENT_BLOCK_SIZE = RefinementTest.DEFAULT_BLOCK_SIZE;
+
     private final Maybe<Executor> executorOverride;
     private final GeneratorTestRunner generatorTestRunner;
     private final DomainTestRunner domainTestRunner;
@@ -234,9 +235,8 @@ final class Core implements GauntletApi {
             return io(initialResult);
         }
         return refinementTestRunner
-                .run(refinementTestExecutionParameters(getExecutor()),
-                        refinementTest(shrinkStrategy, testData.getProperty(), falsified.getCounterexample().getSample(),
-                                testData.getMaximumShrinkCount(), testData.getTimeout()))
+                .run(refinementTest(shrinkStrategy, testData.getProperty(), falsified.getCounterexample().getSample(),
+                        testData.getMaximumShrinkCount(), testData.getTimeout(), getExecutor(), REFINEMENT_BLOCK_SIZE))
                 .fmap(maybeRefinedResult -> maybeRefinedResult
                         .match(__ -> initialResult,
                                 refined -> initialResult.withResult(falsified.withRefinedCounterexample(refined))));

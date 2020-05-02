@@ -38,16 +38,15 @@ public final class RefinementTestRunner {
         return INSTANCE;
     }
 
-    public <A> IO<Maybe<RefinedCounterexample<A>>> run(RefinementTestExecutionParameters executionParameters,
-                                                       RefinementTest<A> testData) {
+    public <A> IO<Maybe<RefinedCounterexample<A>>> run(RefinementTest<A> refinementTest) {
         return io(() -> {
-            LocalDateTime deadline = LocalDateTime.now().plus(testData.getTimeout());
+            LocalDateTime deadline = LocalDateTime.now().plus(refinementTest.getTimeout());
 
-            Session<A> session = new Session<>(executionParameters.getExecutor(),
-                    testData.getShrinkStrategy(), testData.getProperty(), testData.getMaximumShrinkCount(),
-                    deadline, executionParameters.getBlockSize());
+            Session<A> session = new Session<>(refinementTest.getExecutor(),
+                    refinementTest.getShrinkStrategy(), refinementTest.getProperty(), refinementTest.getMaximumShrinkCount(),
+                    deadline, refinementTest.getBlockSize());
 
-            return session.run(testData.getSample());
+            return session.run(refinementTest.getSample());
         });
     }
 
