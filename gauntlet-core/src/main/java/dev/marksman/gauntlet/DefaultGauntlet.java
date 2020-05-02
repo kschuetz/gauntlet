@@ -16,8 +16,8 @@ import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.io.IO.io;
 import static dev.marksman.gauntlet.ConcreteDomainTestApi.concreteDomainTestApi;
-import static dev.marksman.gauntlet.ConcreteGeneratorTestApi.concreteGeneratorTestApi;
 import static dev.marksman.gauntlet.DomainTestParameters.domainTestParameters;
+import static dev.marksman.gauntlet.GeneratorTestApi.generatorTestApi;
 import static dev.marksman.gauntlet.GeneratorTestParameters.generatorTestParameters;
 import static dev.marksman.gauntlet.Quantifier.EXISTENTIAL;
 import static dev.marksman.gauntlet.Quantifier.UNIVERSAL;
@@ -223,7 +223,7 @@ class DefaultGauntlet implements GauntletApi {
     }
 
     private <A> GeneratorTestApi<A> createGeneratorTestApi(Arbitrary<A> generator) {
-        return concreteGeneratorTestApi(this::getExecutor, this::runGeneratorTest,
+        return generatorTestApi(this::getExecutor, this::runGeneratorTest,
                 generatorTestParameters(generator, nothing(), defaultSampleCount, defaultMaximumShrinkCount,
                         Vector.empty(), defaultTimeout, nothing(), getGeneratorParameters()));
     }
