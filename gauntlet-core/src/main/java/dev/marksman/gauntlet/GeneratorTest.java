@@ -14,7 +14,7 @@ import java.util.concurrent.Executor;
 import static lombok.AccessLevel.PRIVATE;
 
 @AllArgsConstructor(access = PRIVATE)
-public final class GeneratorTest<A> {
+final class GeneratorTest<A> {
     @Getter
     private final Arbitrary<A> arbitrary;
     @Getter

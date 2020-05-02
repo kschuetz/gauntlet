@@ -12,7 +12,7 @@ import java.util.concurrent.Executor;
 import static lombok.AccessLevel.PRIVATE;
 
 @AllArgsConstructor(access = PRIVATE)
-public final class DomainTest<A> {
+final class DomainTest<A> {
     @Getter
     private final Quantifier quantifier;
     @Getter

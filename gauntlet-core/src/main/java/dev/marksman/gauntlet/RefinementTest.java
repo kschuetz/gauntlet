@@ -9,7 +9,7 @@ import java.time.Duration;
 import static lombok.AccessLevel.PRIVATE;
 
 @AllArgsConstructor(access = PRIVATE)
-public final class RefinementTest<A> {
+final class RefinementTest<A> {
     @Getter
     private final ShrinkStrategy<A> shrinkStrategy;
     @Getter
