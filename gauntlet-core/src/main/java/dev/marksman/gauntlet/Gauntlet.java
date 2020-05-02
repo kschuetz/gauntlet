@@ -4,10 +4,10 @@ import java.time.Duration;
 
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.gauntlet.DefaultDomainTestRunner.defaultDomainTestRunner;
-import static dev.marksman.gauntlet.DefaultGeneratorTestRunner.defaultGeneratorTestRunner;
 import static dev.marksman.gauntlet.DefaultRefinementTestRunner.defaultShrinkTestRunner;
 import static dev.marksman.gauntlet.DefaultReportRenderer.defaultReportRenderer;
 import static dev.marksman.gauntlet.DefaultReporter.defaultReporter;
+import static dev.marksman.gauntlet.GeneratorTestRunner.generatorTestRunner;
 import static dev.marksman.gauntlet.ReportSettings.defaultReportSettings;
 import static dev.marksman.kraftwerk.StandardGeneratorParameters.defaultGeneratorParameters;
 import static dev.marksman.kraftwerk.bias.DefaultPropertyTestingBiasSettings.defaultPropertyTestBiasSettings;
@@ -29,7 +29,7 @@ public final class Gauntlet {
         if (INSTANCE == null) {
             synchronized (Gauntlet.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new Core(defaultGeneratorTestRunner(),
+                    INSTANCE = new Core(generatorTestRunner(),
                             defaultDomainTestRunner(),
                             defaultShrinkTestRunner(),
                             defaultReporter(),
