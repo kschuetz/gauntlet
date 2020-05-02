@@ -4,35 +4,35 @@ import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.kraftwerk.GeneratorParameters;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.time.Duration;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
-import static lombok.AccessLevel.PRIVATE;
-
-@AllArgsConstructor(access = PRIVATE)
 final class GeneratorTest<A> {
-    @Getter
     private final Arbitrary<A> arbitrary;
-    @Getter
     private final Prop<A> property;
-    @Getter
     private final Maybe<Long> initialSeed;
-    @Getter
     private final int sampleCount;
-    @Getter
     private final int maximumShrinkCount;
-    @Getter
     private final ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers;
-    @Getter
     private final Duration timeout;
-    @Getter
     private final Executor executor;
-    @Getter
     private final GeneratorParameters generatorParameters;
+
+    private GeneratorTest(Arbitrary<A> arbitrary, Prop<A> property, Maybe<Long> initialSeed, int sampleCount,
+                          int maximumShrinkCount, ImmutableFiniteIterable<Fn1<A, Set<String>>> classifiers,
+                          Duration timeout, Executor executor, GeneratorParameters generatorParameters) {
+        this.arbitrary = arbitrary;
+        this.property = property;
+        this.initialSeed = initialSeed;
+        this.sampleCount = sampleCount;
+        this.maximumShrinkCount = maximumShrinkCount;
+        this.classifiers = classifiers;
+        this.timeout = timeout;
+        this.executor = executor;
+        this.generatorParameters = generatorParameters;
+    }
 
     static <A> GeneratorTest<A> generatorTest(Arbitrary<A> arbitrary,
                                               Prop<A> property,
@@ -47,4 +47,39 @@ final class GeneratorTest<A> {
                 timeout, executor, generatorParameters);
     }
 
+    public Arbitrary<A> getArbitrary() {
+        return this.arbitrary;
+    }
+
+    public Prop<A> getProperty() {
+        return this.property;
+    }
+
+    public Maybe<Long> getInitialSeed() {
+        return this.initialSeed;
+    }
+
+    public int getSampleCount() {
+        return this.sampleCount;
+    }
+
+    public int getMaximumShrinkCount() {
+        return this.maximumShrinkCount;
+    }
+
+    public ImmutableFiniteIterable<Fn1<A, Set<String>>> getClassifiers() {
+        return this.classifiers;
+    }
+
+    public Duration getTimeout() {
+        return this.timeout;
+    }
+
+    public Executor getExecutor() {
+        return this.executor;
+    }
+
+    public GeneratorParameters getGeneratorParameters() {
+        return this.generatorParameters;
+    }
 }

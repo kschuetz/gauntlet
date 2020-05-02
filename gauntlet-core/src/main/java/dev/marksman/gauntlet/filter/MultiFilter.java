@@ -3,14 +3,19 @@ package dev.marksman.gauntlet.filter;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.util.MapperChain;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 
 import static dev.marksman.gauntlet.filter.MappedFilter.mappedFilter;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 final class MultiFilter<A> implements Filter<A> {
     private final ImmutableFiniteIterable<Fn1<? super A, Boolean>> filters;
+
+    private MultiFilter(ImmutableFiniteIterable<Fn1<? super A, Boolean>> filters) {
+        this.filters = filters;
+    }
+
+    static <A> Filter<A> multiFilter(Fn1<? super A, Boolean> filter) {
+        return new MultiFilter<>(ImmutableFiniteIterable.of(filter));
+    }
 
     @Override
     public Filter<A> add(Fn1<? super A, Boolean> predicate) {
@@ -36,10 +41,6 @@ final class MultiFilter<A> implements Filter<A> {
     @Override
     public boolean isEmpty() {
         return false;
-    }
-
-    static <A> Filter<A> multiFilter(Fn1<? super A, Boolean> filter) {
-        return new MultiFilter<>(ImmutableFiniteIterable.of(filter));
     }
 
 }
