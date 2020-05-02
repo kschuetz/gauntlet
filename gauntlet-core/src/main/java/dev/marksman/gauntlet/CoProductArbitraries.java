@@ -117,7 +117,7 @@ final class CoProductArbitraries {
 
         Arbitrary<A> arbitraryA = a.getValue();
         Arbitrary<B> arbitraryB = b.getValue();
-        return ConcreteArbitrary.concreteArbitrary(parameters ->
+        return Arbitrary.arbitrary(parameters ->
                         new ChoiceSupply2<>(arbitraryA.createSupply(parameters),
                                 arbitraryB.createSupply(parameters),
                                 generateWhich.prepare(parameters)),
@@ -135,7 +135,7 @@ final class CoProductArbitraries {
         Arbitrary<A> arbitraryA = a.getValue();
         Arbitrary<B> arbitraryB = b.getValue();
         Arbitrary<C> arbitraryC = c.getValue();
-        return ConcreteArbitrary.concreteArbitrary(parameters ->
+        return Arbitrary.arbitrary(parameters ->
                         new ChoiceSupply3<>(arbitraryA.createSupply(parameters),
                                 arbitraryB.createSupply(parameters),
                                 arbitraryC.createSupply(parameters),

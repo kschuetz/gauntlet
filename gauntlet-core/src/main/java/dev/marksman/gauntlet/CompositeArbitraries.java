@@ -16,7 +16,7 @@ import dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
-import static dev.marksman.gauntlet.ConcreteArbitrary.concreteArbitrary;
+import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 
 final class CompositeArbitraries {
 
@@ -25,7 +25,7 @@ final class CompositeArbitraries {
 
         Fn2<A, B, Tuple2<A, B>> toFn = HList::tuple;
 
-        return concreteArbitrary(parameters -> new CompositeSupply2<>(a.createSupply(parameters),
+        return arbitrary(parameters -> new CompositeSupply2<>(a.createSupply(parameters),
                         b.createSupply(parameters),
                         toFn),
                 combineShrinkStrategies(a.getShrinkStrategy(), b.getShrinkStrategy(), toFn),
@@ -38,7 +38,7 @@ final class CompositeArbitraries {
 
         Fn3<A, B, C, Tuple3<A, B, C>> toFn = HList::tuple;
 
-        return concreteArbitrary(parameters -> new CompositeSupply3<>(a.createSupply(parameters),
+        return arbitrary(parameters -> new CompositeSupply3<>(a.createSupply(parameters),
                         b.createSupply(parameters),
                         c.createSupply(parameters),
                         toFn),
@@ -53,7 +53,7 @@ final class CompositeArbitraries {
 
         Fn4<A, B, C, D, Tuple4<A, B, C, D>> toFn = HList::tuple;
 
-        return concreteArbitrary(parameters -> new CompositeSupply4<>(a.createSupply(parameters),
+        return arbitrary(parameters -> new CompositeSupply4<>(a.createSupply(parameters),
                         b.createSupply(parameters),
                         c.createSupply(parameters),
                         d.createSupply(parameters),
@@ -71,7 +71,7 @@ final class CompositeArbitraries {
 
         Fn5<A, B, C, D, E, Tuple5<A, B, C, D, E>> toFn = HList::tuple;
 
-        return concreteArbitrary(parameters -> new CompositeSupply5<>(a.createSupply(parameters),
+        return arbitrary(parameters -> new CompositeSupply5<>(a.createSupply(parameters),
                         b.createSupply(parameters),
                         c.createSupply(parameters),
                         d.createSupply(parameters),

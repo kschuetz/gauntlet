@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
-import static dev.marksman.gauntlet.ConcreteArbitrary.concreteArbitrary;
+import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkArrayList;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkHashSet;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkNonEmptyVector;
@@ -23,7 +23,7 @@ import static dev.marksman.kraftwerk.aggregator.Aggregators.vectorAggregator;
 final class CollectionArbitraries {
 
     static <A> Arbitrary<ImmutableVector<A>> vector(Arbitrary<A> elements) {
-        return concreteArbitrary(parameters ->
+        return arbitrary(parameters ->
                         new CollectionSupply<>(elements.createSupply(parameters),
                                 sizeGenerator(parameters),
                                 vectorAggregator()),
@@ -33,7 +33,7 @@ final class CollectionArbitraries {
     }
 
     static <A> Arbitrary<ImmutableVector<A>> vectorOfN(int count, Arbitrary<A> elements) {
-        return concreteArbitrary(parameters ->
+        return arbitrary(parameters ->
                         new CollectionSupply<>(elements.createSupply(parameters),
                                 Generators.constant(count).prepare(parameters),
                                 vectorAggregator()),
@@ -43,7 +43,7 @@ final class CollectionArbitraries {
     }
 
     static <A> Arbitrary<ImmutableNonEmptyVector<A>> nonEmptyVector(Arbitrary<A> elements) {
-        return concreteArbitrary(parameters ->
+        return arbitrary(parameters ->
                         new CollectionSupply<>(elements.createSupply(parameters),
                                 sizeGenerator(1, parameters),
                                 vectorAggregator())
@@ -57,7 +57,7 @@ final class CollectionArbitraries {
         if (count < 1) {
             throw new IllegalArgumentException("count must be >= 1");
         }
-        return concreteArbitrary(parameters ->
+        return arbitrary(parameters ->
                         new CollectionSupply<>(elements.createSupply(parameters),
                                 Generators.constant(count).prepare(parameters),
                                 vectorAggregator())
@@ -69,7 +69,7 @@ final class CollectionArbitraries {
 
 
     static <A> Arbitrary<ArrayList<A>> arrayList(Arbitrary<A> elements) {
-        return concreteArbitrary(parameters ->
+        return arbitrary(parameters ->
                         new CollectionSupply<>(elements.createSupply(parameters),
                                 sizeGenerator(parameters),
                                 collectionAggregator(ArrayList::new)),
@@ -80,7 +80,7 @@ final class CollectionArbitraries {
 
 
     static <A> Arbitrary<ArrayList<A>> arrayListOfN(int count, Arbitrary<A> elements) {
-        return concreteArbitrary(parameters ->
+        return arbitrary(parameters ->
                         new CollectionSupply<>(elements.createSupply(parameters),
                                 Generators.constant(count).prepare(parameters),
                                 collectionAggregator(ArrayList::new)),
@@ -91,7 +91,7 @@ final class CollectionArbitraries {
 
 
     static <A> Arbitrary<ArrayList<A>> nonEmptyArrayList(Arbitrary<A> elements) {
-        return concreteArbitrary(parameters ->
+        return arbitrary(parameters ->
                         new CollectionSupply<>(elements.createSupply(parameters),
                                 sizeGenerator(1, parameters),
                                 collectionAggregator(ArrayList::new)),
@@ -102,7 +102,7 @@ final class CollectionArbitraries {
 
 
     static <A> Arbitrary<HashSet<A>> hashSet(Arbitrary<A> elements) {
-        return concreteArbitrary(parameters ->
+        return arbitrary(parameters ->
                         new CollectionSupply<>(elements.createSupply(parameters),
                                 sizeGenerator(parameters),
                                 collectionAggregator(HashSet::new)),
@@ -113,7 +113,7 @@ final class CollectionArbitraries {
 
 
     static <A> Arbitrary<HashSet<A>> nonEmptyHashSet(Arbitrary<A> elements) {
-        return concreteArbitrary(parameters ->
+        return arbitrary(parameters ->
                         new CollectionSupply<>(elements.createSupply(parameters),
                                 sizeGenerator(1, parameters),
                                 collectionAggregator(HashSet::new)),
