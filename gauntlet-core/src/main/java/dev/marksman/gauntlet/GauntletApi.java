@@ -47,12 +47,6 @@ public interface GauntletApi {
                                                         Domain<C> domainC,
                                                         Domain<D> domainD);
 
-    GeneratorTestRunner getGeneratorTestRunner();
-
-    DomainTestRunner getDomainTestRunner();
-
-    RefinementTestRunner getRefinementTestRunner();
-
     Reporter getReporter();
 
     ReportSettings getReportSettings();
@@ -68,12 +62,6 @@ public interface GauntletApi {
     int getDefaultMaximumShrinkCount();
 
     GauntletApi withExecutor(Executor executor);
-
-    GauntletApi withGeneratorTestRunner(GeneratorTestRunner testRunner);
-
-    GauntletApi withDomainTestRunner(DomainTestRunner testRunner);
-
-    GauntletApi withRefinementTestRunner(RefinementTestRunner testRunner);
 
     GauntletApi withReporter(Reporter reporter);
 

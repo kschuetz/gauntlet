@@ -63,21 +63,6 @@ final class Core implements GauntletApi {
     }
 
     @Override
-    public GeneratorTestRunner getGeneratorTestRunner() {
-        return generatorTestRunner;
-    }
-
-    @Override
-    public DomainTestRunner getDomainTestRunner() {
-        return domainTestRunner;
-    }
-
-    @Override
-    public RefinementTestRunner getRefinementTestRunner() {
-        return refinementTestRunner;
-    }
-
-    @Override
     public GeneratorParameters getGeneratorParameters() {
         return generatorParameters;
     }
@@ -125,21 +110,6 @@ final class Core implements GauntletApi {
     @Override
     public GauntletApi withExecutor(Executor executor) {
         return new Core(generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, just(executor));
-    }
-
-    @Override
-    public GauntletApi withGeneratorTestRunner(GeneratorTestRunner testRunner) {
-        return new Core(testRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
-    }
-
-    @Override
-    public GauntletApi withDomainTestRunner(DomainTestRunner testRunner) {
-        return new Core(generatorTestRunner, testRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
-    }
-
-    @Override
-    public GauntletApi withRefinementTestRunner(RefinementTestRunner testRunner) {
-        return new Core(generatorTestRunner, domainTestRunner, testRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
     }
 
     @Override
