@@ -15,7 +15,7 @@ import java.util.concurrent.Executor;
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.io.IO.io;
-import static dev.marksman.gauntlet.ConcreteDomainTestApi.concreteDomainTestApi;
+import static dev.marksman.gauntlet.DomainTestApi.domainTestApi;
 import static dev.marksman.gauntlet.DomainTestParameters.domainTestParameters;
 import static dev.marksman.gauntlet.GeneratorTestApi.generatorTestApi;
 import static dev.marksman.gauntlet.GeneratorTestParameters.generatorTestParameters;
@@ -249,7 +249,7 @@ class DefaultGauntlet implements GauntletApi {
     }
 
     private <A> DomainTestApi<A> createDomainTestApi(Quantifier quantifier, Domain<A> domain) {
-        return concreteDomainTestApi(this::getExecutor, this::runDomainTest,
+        return domainTestApi(this::getExecutor, this::runDomainTest,
                 domainTestParameters(domain, quantifier, Vector.empty(), defaultTimeout, nothing()));
     }
 
