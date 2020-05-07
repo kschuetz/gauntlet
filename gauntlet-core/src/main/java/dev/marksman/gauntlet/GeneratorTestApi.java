@@ -1,6 +1,7 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.functions.Fn0;
+import dev.marksman.gauntlet.prop.Props;
 
 import java.time.Duration;
 import java.util.concurrent.Executor;
@@ -51,6 +52,16 @@ public final class GeneratorTestApi<A> {
                 parameters.getMaximumShrinkCount(), parameters.getTimeout(), parameters.getExecutorOverride().orElseGet(getParentExecutor),
                 parameters.getGeneratorParameters());
         runner.accept(generatorTest);
+    }
+
+    @SafeVarargs
+    public final void mustSatisfyAllOf(Prop<A> first, Prop<A>... more) {
+        mustSatisfy(Props.allOf(first, more));
+    }
+
+    @SafeVarargs
+    public final void mustSatisfyAnyOf(Prop<A> first, Prop<A>... more) {
+        mustSatisfy(Props.anyOf(first, more));
     }
 
     public void mustNotSatisfy(Prop<A> prop) {

@@ -8,7 +8,6 @@ import static com.jnape.palatable.lambda.functions.builtin.fn1.Not.not;
 import static dev.marksman.gauntlet.Arbitraries.arbitraryBoxedPrimitive;
 import static dev.marksman.gauntlet.Arbitraries.arbitraryInt;
 import static dev.marksman.gauntlet.Prop.predicate;
-import static dev.marksman.gauntlet.prop.Props.allOf;
 import static dev.marksman.gauntlet.prop.Props.named;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,17 +18,17 @@ final class FilterTest extends GauntletApiBase {
     void emptyFilter() {
         Filter<Object> filter = Filter.emptyFilter();
         all(arbitraryBoxedPrimitive())
-                .mustSatisfy(predicate(filter::apply));
+                .mustSatisfy(predicate("always true", filter::apply));
     }
 
     @Test
     void basicFilter() {
         Filter<Integer> isEven = Filter.filter(n -> n % 2 == 0);
         all(arbitraryInt())
-                .mustSatisfy(allOf(
+                .mustSatisfyAllOf(
                         predicate("true for even numbers", n -> isEven.apply(n * 2)),
                         predicate("false for odd numbers", n -> !isEven.apply(n * 2 + 1)),
-                        predicate(isEven).xor(predicate(not(isEven)))));
+                        predicate(isEven).xor(predicate(not(isEven))));
     }
 
     @Test
@@ -45,9 +44,9 @@ final class FilterTest extends GauntletApiBase {
         Prop<Integer> divisibleBy5and3 = predicate(div53);
 
         all(arbitraryInt())
-                .mustSatisfy(allOf(
+                .mustSatisfyAllOf(
                         named("combines all components with 'and'", divisibleBy3and5.iff(divisibleBy3.and(divisibleBy5))),
-                        named("commutative", divisibleBy3and5.iff(divisibleBy5and3))));
+                        named("commutative", divisibleBy3and5.iff(divisibleBy5and3)));
     }
 
     @Test

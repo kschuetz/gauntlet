@@ -1,6 +1,7 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.functions.Fn0;
+import dev.marksman.gauntlet.prop.Props;
 
 import java.time.Duration;
 import java.util.concurrent.Executor;
@@ -38,6 +39,16 @@ public final class DomainTestApi<A> {
         DomainTest<A> domainTest = domainTest(parameters.getQuantifier(), parameters.getDomain(), property,
                 parameters.getTimeout(), parameters.getExecutorOverride().orElseGet(getParentExecutor));
         runner.accept(domainTest);
+    }
+
+    @SafeVarargs
+    public final void mustSatisfyAllOf(Prop<A> first, Prop<A>... more) {
+        mustSatisfy(Props.allOf(first, more));
+    }
+
+    @SafeVarargs
+    public final void mustSatisfyAnyOf(Prop<A> first, Prop<A>... more) {
+        mustSatisfy(Props.anyOf(first, more));
     }
 
     public void mustNotSatisfy(Prop<A> prop) {
