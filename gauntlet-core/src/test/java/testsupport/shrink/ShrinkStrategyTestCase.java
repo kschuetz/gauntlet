@@ -7,8 +7,6 @@ import dev.marksman.gauntlet.Prop;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.constraints.Constraint;
-import lombok.AllArgsConstructor;
-import lombok.Value;
 
 import java.util.HashSet;
 
@@ -16,14 +14,17 @@ import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 import static dev.marksman.gauntlet.Prop.prop;
 import static dev.marksman.gauntlet.SimpleResult.fail;
 import static dev.marksman.gauntlet.SimpleResult.pass;
-import static lombok.AccessLevel.PRIVATE;
 
-@Value
-@AllArgsConstructor(access = PRIVATE)
-public class ShrinkStrategyTestCase<A> {
-    A input;
-    ImmutableFiniteIterable<A> output;
-    Constraint<A> constraint;
+public final class ShrinkStrategyTestCase<A> {
+    private final A input;
+    private final ImmutableFiniteIterable<A> output;
+    private final Constraint<A> constraint;
+
+    private ShrinkStrategyTestCase(A input, ImmutableFiniteIterable<A> output, Constraint<A> constraint) {
+        this.input = input;
+        this.output = output;
+        this.constraint = constraint;
+    }
 
     public static <A> ShrinkStrategyTestCase<A> shrinkStrategyTestCase(A input, ImmutableFiniteIterable<A> output) {
         return new ShrinkStrategyTestCase<>(input, output, null);
@@ -93,5 +94,17 @@ public class ShrinkStrategyTestCase<A> {
 
     private static <A> Prop<ShrinkStrategyTestCase<A>> shrinkOutputIsEmpty() {
         return Prop.predicate("shrink output is empty", tc -> tc.getOutput().isEmpty());
+    }
+
+    public A getInput() {
+        return this.input;
+    }
+
+    public ImmutableFiniteIterable<A> getOutput() {
+        return this.output;
+    }
+
+    public Constraint<A> getConstraint() {
+        return this.constraint;
     }
 }
