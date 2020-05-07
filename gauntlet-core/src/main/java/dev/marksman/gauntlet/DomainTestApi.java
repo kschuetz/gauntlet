@@ -1,10 +1,8 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.functions.Fn0;
-import com.jnape.palatable.lambda.functions.Fn1;
 
 import java.time.Duration;
-import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
@@ -32,16 +30,12 @@ public final class DomainTestApi<A> {
         return new DomainTestApi<>(getParentExecutor, runner, parameters.withTimeout(timeout));
     }
 
-    public DomainTestApi<A> classifyUsing(Fn1<A, Set<String>> classifier) {
-        return new DomainTestApi<>(getParentExecutor, runner, parameters.addClassifier(classifier));
-    }
-
     public DomainTestApi<A> withExecutor(Executor executor) {
         return new DomainTestApi<>(getParentExecutor, runner, parameters.withExecutorOverride(just(executor)));
     }
 
     public void mustSatisfy(Prop<A> property) {
-        DomainTest<A> domainTest = domainTest(parameters.getQuantifier(), parameters.getDomain(), property, parameters.getClassifiers(),
+        DomainTest<A> domainTest = domainTest(parameters.getQuantifier(), parameters.getDomain(), property,
                 parameters.getTimeout(), parameters.getExecutorOverride().orElseGet(getParentExecutor));
         runner.accept(domainTest);
     }
