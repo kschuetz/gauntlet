@@ -37,5 +37,4 @@ final class Safe<A> implements Prop<A> {
     public <B> Prop<B> contraMap(Fn1<? super B, ? extends A> fn) {
         return new Safe<>(underlying.contraMap(fn));
     }
-
 }

@@ -56,5 +56,4 @@ public final class GeneratorTestApi<A> {
     public void mustNotSatisfy(Prop<A> prop) {
         mustSatisfy(prop.not());
     }
-
 }

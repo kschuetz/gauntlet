@@ -14,7 +14,6 @@ import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RefinementTestRunnerTest {
-
     private static final int BLOCK_SIZE = 3;
 
     private static final Prop<Integer> lessThan100 = Prop.predicate("< 100", n -> n < 100);
@@ -74,5 +73,4 @@ class RefinementTestRunnerTest {
         assertEquals(101, result.getCounterexample().getSample());
         assertEquals(6, result.getShrinkCount());
     }
-
 }

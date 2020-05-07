@@ -8,7 +8,6 @@ import static dev.marksman.gauntlet.EvalFailure.evalFailure;
 import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
 import static dev.marksman.gauntlet.Reasons.reasons;
 
-
 final class PredicateProp<A> implements Prop<A> {
     private final String name;
     private final Fn1<? super A, Boolean> predicate;

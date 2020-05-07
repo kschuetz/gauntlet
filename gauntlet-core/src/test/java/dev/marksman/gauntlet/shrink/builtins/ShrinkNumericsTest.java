@@ -29,7 +29,6 @@ import static testsupport.shrink.ShrinkStrategyTestCase.shrinkOutputEmptyWhenInp
 import static testsupport.shrink.ShrinkStrategyTestCase.shrinkTestCases;
 
 class ShrinkNumericsTest extends GauntletApiBase {
-
     private static final Generator<Tuple2<Integer, Integer>> generateIntSpan =
             generateOrderedPair(generateInt());
 
@@ -43,7 +42,6 @@ class ShrinkNumericsTest extends GauntletApiBase {
     @Nested
     @DisplayName("ints")
     class Ints {
-
         @Test
         void unclamped() {
             all(shrinkTestCases(generateInt(), shrinkInt()))
@@ -65,43 +63,35 @@ class ShrinkNumericsTest extends GauntletApiBase {
                             shrinkOutputEmptyWhenInputOutsideOfDomain()
                     ));
         }
-
     }
 
     @Nested
     @DisplayName("longs")
     class Longs {
-
         @Test
         void unclamped() {
             all(shrinkTestCases(generateLong(), shrinkLong()))
                     .mustSatisfy(neverRepeatsAnElement());
         }
-
     }
 
     @Nested
     @DisplayName("shorts")
     class Shorts {
-
         @Test
         void unclamped() {
             all(shrinkTestCases(generateShort(), shrinkShort()))
                     .mustSatisfy(neverRepeatsAnElement());
         }
-
     }
 
     @Nested
     @DisplayName("bytes")
     class Bytes {
-
         @Test
         void unclamped() {
             all(shrinkTestCases(generateByte(), shrinkByte()))
                     .mustSatisfy(neverRepeatsAnElement());
         }
-
     }
-
 }

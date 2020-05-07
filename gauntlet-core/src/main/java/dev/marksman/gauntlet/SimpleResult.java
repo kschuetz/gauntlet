@@ -6,7 +6,6 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import static dev.marksman.gauntlet.Reasons.reasons;
 
 public abstract class SimpleResult implements CoProduct2<SimpleResult.Pass, SimpleResult.Fail, SimpleResult> {
-
     public static Pass pass() {
         return Pass.INSTANCE;
     }
@@ -95,5 +94,4 @@ public abstract class SimpleResult implements CoProduct2<SimpleResult.Pass, Simp
             return result;
         }
     }
-
 }

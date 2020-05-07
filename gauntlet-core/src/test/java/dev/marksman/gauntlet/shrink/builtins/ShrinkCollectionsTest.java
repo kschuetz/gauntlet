@@ -11,7 +11,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 
 class ShrinkCollectionsTest {
-
     @Test
     void shrinkVectorStructure() {
         ShrinkStrategy<ImmutableVector<Integer>> shrink = shrinkVector(ShrinkStrategy.none());
@@ -23,5 +22,4 @@ class ShrinkCollectionsTest {
                 Vector.of(1, 3, 5, 7, 9)
         ));
     }
-
 }

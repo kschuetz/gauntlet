@@ -22,7 +22,6 @@ import static dev.marksman.kraftwerk.Generators.generateUnit;
 import static dev.marksman.kraftwerk.weights.MaybeWeights.justs;
 
 final class CoProductArbitraries {
-
     private static final MaybeWeights DEFAULT_MAYBE_WEIGHTS = justs(9).toNothings(1);
 
     private static final Arbitrary<Unit> ARBITRARY_UNIT = arbitrary(generateUnit());

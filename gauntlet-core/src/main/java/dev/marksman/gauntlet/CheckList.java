@@ -35,5 +35,4 @@ final class CheckList {
     int firstUnmarkedIndex() {
         return firstUnmarkedIndex;
     }
-
 }

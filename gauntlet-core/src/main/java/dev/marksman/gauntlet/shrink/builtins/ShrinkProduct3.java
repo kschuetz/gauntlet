@@ -15,7 +15,6 @@ import static com.jnape.palatable.lambda.functions.builtin.fn2.Into3.into3;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct2.zip2;
 
 final class ShrinkProduct3 {
-
     private ShrinkProduct3() {
     }
 
@@ -54,5 +53,4 @@ final class ShrinkProduct3 {
                         .zipWith(Tuple2::tuple, cs))
                 .fmap(x -> tuple(x._1(), x._2()._1(), x._2()._2()));
     }
-
 }

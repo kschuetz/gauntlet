@@ -21,7 +21,6 @@ import static dev.marksman.kraftwerk.aggregator.Aggregators.collectionAggregator
 import static dev.marksman.kraftwerk.aggregator.Aggregators.vectorAggregator;
 
 final class CollectionArbitraries {
-
     static <A> Arbitrary<ImmutableVector<A>> vector(Arbitrary<A> elements) {
         return arbitrary(parameters ->
                         new CollectionSupply<>(elements.createSupply(parameters),

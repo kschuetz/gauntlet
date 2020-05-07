@@ -32,5 +32,4 @@ final class ChoiceSupply3<A, B, C> implements Supply<Choice3<A, B, C>> {
     public SupplyTree getSupplyTree() {
         return SupplyTree.composite(supplyA.getSupplyTree(), supplyB.getSupplyTree(), supplyC.getSupplyTree());
     }
-
 }

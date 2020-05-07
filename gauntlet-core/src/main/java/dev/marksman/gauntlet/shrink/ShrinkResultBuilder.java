@@ -57,5 +57,4 @@ public final class ShrinkResultBuilder<A> {
     public ImmutableFiniteIterable<A> build() {
         return result;
     }
-
 }

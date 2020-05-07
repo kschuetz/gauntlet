@@ -29,5 +29,4 @@ final class ChoiceSupply2<A, B> implements Supply<Choice2<A, B>> {
     public SupplyTree getSupplyTree() {
         return SupplyTree.composite(supplyA.getSupplyTree(), supplyB.getSupplyTree());
     }
-
 }

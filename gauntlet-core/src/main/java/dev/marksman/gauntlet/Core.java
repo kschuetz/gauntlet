@@ -245,5 +245,4 @@ final class Core implements GauntletApi {
     private Executor getExecutor() {
         return executorOverride.orElseGet(DefaultGauntletExecutor::defaultGauntletExecutor);
     }
-
 }

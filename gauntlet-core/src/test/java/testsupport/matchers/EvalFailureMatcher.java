@@ -10,7 +10,6 @@ import static com.jnape.palatable.lambda.io.IO.io;
 import static org.hamcrest.core.IsAnything.anything;
 
 public final class EvalFailureMatcher extends TypeSafeMatcher<EvalResult> {
-
     private final Matcher<? super EvalFailure> failureMatcher;
 
     private EvalFailureMatcher(Matcher<? super EvalFailure> failureMatcher) {
@@ -47,5 +46,4 @@ public final class EvalFailureMatcher extends TypeSafeMatcher<EvalResult> {
     public static EvalFailureMatcher isEvalFailure() {
         return isEvalFailureThat(anything());
     }
-
 }

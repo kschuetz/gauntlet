@@ -6,7 +6,6 @@ import dev.marksman.collectionviews.Vector;
 import static dev.marksman.gauntlet.Domain.domain;
 
 public final class Domains {
-
     private static final Domain<Character> ASCII = domain(NonEmptyVector.lazyFill(128, idx -> (char) ((int) idx)));
 
     private static final Domain<Character> ASCII_PRINTABLE = domain(NonEmptyVector.lazyFill(95, idx -> (char) (32 + idx)));
@@ -53,5 +52,4 @@ public final class Domains {
 
         Domain<A> until(A upper);
     }
-
 }

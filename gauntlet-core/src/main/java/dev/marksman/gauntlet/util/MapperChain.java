@@ -114,5 +114,4 @@ public interface MapperChain {
     static Function<Object, Object> lambdaToJava(Fn1<Object, Object> f) {
         return f::apply;
     }
-
 }

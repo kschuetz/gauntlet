@@ -28,5 +28,4 @@ final class BasicProp<A> implements Prop<A> {
     public String getName() {
         return name;
     }
-
 }

@@ -21,5 +21,4 @@ public interface Filter<A> extends Predicate<A> {
     static <A> Filter<A> filter(Fn1<? super A, Boolean> f) {
         return multiFilter(f);
     }
-
 }

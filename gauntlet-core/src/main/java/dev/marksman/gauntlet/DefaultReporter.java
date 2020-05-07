@@ -3,7 +3,6 @@ package dev.marksman.gauntlet;
 import static dev.marksman.gauntlet.VerbosityLevel.EXTRA;
 
 public final class DefaultReporter implements Reporter {
-
     private static final DefaultReporter INSTANCE = new DefaultReporter();
 
     public static DefaultReporter defaultReporter() {
@@ -21,5 +20,4 @@ public final class DefaultReporter implements Reporter {
         }
 
     }
-
 }

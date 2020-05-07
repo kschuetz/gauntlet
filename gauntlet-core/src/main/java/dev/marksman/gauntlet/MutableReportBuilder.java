@@ -52,5 +52,4 @@ class MutableReportBuilder {
         output.append(line);
         output.append('\n');
     }
-
 }

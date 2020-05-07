@@ -31,5 +31,4 @@ final class CompositeSupply3<A, B, C, Out> implements Supply<Out> {
                         (b, s2) -> threadSeed(2, vsC.getNext(s2),
                                 (c, s3) -> GeneratorOutput.success(s3, fn.apply(a, b, c)))));
     }
-
 }

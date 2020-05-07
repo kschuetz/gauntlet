@@ -237,5 +237,4 @@ abstract class ResultCollector<A> implements ResultReceiver {
             return builder.build();
         }
     }
-
 }

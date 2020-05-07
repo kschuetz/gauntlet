@@ -35,5 +35,4 @@ final class AlwaysFail<A> implements Prop<A> {
     public String getName() {
         return NAME;
     }
-
 }

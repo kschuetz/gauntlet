@@ -6,7 +6,6 @@ import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import static com.jnape.palatable.lambda.adt.Unit.UNIT;
 
 public final class DefaultReportRenderer implements ReportRenderer {
-
     private DefaultReportRenderer() {
     }
 
@@ -142,5 +141,4 @@ public final class DefaultReportRenderer implements ReportRenderer {
         }
         output.newLine();
     }
-
 }

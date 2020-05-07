@@ -4,7 +4,6 @@ import com.jnape.palatable.lambda.adt.coproduct.CoProduct2;
 import com.jnape.palatable.lambda.functions.Fn1;
 
 public abstract class Cause implements CoProduct2<Cause.Explanation, Cause.PropertyFailed, Cause> {
-
     public static Explanation explanation(Named propertyName, Reasons reasons) {
         return new Explanation(propertyName, reasons);
     }
@@ -116,5 +115,4 @@ public abstract class Cause implements CoProduct2<Cause.Explanation, Cause.Prope
             return result;
         }
     }
-
 }

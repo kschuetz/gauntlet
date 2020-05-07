@@ -9,7 +9,6 @@ import java.time.Duration;
 import java.util.concurrent.Executor;
 
 public interface GauntletApi {
-
     <A> GeneratorTestApi<A> all(Arbitrary<A> generator);
 
     <A, B> GeneratorTestApi<Tuple2<A, B>> all(Arbitrary<A> generatorA,

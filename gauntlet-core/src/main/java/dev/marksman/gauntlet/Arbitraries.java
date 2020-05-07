@@ -42,9 +42,7 @@ import static dev.marksman.kraftwerk.Generators.generateLongIndex;
 import static dev.marksman.kraftwerk.Generators.generateShort;
 
 public final class Arbitraries {
-
     private Arbitraries() {
-
     }
 
     public static Arbitrary<Integer> arbitraryInt(Generator<Integer> generator) {
@@ -273,5 +271,4 @@ public final class Arbitraries {
     public static <A> Arbitrary<HashSet<A>> arbitraryNonEmptyHashSet(Arbitrary<A> elements) {
         return CollectionArbitraries.nonEmptyHashSet(elements);
     }
-
 }

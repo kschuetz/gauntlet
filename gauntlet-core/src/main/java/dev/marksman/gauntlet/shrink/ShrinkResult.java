@@ -9,7 +9,6 @@ import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmuta
 import static dev.marksman.gauntlet.shrink.LazyCons.lazyTail;
 
 public final class ShrinkResult {
-
     private ShrinkResult() {
 
     }
@@ -30,5 +29,4 @@ public final class ShrinkResult {
     public static <A> ImmutableNonEmptyFiniteIterable<A> of(A firstElement, A... more) {
         return Vector.of(firstElement, more);
     }
-
 }

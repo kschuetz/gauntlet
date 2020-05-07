@@ -5,9 +5,7 @@ import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
 
 final class LazyCons {
-
     private LazyCons() {
-
     }
 
     static <A> ImmutableNonEmptyFiniteIterable<A> lazyTail(A head, Fn0<ImmutableFiniteIterable<A>> tailSupplier) {

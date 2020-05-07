@@ -5,7 +5,6 @@ import java.util.concurrent.Executor;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 
 public final class DefaultGauntletExecutor {
-
     private static Executor INSTANCE;
 
     private DefaultGauntletExecutor() {
@@ -26,5 +25,4 @@ public final class DefaultGauntletExecutor {
     private static Executor createExecutor() {
         return newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
-
 }

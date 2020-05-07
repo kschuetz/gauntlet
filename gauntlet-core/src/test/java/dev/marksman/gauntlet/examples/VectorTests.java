@@ -9,7 +9,6 @@ import static dev.marksman.gauntlet.Arbitraries.arbitraryInt;
 import static dev.marksman.gauntlet.Prop.predicate;
 
 public class VectorTests extends GauntletApiBase {
-
     private static final Arbitrary<ImmutableVector<Integer>> vectors = arbitraryInt().vector();
 
     @Test
@@ -18,5 +17,4 @@ public class VectorTests extends GauntletApiBase {
                 .mustSatisfy(predicate("reverse twice is original",
                         xs -> xs.reverse().reverse().equals(xs)));
     }
-
 }

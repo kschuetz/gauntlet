@@ -5,7 +5,6 @@ import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 
 public final class EvalSuccessMatcher extends TypeSafeMatcher<EvalResult> {
-
     private EvalSuccessMatcher() {
     }
 
@@ -23,5 +22,4 @@ public final class EvalSuccessMatcher extends TypeSafeMatcher<EvalResult> {
     public static EvalSuccessMatcher isEvalSuccess() {
         return new EvalSuccessMatcher();
     }
-
 }

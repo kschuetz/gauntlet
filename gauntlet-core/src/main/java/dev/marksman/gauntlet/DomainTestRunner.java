@@ -36,5 +36,4 @@ public final class DomainTestRunner {
             return domainTestResult(collector.getResultBlocking(domainTest.getTimeout()));
         });
     }
-
 }

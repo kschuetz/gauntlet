@@ -7,7 +7,6 @@ import static dev.marksman.gauntlet.filter.MappedFilter.mappedFilter;
 import static dev.marksman.gauntlet.filter.MultiFilter.multiFilter;
 
 final class EmptyFilter<A> implements Filter<A> {
-
     private static final EmptyFilter<?> INSTANCE = new EmptyFilter<>();
 
     @Override
@@ -35,5 +34,4 @@ final class EmptyFilter<A> implements Filter<A> {
     static <A> EmptyFilter<A> emptyFilterChain() {
         return (EmptyFilter<A>) INSTANCE;
     }
-
 }

@@ -22,5 +22,4 @@ public class Weighted<A> {
     public static <A> Weighted<A> weighted(A value) {
         return weighted(1, value);
     }
-
 }

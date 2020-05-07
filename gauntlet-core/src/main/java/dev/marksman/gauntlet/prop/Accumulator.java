@@ -36,5 +36,4 @@ final class Accumulator {
     public int getSuccessCount() {
         return this.successCount;
     }
-
 }

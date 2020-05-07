@@ -31,5 +31,4 @@ final class EnumeratedDomain<A> implements Domain<A> {
     public Domain<A> suchThat(Fn1<? super A, Boolean> predicate) {
         return new FilteredDomain<>(elements, filter(predicate), prettyPrinter);
     }
-
 }

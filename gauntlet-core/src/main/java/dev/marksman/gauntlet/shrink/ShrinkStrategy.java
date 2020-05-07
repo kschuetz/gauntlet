@@ -10,7 +10,6 @@ import static dev.marksman.gauntlet.shrink.ShrinkStrategyNone.shrinkNone;
 
 @FunctionalInterface
 public interface ShrinkStrategy<A> {
-
     static <A> ShrinkStrategy<A> none() {
         return shrinkNone();
     }

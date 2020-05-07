@@ -42,5 +42,4 @@ public final class EvalSuccess extends EvalResult {
     protected boolean canEqual(final Object other) {
         return other instanceof EvalSuccess;
     }
-
 }

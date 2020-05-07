@@ -95,5 +95,4 @@ final class GeneratorTestRunner {
         }
         return generatedDataSet(initialSeedValue, values, supplyFailure, state);
     }
-
 }

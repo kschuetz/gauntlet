@@ -38,5 +38,4 @@ final class CompositeSupply5<A, B, C, D, E, Out> implements Supply<Out> {
                                         (d, s4) -> threadSeed(4, supplyE.getNext(s4),
                                                 (e, s5) -> GeneratorOutput.success(s5, fn.apply(a, b, c, d, e)))))));
     }
-
 }

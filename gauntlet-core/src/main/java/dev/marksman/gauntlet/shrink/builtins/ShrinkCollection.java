@@ -7,7 +7,6 @@ import dev.marksman.gauntlet.shrink.ShrinkResultBuilder;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 
 final class ShrinkCollection {
-
     private ShrinkCollection() {
     }
 
@@ -38,5 +37,4 @@ final class ShrinkCollection {
         int newSize = vector.size() / 2;
         return Vector.lazyFill(newSize, idx -> vector.unsafeGet(1 + idx * 2));
     }
-
 }

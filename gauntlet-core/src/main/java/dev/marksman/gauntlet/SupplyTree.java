@@ -9,9 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
-
 public abstract class SupplyTree implements CoProduct3<SupplyTree.Leaf, SupplyTree.Composite, SupplyTree.Collection, SupplyTree> {
-
     public static SupplyTree leaf(String name) {
         return new Leaf(name);
     }

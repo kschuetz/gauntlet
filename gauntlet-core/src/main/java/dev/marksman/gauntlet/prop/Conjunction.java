@@ -12,7 +12,6 @@ import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
 import static dev.marksman.gauntlet.Reasons.reasons;
 import static dev.marksman.gauntlet.prop.Accumulator.accumulator;
 
-
 final class Conjunction<A> implements Prop<A> {
     private final ImmutableNonEmptyFiniteIterable<Prop<A>> operands;
     private final String name;
@@ -57,5 +56,4 @@ final class Conjunction<A> implements Prop<A> {
     public String getName() {
         return name;
     }
-
 }

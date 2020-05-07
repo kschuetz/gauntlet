@@ -28,5 +28,4 @@ public class ReportSettings {
     public ReportSettings withFailureVerbosity(VerbosityLevel failureVerbosity) {
         return reportSettings(failureVerbosity, successVerbosity);
     }
-
 }

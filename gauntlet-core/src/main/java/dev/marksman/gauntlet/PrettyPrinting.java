@@ -10,7 +10,6 @@ import com.jnape.palatable.lambda.adt.product.Product8;
 import com.jnape.palatable.lambda.functions.Fn1;
 
 public final class PrettyPrinting {
-
     public static <A, B> Fn1<? super Product2<A, B>, String> productPrettyPrinter(Fn1<? super A, String> ppA,
                                                                                   Fn1<? super B, String> ppB) {
         return t -> makeProductString(ppA.apply(t._1()),
@@ -110,5 +109,4 @@ public final class PrettyPrinting {
         builder.append(")");
         return builder.toString();
     }
-
 }

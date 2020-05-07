@@ -11,13 +11,17 @@ import static com.jnape.palatable.lambda.adt.Either.right;
 import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
 import static dev.marksman.gauntlet.EvaluateSampleTask.evaluateSampleTask;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.*;
-
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @SuppressWarnings("unchecked")
 @ExtendWith(MockitoExtension.class)
 class EvaluateSampleTaskTest {
-
     private static final Prop<Integer> isOdd = Prop.predicate(n -> n % 2 == 1);
 
     @Mock

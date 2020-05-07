@@ -9,7 +9,6 @@ import dev.marksman.collectionviews.ImmutableVector;
 import static dev.marksman.gauntlet.PrettyPrinting.productPrettyPrinter;
 
 final class DomainCombinators {
-
     private DomainCombinators() {
 
     }

@@ -11,7 +11,6 @@ import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Into.into;
 
 final class ShrinkProduct2 {
-
     private ShrinkProduct2() {
     }
 

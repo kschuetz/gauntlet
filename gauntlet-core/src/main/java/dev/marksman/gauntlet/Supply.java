@@ -7,7 +7,6 @@ import dev.marksman.kraftwerk.Seed;
 import static dev.marksman.gauntlet.MappedSupply.mappedSupply;
 
 public interface Supply<A> extends Functor<A, Supply<?>> {
-
     GeneratorOutput<A> getNext(Seed input);
 
     SupplyTree getSupplyTree();

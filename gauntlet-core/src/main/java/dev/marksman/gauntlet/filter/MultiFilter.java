@@ -42,5 +42,4 @@ final class MultiFilter<A> implements Filter<A> {
     public boolean isEmpty() {
         return false;
     }
-
 }

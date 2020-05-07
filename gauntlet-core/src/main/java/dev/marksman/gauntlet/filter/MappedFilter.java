@@ -41,5 +41,4 @@ final class MappedFilter<A, B> implements Filter<A> {
     public boolean isEmpty() {
         return underlying.isEmpty();
     }
-
 }

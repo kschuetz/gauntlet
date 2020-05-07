@@ -27,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ResultCollectorTest {
-
     private static final Prop<Integer> failureProp = Prop.<Integer>alwaysFail().rename("prop");
     private static final EvalFailure failure = EvalFailure.evalFailure(failureProp, reasons("failed"));
 

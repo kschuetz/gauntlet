@@ -12,7 +12,6 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct4.shrinkProduct
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct5.shrinkProduct5;
 
 final class ShrinkTuple {
-
     private ShrinkTuple() {
     }
 

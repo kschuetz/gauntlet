@@ -19,7 +19,6 @@ import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 
 final class CompositeArbitraries {
-
     static <A, B> Arbitrary<Tuple2<A, B>> combine(Arbitrary<A> a,
                                                   Arbitrary<B> b) {
 
@@ -152,5 +151,4 @@ final class CompositeArbitraries {
     private static <A> boolean isNothing(Maybe<A> ma) {
         return ma.match(__ -> true, __ -> false);
     }
-
 }

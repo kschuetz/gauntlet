@@ -45,7 +45,6 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct4.shrinkProduct
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct5.shrinkProduct5;
 
 public final class ShrinkStrategies {
-
     private ShrinkStrategies() {
     }
 

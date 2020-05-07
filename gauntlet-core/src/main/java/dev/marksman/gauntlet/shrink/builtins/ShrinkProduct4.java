@@ -17,7 +17,6 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct2.zip2;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct3.zip3;
 
 final class ShrinkProduct4 {
-
     private ShrinkProduct4() {
     }
 
@@ -66,5 +65,4 @@ final class ShrinkProduct4 {
         return as.zipWith(Tuple2::tuple, bs.zipWith(Tuple2::tuple, cs.zipWith(Tuple2::tuple, ds)))
                 .fmap(x -> tuple(x._1(), x._2()._1(), x._2()._2()._1(), x._2()._2()._2()));
     }
-
 }

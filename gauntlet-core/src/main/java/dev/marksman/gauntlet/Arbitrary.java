@@ -237,5 +237,4 @@ public final class Arbitrary<A> {
     public Arbitrary<Maybe<A>> maybe(MaybeWeights weights) {
         return CoProductArbitraries.arbitraryMaybe(weights, this);
     }
-
 }

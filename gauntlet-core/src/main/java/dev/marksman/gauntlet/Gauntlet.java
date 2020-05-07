@@ -13,7 +13,6 @@ import static dev.marksman.kraftwerk.StandardGeneratorParameters.defaultGenerato
 import static dev.marksman.kraftwerk.bias.DefaultPropertyTestingBiasSettings.defaultPropertyTestBiasSettings;
 
 public final class Gauntlet {
-
     public static final int DEFAULT_SAMPLE_COUNT = 100;
     public static final int DEFAULT_MAX_DISCARDS = 100;
     public static final int DEFAULT_MAXIMUM_SHRINK_COUNT = 1000;
@@ -46,5 +45,4 @@ public final class Gauntlet {
         }
         return INSTANCE;
     }
-
 }

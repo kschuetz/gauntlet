@@ -17,7 +17,6 @@ import java.util.concurrent.Executor;
  * All `withX` methods from the API are also available.
  */
 public abstract class GauntletApiBase implements GauntletApi {
-
     private GauntletApi apiInstance;
 
     protected GauntletApi initializeGauntletApi() {

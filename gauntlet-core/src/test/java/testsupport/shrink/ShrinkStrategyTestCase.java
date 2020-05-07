@@ -94,5 +94,4 @@ public class ShrinkStrategyTestCase<A> {
     private static <A> Prop<ShrinkStrategyTestCase<A>> shrinkOutputIsEmpty() {
         return Prop.predicate("shrink output is empty", tc -> tc.getOutput().isEmpty());
     }
-
 }

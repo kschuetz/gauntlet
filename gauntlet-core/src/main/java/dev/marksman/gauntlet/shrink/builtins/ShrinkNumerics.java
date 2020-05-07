@@ -12,7 +12,6 @@ import dev.marksman.kraftwerk.constraints.LongRange;
 import dev.marksman.kraftwerk.constraints.ShortRange;
 
 final class ShrinkNumerics {
-
     private static final ShrinkStrategy<Integer> INT = input -> {
         if (input < 0) {
             int high = input == Integer.MIN_VALUE ? Integer.MAX_VALUE : -input;
@@ -350,5 +349,4 @@ final class ShrinkNumerics {
             return ShrinkResult.cons(low, () -> series(middle, high));
         }
     }
-
 }
