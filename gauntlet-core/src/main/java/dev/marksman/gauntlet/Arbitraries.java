@@ -12,6 +12,7 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple5;
 import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.kraftwerk.Generator;
+import dev.marksman.kraftwerk.Generators;
 import dev.marksman.kraftwerk.constraints.ByteRange;
 import dev.marksman.kraftwerk.constraints.DoubleRange;
 import dev.marksman.kraftwerk.constraints.FloatRange;
@@ -25,6 +26,7 @@ import dev.marksman.kraftwerk.weights.MaybeWeights;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import static com.jnape.palatable.lambda.functions.builtin.fn1.Upcast.upcast;
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkByte;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkDouble;
@@ -157,6 +159,20 @@ public final class Arbitraries {
 
     public static Arbitrary<Double> arbitraryDouble(FrequencyMap<Double> frequencyMap) {
         return arbitraryDouble(frequencyMap.toGenerator());
+    }
+
+    public static Arbitrary<Object> arbitraryBoxedPrimitive() {
+        // TODO: generateChar
+        // TODO: revisit FrequencyMap API
+        Generator<Object> generator = FrequencyMap.<Object>frequencyMap(generateInt().fmap(upcast()))
+                .add(generateLong())
+                .add(generateShort())
+                .add(generateByte())
+                .add(generateFloat())
+                .add(generateDouble())
+                .add(Generators.generateBoolean())
+                .toGenerator();
+        return arbitrary(generator);
     }
 
     public static <A, B> Arbitrary<Tuple2<A, B>> combine(Arbitrary<A> a,
