@@ -14,8 +14,8 @@ final class DomainCombinators {
 
     }
 
-    static <A, B> EnumeratedDomain<Tuple2<A, B>> cartesianProduct(Domain<A> domainA,
-                                                                  Domain<B> domainB) {
+    static <A, B> Domain<Tuple2<A, B>> cartesianProduct(Domain<A> domainA,
+                                                        Domain<B> domainB) {
         ImmutableVector<Tuple2<A, B>> newElements = domainA.getElements().cross(domainB.getElements());
         Fn1<? super Tuple2<A, B>, String> newPrettyPrinter = productPrettyPrinter(domainA.getPrettyPrinter(),
                 domainB.getPrettyPrinter());
@@ -23,9 +23,9 @@ final class DomainCombinators {
                 newPrettyPrinter);
     }
 
-    static <A, B, C> EnumeratedDomain<Tuple3<A, B, C>> cartesianProduct(Domain<A> domainA,
-                                                                        Domain<B> domainB,
-                                                                        Domain<C> domainC) {
+    static <A, B, C> Domain<Tuple3<A, B, C>> cartesianProduct(Domain<A> domainA,
+                                                              Domain<B> domainB,
+                                                              Domain<C> domainC) {
         ImmutableVector<Tuple3<A, B, C>> newElements = domainA.getElements().cross(domainB.getElements().cross(domainC.getElements()))
                 .fmap(t -> Tuple3.tuple(
                         t._1(),
@@ -37,10 +37,10 @@ final class DomainCombinators {
         return new EnumeratedDomain<>(newElements, newPrettyPrinter);
     }
 
-    static <A, B, C, D> EnumeratedDomain<Tuple4<A, B, C, D>> cartesianProduct(Domain<A> domainA,
-                                                                              Domain<B> domainB,
-                                                                              Domain<C> domainC,
-                                                                              Domain<D> domainD) {
+    static <A, B, C, D> Domain<Tuple4<A, B, C, D>> cartesianProduct(Domain<A> domainA,
+                                                                    Domain<B> domainB,
+                                                                    Domain<C> domainC,
+                                                                    Domain<D> domainD) {
         ImmutableVector<Tuple4<A, B, C, D>> newElements = domainA.getElements()
                 .cross(domainB.getElements()
                         .cross(domainC.getElements()
