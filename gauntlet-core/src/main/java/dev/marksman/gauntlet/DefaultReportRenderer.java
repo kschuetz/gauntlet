@@ -2,13 +2,13 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.ImmutableNonEmptyVector;
-import lombok.AllArgsConstructor;
 
 import static com.jnape.palatable.lambda.adt.Unit.UNIT;
-import static lombok.AccessLevel.PRIVATE;
 
-@AllArgsConstructor(access = PRIVATE)
 public final class DefaultReportRenderer implements ReportRenderer {
+
+    private DefaultReportRenderer() {
+    }
 
     public static DefaultReportRenderer defaultReportRenderer() {
         return new DefaultReportRenderer();
