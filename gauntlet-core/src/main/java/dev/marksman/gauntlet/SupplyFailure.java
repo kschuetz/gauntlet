@@ -1,16 +1,23 @@
 package dev.marksman.gauntlet;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Value;
+public final class SupplyFailure {
+    private final int discardCount;
+    private final SupplyTree supplyTree;
 
-@Value
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class SupplyFailure {
-    int discardCount;
-    SupplyTree tree;
+    private SupplyFailure(int discardCount, SupplyTree supplyTree) {
+        this.discardCount = discardCount;
+        this.supplyTree = supplyTree;
+    }
 
-    public static SupplyFailure supplyFailure(int discardCount, SupplyTree tree) {
-        return new SupplyFailure(discardCount, tree);
+    public static SupplyFailure supplyFailure(int discardCount, SupplyTree supplyTree) {
+        return new SupplyFailure(discardCount, supplyTree);
+    }
+
+    public int getDiscardCount() {
+        return discardCount;
+    }
+
+    public SupplyTree getSupplyTree() {
+        return supplyTree;
     }
 }
