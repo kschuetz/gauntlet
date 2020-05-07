@@ -9,7 +9,7 @@ import static dev.marksman.gauntlet.prop.Props.allOf;
 import static dev.marksman.gauntlet.prop.Props.named;
 import static dev.marksman.gauntlet.prop.Props.noneOf;
 
-public class CharacterTests extends GauntletApiBase {
+public final class CharacterTests extends GauntletApiBase {
     public static final Prop<Character> isUpperCaseLetter = Prop.predicate("is uppercase letter", Character::isUpperCase);
     public static final Prop<Character> isLowerCaseLetter = Prop.predicate("is lowercase letter", Character::isLowerCase);
 

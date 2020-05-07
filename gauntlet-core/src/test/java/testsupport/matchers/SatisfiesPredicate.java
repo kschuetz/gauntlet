@@ -8,7 +8,7 @@ import org.hamcrest.TypeSafeMatcher;
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 
-public class SatisfiesPredicate<A> extends TypeSafeMatcher<A> {
+public final class SatisfiesPredicate<A> extends TypeSafeMatcher<A> {
     private final Fn1<? super A, Boolean> predicate;
     private final Maybe<String> label;
 

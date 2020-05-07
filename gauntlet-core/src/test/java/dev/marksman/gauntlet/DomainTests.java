@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import static dev.marksman.gauntlet.Domains.integersFrom;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class DomainTests {
+final class DomainTests {
     @Test
     void filterOnce() {
         assertEquals(Vector.of(0, 2, 4, 6, 8),

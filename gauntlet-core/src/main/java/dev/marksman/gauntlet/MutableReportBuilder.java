@@ -1,6 +1,6 @@
 package dev.marksman.gauntlet;
 
-class MutableReportBuilder {
+final class MutableReportBuilder {
     private final StringBuilder output;
     private int indentLevel;
     private boolean wasCurrentLineStarted;

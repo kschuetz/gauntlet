@@ -3,7 +3,7 @@ package dev.marksman.gauntlet;
 import static com.jnape.palatable.lambda.adt.Either.left;
 import static com.jnape.palatable.lambda.adt.Either.right;
 
-public class EvaluateSampleTask<A> implements Runnable {
+public final class EvaluateSampleTask<A> implements Runnable {
     private final ResultReceiver receiver;
     private final Prop<A> property;
     private final int sampleIndex;

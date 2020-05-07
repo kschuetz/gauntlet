@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 
 @SuppressWarnings("unchecked")
 @ExtendWith(MockitoExtension.class)
-class EvaluateSampleTaskTest {
+final class EvaluateSampleTaskTest {
     private static final Prop<Integer> isOdd = Prop.predicate(n -> n % 2 == 1);
 
     @Mock

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static dev.marksman.gauntlet.Arbitraries.arbitraryInt;
 import static dev.marksman.gauntlet.Prop.predicate;
 
-public class VectorTests extends GauntletApiBase {
+public final class VectorTests extends GauntletApiBase {
     private static final Arbitrary<ImmutableVector<Integer>> vectors = arbitraryInt().vector();
 
     @Test

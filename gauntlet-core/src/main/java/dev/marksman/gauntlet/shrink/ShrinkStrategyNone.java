@@ -6,7 +6,7 @@ import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 
 import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
 
-class ShrinkStrategyNone<A> implements ShrinkStrategy<A> {
+final class ShrinkStrategyNone<A> implements ShrinkStrategy<A> {
     private static final ShrinkStrategyNone<?> INSTANCE = new ShrinkStrategyNone<>();
 
     @SuppressWarnings("unchecked")

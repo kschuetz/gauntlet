@@ -28,7 +28,7 @@ import static testsupport.shrink.ShrinkStrategyTestCase.neverRepeatsAnElement;
 import static testsupport.shrink.ShrinkStrategyTestCase.shrinkOutputEmptyWhenInputOutsideOfDomain;
 import static testsupport.shrink.ShrinkStrategyTestCase.shrinkTestCases;
 
-class ShrinkNumericsTest extends GauntletApiBase {
+final class ShrinkNumericsTest extends GauntletApiBase {
     private static final Generator<Tuple2<Integer, Integer>> generateIntSpan =
             generateOrderedPair(generateInt());
 

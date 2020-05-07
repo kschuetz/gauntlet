@@ -13,7 +13,7 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkInt;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class RefinementTestRunnerTest {
+final class RefinementTestRunnerTest {
     private static final int BLOCK_SIZE = 3;
 
     private static final Prop<Integer> lessThan100 = Prop.predicate("< 100", n -> n < 100);

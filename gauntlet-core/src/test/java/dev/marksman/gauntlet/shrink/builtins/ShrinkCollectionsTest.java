@@ -10,7 +10,7 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkVecto
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 
-class ShrinkCollectionsTest {
+final class ShrinkCollectionsTest {
     @Test
     void shrinkVectorStructure() {
         ShrinkStrategy<ImmutableVector<Integer>> shrink = shrinkVector(ShrinkStrategy.none());

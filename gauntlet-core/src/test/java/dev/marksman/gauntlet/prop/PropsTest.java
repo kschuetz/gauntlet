@@ -31,7 +31,7 @@ import static testsupport.matchers.EvalFailureMatcher.isEvalFailureThat;
 import static testsupport.matchers.EvalSuccessMatcher.isEvalSuccess;
 import static testsupport.matchers.SatisfiesPredicate.satisfiesPredicate;
 
-class PropsTest {
+final class PropsTest {
     private static final Prop<Object> yes = Prop.predicate("yes", constantly(true));
     private static final Prop<Object> no = Prop.predicate("no", constantly(false));
 

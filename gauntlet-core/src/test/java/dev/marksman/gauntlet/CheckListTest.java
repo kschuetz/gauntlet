@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class CheckListTest {
+final class CheckListTest {
     @Test
     void startsWithNoneMarked() {
         CheckList checkList = new CheckList(100);
