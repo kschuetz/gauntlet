@@ -13,37 +13,73 @@ import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.Weighted;
+import dev.marksman.kraftwerk.constraints.BigDecimalRange;
+import dev.marksman.kraftwerk.constraints.BigIntegerRange;
 import dev.marksman.kraftwerk.constraints.ByteRange;
 import dev.marksman.kraftwerk.constraints.CharRange;
 import dev.marksman.kraftwerk.constraints.DoubleRange;
+import dev.marksman.kraftwerk.constraints.DurationRange;
 import dev.marksman.kraftwerk.constraints.FloatRange;
 import dev.marksman.kraftwerk.constraints.IntRange;
+import dev.marksman.kraftwerk.constraints.LocalDateRange;
+import dev.marksman.kraftwerk.constraints.LocalDateTimeRange;
+import dev.marksman.kraftwerk.constraints.LocalTimeRange;
 import dev.marksman.kraftwerk.constraints.LongRange;
 import dev.marksman.kraftwerk.constraints.ShortRange;
 import dev.marksman.kraftwerk.frequency.FrequencyMap;
 import dev.marksman.kraftwerk.weights.EitherWeights;
 import dev.marksman.kraftwerk.weights.MaybeWeights;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Year;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashSet;
 
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkBoolean;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkByte;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkDouble;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkFloat;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkInt;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkLong;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkShort;
+import static dev.marksman.kraftwerk.Generators.generateBigDecimal;
+import static dev.marksman.kraftwerk.Generators.generateBigInteger;
+import static dev.marksman.kraftwerk.Generators.generateBigIntegerRange;
+import static dev.marksman.kraftwerk.Generators.generateBoolean;
 import static dev.marksman.kraftwerk.Generators.generateBoxedPrimitive;
 import static dev.marksman.kraftwerk.Generators.generateByte;
+import static dev.marksman.kraftwerk.Generators.generateByteRange;
 import static dev.marksman.kraftwerk.Generators.generateChar;
 import static dev.marksman.kraftwerk.Generators.generateDouble;
+import static dev.marksman.kraftwerk.Generators.generateDoubleRange;
+import static dev.marksman.kraftwerk.Generators.generateDuration;
+import static dev.marksman.kraftwerk.Generators.generateDurationRange;
 import static dev.marksman.kraftwerk.Generators.generateFloat;
+import static dev.marksman.kraftwerk.Generators.generateFloatRange;
 import static dev.marksman.kraftwerk.Generators.generateInt;
 import static dev.marksman.kraftwerk.Generators.generateIntIndex;
+import static dev.marksman.kraftwerk.Generators.generateIntRange;
+import static dev.marksman.kraftwerk.Generators.generateLocalDate;
+import static dev.marksman.kraftwerk.Generators.generateLocalDateForMonth;
+import static dev.marksman.kraftwerk.Generators.generateLocalDateForYear;
+import static dev.marksman.kraftwerk.Generators.generateLocalDateRange;
+import static dev.marksman.kraftwerk.Generators.generateLocalDateTime;
+import static dev.marksman.kraftwerk.Generators.generateLocalDateTimeRange;
+import static dev.marksman.kraftwerk.Generators.generateLocalTime;
+import static dev.marksman.kraftwerk.Generators.generateLocalTimeRange;
 import static dev.marksman.kraftwerk.Generators.generateLong;
 import static dev.marksman.kraftwerk.Generators.generateLongIndex;
+import static dev.marksman.kraftwerk.Generators.generateLongRange;
 import static dev.marksman.kraftwerk.Generators.generateShort;
+import static dev.marksman.kraftwerk.Generators.generateShortRange;
+import static dev.marksman.kraftwerk.Generators.generateString;
 
 public final class Arbitraries {
     private Arbitraries() {
@@ -131,6 +167,14 @@ public final class Arbitraries {
         return bytes(frequencyMap.toGenerator());
     }
 
+    public static Arbitrary<Boolean> booleans(Generator<Boolean> generator) {
+        return arbitrary(generator).withShrinkStrategy(shrinkBoolean());
+    }
+
+    public static Arbitrary<Boolean> booleans() {
+        return booleans(generateBoolean());
+    }
+
     public static Arbitrary<Character> characters(Generator<Character> generator) {
         return arbitrary(generator); // TODO: shrink characters
     }
@@ -181,6 +225,47 @@ public final class Arbitraries {
 
     public static Arbitrary<Object> boxedPrimitives() {
         return arbitrary(generateBoxedPrimitive());
+    }
+
+    public static Arbitrary<String> strings(Generator<String> generator) {
+        return arbitrary(generator); // TODO: shrink strings
+    }
+
+    public static Arbitrary<String> strings() {
+        return strings(generateString());
+    }
+
+    public static Arbitrary<String> strings(FrequencyMap<String> frequencyMap) {
+        return strings(frequencyMap.toGenerator());
+    }
+
+    public static Arbitrary<BigInteger> bigIntegers(Generator<BigInteger> generator) {
+        return arbitrary(generator); // TODO: shrink BigIntegers
+    }
+
+    public static Arbitrary<BigInteger> bigIntegers(BigIntegerRange range) {
+        return bigIntegers(generateBigInteger(range));
+    }
+
+    public static Arbitrary<BigInteger> bigIntegers(FrequencyMap<BigInteger> frequencyMap) {
+        return bigIntegers(frequencyMap.toGenerator());
+    }
+
+    public static Arbitrary<BigDecimal> bigDecimals(Generator<BigDecimal> generator) {
+        return arbitrary(generator); // TODO: shrink BigDecimal
+    }
+
+    public static Arbitrary<BigDecimal> bigDecimals(int decimalPlaces, BigDecimalRange range) {
+        return bigDecimals(generateBigDecimal(decimalPlaces, range));
+    }
+
+    // TODO: kraftwerk - more BigDecimal generators
+    public static Arbitrary<BigDecimal> bigDecimals(IntRange decimalPlaces, BigDecimalRange range) {
+        return bigDecimals(generateInt(decimalPlaces).flatMap(dp -> generateBigDecimal(dp, range)));
+    }
+
+    public static Arbitrary<BigDecimal> bigDecimals(FrequencyMap<BigDecimal> frequencyMap) {
+        return bigDecimals(frequencyMap.toGenerator());
     }
 
     public static <A, B> Arbitrary<Tuple2<A, B>> tuplesOf(Arbitrary<A> a,
@@ -294,5 +379,101 @@ public final class Arbitraries {
 
     public static <A> Arbitrary<HashSet<A>> nonEmptyHashSetsOf(Arbitrary<A> elements) {
         return CollectionArbitraries.nonEmptyHashSet(elements);
+    }
+
+    public static <A> Arbitrary<LocalDate> localDates(LocalDateRange range) {
+        return arbitrary(generateLocalDate(range));
+    }
+
+    public static <A> Arbitrary<LocalDate> localDatesForYear(Year year) {
+        return arbitrary(generateLocalDateForYear(year));
+    }
+
+    public static <A> Arbitrary<LocalDate> localDatesForMonth(YearMonth month) {
+        return arbitrary(generateLocalDateForMonth(month));
+    }
+
+    public static <A> Arbitrary<LocalTime> localTimes() {
+        return arbitrary(generateLocalTime());
+    }
+
+    public static <A> Arbitrary<LocalTime> localTimes(LocalTimeRange range) {
+        return arbitrary(generateLocalTime(range));
+    }
+
+    public static <A> Arbitrary<LocalDateTime> localDateTimes(LocalDateRange range) {
+        return arbitrary(generateLocalDateTime(range));
+    }
+
+    public static <A> Arbitrary<LocalDateTime> localDateTimes(LocalDateTimeRange range) {
+        return arbitrary(generateLocalDateTime(range));
+    }
+
+    public static <A> Arbitrary<Duration> durations(DurationRange range) {
+        return arbitrary(generateDuration(range));
+    }
+
+    public static Arbitrary<IntRange> intRanges() {
+        return arbitrary(generateIntRange());
+    }
+
+    public static Arbitrary<IntRange> intRanges(IntRange parentRange) {
+        return arbitrary(generateIntRange(parentRange));
+    }
+
+    public static Arbitrary<LongRange> longRanges() {
+        return arbitrary(generateLongRange());
+    }
+
+    public static Arbitrary<LongRange> longRanges(LongRange parentRange) {
+        return arbitrary(generateLongRange(parentRange));
+    }
+
+    public static Arbitrary<ShortRange> shortRanges() {
+        return arbitrary(generateShortRange());
+    }
+
+    public static Arbitrary<ShortRange> shortRanges(ShortRange parentRange) {
+        return arbitrary(generateShortRange(parentRange));
+    }
+
+    public static Arbitrary<ByteRange> byteRanges() {
+        return arbitrary(generateByteRange());
+    }
+
+    public static Arbitrary<ByteRange> byteRanges(ByteRange parentRange) {
+        return arbitrary(generateByteRange(parentRange));
+    }
+
+    public static Arbitrary<DoubleRange> doubleRanges(DoubleRange parentRange) {
+        return arbitrary(generateDoubleRange(parentRange));
+    }
+
+    public static Arbitrary<FloatRange> doubleRanges(FloatRange parentRange) {
+        return arbitrary(generateFloatRange(parentRange));
+    }
+
+    public static Arbitrary<BigIntegerRange> bigIntegerRanges(BigIntegerRange parentRange) {
+        return arbitrary(generateBigIntegerRange(parentRange));
+    }
+
+    public static Arbitrary<LocalDateRange> localDateRanges(LocalDateRange parentRange) {
+        return arbitrary(generateLocalDateRange(parentRange));
+    }
+
+    public static Arbitrary<LocalTimeRange> localTimeRanges(LocalTimeRange parentRange) {
+        return arbitrary(generateLocalTimeRange(parentRange));
+    }
+
+    public static Arbitrary<LocalDateTimeRange> localDateTimeRanges(LocalDateRange parentRange) {
+        return arbitrary(generateLocalDateTimeRange(parentRange));
+    }
+
+    public static Arbitrary<LocalDateTimeRange> localDateTimeRanges(LocalDateTimeRange parentRange) {
+        return arbitrary(generateLocalDateTimeRange(parentRange));
+    }
+
+    public static Arbitrary<DurationRange> durationRanges(DurationRange parentRange) {
+        return arbitrary(generateDurationRange(parentRange));
     }
 }
