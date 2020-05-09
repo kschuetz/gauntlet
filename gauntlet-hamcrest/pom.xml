@@ -11,7 +11,7 @@
 
     <artifactId>gauntlet-hamcrest</artifactId>
     <name>gauntlet-hamcrest</name>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.0-alpha-1</version>
     <packaging>jar</packaging>
     <description>
         Hamcrest extensions for Gauntlet
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>dev.marksman</groupId>
             <artifactId>gauntlet-core</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>0.1.0-alpha-1</version>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
