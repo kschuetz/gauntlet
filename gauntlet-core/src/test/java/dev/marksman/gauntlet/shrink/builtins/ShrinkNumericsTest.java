@@ -34,8 +34,8 @@ final class ShrinkNumericsTest extends GauntletApiBase {
 
     // For the shrink input, we want most values to be in the domain, but occasionally exercise it outside of the domain
     private static Generator<Integer> generateMostlyInDomain(IntRange range) {
-        return frequencyMap(1, generateInt())
-                .add(3, generateInt(range))
+        return frequencyMap(generateInt().weighted(1))
+                .add(generateInt(range).weighted(3))
                 .toGenerator();
     }
 

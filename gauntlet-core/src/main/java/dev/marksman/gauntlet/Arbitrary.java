@@ -13,6 +13,7 @@ import dev.marksman.gauntlet.filter.Filter;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.GeneratorParameters;
+import dev.marksman.kraftwerk.Weighted;
 import dev.marksman.kraftwerk.weights.MaybeWeights;
 
 import java.util.ArrayList;

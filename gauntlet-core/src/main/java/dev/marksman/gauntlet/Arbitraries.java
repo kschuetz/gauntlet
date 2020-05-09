@@ -13,6 +13,7 @@ import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.Generators;
+import dev.marksman.kraftwerk.Weighted;
 import dev.marksman.kraftwerk.constraints.ByteRange;
 import dev.marksman.kraftwerk.constraints.DoubleRange;
 import dev.marksman.kraftwerk.constraints.FloatRange;

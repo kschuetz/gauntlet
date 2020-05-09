@@ -8,6 +8,7 @@ import com.jnape.palatable.lambda.adt.choice.Choice3;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.Generators;
+import dev.marksman.kraftwerk.Weighted;
 import dev.marksman.kraftwerk.weights.EitherWeights;
 import dev.marksman.kraftwerk.weights.MaybeWeights;
 
@@ -19,6 +20,7 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkChoic
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkChoice3;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkMaybe;
 import static dev.marksman.kraftwerk.Generators.generateUnit;
+import static dev.marksman.kraftwerk.Weighted.weighted;
 import static dev.marksman.kraftwerk.weights.MaybeWeights.justs;
 
 final class CoProductArbitraries {
@@ -96,16 +98,16 @@ final class CoProductArbitraries {
 
     private static Generator<Choice2<Unit, Unit>> generateWhich(int weightA, int weightB) {
         validateWeights(weightA + weightB);
-        return Generators.choiceBuilderValue(weightA, UNIT)
-                .orValue(weightB, UNIT)
+        return Generators.choiceBuilderValue(weighted(weightA, UNIT))
+                .orValue(weighted(weightB, UNIT))
                 .toGenerator();
     }
 
     private static Generator<Choice3<Unit, Unit, Unit>> generateWhich(int weightA, int weightB, int weightC) {
         validateWeights(weightA + weightB + weightC);
-        return Generators.choiceBuilderValue(weightA, UNIT)
-                .orValue(weightB, UNIT)
-                .orValue(weightC, UNIT)
+        return Generators.choiceBuilderValue(weighted(weightA, UNIT))
+                .orValue(weighted(weightB, UNIT))
+                .orValue(weighted(weightC, UNIT))
                 .toGenerator();
     }
 
