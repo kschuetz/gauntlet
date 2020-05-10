@@ -67,6 +67,7 @@ import static dev.marksman.kraftwerk.Generators.generateDurationRange;
 import static dev.marksman.kraftwerk.Generators.generateFloat;
 import static dev.marksman.kraftwerk.Generators.generateFloatFractional;
 import static dev.marksman.kraftwerk.Generators.generateFloatRange;
+import static dev.marksman.kraftwerk.Generators.generateFromEnum;
 import static dev.marksman.kraftwerk.Generators.generateInt;
 import static dev.marksman.kraftwerk.Generators.generateIntIndex;
 import static dev.marksman.kraftwerk.Generators.generateIntRange;
@@ -327,6 +328,10 @@ public final class Arbitraries {
 
     public static Arbitrary<BigDecimal> bigDecimals(FrequencyMap<BigDecimal> frequencyMap) {
         return bigDecimals(frequencyMap.toGenerator());
+    }
+
+    public static <A extends Enum<A>> Arbitrary<A> valuesOfEnumClass(Class<A> enumType) {
+        return arbitrary(generateFromEnum(enumType));
     }
 
     public static <A, B> Arbitrary<Tuple2<A, B>> tuplesOf(Arbitrary<A> a,
