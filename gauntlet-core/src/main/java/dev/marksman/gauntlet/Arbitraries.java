@@ -11,6 +11,8 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple4;
 import com.jnape.palatable.lambda.adt.hlist.Tuple5;
 import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.collectionviews.ImmutableVector;
+import dev.marksman.collectionviews.NonEmptyVector;
+import dev.marksman.collectionviews.Vector;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.Weighted;
 import dev.marksman.kraftwerk.constraints.BigDecimalRange;
@@ -32,15 +34,18 @@ import dev.marksman.kraftwerk.weights.MaybeWeights;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.UUID;
 
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkBoolean;
@@ -59,6 +64,7 @@ import static dev.marksman.kraftwerk.Generators.generateByte;
 import static dev.marksman.kraftwerk.Generators.generateByteArray;
 import static dev.marksman.kraftwerk.Generators.generateByteRange;
 import static dev.marksman.kraftwerk.Generators.generateChar;
+import static dev.marksman.kraftwerk.Generators.generateDayOfWeek;
 import static dev.marksman.kraftwerk.Generators.generateDouble;
 import static dev.marksman.kraftwerk.Generators.generateDoubleFractional;
 import static dev.marksman.kraftwerk.Generators.generateDoubleRange;
@@ -82,9 +88,12 @@ import static dev.marksman.kraftwerk.Generators.generateLocalTimeRange;
 import static dev.marksman.kraftwerk.Generators.generateLong;
 import static dev.marksman.kraftwerk.Generators.generateLongIndex;
 import static dev.marksman.kraftwerk.Generators.generateLongRange;
+import static dev.marksman.kraftwerk.Generators.generateMonth;
 import static dev.marksman.kraftwerk.Generators.generateShort;
 import static dev.marksman.kraftwerk.Generators.generateShortRange;
+import static dev.marksman.kraftwerk.Generators.generateShuffled;
 import static dev.marksman.kraftwerk.Generators.generateString;
+import static dev.marksman.kraftwerk.Generators.generateUUID;
 
 public final class Arbitraries {
     private Arbitraries() {
@@ -501,6 +510,18 @@ public final class Arbitraries {
         return arbitrary(generateDuration(range));
     }
 
+    public static Arbitrary<DayOfWeek> daysOfWeek() {
+        return arbitrary(generateDayOfWeek());
+    }
+
+    public static Arbitrary<Month> months() {
+        return arbitrary(generateMonth());
+    }
+
+    public static Arbitrary<UUID> uuids() {
+        return arbitrary(generateUUID());
+    }
+
     public static Arbitrary<IntRange> intRanges() {
         return arbitrary(generateIntRange());
     }
@@ -591,5 +612,17 @@ public final class Arbitraries {
 
     public static Arbitrary<DurationRange> durationRanges(DurationRange parentRange) {
         return arbitrary(generateDurationRange(parentRange));
+    }
+
+    public static <A> Arbitrary<Vector<A>> shufflesOf(Vector<A> elements) {
+        return arbitrary(generateShuffled(elements));
+    }
+
+    public static Arbitrary<Vector<Integer>> shufflesOfIndices(int count) {
+        return arbitrary(generateShuffled(Vector.range(count)));
+    }
+
+    public static <A> Arbitrary<NonEmptyVector<A>> nonEmptyShufflesOf(NonEmptyVector<A> elements) {
+        return arbitrary(generateShuffled(elements));
     }
 }
