@@ -55,13 +55,16 @@ import static dev.marksman.kraftwerk.Generators.generateBigIntegerRange;
 import static dev.marksman.kraftwerk.Generators.generateBoolean;
 import static dev.marksman.kraftwerk.Generators.generateBoxedPrimitive;
 import static dev.marksman.kraftwerk.Generators.generateByte;
+import static dev.marksman.kraftwerk.Generators.generateByteArray;
 import static dev.marksman.kraftwerk.Generators.generateByteRange;
 import static dev.marksman.kraftwerk.Generators.generateChar;
 import static dev.marksman.kraftwerk.Generators.generateDouble;
+import static dev.marksman.kraftwerk.Generators.generateDoubleFractional;
 import static dev.marksman.kraftwerk.Generators.generateDoubleRange;
 import static dev.marksman.kraftwerk.Generators.generateDuration;
 import static dev.marksman.kraftwerk.Generators.generateDurationRange;
 import static dev.marksman.kraftwerk.Generators.generateFloat;
+import static dev.marksman.kraftwerk.Generators.generateFloatFractional;
 import static dev.marksman.kraftwerk.Generators.generateFloatRange;
 import static dev.marksman.kraftwerk.Generators.generateInt;
 import static dev.marksman.kraftwerk.Generators.generateIntIndex;
@@ -89,10 +92,16 @@ public final class Arbitraries {
         return arbitrary(generator).withShrinkStrategy(shrinkInt());
     }
 
+    /**
+     * An arbitrary that generates an {@link Integer} within the specified range.
+     */
     public static Arbitrary<Integer> ints() {
         return ints(generateInt());
     }
 
+    /**
+     * An arbitrary that generates {@link Integer}s within the specified range.
+     */
     public static Arbitrary<Integer> ints(IntRange range) {
         return arbitrary(generateInt(range)).withShrinkStrategy(shrinkInt(range));
     }
@@ -102,12 +111,19 @@ public final class Arbitraries {
     }
 
     /**
-     * An arbitrary that generates an integer (0 &lt;= n &lt; bound) that is intended to be used
+     * An arbitrary that generates {@link Integer}s (0 &lt;= n &lt; bound) that are intended to be used
      * as an index into a collection or sequence.  Output is uniform and unaffected by bias
      * settings (i.e., there will be no emphasis on edge cases).
      */
     public static Arbitrary<Integer> intIndices(int bound) {
         return arbitrary(generateIntIndex(bound));
+    }
+
+    /**
+     * An arbitrary that generates {@link Integer}s &gt;= 0.
+     */
+    public static Arbitrary<Integer> intNaturals() {
+        return ints(IntRange.from(0).to(Integer.MAX_VALUE));
     }
 
     public static Arbitrary<Long> longs(Generator<Long> generator) {
@@ -127,12 +143,19 @@ public final class Arbitraries {
     }
 
     /**
-     * An arbitrary that generates a long (0 &lt;= n &lt; bound) that is intended to be used
+     * An arbitrary that generates {@link Long}s (0 &lt;= n &lt; bound) that are intended to be used
      * as an index into a collection or sequence.  Output is uniform and unaffected by bias
      * settings (i.e., there will be no emphasis on edge cases).
      */
     public static Arbitrary<Long> longIndices(long bound) {
         return arbitrary(generateLongIndex(bound));
+    }
+
+    /**
+     * An arbitrary that generates {@link Long}s &gt;= 0.
+     */
+    public static Arbitrary<Long> longNaturals() {
+        return longs(LongRange.from(0).to(Long.MAX_VALUE));
     }
 
     public static Arbitrary<Short> shorts(Generator<Short> generator) {
@@ -149,6 +172,10 @@ public final class Arbitraries {
 
     public static Arbitrary<Short> shorts(FrequencyMap<Short> frequencyMap) {
         return shorts(frequencyMap.toGenerator());
+    }
+
+    public static Arbitrary<Short> shortNaturals() {
+        return shorts(ShortRange.from((short) 0).to(Short.MAX_VALUE));
     }
 
     public static Arbitrary<Byte> bytes(Generator<Byte> generator) {
@@ -207,6 +234,13 @@ public final class Arbitraries {
         return floats(frequencyMap.toGenerator());
     }
 
+    /**
+     * An arbitrary that generates {@link Float}s between 0 (inclusive) and 1 (exclusive).
+     */
+    public static Arbitrary<Float> floatFractionals() {
+        return arbitrary(generateFloatFractional()).withShrinkStrategy(shrinkFloat(FloatRange.exclusive(1)));
+    }
+
     public static Arbitrary<Double> doubles(Generator<Double> generator) {
         return arbitrary(generator).withShrinkStrategy(shrinkDouble());
     }
@@ -221,6 +255,21 @@ public final class Arbitraries {
 
     public static Arbitrary<Double> doubles(FrequencyMap<Double> frequencyMap) {
         return doubles(frequencyMap.toGenerator());
+    }
+
+    /**
+     * An arbitrary that generates {@link Double}s between 0 (inclusive) and 1 (exclusive).
+     */
+    public static Arbitrary<Double> doubleFractionals() {
+        return arbitrary(generateDoubleFractional()).withShrinkStrategy(shrinkDouble(DoubleRange.exclusive(1)));
+    }
+
+    public static Arbitrary<Byte[]> byteArrays() {
+        return arbitrary(generateByteArray());
+    }
+
+    public static Arbitrary<Byte[]> byteArrays(int size) {
+        return arbitrary(generateByteArray(size));
     }
 
     public static Arbitrary<Object> boxedPrimitives() {
@@ -243,6 +292,10 @@ public final class Arbitraries {
         return arbitrary(generator); // TODO: shrink BigIntegers
     }
 
+    public static Arbitrary<BigInteger> bigIntegers() {
+        return bigIntegers(generateBigInteger());
+    }
+
     public static Arbitrary<BigInteger> bigIntegers(BigIntegerRange range) {
         return bigIntegers(generateBigInteger(range));
     }
@@ -255,13 +308,20 @@ public final class Arbitraries {
         return arbitrary(generator); // TODO: shrink BigDecimal
     }
 
+    public static Arbitrary<BigDecimal> bigDecimals() {
+        return bigDecimals(generateBigDecimal());
+    }
+
+    public static Arbitrary<BigDecimal> bigDecimals(BigDecimalRange range) {
+        return bigDecimals(generateBigDecimal(range));
+    }
+
     public static Arbitrary<BigDecimal> bigDecimals(int decimalPlaces, BigDecimalRange range) {
         return bigDecimals(generateBigDecimal(decimalPlaces, range));
     }
 
-    // TODO: kraftwerk - more BigDecimal generators
     public static Arbitrary<BigDecimal> bigDecimals(IntRange decimalPlaces, BigDecimalRange range) {
-        return bigDecimals(generateInt(decimalPlaces).flatMap(dp -> generateBigDecimal(dp, range)));
+        return bigDecimals(generateBigDecimal(generateInt(decimalPlaces), range));
     }
 
     public static Arbitrary<BigDecimal> bigDecimals(FrequencyMap<BigDecimal> frequencyMap) {
@@ -381,6 +441,10 @@ public final class Arbitraries {
         return CollectionArbitraries.nonEmptyHashSet(elements);
     }
 
+    public static <A> Arbitrary<LocalDate> localDates() {
+        return arbitrary(generateLocalDate());
+    }
+
     public static <A> Arbitrary<LocalDate> localDates(LocalDateRange range) {
         return arbitrary(generateLocalDate(range));
     }
@@ -401,12 +465,20 @@ public final class Arbitraries {
         return arbitrary(generateLocalTime(range));
     }
 
+    public static <A> Arbitrary<LocalDateTime> localDateTimes() {
+        return arbitrary(generateLocalDateTime());
+    }
+
     public static <A> Arbitrary<LocalDateTime> localDateTimes(LocalDateRange range) {
         return arbitrary(generateLocalDateTime(range));
     }
 
     public static <A> Arbitrary<LocalDateTime> localDateTimes(LocalDateTimeRange range) {
         return arbitrary(generateLocalDateTime(range));
+    }
+
+    public static <A> Arbitrary<Duration> durations() {
+        return arbitrary(generateDuration());
     }
 
     public static <A> Arbitrary<Duration> durations(DurationRange range) {
@@ -445,24 +517,48 @@ public final class Arbitraries {
         return arbitrary(generateByteRange(parentRange));
     }
 
+    public static Arbitrary<DoubleRange> doubleRanges() {
+        return arbitrary(generateDoubleRange());
+    }
+
     public static Arbitrary<DoubleRange> doubleRanges(DoubleRange parentRange) {
         return arbitrary(generateDoubleRange(parentRange));
     }
 
-    public static Arbitrary<FloatRange> doubleRanges(FloatRange parentRange) {
+    public static Arbitrary<FloatRange> floatRanges() {
+        return arbitrary(generateFloatRange());
+    }
+
+    public static Arbitrary<FloatRange> floatRanges(FloatRange parentRange) {
         return arbitrary(generateFloatRange(parentRange));
+    }
+
+    public static Arbitrary<BigIntegerRange> bigIntegerRanges() {
+        return arbitrary(generateBigIntegerRange());
     }
 
     public static Arbitrary<BigIntegerRange> bigIntegerRanges(BigIntegerRange parentRange) {
         return arbitrary(generateBigIntegerRange(parentRange));
     }
 
+    public static Arbitrary<LocalDateRange> localDateRanges() {
+        return arbitrary(generateLocalDateRange());
+    }
+
     public static Arbitrary<LocalDateRange> localDateRanges(LocalDateRange parentRange) {
         return arbitrary(generateLocalDateRange(parentRange));
     }
 
+    public static Arbitrary<LocalTimeRange> localTimeRanges() {
+        return arbitrary(generateLocalTimeRange());
+    }
+
     public static Arbitrary<LocalTimeRange> localTimeRanges(LocalTimeRange parentRange) {
         return arbitrary(generateLocalTimeRange(parentRange));
+    }
+
+    public static Arbitrary<LocalDateTimeRange> localDateTimeRanges() {
+        return arbitrary(generateLocalDateTimeRange());
     }
 
     public static Arbitrary<LocalDateTimeRange> localDateTimeRanges(LocalDateRange parentRange) {
@@ -471,6 +567,10 @@ public final class Arbitraries {
 
     public static Arbitrary<LocalDateTimeRange> localDateTimeRanges(LocalDateTimeRange parentRange) {
         return arbitrary(generateLocalDateTimeRange(parentRange));
+    }
+
+    public static Arbitrary<DurationRange> durationRanges() {
+        return arbitrary(generateDurationRange());
     }
 
     public static Arbitrary<DurationRange> durationRanges(DurationRange parentRange) {
