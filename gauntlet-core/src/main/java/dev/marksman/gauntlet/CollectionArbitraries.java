@@ -1,16 +1,22 @@
 package dev.marksman.gauntlet;
 
+import com.jnape.palatable.lambda.adt.hlist.Tuple2;
+import com.jnape.palatable.lambda.functions.builtin.fn2.ToMap;
 import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.collectionviews.ImmutableVector;
+import dev.marksman.collectionviews.Vector;
+import dev.marksman.collectionviews.VectorBuilder;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.Generate;
 import dev.marksman.kraftwerk.GeneratorParameters;
 import dev.marksman.kraftwerk.Generators;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
+import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkArrayList;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkHashSet;
@@ -119,6 +125,38 @@ final class CollectionArbitraries {
                 just(shrinkHashSet(1, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
                 Object::toString);
+    }
+
+    static <K, V> Arbitrary<HashMap<K, V>> hashMap(Arbitrary<K> keys,
+                                                   Arbitrary<V> values) {
+        return convertToHashMap(Arbitraries.tuplesOf(keys, values).vector());
+    }
+
+    static <K, V> Arbitrary<HashMap<K, V>> nonEmptyHashMap(Arbitrary<K> keys,
+                                                           Arbitrary<V> values) {
+        return convertToNonEmptyHashMap(Arbitraries.tuplesOf(keys, values).nonEmptyVector());
+    }
+
+    private static <K, V> Arbitrary<HashMap<K, V>> convertToHashMap(Arbitrary<ImmutableVector<Tuple2<K, V>>> entries) {
+        return entries.convert(pairs -> ToMap.toMap(HashMap::new, pairs),
+                (HashMap<K, V> map) -> {
+                    VectorBuilder<Tuple2<K, V>> builder = Vector.builder();
+                    for (K key : map.keySet()) {
+                        builder = builder.add(tuple(key, map.get(key)));
+                    }
+                    return builder.build();
+                });
+    }
+
+    private static <K, V> Arbitrary<HashMap<K, V>> convertToNonEmptyHashMap(Arbitrary<ImmutableNonEmptyVector<Tuple2<K, V>>> entries) {
+        return entries.convert(pairs -> ToMap.toMap(HashMap::new, pairs),
+                (HashMap<K, V> map) -> {
+                    VectorBuilder<Tuple2<K, V>> builder = Vector.builder();
+                    for (K key : map.keySet()) {
+                        builder = builder.add(tuple(key, map.get(key)));
+                    }
+                    return builder.build().toNonEmptyOrThrow();
+                });
     }
 
     private static Generate<Integer> sizeGenerator(GeneratorParameters parameters) {

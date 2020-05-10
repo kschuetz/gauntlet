@@ -39,6 +39,7 @@ import java.time.LocalTime;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
@@ -439,6 +440,16 @@ public final class Arbitraries {
 
     public static <A> Arbitrary<HashSet<A>> nonEmptyHashSetsOf(Arbitrary<A> elements) {
         return CollectionArbitraries.nonEmptyHashSet(elements);
+    }
+
+    public static <K, V> Arbitrary<HashMap<K, V>> hashMapsOf(Arbitrary<K> keys,
+                                                             Arbitrary<V> values) {
+        return CollectionArbitraries.hashMap(keys, values);
+    }
+
+    public static <K, V> Arbitrary<HashMap<K, V>> nonEmptyHashMapsOf(Arbitrary<K> keys,
+                                                                     Arbitrary<V> values) {
+        return CollectionArbitraries.nonEmptyHashMap(keys, values);
     }
 
     public static <A> Arbitrary<LocalDate> localDates() {
