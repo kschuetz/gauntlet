@@ -11,7 +11,7 @@
 
     <artifactId>gauntlet-core</artifactId>
     <name>gauntlet-core</name>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.1.1</version>
     <description>
         Property-based testing
     </description>
