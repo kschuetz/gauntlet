@@ -8,6 +8,9 @@ import com.jnape.palatable.lambda.adt.product.Product6;
 import com.jnape.palatable.lambda.adt.product.Product7;
 import com.jnape.palatable.lambda.adt.product.Product8;
 import com.jnape.palatable.lambda.functions.Fn1;
+import com.jnape.palatable.lambda.functions.builtin.fn2.Map;
+
+import static java.util.Arrays.asList;
 
 public final class PrettyPrinting {
     public static <A, B> Fn1<? super Product2<A, B>, String> productPrettyPrinter(Fn1<? super A, String> ppA,
@@ -94,7 +97,11 @@ public final class PrettyPrinting {
                 ppH.apply(t._8()));
     }
 
-    private static String makeProductString(String... elements) {
+    public static <A> String productStringFromList(Fn1<? super A, String> pp, Iterable<A> elements) {
+        return makeProductString(Map.map(pp, elements));
+    }
+
+    private static String makeProductString(Iterable<String> elements) {
         StringBuilder builder = new StringBuilder();
         builder.append("(");
         boolean inner = false;
@@ -109,4 +116,9 @@ public final class PrettyPrinting {
         builder.append(")");
         return builder.toString();
     }
+
+    private static String makeProductString(String... elements) {
+        return makeProductString(asList(elements));
+    }
+
 }

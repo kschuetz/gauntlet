@@ -1,9 +1,11 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.functions.Fn1;
+import com.jnape.palatable.lambda.functions.Fn2;
 import com.jnape.palatable.lambda.functor.Contravariant;
 import dev.marksman.collectionviews.NonEmptyVector;
 import dev.marksman.gauntlet.prop.Facade;
+import dev.marksman.gauntlet.prop.Isomorphic;
 
 import static dev.marksman.gauntlet.prop.Facade.biconditional;
 import static dev.marksman.gauntlet.prop.Facade.conjunction;
@@ -68,6 +70,19 @@ public interface Prop<A> extends Contravariant<A, Prop<?>>, Named {
     @SafeVarargs
     static <A> Prop<A> noneOf(Prop<A> first, Prop<A>... more) {
         return Facade.disjunction(NonEmptyVector.of(first, more)).not();
+    }
+
+    /**
+     * Returns a property that passes iff all provided functions return the equivalent outputs for the given input.
+     * <p>
+     * Outputs are compared using {@link Object#equals} by default, but the strategy for comparison can
+     * be overridden using {@link Isomorphic#withEquivalencyRelation(Fn2)}.
+     */
+    @SafeVarargs
+    static <A, B> Isomorphic<A, B> isomorphic(Fn1<? super A, ? extends B> f1,
+                                              Fn1<? super A, ? extends B> f2,
+                                              Fn1<? super A, ? extends B>... more) {
+        return Isomorphic.isomorphic(f1, f2, more);
     }
 
     EvalResult evaluate(A data);
