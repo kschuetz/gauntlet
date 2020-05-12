@@ -5,13 +5,13 @@
     <parent>
         <artifactId>gauntlet</artifactId>
         <groupId>dev.marksman</groupId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.2.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>gauntlet-core</artifactId>
     <name>gauntlet-core</name>
-    <version>0.1.2-SNAPSHOT</version>
+    <version>0.2.0</version>
     <description>
         Property-based testing
     </description>

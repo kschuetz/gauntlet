@@ -5,13 +5,13 @@
     <parent>
         <artifactId>gauntlet</artifactId>
         <groupId>dev.marksman</groupId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.2.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>gauntlet-hamcrest</artifactId>
     <name>gauntlet-hamcrest</name>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.2.0</version>
     <packaging>jar</packaging>
     <description>
         Hamcrest extensions for Gauntlet
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>dev.marksman</groupId>
             <artifactId>gauntlet-core</artifactId>
-            <version>0.1.1-SNAPSHOT</version>
+            <version>0.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
