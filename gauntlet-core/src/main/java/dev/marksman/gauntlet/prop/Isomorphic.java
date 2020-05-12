@@ -16,14 +16,14 @@ import static dev.marksman.gauntlet.PrettyPrinting.productStringFromList;
 import static dev.marksman.gauntlet.Reasons.reasons;
 
 public final class Isomorphic<A, B> implements Prop<A> {
-    private final Fn2<? super B, ? super B, Boolean> equivalencyRelation;
+    private final Fn2<? super B, ? super B, Boolean> equivalenceRelation;
     private final Fn1<? super B, String> prettyPrinter;
     private final ImmutableNonEmptyFiniteIterable<Fn1<A, B>> fns;
 
-    private Isomorphic(Fn2<? super B, ? super B, Boolean> equivalencyRelation,
+    private Isomorphic(Fn2<? super B, ? super B, Boolean> equivalenceRelation,
                        Fn1<? super B, String> prettyPrinter,
                        ImmutableNonEmptyFiniteIterable<Fn1<A, B>> fns) {
-        this.equivalencyRelation = equivalencyRelation;
+        this.equivalenceRelation = equivalenceRelation;
         this.prettyPrinter = prettyPrinter;
         this.fns = fns;
     }
@@ -43,11 +43,11 @@ public final class Isomorphic<A, B> implements Prop<A> {
     /**
      * Updates the strategy for checking for equality for values of type {@code B}.
      *
-     * @param equivalencyRelation a function that returns true iff both arguments are considered equal
-     * @return a new {@code Isomorphic<A, B>} that is the same as this one, with the equivalency relation updated
+     * @param equivalenceRelation a function that returns true iff both arguments are considered equal
+     * @return a new {@code Isomorphic<A, B>} that is the same as this one, with the equivalence relation updated
      */
-    public Isomorphic<A, B> withEquivalencyRelation(Fn2<? super B, ? super B, Boolean> equivalencyRelation) {
-        return new Isomorphic<>(equivalencyRelation, prettyPrinter, fns);
+    public Isomorphic<A, B> withEquivalenceRelation(Fn2<? super B, ? super B, Boolean> equivalenceRelation) {
+        return new Isomorphic<>(equivalenceRelation, prettyPrinter, fns);
     }
 
     /**
@@ -58,7 +58,7 @@ public final class Isomorphic<A, B> implements Prop<A> {
      * @return a new {@code Isomorphic<A, B>} that is the same as this one, with the pretty printer updated
      */
     public Isomorphic<A, B> withPrettyPrinter(Fn1<? super B, String> prettyPrinter) {
-        return new Isomorphic<>(equivalencyRelation, prettyPrinter, fns);
+        return new Isomorphic<>(equivalenceRelation, prettyPrinter, fns);
     }
 
     @Override
@@ -67,7 +67,7 @@ public final class Isomorphic<A, B> implements Prop<A> {
         B target = fns.head().apply(data);
         for (Fn1<? super A, ? extends B> f : fns.tail()) {
             B result = f.apply(data);
-            if (!equivalencyRelation.apply(target, result)) {
+            if (!equivalenceRelation.apply(target, result)) {
                 success = false;
                 break;
             }
