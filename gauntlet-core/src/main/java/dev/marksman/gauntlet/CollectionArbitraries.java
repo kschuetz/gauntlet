@@ -10,18 +10,21 @@ import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.Generate;
 import dev.marksman.kraftwerk.GeneratorParameters;
 import dev.marksman.kraftwerk.Generators;
+import dev.marksman.kraftwerk.constraints.IntRange;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
+import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkArrayList;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkHashSet;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkNonEmptyVector;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkVector;
+import static dev.marksman.kraftwerk.Generators.generateInt;
 import static dev.marksman.kraftwerk.Generators.generateSize;
 import static dev.marksman.kraftwerk.aggregator.Aggregators.collectionAggregator;
 import static dev.marksman.kraftwerk.aggregator.Aggregators.vectorAggregator;
@@ -137,6 +140,30 @@ final class CollectionArbitraries {
         return convertToNonEmptyHashMap(Arbitraries.tuplesOf(keys, values).nonEmptyVector());
     }
 
+    static Arbitrary<ImmutableVector<?>> homogeneousCollection() {
+        return null;
+    }
+
+    static Arbitrary<ImmutableVector<?>> homogeneousCollection(IntRange sizeRange) {
+        if (sizeRange.minInclusive() < 0 || sizeRange.maxInclusive() < 0) {
+            throw new IllegalArgumentException("size must be >= 0");
+        }
+        return arbitrary(parameters -> {
+                    Supply<Arbitrary<?>> arbitrarySupply = arbitraryArbitrary().createSupply(parameters);
+                    return new HomogeneousCollectionSupply(arbitrarySupply,
+                            sizeGenerator(sizeRange, parameters),
+                            parameters);
+                },
+                nothing(), Object::toString);
+    }
+
+    static Arbitrary<Arbitrary<?>> arbitraryArbitrary() {
+        return Arbitrary.arbitrary(Generators.chooseOneOfValues(Arbitraries.ints(),
+                Arbitraries.strings(),
+                Arbitraries.doubles(),
+                Arbitraries.localDates()));
+    }
+
     private static <K, V> Arbitrary<HashMap<K, V>> convertToHashMap(Arbitrary<ImmutableVector<Tuple2<K, V>>> entries) {
         return entries.convert(pairs -> ToMap.toMap(HashMap::new, pairs),
                 (HashMap<K, V> map) -> {
@@ -167,6 +194,11 @@ final class CollectionArbitraries {
     private static Generate<Integer> sizeGenerator(int minSize, GeneratorParameters parameters) {
         return generateSize()
                 .fmap(s -> Math.max(minSize, s))
+                .prepare(parameters);
+    }
+
+    private static Generate<Integer> sizeGenerator(IntRange sizeRange, GeneratorParameters parameters) {
+        return generateInt(sizeRange)
                 .prepare(parameters);
     }
 }
