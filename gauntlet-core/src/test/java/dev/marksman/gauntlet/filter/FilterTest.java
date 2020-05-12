@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Not.not;
 import static dev.marksman.gauntlet.Arbitraries.boxedPrimitives;
+import static dev.marksman.gauntlet.Prop.named;
 import static dev.marksman.gauntlet.Prop.predicate;
-import static dev.marksman.gauntlet.prop.Props.named;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static testsupport.IterateN.iterateN;

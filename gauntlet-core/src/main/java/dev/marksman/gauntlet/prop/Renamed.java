@@ -24,7 +24,7 @@ final class Renamed<A> implements Prop<A> {
 
     @Override
     public Prop<A> rename(String name) {
-        return Props.named(name, underlying);
+        return Facade.named(name, underlying);
     }
 
     public Prop<A> getUnderlying() {

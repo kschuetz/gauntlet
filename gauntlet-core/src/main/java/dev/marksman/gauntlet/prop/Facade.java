@@ -1,7 +1,6 @@
 package dev.marksman.gauntlet.prop;
 
 import com.jnape.palatable.lambda.functions.Fn1;
-import dev.marksman.collectionviews.NonEmptyVector;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
 import dev.marksman.gauntlet.Prop;
@@ -13,7 +12,7 @@ import java.util.function.Consumer;
 import static dev.marksman.gauntlet.Reasons.reasons;
 import static dev.marksman.gauntlet.prop.Executes.executes;
 
-public final class Props {
+public final class Facade {
 
     public static <A> Prop<A> predicate(Fn1<? super A, Boolean> predicate) {
         return predicate(PredicateProp.class.getSimpleName(), predicate);
@@ -45,26 +44,6 @@ public final class Props {
 
     public static <A> Prop<A> alwaysFail(Reasons reasons) {
         return AlwaysFail.alwaysFail(reasons);
-    }
-
-    @SafeVarargs
-    public static <A> Prop<A> allOf(Prop<A> first, Prop<A>... more) {
-        return conjunction(NonEmptyVector.of(first, more));
-    }
-
-    @SafeVarargs
-    public static <A> Prop<A> anyOf(Prop<A> first, Prop<A>... more) {
-        return disjunction(NonEmptyVector.of(first, more));
-    }
-
-    @SafeVarargs
-    public static <A> Prop<A> notAllOf(Prop<A> first, Prop<A>... more) {
-        return conjunction(NonEmptyVector.of(first, more)).not();
-    }
-
-    @SafeVarargs
-    public static <A> Prop<A> noneOf(Prop<A> first, Prop<A>... more) {
-        return disjunction(NonEmptyVector.of(first, more)).not();
     }
 
     public static <A> Prop<A> conjunction(Prop<A> p, Prop<A> q) {

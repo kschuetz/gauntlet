@@ -14,13 +14,13 @@ import java.util.function.Supplier;
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Constantly.constantly;
 import static dev.marksman.gauntlet.Prop.alwaysFail;
 import static dev.marksman.gauntlet.Prop.alwaysPass;
-import static dev.marksman.gauntlet.prop.Props.biconditional;
-import static dev.marksman.gauntlet.prop.Props.conjunction;
-import static dev.marksman.gauntlet.prop.Props.disjunction;
-import static dev.marksman.gauntlet.prop.Props.exclusiveDisjunction;
-import static dev.marksman.gauntlet.prop.Props.implication;
-import static dev.marksman.gauntlet.prop.Props.negation;
-import static dev.marksman.gauntlet.prop.Props.whenExecuting;
+import static dev.marksman.gauntlet.prop.Facade.biconditional;
+import static dev.marksman.gauntlet.prop.Facade.conjunction;
+import static dev.marksman.gauntlet.prop.Facade.disjunction;
+import static dev.marksman.gauntlet.prop.Facade.exclusiveDisjunction;
+import static dev.marksman.gauntlet.prop.Facade.implication;
+import static dev.marksman.gauntlet.prop.Facade.negation;
+import static dev.marksman.gauntlet.prop.Facade.whenExecuting;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
@@ -41,18 +41,18 @@ final class PropsTest {
 
         @Test
         void successCase() {
-            assertThat(Props.prop(constantly(SimpleResult.pass())).evaluate(0), isEvalSuccess());
+            assertThat(Facade.prop(constantly(SimpleResult.pass())).evaluate(0), isEvalSuccess());
         }
 
         @Test
         void failureCase() {
-            assertThat(Props.prop(constantly(SimpleResult.fail("it is not true"))).evaluate(0),
+            assertThat(Facade.prop(constantly(SimpleResult.fail("it is not true"))).evaluate(0),
                     isEvalFailureThat(satisfiesPredicate(ef -> ef.getReasons().getPrimary().equals("it is not true"))));
         }
 
         @Test
         void takesNameThatWasGiven() {
-            assertEquals("custom name", Props.prop("custom name", constantly(SimpleResult.pass())).getName());
+            assertEquals("custom name", Facade.prop("custom name", constantly(SimpleResult.pass())).getName());
         }
 
     }
@@ -63,12 +63,12 @@ final class PropsTest {
 
         @Test
         void successCase() {
-            assertThat(Props.predicate(constantly(true)).evaluate(0), isEvalSuccess());
+            assertThat(Facade.predicate(constantly(true)).evaluate(0), isEvalSuccess());
         }
 
         @Test
         void failureCase() {
-            assertThat(Props.predicate(constantly(false)).evaluate(0), isEvalFailure());
+            assertThat(Facade.predicate(constantly(false)).evaluate(0), isEvalFailure());
         }
 
     }
@@ -441,17 +441,17 @@ final class PropsTest {
 
         @Test
         void successCases() {
-            assertThat(Props.anyOf(yes).evaluate(0), isEvalSuccess());
-            assertThat(Props.anyOf(no, yes).evaluate(0), isEvalSuccess());
-            assertThat(Props.anyOf(no, no, yes).evaluate(0), isEvalSuccess());
-            assertThat(Props.anyOf(yes, yes, yes).evaluate(0), isEvalSuccess());
+            assertThat(Prop.anyOf(yes).evaluate(0), isEvalSuccess());
+            assertThat(Prop.anyOf(no, yes).evaluate(0), isEvalSuccess());
+            assertThat(Prop.anyOf(no, no, yes).evaluate(0), isEvalSuccess());
+            assertThat(Prop.anyOf(yes, yes, yes).evaluate(0), isEvalSuccess());
         }
 
         @Test
         void failureCases() {
-            assertThat(Props.anyOf(no).evaluate(0), isEvalFailure());
-            assertThat(Props.anyOf(no, no).evaluate(0), isEvalFailure());
-            assertThat(Props.anyOf(no, no, no).evaluate(0), isEvalFailure());
+            assertThat(Prop.anyOf(no).evaluate(0), isEvalFailure());
+            assertThat(Prop.anyOf(no, no).evaluate(0), isEvalFailure());
+            assertThat(Prop.anyOf(no, no, no).evaluate(0), isEvalFailure());
         }
 
     }
@@ -462,17 +462,17 @@ final class PropsTest {
 
         @Test
         void successCases() {
-            assertThat(Props.allOf(yes).evaluate(0), isEvalSuccess());
-            assertThat(Props.allOf(yes, yes).evaluate(0), isEvalSuccess());
-            assertThat(Props.allOf(yes, yes, yes).evaluate(0), isEvalSuccess());
+            assertThat(Prop.allOf(yes).evaluate(0), isEvalSuccess());
+            assertThat(Prop.allOf(yes, yes).evaluate(0), isEvalSuccess());
+            assertThat(Prop.allOf(yes, yes, yes).evaluate(0), isEvalSuccess());
         }
 
         @Test
         void failureCases() {
-            assertThat(Props.allOf(no).evaluate(0), isEvalFailure());
-            assertThat(Props.allOf(no, yes).evaluate(0), isEvalFailure());
-            assertThat(Props.allOf(no, yes, yes).evaluate(0), isEvalFailure());
-            assertThat(Props.allOf(no, no, no).evaluate(0), isEvalFailure());
+            assertThat(Prop.allOf(no).evaluate(0), isEvalFailure());
+            assertThat(Prop.allOf(no, yes).evaluate(0), isEvalFailure());
+            assertThat(Prop.allOf(no, yes, yes).evaluate(0), isEvalFailure());
+            assertThat(Prop.allOf(no, no, no).evaluate(0), isEvalFailure());
         }
 
     }
@@ -483,16 +483,16 @@ final class PropsTest {
 
         @Test
         void successCases() {
-            assertThat(Props.noneOf(no).evaluate(0), isEvalSuccess());
-            assertThat(Props.noneOf(no, no).evaluate(0), isEvalSuccess());
-            assertThat(Props.noneOf(no, no, no).evaluate(0), isEvalSuccess());
+            assertThat(Prop.noneOf(no).evaluate(0), isEvalSuccess());
+            assertThat(Prop.noneOf(no, no).evaluate(0), isEvalSuccess());
+            assertThat(Prop.noneOf(no, no, no).evaluate(0), isEvalSuccess());
         }
 
         @Test
         void failureCases() {
-            assertThat(Props.noneOf(yes).evaluate(0), isEvalFailure());
-            assertThat(Props.noneOf(no, yes).evaluate(0), isEvalFailure());
-            assertThat(Props.noneOf(no, no, yes).evaluate(0), isEvalFailure());
+            assertThat(Prop.noneOf(yes).evaluate(0), isEvalFailure());
+            assertThat(Prop.noneOf(no, yes).evaluate(0), isEvalFailure());
+            assertThat(Prop.noneOf(no, no, yes).evaluate(0), isEvalFailure());
         }
 
     }
@@ -503,16 +503,16 @@ final class PropsTest {
 
         @Test
         void successCases() {
-            assertThat(Props.notAllOf(no).evaluate(0), isEvalSuccess());
-            assertThat(Props.notAllOf(no, yes).evaluate(0), isEvalSuccess());
-            assertThat(Props.notAllOf(no, yes, yes).evaluate(0), isEvalSuccess());
+            assertThat(Prop.notAllOf(no).evaluate(0), isEvalSuccess());
+            assertThat(Prop.notAllOf(no, yes).evaluate(0), isEvalSuccess());
+            assertThat(Prop.notAllOf(no, yes, yes).evaluate(0), isEvalSuccess());
         }
 
         @Test
         void failureCases() {
-            assertThat(Props.notAllOf(yes).evaluate(0), isEvalFailure());
-            assertThat(Props.notAllOf(yes, yes).evaluate(0), isEvalFailure());
-            assertThat(Props.notAllOf(yes, yes, yes).evaluate(0), isEvalFailure());
+            assertThat(Prop.notAllOf(yes).evaluate(0), isEvalFailure());
+            assertThat(Prop.notAllOf(yes, yes).evaluate(0), isEvalFailure());
+            assertThat(Prop.notAllOf(yes, yes, yes).evaluate(0), isEvalFailure());
         }
 
     }
@@ -527,13 +527,13 @@ final class PropsTest {
 
             @Test
             void takesOnNameGiven() {
-                assertEquals("new name", Props.named("new name", yes).getName());
-                assertEquals("new name", Props.named("new name", yes.and(yes)).getName());
+                assertEquals("new name", Prop.named("new name", yes).getName());
+                assertEquals("new name", Prop.named("new name", yes.and(yes)).getName());
             }
 
             @Test
             void replacesPreviousCallsToNamed() {
-                assertEquals("new name", Props.named("new name", Props.named("temporary", yes)).getName());
+                assertEquals("new name", Prop.named("new name", Facade.named("temporary", yes)).getName());
             }
 
         }

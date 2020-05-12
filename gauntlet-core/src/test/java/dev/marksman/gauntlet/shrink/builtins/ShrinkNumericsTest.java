@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import testsupport.shrink.ShrinkStrategyTestCase;
 
-import static dev.marksman.gauntlet.prop.Props.allOf;
+import static dev.marksman.gauntlet.Prop.allOf;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkByte;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkInt;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkLong;

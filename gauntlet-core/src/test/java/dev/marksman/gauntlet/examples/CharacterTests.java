@@ -5,9 +5,9 @@ import dev.marksman.gauntlet.Prop;
 import org.junit.jupiter.api.Test;
 
 import static dev.marksman.gauntlet.Domains.asciiCharacters;
-import static dev.marksman.gauntlet.prop.Props.allOf;
-import static dev.marksman.gauntlet.prop.Props.named;
-import static dev.marksman.gauntlet.prop.Props.noneOf;
+import static dev.marksman.gauntlet.Prop.allOf;
+import static dev.marksman.gauntlet.Prop.named;
+import static dev.marksman.gauntlet.Prop.noneOf;
 
 public final class CharacterTests extends GauntletApiBase {
     public static final Prop<Character> isUpperCaseLetter = Prop.predicate("is uppercase letter", Character::isUpperCase);
