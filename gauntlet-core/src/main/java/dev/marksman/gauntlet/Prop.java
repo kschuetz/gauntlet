@@ -1,5 +1,6 @@
 package dev.marksman.gauntlet;
 
+import com.jnape.palatable.lambda.adt.product.Product2;
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.Fn2;
 import com.jnape.palatable.lambda.functor.Contravariant;
@@ -124,5 +125,25 @@ public interface Prop<A> extends Contravariant<A, Prop<?>>, Named {
 
     default Prop<A> safe() {
         return Facade.safe(this);
+    }
+
+    default <B> Prop<Product2<? super A, ? super B>> zipAnd(Prop<B> other) {
+        return Facade.zip2(Prop::and, this, other);
+    }
+
+    default <B> Prop<Product2<? super A, ? super B>> zipOr(Prop<B> other) {
+        return Facade.zip2(Prop::or, this, other);
+    }
+
+    default <B> Prop<Product2<? super A, ? super B>> zipImplies(Prop<B> other) {
+        return Facade.zip2(Prop::implies, this, other);
+    }
+
+    default <B> Prop<Product2<? super A, ? super B>> zipIff(Prop<B> other) {
+        return Facade.zip2(Prop::iff, this, other);
+    }
+
+    default <B> Prop<Product2<? super A, ? super B>> zipXor(Prop<B> other) {
+        return Facade.zip2(Prop::xor, this, other);
     }
 }

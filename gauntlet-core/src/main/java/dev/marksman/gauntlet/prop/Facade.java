@@ -1,6 +1,8 @@
 package dev.marksman.gauntlet.prop;
 
+import com.jnape.palatable.lambda.adt.product.Product2;
 import com.jnape.palatable.lambda.functions.Fn1;
+import com.jnape.palatable.lambda.functions.Fn2;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
 import dev.marksman.gauntlet.Prop;
@@ -103,6 +105,17 @@ public final class Facade {
         } else {
             return new Safe<>(prop);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <A, B> Prop<Product2<? super A, ? super B>> zip2(Fn2<Prop<Product2<? super A, ? super B>>, Prop<Product2<? super A, ? super B>>, Prop<Product2<? super A, ? super B>>> combinator,
+                                                                   Prop<? super A> pa,
+                                                                   Prop<? super B> pb) {
+        Fn1<? super Product2<? super A, ? super B>, A> fst = p -> (A) p._1();
+        Fn1<? super Product2<? super A, ? super B>, B> snd = p -> (B) p._2();
+        Prop<Product2<? super A, ? super B>> p1 = pa.contraMap(fst);
+        Prop<Product2<? super A, ? super B>> p2 = pb.contraMap(snd);
+        return combinator.apply(p1, p2);
     }
 
     public static <A> WhenExecuting<A> whenExecuting(Consumer<A> executable) {
