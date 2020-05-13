@@ -5,15 +5,20 @@ import dev.marksman.kraftwerk.Seed;
 
 import static dev.marksman.gauntlet.SupplyTree.composite;
 
-final class CompositeSupply2<A, B, Out> implements Supply<Out> {
-    private final Supply<A> vsA;
-    private final Supply<B> vsB;
+final class CompositeSupplyStrategy2<A, B, Out> implements SupplyStrategy<Out> {
+    private final SupplyStrategy<A> strategyA;
+    private final SupplyStrategy<B> strategyB;
     private final Fn2<A, B, Out> fn;
 
-    CompositeSupply2(Supply<A> vsA, Supply<B> vsB, Fn2<A, B, Out> fn) {
-        this.vsA = vsA;
-        this.vsB = vsB;
+    CompositeSupplyStrategy2(SupplyStrategy<A> strategyA, SupplyStrategy<B> strategyB, Fn2<A, B, Out> fn) {
+        this.strategyA = strategyA;
+        this.strategyB = strategyB;
         this.fn = fn;
+    }
+
+    @Override
+    public StatefulSupply<Out> createSupply() {
+        return new CompositeSupply2(strategyA.createSupply(), strategyB.createSupply());
     }
 
     static <A, B> GeneratorOutput<B> threadSeed(int posIndex,
@@ -49,14 +54,23 @@ final class CompositeSupply2<A, B, Out> implements Supply<Out> {
 
     @Override
     public SupplyTree getSupplyTree() {
-        return composite(vsA.getSupplyTree(), vsB.getSupplyTree());
+        return composite(strategyA.getSupplyTree(), strategyB.getSupplyTree());
     }
 
-    @Override
-    public GeneratorOutput<Out> getNext(Seed input) {
-        return threadSeed(0,
-                vsA.getNext(input), (a, s1) -> threadSeed(1, vsB.getNext(s1),
-                        (b, s2) -> GeneratorOutput.success(s2, fn.apply(a, b))));
+    class CompositeSupply2 implements StatefulSupply<Out> {
+        private final StatefulSupply<A> supplyA;
+        private final StatefulSupply<B> supplyB;
 
+        CompositeSupply2(StatefulSupply<A> supplyA, StatefulSupply<B> supplyB) {
+            this.supplyA = supplyA;
+            this.supplyB = supplyB;
+        }
+
+        @Override
+        public GeneratorOutput<Out> getNext(Seed input) {
+            return threadSeed(0,
+                    supplyA.getNext(input), (a, s1) -> threadSeed(1, supplyB.getNext(s1),
+                            (b, s2) -> GeneratorOutput.success(s2, fn.apply(a, b))));
+        }
     }
 }

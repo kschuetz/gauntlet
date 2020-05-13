@@ -32,7 +32,7 @@ import static dev.marksman.kraftwerk.aggregator.Aggregators.vectorAggregator;
 final class CollectionArbitraries {
     static <A> Arbitrary<ImmutableVector<A>> vector(Arbitrary<A> elements) {
         return arbitrary(parameters ->
-                        new CollectionSupply<>(elements.createSupply(parameters),
+                        new CollectionSupplyStrategy<>(elements.supplyStrategy(parameters),
                                 sizeGenerator(parameters),
                                 vectorAggregator()),
                 just(shrinkVector(elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
@@ -42,7 +42,7 @@ final class CollectionArbitraries {
 
     static <A> Arbitrary<ImmutableVector<A>> vectorOfN(int count, Arbitrary<A> elements) {
         return arbitrary(parameters ->
-                        new CollectionSupply<>(elements.createSupply(parameters),
+                        new CollectionSupplyStrategy<>(elements.supplyStrategy(parameters),
                                 Generators.constant(count).prepare(parameters),
                                 vectorAggregator()),
                 just(shrinkVector(count, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
@@ -52,7 +52,7 @@ final class CollectionArbitraries {
 
     static <A> Arbitrary<ImmutableNonEmptyVector<A>> nonEmptyVector(Arbitrary<A> elements) {
         return arbitrary(parameters ->
-                        new CollectionSupply<>(elements.createSupply(parameters),
+                        new CollectionSupplyStrategy<>(elements.supplyStrategy(parameters),
                                 sizeGenerator(1, parameters),
                                 vectorAggregator())
                                 .fmap(ImmutableVector::toNonEmptyOrThrow),
@@ -66,7 +66,7 @@ final class CollectionArbitraries {
             throw new IllegalArgumentException("count must be >= 1");
         }
         return arbitrary(parameters ->
-                        new CollectionSupply<>(elements.createSupply(parameters),
+                        new CollectionSupplyStrategy<>(elements.supplyStrategy(parameters),
                                 Generators.constant(count).prepare(parameters),
                                 vectorAggregator())
                                 .fmap(ImmutableVector::toNonEmptyOrThrow),
@@ -78,7 +78,7 @@ final class CollectionArbitraries {
 
     static <A> Arbitrary<ArrayList<A>> arrayList(Arbitrary<A> elements) {
         return arbitrary(parameters ->
-                        new CollectionSupply<>(elements.createSupply(parameters),
+                        new CollectionSupplyStrategy<>(elements.supplyStrategy(parameters),
                                 sizeGenerator(parameters),
                                 collectionAggregator(ArrayList::new)),
                 just(shrinkArrayList(elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
@@ -89,7 +89,7 @@ final class CollectionArbitraries {
 
     static <A> Arbitrary<ArrayList<A>> arrayListOfN(int count, Arbitrary<A> elements) {
         return arbitrary(parameters ->
-                        new CollectionSupply<>(elements.createSupply(parameters),
+                        new CollectionSupplyStrategy<>(elements.supplyStrategy(parameters),
                                 Generators.constant(count).prepare(parameters),
                                 collectionAggregator(ArrayList::new)),
                 just(shrinkArrayList(count, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
@@ -100,7 +100,7 @@ final class CollectionArbitraries {
 
     static <A> Arbitrary<ArrayList<A>> nonEmptyArrayList(Arbitrary<A> elements) {
         return arbitrary(parameters ->
-                        new CollectionSupply<>(elements.createSupply(parameters),
+                        new CollectionSupplyStrategy<>(elements.supplyStrategy(parameters),
                                 sizeGenerator(1, parameters),
                                 collectionAggregator(ArrayList::new)),
                 just(shrinkArrayList(1, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
@@ -111,7 +111,7 @@ final class CollectionArbitraries {
 
     static <A> Arbitrary<HashSet<A>> hashSet(Arbitrary<A> elements) {
         return arbitrary(parameters ->
-                        new CollectionSupply<>(elements.createSupply(parameters),
+                        new CollectionSupplyStrategy<>(elements.supplyStrategy(parameters),
                                 sizeGenerator(parameters),
                                 collectionAggregator(HashSet::new)),
                 just(shrinkHashSet(1, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
@@ -122,7 +122,7 @@ final class CollectionArbitraries {
 
     static <A> Arbitrary<HashSet<A>> nonEmptyHashSet(Arbitrary<A> elements) {
         return arbitrary(parameters ->
-                        new CollectionSupply<>(elements.createSupply(parameters),
+                        new CollectionSupplyStrategy<>(elements.supplyStrategy(parameters),
                                 sizeGenerator(1, parameters),
                                 collectionAggregator(HashSet::new)),
                 just(shrinkHashSet(1, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
@@ -149,8 +149,8 @@ final class CollectionArbitraries {
             throw new IllegalArgumentException("size must be >= 0");
         }
         return arbitrary(parameters -> {
-                    Supply<Arbitrary<?>> arbitrarySupply = arbitraryArbitrary().createSupply(parameters);
-                    return new HomogeneousCollectionSupply(arbitrarySupply,
+                    SupplyStrategy<Arbitrary<?>> arbitrarySupply = arbitraryArbitrary().supplyStrategy(parameters);
+                    return new HomogeneousCollectionSupplyStrategy(arbitrarySupply,
                             sizeGenerator(sizeRange, parameters),
                             parameters);
                 },

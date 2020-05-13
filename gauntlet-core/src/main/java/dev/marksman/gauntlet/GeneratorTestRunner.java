@@ -70,16 +70,17 @@ final class GeneratorTestRunner {
                                                         GeneratorTest<A> testData) {
         return getInitialSeedValue(testData.getInitialSeed())
                 .flatMap(isv -> io(() ->
-                        buildDataSetFromSupply(isv, testData.getArbitrary().createSupply(generatorParameters),
+                        buildDataSetFromSupply(isv, testData.getArbitrary().supplyStrategy(generatorParameters),
                                 testData.getSampleCount())));
     }
 
     private <A> GeneratedDataSet<A> buildDataSetFromSupply(long initialSeedValue,
-                                                           Supply<A> supply,
+                                                           SupplyStrategy<A> supplyStrategy,
                                                            int sampleCount) {
         Maybe<SupplyFailure> supplyFailure = nothing();
         ArrayList<A> values = new ArrayList<>(sampleCount);
         Seed state = Seed.create(initialSeedValue);
+        StatefulSupply<A> supply = supplyStrategy.createSupply();
         for (int i = 0; i < sampleCount; i++) {
             GeneratorOutput<A> next = supply.getNext(state);
             supplyFailure = next.getValue()

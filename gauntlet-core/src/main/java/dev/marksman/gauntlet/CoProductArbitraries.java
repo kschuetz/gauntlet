@@ -119,8 +119,8 @@ final class CoProductArbitraries {
         Arbitrary<A> arbitraryA = a.getValue();
         Arbitrary<B> arbitraryB = b.getValue();
         return Arbitrary.arbitrary(parameters ->
-                        new ChoiceSupply2<>(arbitraryA.createSupply(parameters),
-                                arbitraryB.createSupply(parameters),
+                        new ChoiceSupplyStrategy2<>(arbitraryA.supplyStrategy(parameters),
+                                arbitraryB.supplyStrategy(parameters),
                                 generateWhich.prepare(parameters)),
                 shrinkStrategy,
                 // TODO: prettyPrinter
@@ -137,9 +137,9 @@ final class CoProductArbitraries {
         Arbitrary<B> arbitraryB = b.getValue();
         Arbitrary<C> arbitraryC = c.getValue();
         return Arbitrary.arbitrary(parameters ->
-                        new ChoiceSupply3<>(arbitraryA.createSupply(parameters),
-                                arbitraryB.createSupply(parameters),
-                                arbitraryC.createSupply(parameters),
+                        new ChoiceSupplyStrategy3<>(arbitraryA.supplyStrategy(parameters),
+                                arbitraryB.supplyStrategy(parameters),
+                                arbitraryC.supplyStrategy(parameters),
                                 generateWhich.prepare(parameters)),
                 shrinkStrategy,
                 // TODO: prettyPrinter

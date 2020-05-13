@@ -47,14 +47,14 @@ import static dev.marksman.gauntlet.CompositeArbitraries.combine;
  * @param <A>
  */
 public final class Arbitrary<A> {
-    private final Fn1<GeneratorParameters, Supply<A>> generator;
+    private final Fn1<GeneratorParameters, SupplyStrategy<A>> generator;
     private final ImmutableFiniteIterable<Fn1<GeneratorParameters, GeneratorParameters>> parameterTransforms;
     private final Filter<A> filter;
     private final Maybe<ShrinkStrategy<A>> shrinkStrategy;
     private final Fn1<? super A, String> prettyPrinter;
     private final int maxDiscards;
 
-    private Arbitrary(Fn1<GeneratorParameters, Supply<A>> generator,
+    private Arbitrary(Fn1<GeneratorParameters, SupplyStrategy<A>> generator,
                       ImmutableFiniteIterable<Fn1<GeneratorParameters, GeneratorParameters>> parameterTransforms,
                       Filter<A> filter, Maybe<ShrinkStrategy<A>> shrinkStrategy,
                       Fn1<? super A, String> prettyPrinter,
@@ -75,24 +75,24 @@ public final class Arbitrary<A> {
      */
     public static <A> Arbitrary<A> arbitrary(Generator<A> generator) {
         Fn0<String> labelSupplier = () -> generator.getLabel().orElseGet(generator::toString);
-        return arbitrary(p -> new UnfilteredSupply<>(generator.prepare(p), labelSupplier),
+        return arbitrary(p -> new UnfilteredSupplyStrategy<>(generator.prepare(p), labelSupplier),
                 nothing(), Object::toString);
     }
 
-    static <A> Arbitrary<A> arbitrary(Fn1<GeneratorParameters, Supply<A>> generator,
+    static <A> Arbitrary<A> arbitrary(Fn1<GeneratorParameters, SupplyStrategy<A>> generator,
                                       Maybe<ShrinkStrategy<A>> shrinkStrategy,
                                       Fn1<? super A, String> prettyPrinter) {
         return new Arbitrary<>(generator, emptyImmutableFiniteIterable(), Filter.emptyFilter(), shrinkStrategy,
                 prettyPrinter, Gauntlet.DEFAULT_MAX_DISCARDS);
     }
 
-    public Supply<A> createSupply(GeneratorParameters parameters) {
+    public SupplyStrategy<A> supplyStrategy(GeneratorParameters parameters) {
         GeneratorParameters transformedParameters = parameterTransforms.foldLeft((acc, f) -> f.apply(acc), parameters);
-        Supply<A> vs = generator.apply(transformedParameters);
+        SupplyStrategy<A> vs = generator.apply(transformedParameters);
         if (filter.isEmpty()) {
             return vs;
         } else {
-            return new FilteredSupply<>(vs, filter, maxDiscards);
+            return new FilteredSupplyStrategy<>(vs, filter, maxDiscards);
         }
     }
 

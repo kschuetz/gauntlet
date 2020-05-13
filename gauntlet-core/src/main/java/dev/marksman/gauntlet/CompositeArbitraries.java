@@ -24,8 +24,8 @@ final class CompositeArbitraries {
 
         Fn2<A, B, Tuple2<A, B>> toFn = HList::tuple;
 
-        return arbitrary(parameters -> new CompositeSupply2<>(a.createSupply(parameters),
-                        b.createSupply(parameters),
+        return arbitrary(parameters -> new CompositeSupplyStrategy2<>(a.supplyStrategy(parameters),
+                        b.supplyStrategy(parameters),
                         toFn),
                 combineShrinkStrategies(a.getShrinkStrategy(), b.getShrinkStrategy(), toFn),
                 PrettyPrinting.<A, B>productPrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter()));
@@ -37,9 +37,9 @@ final class CompositeArbitraries {
 
         Fn3<A, B, C, Tuple3<A, B, C>> toFn = HList::tuple;
 
-        return arbitrary(parameters -> new CompositeSupply3<>(a.createSupply(parameters),
-                        b.createSupply(parameters),
-                        c.createSupply(parameters),
+        return arbitrary(parameters -> new CompositeSupplyStrategy3<>(a.supplyStrategy(parameters),
+                        b.supplyStrategy(parameters),
+                        c.supplyStrategy(parameters),
                         toFn),
                 combineShrinkStrategies(a.getShrinkStrategy(), b.getShrinkStrategy(), c.getShrinkStrategy(), toFn),
                 PrettyPrinting.<A, B, C>productPrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter(), c.getPrettyPrinter()));
@@ -52,10 +52,10 @@ final class CompositeArbitraries {
 
         Fn4<A, B, C, D, Tuple4<A, B, C, D>> toFn = HList::tuple;
 
-        return arbitrary(parameters -> new CompositeSupply4<>(a.createSupply(parameters),
-                        b.createSupply(parameters),
-                        c.createSupply(parameters),
-                        d.createSupply(parameters),
+        return arbitrary(parameters -> new CompositeSupplyStrategy4<>(a.supplyStrategy(parameters),
+                        b.supplyStrategy(parameters),
+                        c.supplyStrategy(parameters),
+                        d.supplyStrategy(parameters),
                         toFn),
                 combineShrinkStrategies(a.getShrinkStrategy(), b.getShrinkStrategy(), c.getShrinkStrategy(), d.getShrinkStrategy(), toFn),
                 PrettyPrinting.<A, B, C, D>productPrettyPrinter(a.getPrettyPrinter(), b.getPrettyPrinter(),
@@ -70,11 +70,11 @@ final class CompositeArbitraries {
 
         Fn5<A, B, C, D, E, Tuple5<A, B, C, D, E>> toFn = HList::tuple;
 
-        return arbitrary(parameters -> new CompositeSupply5<>(a.createSupply(parameters),
-                        b.createSupply(parameters),
-                        c.createSupply(parameters),
-                        d.createSupply(parameters),
-                        e.createSupply(parameters),
+        return arbitrary(parameters -> new CompositeSupplyStrategy5<>(a.supplyStrategy(parameters),
+                        b.supplyStrategy(parameters),
+                        c.supplyStrategy(parameters),
+                        d.supplyStrategy(parameters),
+                        e.supplyStrategy(parameters),
                         toFn),
                 combineShrinkStrategies(a.getShrinkStrategy(), b.getShrinkStrategy(), c.getShrinkStrategy(),
                         d.getShrinkStrategy(), e.getShrinkStrategy(), toFn),
