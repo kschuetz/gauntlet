@@ -171,6 +171,10 @@ public final class Arbitrary<A> {
 
     }
 
+    public <B> Arbitrary<Tuple2<B, A>> addLayer(int sampleCount, Fn1<A, Arbitrary<B>> f) {
+        throw new UnsupportedOperationException("TODO");
+    }
+
     public Arbitrary<A> modifyGeneratorParameters(Fn1<GeneratorParameters, GeneratorParameters> modifyFn) {
         return new Arbitrary<>(generator, parameterTransforms.append(modifyFn), filter, shrinkStrategy, prettyPrinter, maxDiscards);
     }
