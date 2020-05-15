@@ -1,6 +1,5 @@
 package dev.marksman.gauntlet;
 
-import com.jnape.palatable.lambda.adt.Maybe;
 import dev.marksman.kraftwerk.GeneratorParameters;
 
 import java.time.Duration;
@@ -9,19 +8,17 @@ import java.util.concurrent.Executor;
 final class GeneratorTest<A> {
     private final Arbitrary<A> arbitrary;
     private final Prop<A> property;
-    private final Maybe<Long> initialSeed;
     private final int sampleCount;
     private final int maximumShrinkCount;
     private final Duration timeout;
     private final Executor executor;
     private final GeneratorParameters generatorParameters;
 
-    private GeneratorTest(Arbitrary<A> arbitrary, Prop<A> property, Maybe<Long> initialSeed, int sampleCount,
+    private GeneratorTest(Arbitrary<A> arbitrary, Prop<A> property, int sampleCount,
                           int maximumShrinkCount,
                           Duration timeout, Executor executor, GeneratorParameters generatorParameters) {
         this.arbitrary = arbitrary;
         this.property = property;
-        this.initialSeed = initialSeed;
         this.sampleCount = sampleCount;
         this.maximumShrinkCount = maximumShrinkCount;
         this.timeout = timeout;
@@ -31,13 +28,12 @@ final class GeneratorTest<A> {
 
     static <A> GeneratorTest<A> generatorTest(Arbitrary<A> arbitrary,
                                               Prop<A> property,
-                                              Maybe<Long> initialSeed,
                                               int sampleCount,
                                               int maximumShrinkCount,
                                               Duration timeout,
                                               Executor executor,
                                               GeneratorParameters generatorParameters) {
-        return new GeneratorTest<>(arbitrary, property, initialSeed, sampleCount, maximumShrinkCount,
+        return new GeneratorTest<>(arbitrary, property, sampleCount, maximumShrinkCount,
                 timeout, executor, generatorParameters);
     }
 
@@ -47,10 +43,6 @@ final class GeneratorTest<A> {
 
     public Prop<A> getProperty() {
         return this.property;
-    }
-
-    public Maybe<Long> getInitialSeed() {
-        return this.initialSeed;
     }
 
     public int getSampleCount() {

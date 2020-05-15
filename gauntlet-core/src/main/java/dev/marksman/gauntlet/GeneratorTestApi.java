@@ -30,10 +30,6 @@ public final class GeneratorTestApi<A> {
         return new GeneratorTestApi<>(getParentExecutor, runner, parameters.withSampleCount(sampleCount));
     }
 
-    public GeneratorTestApi<A> withInitialSeed(long initialSeed) {
-        return new GeneratorTestApi<>(getParentExecutor, runner, parameters.withInitialSeed(just(initialSeed)));
-    }
-
     public GeneratorTestApi<A> withMaximumShrinkCount(int maximumShrinkCount) {
         return new GeneratorTestApi<>(getParentExecutor, runner, parameters.withMaximumShrinkCount(maximumShrinkCount));
     }
@@ -47,7 +43,7 @@ public final class GeneratorTestApi<A> {
     }
 
     public void mustSatisfy(Prop<A> property) {
-        GeneratorTest<A> generatorTest = generatorTest(parameters.getArbitrary(), property, parameters.getInitialSeed(), parameters.getSampleCount(),
+        GeneratorTest<A> generatorTest = generatorTest(parameters.getArbitrary(), property, parameters.getSampleCount(),
                 parameters.getMaximumShrinkCount(), parameters.getTimeout(), parameters.getExecutorOverride().orElseGet(getParentExecutor),
                 parameters.getGeneratorParameters());
         runner.accept(generatorTest);

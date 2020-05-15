@@ -68,7 +68,7 @@ final class GeneratorTestRunner {
 
     private <A> IO<GeneratedDataSet<A>> generateDataSet(GeneratorParameters generatorParameters,
                                                         GeneratorTest<A> testData) {
-        return getInitialSeedValue(testData.getInitialSeed())
+        return getInitialSeedValue(nothing())
                 .flatMap(isv -> io(() ->
                         buildDataSetFromSupply(isv, testData.getArbitrary().supplyStrategy(generatorParameters),
                                 testData.getSampleCount())));
