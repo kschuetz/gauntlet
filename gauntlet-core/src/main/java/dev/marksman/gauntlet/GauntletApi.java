@@ -9,14 +9,22 @@ import java.time.Duration;
 import java.util.concurrent.Executor;
 
 public interface GauntletApi {
-    <A> GeneratorTestApi<A> all(Arbitrary<A> generator);
 
-    <A, B> GeneratorTestApi<Tuple2<A, B>> all(Arbitrary<A> generatorA,
-                                              Arbitrary<B> generatorB);
 
-    <A, B, C> GeneratorTestApi<Tuple3<A, B, C>> all(Arbitrary<A> generatorA,
-                                                    Arbitrary<B> generatorB,
-                                                    Arbitrary<C> generatorC);
+    static <A> GeneratorTestApi<A> all(Arbitrary<A> arbitrary) {
+
+    }
+
+    static <A, B> GeneratorTestApi<Tuple2<A, B>> all(Arbitrary<A> arbitraryA,
+                                                     Arbitrary<B> arbitraryB) {
+
+    }
+
+    static <A, B, C> GeneratorTestApi<Tuple3<A, B, C>> all(Arbitrary<A> arbitraryA,
+                                                           Arbitrary<B> arbitraryB,
+                                                           Arbitrary<C> arbitraryC) {
+
+    }
 
     <A> DomainTestApi<A> all(Domain<A> domain);
 
@@ -76,3 +84,4 @@ public interface GauntletApi {
 
     GauntletApi withDefaultTimeout(Duration timeout);
 }
+

@@ -43,7 +43,7 @@ final class GeneratorTestRunner {
     private <A> IO<GeneratorTestResult<A>> runTest(GeneratorTest<A> generatorTest,
                                                    GeneratedDataSet<A> dataSet) {
         return io(() -> {
-            Executor executor = generatorTest.getExecutor();
+            Executor executor = generatorTest.getExecutorOverride();
             ImmutableVector<A> samples = dataSet.getSamples();
             int actualSampleCount = samples.size();
             ResultCollector<A> collector = universalResultCollector(dataSet.getSamples());
