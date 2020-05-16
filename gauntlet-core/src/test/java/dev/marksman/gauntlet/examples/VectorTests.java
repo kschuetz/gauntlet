@@ -3,7 +3,6 @@ package dev.marksman.gauntlet.examples;
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.gauntlet.Arbitraries;
 import dev.marksman.gauntlet.Arbitrary;
-import dev.marksman.gauntlet.GauntletApi;
 import dev.marksman.gauntlet.GauntletApiBase;
 import org.junit.jupiter.api.Test;
 
@@ -14,8 +13,8 @@ public final class VectorTests extends GauntletApiBase {
 
     @Test
     void reverseTwiceIsOriginal() {
-        GauntletApi.all(vectors)
+        assertThat(all(vectors)
                 .mustSatisfy(predicate("reverse twice is original",
-                        xs -> xs.reverse().reverse().equals(xs)));
+                        xs -> xs.reverse().reverse().equals(xs))));
     }
 }

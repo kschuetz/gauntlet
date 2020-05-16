@@ -27,6 +27,8 @@ public interface GauntletApi {
         return generatorTestApi(Arbitraries.tuplesOf(arbitraryA, arbitraryB, arbitraryC));
     }
 
+    <A> void assertThat(GeneratorTest<A> generatorTest);
+
     <A> DomainTestApi<A> all(Domain<A> domain);
 
     <A, B> DomainTestApi<Tuple2<A, B>> all(Domain<A> domainA,

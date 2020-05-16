@@ -38,6 +38,22 @@ public abstract class GauntletApiBase implements GauntletApi {
         return GauntletApi.all(arbitrary);
     }
 
+    public <A, B> GeneratorTestApi<Tuple2<A, B>> all(Arbitrary<A> arbitraryA,
+                                                     Arbitrary<B> arbitraryB) {
+        return GauntletApi.all(arbitraryA, arbitraryB);
+    }
+
+    public <A, B, C> GeneratorTestApi<Tuple3<A, B, C>> all(Arbitrary<A> arbitraryA,
+                                                           Arbitrary<B> arbitraryB,
+                                                           Arbitrary<C> arbitraryC) {
+        return GauntletApi.all(arbitraryA, arbitraryB, arbitraryC);
+    }
+
+    @Override
+    public <A> void assertThat(GeneratorTest<A> generatorTest) {
+        getApi().assertThat(generatorTest);
+    }
+
     @Override
     public <A> DomainTestApi<A> all(Domain<A> domain) {
         return getApi().all(domain);

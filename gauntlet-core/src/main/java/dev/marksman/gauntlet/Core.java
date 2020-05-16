@@ -175,7 +175,8 @@ final class Core implements GauntletApi {
         return createDomainTestApi(EXISTENTIAL, Domain.cartesianProduct(domainA, domainB, domainC, domainD));
     }
 
-    private <A> void runGeneratorTest(GeneratorTest<A> generatorTest) {
+    @Override
+    public <A> void assertThat(GeneratorTest<A> generatorTest) {
         GeneratorTestSettings settings = createGeneratorSettings(generatorTest.getSettingsAdjustments());
         GeneratorTestResult<A> result = generatorTestRunner.run(settings, generatorTest.getArbitrary(), generatorTest.getProperty())
                 .flatMap(res -> refineResult(generatorTest, res))
