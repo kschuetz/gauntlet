@@ -34,19 +34,8 @@ public abstract class GauntletApiBase implements GauntletApi {
         return apiInstance;
     }
 
-    @Override
-    public <A> GeneratorTestApi<A> all(Arbitrary<A> generator) {
-        return getApi().all(generator);
-    }
-
-    @Override
-    public <A, B> GeneratorTestApi<Tuple2<A, B>> all(Arbitrary<A> generatorA, Arbitrary<B> generatorB) {
-        return getApi().all(generatorA, generatorB);
-    }
-
-    @Override
-    public <A, B, C> GeneratorTestApi<Tuple3<A, B, C>> all(Arbitrary<A> generatorA, Arbitrary<B> generatorB, Arbitrary<C> generatorC) {
-        return getApi().all(generatorA, generatorB, generatorC);
+    public <A> GeneratorTestApi<A> all(Arbitrary<A> arbitrary) {
+        return GauntletApi.all(arbitrary);
     }
 
     @Override

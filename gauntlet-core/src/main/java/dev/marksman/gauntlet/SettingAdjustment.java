@@ -1,9 +1,10 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.coproduct.CoProduct3;
+import com.jnape.palatable.lambda.functions.Fn0;
 import com.jnape.palatable.lambda.functions.Fn1;
 
-public abstract class ConfigLayer<A> implements CoProduct3<ConfigLayer.Inherit<A>, ConfigLayer.Modify<A>, ConfigLayer.Absolute<A>, ConfigLayer<A>> {
+public abstract class SettingAdjustment<A> implements CoProduct3<SettingAdjustment.Inherit<A>, SettingAdjustment.Modify<A>, SettingAdjustment.Absolute<A>, SettingAdjustment<A>> {
 
     @SuppressWarnings("unchecked")
     public static <A> Inherit<A> inherit() {
@@ -18,23 +19,23 @@ public abstract class ConfigLayer<A> implements CoProduct3<ConfigLayer.Inherit<A
         return new Absolute<>(value);
     }
 
-    public abstract A apply(A input);
+    public abstract A apply(Fn0<A> getDefault);
 
-    public abstract ConfigLayer<A> add(ConfigLayer<A> other);
+    public abstract SettingAdjustment<A> add(SettingAdjustment<A> other);
 
-    public static class Inherit<A> extends ConfigLayer<A> {
+    public static class Inherit<A> extends SettingAdjustment<A> {
         private static final Inherit<?> INSTANCE = new Inherit<>();
 
         private Inherit() {
         }
 
         @Override
-        public A apply(A input) {
-            return input;
+        public A apply(Fn0<A> getDefault) {
+            return getDefault.apply();
         }
 
         @Override
-        public ConfigLayer<A> add(ConfigLayer<A> other) {
+        public SettingAdjustment<A> add(SettingAdjustment<A> other) {
             return other;
         }
 
@@ -44,7 +45,7 @@ public abstract class ConfigLayer<A> implements CoProduct3<ConfigLayer.Inherit<A
         }
     }
 
-    public static class Modify<A> extends ConfigLayer<A> {
+    public static class Modify<A> extends SettingAdjustment<A> {
         private final Fn1<A, A> fn;
 
         private Modify(Fn1<A, A> fn) {
@@ -52,12 +53,12 @@ public abstract class ConfigLayer<A> implements CoProduct3<ConfigLayer.Inherit<A
         }
 
         @Override
-        public A apply(A input) {
-            return fn.apply(input);
+        public A apply(Fn0<A> getDefault) {
+            return fn.apply(getDefault.apply());
         }
 
         @Override
-        public ConfigLayer<A> add(ConfigLayer<A> other) {
+        public SettingAdjustment<A> add(SettingAdjustment<A> other) {
             return other.match(__ -> this,
                     m -> modify(fn.fmap(m.getFn())),
                     __ -> other);
@@ -73,7 +74,7 @@ public abstract class ConfigLayer<A> implements CoProduct3<ConfigLayer.Inherit<A
         }
     }
 
-    public static class Absolute<A> extends ConfigLayer<A> {
+    public static class Absolute<A> extends SettingAdjustment<A> {
         private final A value;
 
         private Absolute(A value) {
@@ -81,12 +82,12 @@ public abstract class ConfigLayer<A> implements CoProduct3<ConfigLayer.Inherit<A
         }
 
         @Override
-        public A apply(A input) {
+        public A apply(Fn0<A> getDefault) {
             return value;
         }
 
         @Override
-        public ConfigLayer<A> add(ConfigLayer<A> other) {
+        public SettingAdjustment<A> add(SettingAdjustment<A> other) {
             return other.match(__ -> this,
                     m -> absolute(m.getFn().apply(value)),
                     __ -> other);

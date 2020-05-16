@@ -6,7 +6,6 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
 import com.jnape.palatable.lambda.io.IO;
 import dev.marksman.collectionviews.Vector;
-import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.GeneratorParameters;
 
 import java.time.Duration;
@@ -17,11 +16,9 @@ import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.io.IO.io;
 import static dev.marksman.gauntlet.DomainTestApi.domainTestApi;
 import static dev.marksman.gauntlet.DomainTestParameters.domainTestParameters;
-import static dev.marksman.gauntlet.GeneratorTestApi.generatorTestApi;
-import static dev.marksman.gauntlet.GeneratorTestParameters.generatorTestParameters;
+import static dev.marksman.gauntlet.GeneratorTestSettings.generatorTestSettings;
 import static dev.marksman.gauntlet.Quantifier.EXISTENTIAL;
 import static dev.marksman.gauntlet.Quantifier.UNIVERSAL;
-import static dev.marksman.gauntlet.RefinementTest.refinementTest;
 import static dev.marksman.gauntlet.ReportData.reportData;
 
 final class Core implements GauntletApi {
@@ -139,21 +136,6 @@ final class Core implements GauntletApi {
     }
 
     @Override
-    public <A> GeneratorTestApi<A> all(Arbitrary<A> generator) {
-        return createGeneratorTestApi(generator);
-    }
-
-    @Override
-    public <A, B> GeneratorTestApi<Tuple2<A, B>> all(Arbitrary<A> generatorA, Arbitrary<B> generatorB) {
-        return createGeneratorTestApi(CompositeArbitraries.combine(generatorA, generatorB));
-    }
-
-    @Override
-    public <A, B, C> GeneratorTestApi<Tuple3<A, B, C>> all(Arbitrary<A> generatorA, Arbitrary<B> generatorB, Arbitrary<C> generatorC) {
-        return createGeneratorTestApi(CompositeArbitraries.combine(generatorA, generatorB, generatorC));
-    }
-
-    @Override
     public <A> DomainTestApi<A> all(Domain<A> domain) {
         return createDomainTestApi(UNIVERSAL, domain);
     }
@@ -193,20 +175,22 @@ final class Core implements GauntletApi {
         return createDomainTestApi(EXISTENTIAL, Domain.cartesianProduct(domainA, domainB, domainC, domainD));
     }
 
-    private <A> GeneratorTestApi<A> createGeneratorTestApi(Arbitrary<A> generator) {
-        return generatorTestApi(this::getExecutor, this::runGeneratorTest,
-                generatorTestParameters(generator, defaultSampleCount, defaultMaximumShrinkCount,
-                        defaultTimeout, nothing(), getGeneratorParameters()));
-    }
-
     private <A> void runGeneratorTest(GeneratorTest<A> generatorTest) {
-
-        GeneratorTestResult<A> result = generatorTestRunner.run(generatorTest)
+        GeneratorTestSettings settings = createGeneratorSettings(generatorTest.getSettingsAdjustments());
+        GeneratorTestResult<A> result = generatorTestRunner.run(settings, generatorTest.getArbitrary(), generatorTest.getProperty())
                 .flatMap(res -> refineResult(generatorTest, res))
                 .unsafePerformIO();
         ReportData<A> reportData = reportData(generatorTest.getProperty(), result.getResult(), generatorTest.getArbitrary().getPrettyPrinter(),
                 just(result.getInitialSeedValue()));
         reporter.report(reportSettings, reportRenderer, reportData);
+    }
+
+    private GeneratorTestSettings createGeneratorSettings(GeneratorTestSettingsAdjustments adjustments) {
+        return generatorTestSettings(adjustments.getSampleCount().apply(this::getDefaultSampleCount),
+                adjustments.getMaximumShrinkCount().apply(this::getDefaultMaximumShrinkCount),
+                adjustments.getTimeout().apply(this::getDefaultTimeout),
+                adjustments.getExecutor().apply(this::getExecutor),
+                adjustments.getGeneratorParameters().apply(this::getGeneratorParameters));
     }
 
     private <A> void runDomainTest(DomainTest<A> domainTest) {
@@ -226,20 +210,21 @@ final class Core implements GauntletApi {
 
     private <A> IO<GeneratorTestResult<A>> refineResult(GeneratorTest<A> testData,
                                                         GeneratorTestResult<A> initialResult) {
-        if (!(initialResult.getResult() instanceof TestResult.Falsified<?>)) {
-            return io(initialResult);
-        }
-        TestResult.Falsified<A> falsified = (TestResult.Falsified<A>) initialResult.getResult();
-        ShrinkStrategy<A> shrinkStrategy = testData.getArbitrary().getShrinkStrategy().orElse(null);
-        if (shrinkStrategy == null) {
-            return io(initialResult);
-        }
-        return refinementTestRunner
-                .run(refinementTest(shrinkStrategy, testData.getProperty(), falsified.getCounterexample().getSample(),
-                        testData.getMaximumShrinkCount(), testData.getTimeout(), getExecutor(), REFINEMENT_BLOCK_SIZE))
-                .fmap(maybeRefinedResult -> maybeRefinedResult
-                        .match(__ -> initialResult,
-                                refined -> initialResult.withResult(falsified.withRefinedCounterexample(refined))));
+        return io(initialResult);
+//        if (!(initialResult.getResult() instanceof TestResult.Falsified<?>)) {
+//            return io(initialResult);
+//        }
+//        TestResult.Falsified<A> falsified = (TestResult.Falsified<A>) initialResult.getResult();
+//        ShrinkStrategy<A> shrinkStrategy = testData.getArbitrary().getShrinkStrategy().orElse(null);
+//        if (shrinkStrategy == null) {
+//            return io(initialResult);
+//        }
+//        return refinementTestRunner
+//                .run(refinementTest(shrinkStrategy, testData.getProperty(), falsified.getCounterexample().getSample(),
+//                        testData.getMaximumShrinkCount(), testData.getTimeout(), getExecutor(), REFINEMENT_BLOCK_SIZE))
+//                .fmap(maybeRefinedResult -> maybeRefinedResult
+//                        .match(__ -> initialResult,
+//                                refined -> initialResult.withResult(falsified.withRefinedCounterexample(refined))));
     }
 
     private Executor getExecutor() {

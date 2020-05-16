@@ -1,46 +1,49 @@
 package dev.marksman.gauntlet;
 
+import dev.marksman.kraftwerk.GeneratorParameters;
+
 import java.time.Duration;
 import java.util.concurrent.Executor;
 
-import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static dev.marksman.gauntlet.GeneratorTest.generatorTest;
+import static dev.marksman.gauntlet.GeneratorTestSettingsAdjustments.generatorTestSettingsAdjustments;
+import static dev.marksman.gauntlet.SettingAdjustment.absolute;
 
 public final class GeneratorTestApi<A> {
-    private final GeneratorTestParameters<A> parameters;
+    private final Arbitrary<A> arbitrary;
+    private final GeneratorTestSettingsAdjustments config;
 
-    private GeneratorTestApi(GeneratorTestParameters<A> parameters) {
-        this.parameters = parameters;
+    private GeneratorTestApi(Arbitrary<A> arbitrary, GeneratorTestSettingsAdjustments config) {
+        this.arbitrary = arbitrary;
+        this.config = config;
     }
 
-    static <A> GeneratorTestApi<A> generatorTestApi(GeneratorTestParameters<A> parameters) {
-        return new GeneratorTestApi<>(parameters);
+    static <A> GeneratorTestApi<A> generatorTestApi(Arbitrary<A> arbitrary) {
+        return new GeneratorTestApi<>(arbitrary, generatorTestSettingsAdjustments());
     }
 
     public GeneratorTestApi<A> withSampleCount(int sampleCount) {
-        return new GeneratorTestApi<>(parameters.withSampleCount(sampleCount));
-    }
-
-    public GeneratorTestApi<A> withInitialSeed(long initialSeed) {
-        return new GeneratorTestApi<>(parameters.withInitialSeed(just(initialSeed)));
+        return new GeneratorTestApi<>(arbitrary, config.adjustSampleCount(absolute(sampleCount)));
     }
 
     public GeneratorTestApi<A> withMaximumShrinkCount(int maximumShrinkCount) {
-        return new GeneratorTestApi<>(parameters.withMaximumShrinkCount(maximumShrinkCount));
+        return new GeneratorTestApi<>(arbitrary, config.adjustMaximumShrinkCount(absolute(maximumShrinkCount)));
     }
 
     public GeneratorTestApi<A> withTimeout(Duration timeout) {
-        return new GeneratorTestApi<>(parameters.withTimeout(timeout));
+        return new GeneratorTestApi<>(arbitrary, config.adjustTimeout(absolute(timeout)));
     }
 
     public GeneratorTestApi<A> withExecutor(Executor executor) {
-        return new GeneratorTestApi<>(parameters.withExecutorOverride(just(executor)));
+        return new GeneratorTestApi<>(arbitrary, config.adjustExecutor(absolute(executor)));
+    }
+
+    public GeneratorTestApi<A> withGeneratorParameters(GeneratorParameters generatorParameters) {
+        return new GeneratorTestApi<>(arbitrary, config.adjustGeneratorParameters(absolute(generatorParameters)));
     }
 
     public GeneratorTest<A> mustSatisfy(Prop<A> property) {
-        return generatorTest(parameters.getArbitrary(), property, parameters.getInitialSeed(), parameters.getSampleCount(),
-                parameters.getMaximumShrinkCount(), parameters.getTimeout(), parameters.getExecutorOverride(),
-                parameters.getGeneratorParameters());
+        return generatorTest(arbitrary, property, config);
     }
 
 }

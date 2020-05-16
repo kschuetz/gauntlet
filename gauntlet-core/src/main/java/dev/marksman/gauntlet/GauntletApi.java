@@ -8,22 +8,23 @@ import dev.marksman.kraftwerk.GeneratorParameters;
 import java.time.Duration;
 import java.util.concurrent.Executor;
 
+import static dev.marksman.gauntlet.GeneratorTestApi.generatorTestApi;
+
 public interface GauntletApi {
 
-
     static <A> GeneratorTestApi<A> all(Arbitrary<A> arbitrary) {
-
+        return generatorTestApi(arbitrary);
     }
 
     static <A, B> GeneratorTestApi<Tuple2<A, B>> all(Arbitrary<A> arbitraryA,
                                                      Arbitrary<B> arbitraryB) {
-
+        return generatorTestApi(Arbitraries.tuplesOf(arbitraryA, arbitraryB));
     }
 
     static <A, B, C> GeneratorTestApi<Tuple3<A, B, C>> all(Arbitrary<A> arbitraryA,
                                                            Arbitrary<B> arbitraryB,
                                                            Arbitrary<C> arbitraryC) {
-
+        return generatorTestApi(Arbitraries.tuplesOf(arbitraryA, arbitraryB, arbitraryC));
     }
 
     <A> DomainTestApi<A> all(Domain<A> domain);

@@ -3,7 +3,6 @@ package dev.marksman.gauntlet;
 import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.io.IO;
 import dev.marksman.collectionviews.ImmutableVector;
-import dev.marksman.kraftwerk.GeneratorParameters;
 import dev.marksman.kraftwerk.Seed;
 
 import java.util.ArrayList;
@@ -25,9 +24,11 @@ final class GeneratorTestRunner {
         return INSTANCE;
     }
 
-    public <A> IO<GeneratorTestResult<A>> run(GeneratorTest<A> generatorTest) {
-        return generateDataSet(generatorTest.getGeneratorParameters(), generatorTest)
-                .flatMap(dataSet -> runTest(generatorTest, dataSet));
+    public <A> IO<GeneratorTestResult<A>> run(GeneratorTestSettings settings,
+                                              Arbitrary<A> arbitrary,
+                                              Prop<A> property) {
+        return generateDataSet(settings, arbitrary)
+                .flatMap(dataSet -> runTest(settings, property, dataSet));
     }
 
     private IO<Long> getInitialSeedValue(Maybe<Long> suppliedSeedValue) {
@@ -40,18 +41,19 @@ final class GeneratorTestRunner {
     //    - if cannot falsify, fail with SupplyFailure
     // if all inputs can be generated, submit test tasks to executor along with sample index
 
-    private <A> IO<GeneratorTestResult<A>> runTest(GeneratorTest<A> generatorTest,
+    private <A> IO<GeneratorTestResult<A>> runTest(GeneratorTestSettings settings,
+                                                   Prop<A> property,
                                                    GeneratedDataSet<A> dataSet) {
         return io(() -> {
-            Executor executor = generatorTest.getExecutorOverride();
+            Executor executor = settings.getExecutor();
             ImmutableVector<A> samples = dataSet.getSamples();
             int actualSampleCount = samples.size();
             ResultCollector<A> collector = universalResultCollector(dataSet.getSamples());
             for (int sampleIndex = 0; sampleIndex < actualSampleCount; sampleIndex++) {
-                EvaluateSampleTask<A> task = evaluateSampleTask(collector, generatorTest.getProperty(), sampleIndex, samples.unsafeGet(sampleIndex));
+                EvaluateSampleTask<A> task = evaluateSampleTask(collector, property, sampleIndex, samples.unsafeGet(sampleIndex));
                 executor.execute(task);
             }
-            TestResult<A> initialResult = collector.getResultBlocking(generatorTest.getTimeout());
+            TestResult<A> initialResult = collector.getResultBlocking(settings.getTimeout());
             return generatorTestResult(maybeApplySupplyFailure(dataSet.getSupplyFailure(), initialResult),
                     dataSet.getInitialSeedValue());
         });
@@ -66,12 +68,12 @@ final class GeneratorTestRunner {
                                         passed -> TestResult.supplyFailed(passed.getPassedSamples(), supplyFailure)));
     }
 
-    private <A> IO<GeneratedDataSet<A>> generateDataSet(GeneratorParameters generatorParameters,
-                                                        GeneratorTest<A> testData) {
+    private <A> IO<GeneratedDataSet<A>> generateDataSet(GeneratorTestSettings settings,
+                                                        Arbitrary<A> arbitrary) {
         return getInitialSeedValue(nothing())
                 .flatMap(isv -> io(() ->
-                        buildDataSetFromSupply(isv, testData.getArbitrary().supplyStrategy(generatorParameters),
-                                testData.getSampleCount())));
+                        buildDataSetFromSupply(isv, arbitrary.supplyStrategy(settings.getGeneratorParameters()),
+                                settings.getSampleCount())));
     }
 
     private <A> GeneratedDataSet<A> buildDataSetFromSupply(long initialSeedValue,
