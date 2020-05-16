@@ -3,18 +3,18 @@ package dev.marksman.gauntlet;
 import java.time.Duration;
 import java.util.concurrent.Executor;
 
-final class DomainTestSettings {
+final class TestRunnerSettings {
     private final Duration timeout;
     private final Executor executor;
 
-    private DomainTestSettings(Duration timeout, Executor executor) {
+    private TestRunnerSettings(Duration timeout, Executor executor) {
         this.timeout = timeout;
         this.executor = executor;
     }
 
-    static DomainTestSettings domainTestSettings(Duration timeout,
+    static TestRunnerSettings testRunnerSettings(Duration timeout,
                                                  Executor executor) {
-        return new DomainTestSettings(timeout, executor);
+        return new TestRunnerSettings(timeout, executor);
     }
 
     public Duration getTimeout() {

@@ -10,16 +10,16 @@ import java.util.concurrent.Executor;
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.io.IO.io;
-import static dev.marksman.gauntlet.DomainTestSettings.domainTestSettings;
 import static dev.marksman.gauntlet.GeneratorTestSettings.generatorTestSettings;
 import static dev.marksman.gauntlet.ReportData.reportData;
+import static dev.marksman.gauntlet.TestRunnerSettings.testRunnerSettings;
 
 final class Core implements GauntletApi {
     private static final int REFINEMENT_BLOCK_SIZE = RefinementTest.DEFAULT_BLOCK_SIZE;
 
     private final Maybe<Executor> executorOverride;
     private final GeneratorTestRunner generatorTestRunner;
-    private final DomainTestRunner domainTestRunner;
+    private final TestRunner testRunner;
     private final RefinementTestRunner refinementTestRunner;
     private final Reporter reporter;
     private final ReportSettings reportSettings;
@@ -30,7 +30,7 @@ final class Core implements GauntletApi {
     private final Duration defaultTimeout;
 
     public Core(GeneratorTestRunner generatorTestRunner,
-                DomainTestRunner domainTestRunner,
+                TestRunner testRunner,
                 RefinementTestRunner refinementTestRunner,
                 Reporter reporter,
                 ReportSettings reportSettings,
@@ -42,7 +42,7 @@ final class Core implements GauntletApi {
                 Maybe<Executor> executorOverride) {
         this.executorOverride = executorOverride;
         this.generatorTestRunner = generatorTestRunner;
-        this.domainTestRunner = domainTestRunner;
+        this.testRunner = testRunner;
         this.refinementTestRunner = refinementTestRunner;
         this.reporter = reporter;
         this.reportSettings = reportSettings;
@@ -90,42 +90,42 @@ final class Core implements GauntletApi {
 
     @Override
     public GauntletApi withDefaultSampleCount(int sampleCount) {
-        return new Core(generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, sampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
+        return new Core(generatorTestRunner, testRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, sampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
     }
 
     @Override
     public GauntletApi withDefaultMaximumShrinkCount(int maximumShrinkCount) {
-        return new Core(generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, maximumShrinkCount, defaultTimeout, executorOverride);
+        return new Core(generatorTestRunner, testRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, maximumShrinkCount, defaultTimeout, executorOverride);
     }
 
     @Override
     public GauntletApi withExecutor(Executor executor) {
-        return new Core(generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, just(executor));
+        return new Core(generatorTestRunner, testRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, just(executor));
     }
 
     @Override
     public GauntletApi withGeneratorParameters(GeneratorParameters generatorParameters) {
-        return new Core(generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
+        return new Core(generatorTestRunner, testRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
     }
 
     @Override
     public GauntletApi withReporter(Reporter reporter) {
-        return new Core(generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
+        return new Core(generatorTestRunner, testRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
     }
 
     @Override
     public GauntletApi withReportSettings(ReportSettings reportSettings) {
-        return new Core(generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
+        return new Core(generatorTestRunner, testRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
     }
 
     @Override
     public GauntletApi withReportRenderer(ReportRenderer reportRenderer) {
-        return new Core(generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
+        return new Core(generatorTestRunner, testRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
     }
 
     @Override
     public GauntletApi withDefaultTimeout(Duration timeout) {
-        return new Core(generatorTestRunner, domainTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, timeout, executorOverride);
+        return new Core(generatorTestRunner, testRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, timeout, executorOverride);
     }
 
     @Override
@@ -141,12 +141,12 @@ final class Core implements GauntletApi {
 
     @Override
     public <A> void assertThat(DomainTest<A> domainTest) {
-        DomainTestSettings settings = createDomainSettings(domainTest.getSettingsAdjustments());
-        DomainTestResult<A> result = domainTestRunner.run(settings, domainTest.getQuantifier(), domainTest.getDomain(),
+        TestRunnerSettings settings = createDomainSettings(domainTest.getSettingsAdjustments());
+        TestResult<A> result = testRunner.run(settings, domainTest.getQuantifier(), domainTest.getDomain().getElements(),
                 domainTest.getProperty())
                 .unsafePerformIO();
         ReportData<A> reportData = reportData(domainTest.getProperty(),
-                result.getResult(),
+                result,
                 domainTest.getDomain().getPrettyPrinter(),
                 nothing());
         reporter.report(reportSettings, reportRenderer, reportData);
@@ -160,8 +160,8 @@ final class Core implements GauntletApi {
                 adjustments.getGeneratorParameters().apply(this::getGeneratorParameters));
     }
 
-    private DomainTestSettings createDomainSettings(DomainTestSettingsAdjustments adjustments) {
-        return domainTestSettings(adjustments.getTimeout().apply(this::getDefaultTimeout),
+    private TestRunnerSettings createDomainSettings(DomainTestSettingsAdjustments adjustments) {
+        return testRunnerSettings(adjustments.getTimeout().apply(this::getDefaultTimeout),
                 adjustments.getExecutor().apply(this::getExecutor));
     }
 
