@@ -49,61 +49,58 @@ public abstract class GauntletApiBase implements GauntletApi {
         return GauntletApi.all(arbitraryA, arbitraryB, arbitraryC);
     }
 
+    public <A> DomainTestApi<A> all(Domain<A> domain) {
+        return GauntletApi.all(domain);
+    }
+
+    public <A, B> DomainTestApi<Tuple2<A, B>> all(Domain<A> domainA,
+                                                  Domain<B> domainB) {
+        return GauntletApi.all(domainA, domainB);
+    }
+
+    public <A, B, C> DomainTestApi<Tuple3<A, B, C>> all(Domain<A> domainA,
+                                                        Domain<B> domainB,
+                                                        Domain<C> domainC) {
+        return GauntletApi.all(domainA, domainB, domainC);
+    }
+
+    public <A, B, C, D> DomainTestApi<Tuple4<A, B, C, D>> all(Domain<A> domainA,
+                                                              Domain<B> domainB,
+                                                              Domain<C> domainC,
+                                                              Domain<D> domainD) {
+        return GauntletApi.all(domainA, domainB, domainC, domainD);
+    }
+
+    public <A> DomainTestApi<A> some(Domain<A> domain) {
+        return GauntletApi.some(domain);
+    }
+
+    public <A, B> DomainTestApi<Tuple2<A, B>> some(Domain<A> domainA,
+                                                   Domain<B> domainB) {
+        return GauntletApi.some(domainA, domainB);
+    }
+
+    public <A, B, C> DomainTestApi<Tuple3<A, B, C>> some(Domain<A> domainA,
+                                                         Domain<B> domainB,
+                                                         Domain<C> domainC) {
+        return GauntletApi.some(domainA, domainB, domainC);
+    }
+
+    public <A, B, C, D> DomainTestApi<Tuple4<A, B, C, D>> some(Domain<A> domainA,
+                                                               Domain<B> domainB,
+                                                               Domain<C> domainC,
+                                                               Domain<D> domainD) {
+        return GauntletApi.some(domainA, domainB, domainC, domainD);
+    }
+
     @Override
     public <A> void assertThat(GeneratorTest<A> generatorTest) {
         getApi().assertThat(generatorTest);
     }
 
     @Override
-    public <A> DomainTestApi<A> all(Domain<A> domain) {
-        return getApi().all(domain);
-    }
-
-    @Override
-    public <A, B> DomainTestApi<Tuple2<A, B>> all(Domain<A> domainA,
-                                                  Domain<B> domainB) {
-        return getApi().all(domainA, domainB);
-    }
-
-    @Override
-    public <A, B, C> DomainTestApi<Tuple3<A, B, C>> all(Domain<A> domainA,
-                                                        Domain<B> domainB,
-                                                        Domain<C> domainC) {
-        return getApi().all(domainA, domainB, domainC);
-    }
-
-    @Override
-    public <A, B, C, D> DomainTestApi<Tuple4<A, B, C, D>> all(Domain<A> domainA,
-                                                              Domain<B> domainB,
-                                                              Domain<C> domainC,
-                                                              Domain<D> domainD) {
-        return getApi().all(domainA, domainB, domainC, domainD);
-    }
-
-    @Override
-    public <A> DomainTestApi<A> some(Domain<A> domain) {
-        return getApi().some(domain);
-    }
-
-    @Override
-    public <A, B> DomainTestApi<Tuple2<A, B>> some(Domain<A> domainA,
-                                                   Domain<B> domainB) {
-        return getApi().some(domainA, domainB);
-    }
-
-    @Override
-    public <A, B, C> DomainTestApi<Tuple3<A, B, C>> some(Domain<A> domainA,
-                                                         Domain<B> domainB,
-                                                         Domain<C> domainC) {
-        return getApi().some(domainA, domainB, domainC);
-    }
-
-    @Override
-    public <A, B, C, D> DomainTestApi<Tuple4<A, B, C, D>> some(Domain<A> domainA,
-                                                               Domain<B> domainB,
-                                                               Domain<C> domainC,
-                                                               Domain<D> domainD) {
-        return getApi().some(domainA, domainB, domainC, domainD);
+    public <A> void assertThat(DomainTest<A> domainTest) {
+        getApi().assertThat(domainTest);
     }
 
     @Override

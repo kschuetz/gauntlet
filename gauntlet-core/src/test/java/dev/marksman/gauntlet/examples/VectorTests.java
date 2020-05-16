@@ -14,7 +14,7 @@ public final class VectorTests extends GauntletApiBase {
     @Test
     void reverseTwiceIsOriginal() {
         assertThat(all(vectors)
-                .mustSatisfy(predicate("reverse twice is original",
+                .satisfy(predicate("reverse twice is original",
                         xs -> xs.reverse().reverse().equals(xs))));
     }
 }

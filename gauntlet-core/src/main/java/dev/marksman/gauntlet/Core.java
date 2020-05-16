@@ -1,11 +1,7 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Maybe;
-import com.jnape.palatable.lambda.adt.hlist.Tuple2;
-import com.jnape.palatable.lambda.adt.hlist.Tuple3;
-import com.jnape.palatable.lambda.adt.hlist.Tuple4;
 import com.jnape.palatable.lambda.io.IO;
-import dev.marksman.collectionviews.Vector;
 import dev.marksman.kraftwerk.GeneratorParameters;
 
 import java.time.Duration;
@@ -14,11 +10,8 @@ import java.util.concurrent.Executor;
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.io.IO.io;
-import static dev.marksman.gauntlet.DomainTestApi.domainTestApi;
-import static dev.marksman.gauntlet.DomainTestParameters.domainTestParameters;
+import static dev.marksman.gauntlet.DomainTestSettings.domainTestSettings;
 import static dev.marksman.gauntlet.GeneratorTestSettings.generatorTestSettings;
-import static dev.marksman.gauntlet.Quantifier.EXISTENTIAL;
-import static dev.marksman.gauntlet.Quantifier.UNIVERSAL;
 import static dev.marksman.gauntlet.ReportData.reportData;
 
 final class Core implements GauntletApi {
@@ -136,46 +129,6 @@ final class Core implements GauntletApi {
     }
 
     @Override
-    public <A> DomainTestApi<A> all(Domain<A> domain) {
-        return createDomainTestApi(UNIVERSAL, domain);
-    }
-
-    @Override
-    public <A, B> DomainTestApi<Tuple2<A, B>> all(Domain<A> domainA, Domain<B> domainB) {
-        return createDomainTestApi(UNIVERSAL, Domain.cartesianProduct(domainA, domainB));
-    }
-
-    @Override
-    public <A, B, C> DomainTestApi<Tuple3<A, B, C>> all(Domain<A> domainA, Domain<B> domainB, Domain<C> domainC) {
-        return createDomainTestApi(UNIVERSAL, Domain.cartesianProduct(domainA, domainB, domainC));
-    }
-
-    @Override
-    public <A, B, C, D> DomainTestApi<Tuple4<A, B, C, D>> all(Domain<A> domainA, Domain<B> domainB, Domain<C> domainC, Domain<D> domainD) {
-        return createDomainTestApi(UNIVERSAL, Domain.cartesianProduct(domainA, domainB, domainC, domainD));
-    }
-
-    @Override
-    public <A> DomainTestApi<A> some(Domain<A> domain) {
-        return createDomainTestApi(EXISTENTIAL, domain);
-    }
-
-    @Override
-    public <A, B> DomainTestApi<Tuple2<A, B>> some(Domain<A> domainA, Domain<B> domainB) {
-        return createDomainTestApi(EXISTENTIAL, Domain.cartesianProduct(domainA, domainB));
-    }
-
-    @Override
-    public <A, B, C> DomainTestApi<Tuple3<A, B, C>> some(Domain<A> domainA, Domain<B> domainB, Domain<C> domainC) {
-        return createDomainTestApi(EXISTENTIAL, Domain.cartesianProduct(domainA, domainB, domainC));
-    }
-
-    @Override
-    public <A, B, C, D> DomainTestApi<Tuple4<A, B, C, D>> some(Domain<A> domainA, Domain<B> domainB, Domain<C> domainC, Domain<D> domainD) {
-        return createDomainTestApi(EXISTENTIAL, Domain.cartesianProduct(domainA, domainB, domainC, domainD));
-    }
-
-    @Override
     public <A> void assertThat(GeneratorTest<A> generatorTest) {
         GeneratorTestSettings settings = createGeneratorSettings(generatorTest.getSettingsAdjustments());
         GeneratorTestResult<A> result = generatorTestRunner.run(settings, generatorTest.getArbitrary(), generatorTest.getProperty())
@@ -183,6 +136,19 @@ final class Core implements GauntletApi {
                 .unsafePerformIO();
         ReportData<A> reportData = reportData(generatorTest.getProperty(), result.getResult(), generatorTest.getArbitrary().getPrettyPrinter(),
                 just(result.getInitialSeedValue()));
+        reporter.report(reportSettings, reportRenderer, reportData);
+    }
+
+    @Override
+    public <A> void assertThat(DomainTest<A> domainTest) {
+        DomainTestSettings settings = createDomainSettings(domainTest.getSettingsAdjustments());
+        DomainTestResult<A> result = domainTestRunner.run(settings, domainTest.getQuantifier(), domainTest.getDomain(),
+                domainTest.getProperty())
+                .unsafePerformIO();
+        ReportData<A> reportData = reportData(domainTest.getProperty(),
+                result.getResult(),
+                domainTest.getDomain().getPrettyPrinter(),
+                nothing());
         reporter.report(reportSettings, reportRenderer, reportData);
     }
 
@@ -194,19 +160,9 @@ final class Core implements GauntletApi {
                 adjustments.getGeneratorParameters().apply(this::getGeneratorParameters));
     }
 
-    private <A> void runDomainTest(DomainTest<A> domainTest) {
-        DomainTestResult<A> result = domainTestRunner.run(domainTest)
-                .unsafePerformIO();
-        ReportData<A> reportData = reportData(domainTest.getProperty(),
-                result.getResult(),
-                domainTest.getDomain().getPrettyPrinter(),
-                nothing());
-        reporter.report(reportSettings, reportRenderer, reportData);
-    }
-
-    private <A> DomainTestApi<A> createDomainTestApi(Quantifier quantifier, Domain<A> domain) {
-        return domainTestApi(this::getExecutor, this::runDomainTest,
-                domainTestParameters(domain, quantifier, Vector.empty(), defaultTimeout, nothing()));
+    private DomainTestSettings createDomainSettings(DomainTestSettingsAdjustments adjustments) {
+        return domainTestSettings(adjustments.getTimeout().apply(this::getDefaultTimeout),
+                adjustments.getExecutor().apply(this::getExecutor));
     }
 
     private <A> IO<GeneratorTestResult<A>> refineResult(GeneratorTest<A> testData,

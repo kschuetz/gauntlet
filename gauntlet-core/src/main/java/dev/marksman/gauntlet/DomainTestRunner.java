@@ -20,20 +20,22 @@ public final class DomainTestRunner {
         return INSTANCE;
     }
 
-    public <A> IO<DomainTestResult<A>> run(DomainTest<A> domainTest) {
+    public <A> IO<DomainTestResult<A>> run(DomainTestSettings settings,
+                                           Quantifier quantifier,
+                                           Domain<A> domain,
+                                           Prop<A> property) {
         return io(() -> {
-            Executor executor = domainTest.getExecutor();
-            Domain<A> domain = domainTest.getDomain();
+            Executor executor = settings.getExecutor();
             ImmutableVector<A> elements = Vector.copyFrom(domain.getElements());
-            ResultCollector<A> collector = domainTest.getQuantifier() == EXISTENTIAL
+            ResultCollector<A> collector = quantifier == EXISTENTIAL
                     ? existentialResultCollector(elements)
                     : universalResultCollector(elements);
             int elementCount = elements.size();
             for (int elementIndex = 0; elementIndex < elementCount; elementIndex++) {
-                EvaluateSampleTask<A> task = evaluateSampleTask(collector, domainTest.getProperty(), elementIndex, elements.unsafeGet(elementIndex));
+                EvaluateSampleTask<A> task = evaluateSampleTask(collector, property, elementIndex, elements.unsafeGet(elementIndex));
                 executor.execute(task);
             }
-            return domainTestResult(collector.getResultBlocking(domainTest.getTimeout()));
+            return domainTestResult(collector.getResultBlocking(settings.getTimeout()));
         });
     }
 }

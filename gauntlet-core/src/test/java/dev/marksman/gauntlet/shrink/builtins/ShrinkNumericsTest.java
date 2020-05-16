@@ -44,8 +44,8 @@ final class ShrinkNumericsTest extends GauntletApiBase {
     class Ints {
         @Test
         void unclamped() {
-            all(shrinkTestCases(generateInt(), shrinkInt()))
-                    .mustSatisfy(neverRepeatsAnElement());
+            assertThat(all(shrinkTestCases(generateInt(), shrinkInt()))
+                    .satisfy(neverRepeatsAnElement()));
         }
 
         @Test
@@ -54,14 +54,14 @@ final class ShrinkNumericsTest extends GauntletApiBase {
             // TODO:
             // java.lang.AssertionError: Failed property 'never repeats an element ∧ all elements within domain ∧ when input is outside of shrink domain, shrink output is empty' with value 'ShrinkTestCase(input=-2147483648, output=dev.marksman.gauntlet.shrink.LazyCons$1@30272916, min=-2147483648, max=1413962530)'. reasons: FailureReasons(items=Vector(Conjuncts failed.))
 
-            all(constrainedShrinkTestCase(generateIntRange(),
+            assertThat(all(constrainedShrinkTestCase(generateIntRange(),
                     ShrinkNumericsTest::generateMostlyInDomain,
                     ShrinkNumerics::shrinkInt))
-                    .mustSatisfy(allOf(
+                    .satisfy(allOf(
                             ShrinkStrategyTestCase.<Integer>neverRepeatsAnElement(),
                             allElementsWithinDomain(),
                             shrinkOutputEmptyWhenInputOutsideOfDomain()
-                    ));
+                    )));
         }
     }
 
@@ -70,8 +70,8 @@ final class ShrinkNumericsTest extends GauntletApiBase {
     class Longs {
         @Test
         void unclamped() {
-            all(shrinkTestCases(generateLong(), shrinkLong()))
-                    .mustSatisfy(neverRepeatsAnElement());
+            assertThat(all(shrinkTestCases(generateLong(), shrinkLong()))
+                    .satisfy(neverRepeatsAnElement()));
         }
     }
 
@@ -80,8 +80,8 @@ final class ShrinkNumericsTest extends GauntletApiBase {
     class Shorts {
         @Test
         void unclamped() {
-            all(shrinkTestCases(generateShort(), shrinkShort()))
-                    .mustSatisfy(neverRepeatsAnElement());
+            assertThat(all(shrinkTestCases(generateShort(), shrinkShort()))
+                    .satisfy(neverRepeatsAnElement()));
         }
     }
 
@@ -90,8 +90,8 @@ final class ShrinkNumericsTest extends GauntletApiBase {
     class Bytes {
         @Test
         void unclamped() {
-            all(shrinkTestCases(generateByte(), shrinkByte()))
-                    .mustSatisfy(neverRepeatsAnElement());
+            assertThat(all(shrinkTestCases(generateByte(), shrinkByte()))
+                    .satisfy(neverRepeatsAnElement()));
         }
     }
 }

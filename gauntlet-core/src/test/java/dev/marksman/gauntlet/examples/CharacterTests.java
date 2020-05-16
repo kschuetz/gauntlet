@@ -15,31 +15,31 @@ public final class CharacterTests extends GauntletApiBase {
 
     @Test
     void cannotBeBothUppercaseAndLowercase1() {
-        all(asciiCharacters())
-                .mustSatisfy(named("never both uppercase and lowercase",
-                        (isUpperCaseLetter.and(isLowerCaseLetter)).not()));
+        assertThat(all(asciiCharacters())
+                .satisfy(named("never both uppercase and lowercase",
+                        (isUpperCaseLetter.and(isLowerCaseLetter)).not())));
     }
 
     @Test
     void cannotBeBothUppercaseAndLowercase2() {
-        all(asciiCharacters())
-                .mustSatisfy(named("never both uppercase and lowercase",
+        assertThat(all(asciiCharacters())
+                .satisfy(named("never both uppercase and lowercase",
                         allOf(isUpperCaseLetter.implies(isLowerCaseLetter.not()),
-                                isLowerCaseLetter.implies(isUpperCaseLetter.not()))));
+                                isLowerCaseLetter.implies(isUpperCaseLetter.not())))));
     }
 
     @Test
     void someUppercaseCharactersExist() {
-        some(asciiCharacters()).mustSatisfy(isUpperCaseLetter);
+        assertThat(some(asciiCharacters()).satisfy(isUpperCaseLetter));
     }
 
     @Test
     void someLowercaseCharactersExist() {
-        some(asciiCharacters()).mustSatisfy(isLowerCaseLetter);
+        assertThat(some(asciiCharacters()).satisfy(isLowerCaseLetter));
     }
 
     @Test
     void someCharactersThatAreNeitherUppercaseOrLowercaseExist() {
-        some(asciiCharacters()).mustSatisfy(noneOf(isUpperCaseLetter, isLowerCaseLetter));
+        assertThat(some(asciiCharacters()).satisfy(noneOf(isUpperCaseLetter, isLowerCaseLetter)));
     }
 }

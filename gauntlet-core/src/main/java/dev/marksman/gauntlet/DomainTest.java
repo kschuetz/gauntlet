@@ -1,49 +1,38 @@
 package dev.marksman.gauntlet;
 
-import java.time.Duration;
-import java.util.concurrent.Executor;
-
-final class DomainTest<A> {
+public final class DomainTest<A> {
     private final Quantifier quantifier;
     private final Domain<A> domain;
     private final Prop<A> property;
-    private final Duration timeout;
-    private final Executor executor;
+    private final DomainTestSettingsAdjustments settings;
 
-    private DomainTest(Quantifier quantifier, Domain<A> domain, Prop<A> property,
-                       Duration timeout, Executor executor) {
+    private DomainTest(Quantifier quantifier, Domain<A> domain, Prop<A> property, DomainTestSettingsAdjustments settings) {
         this.quantifier = quantifier;
         this.domain = domain;
         this.property = property;
-        this.timeout = timeout;
-        this.executor = executor;
+        this.settings = settings;
     }
 
     static <A> DomainTest<A> domainTest(Quantifier quantifier,
                                         Domain<A> domain,
                                         Prop<A> property,
-                                        Duration timeout,
-                                        Executor executor) {
-        return new DomainTest<>(quantifier, domain, property, timeout, executor);
+                                        DomainTestSettingsAdjustments settings) {
+        return new DomainTest<>(quantifier, domain, property, settings);
     }
 
     public Quantifier getQuantifier() {
-        return this.quantifier;
+        return quantifier;
     }
 
     public Domain<A> getDomain() {
-        return this.domain;
+        return domain;
     }
 
     public Prop<A> getProperty() {
-        return this.property;
+        return property;
     }
 
-    public Duration getTimeout() {
-        return this.timeout;
-    }
-
-    public Executor getExecutor() {
-        return this.executor;
+    public DomainTestSettingsAdjustments getSettingsAdjustments() {
+        return settings;
     }
 }
