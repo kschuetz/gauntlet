@@ -221,7 +221,7 @@ final class Core implements GauntletApi {
                 .match(__ -> input,
                         supplyFailure -> input.projectA()
                                 .match(__ -> input,
-                                        passed -> TestResult.supplyFailed(passed.getPassedSamples(), supplyFailure)));
+                                        passed -> TestResult.supplyFailed(supplyFailure, passed.getSuccessCount())));
     }
 
     private <A> GeneratedDataSet<A> generateDataSet(GeneratorTestSettings settings,

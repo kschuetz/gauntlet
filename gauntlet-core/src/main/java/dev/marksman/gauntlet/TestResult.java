@@ -3,10 +3,8 @@ package dev.marksman.gauntlet;
 import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.adt.coproduct.CoProduct8;
 import com.jnape.palatable.lambda.functions.Fn1;
-import dev.marksman.collectionviews.ImmutableVector;
 
 import java.time.Duration;
-import java.util.Objects;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
@@ -15,43 +13,41 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
         TestResult.Falsified<A>, TestResult.Unproved<A>, TestResult.SupplyFailed<A>, TestResult.Error<A>,
         TestResult.TimedOut<A>, TestResult.Interrupted<A>, TestResult<A>> {
 
-    public static <A> Passed<A> passed(ImmutableVector<A> passedSamples) {
-        return new Passed<>(passedSamples);
+    public static <A> Passed<A> passed(int successCount) {
+        return new Passed<>(successCount);
     }
 
-    public static <A> Proved<A> proved(A passedSample, ImmutableVector<Counterexample<A>> counterexamples) {
-        return new Proved<>(passedSample, counterexamples);
+    public static <A> Proved<A> proved(A passedSample, int counterexampleCount) {
+        return new Proved<>(passedSample, counterexampleCount);
     }
 
-    public static <A> Falsified<A> falsified(ImmutableVector<A> passedSamples,
-                                             Counterexample<A> counterexample) {
-        return new Falsified<>(passedSamples, counterexample, nothing());
+    public static <A> Falsified<A> falsified(Counterexample<A> counterexample, int successCount) {
+        return new Falsified<>(successCount, counterexample, nothing());
     }
 
-    public static <A> Falsified<A> falsified(ImmutableVector<A> passedSamples,
-                                             Counterexample<A> counterexample,
+    public static <A> Falsified<A> falsified(Counterexample<A> counterexample, int successCount,
                                              Maybe<RefinedCounterexample<A>> refinedCounterexample) {
-        return new Falsified<>(passedSamples, counterexample, refinedCounterexample);
+        return new Falsified<>(successCount, counterexample, refinedCounterexample);
     }
 
-    public static <A> Unproved<A> unproved(ImmutableVector<Counterexample<A>> counterexamples) {
-        return new Unproved<>(counterexamples);
+    public static <A> Unproved<A> unproved(int counterexampleCount) {
+        return new Unproved<>(counterexampleCount);
     }
 
-    public static <A> SupplyFailed<A> supplyFailed(ImmutableVector<A> passedSamples, SupplyFailure supplyFailure) {
-        return new SupplyFailed<>(passedSamples, supplyFailure);
+    public static <A> SupplyFailed<A> supplyFailed(SupplyFailure supplyFailure, int successCount) {
+        return new SupplyFailed<>(supplyFailure, successCount);
     }
 
-    public static <A> Error<A> error(ImmutableVector<A> passedSamples, A errorSample, Throwable error) {
-        return new Error<>(passedSamples, errorSample, error);
+    public static <A> Error<A> error(A errorSample, Throwable error, int successCount) {
+        return new Error<>(errorSample, error, successCount);
     }
 
-    public static <A> TimedOut<A> timedOut(ImmutableVector<A> passedSamples, Duration duration) {
-        return new TimedOut<>(passedSamples, duration);
+    public static <A> TimedOut<A> timedOut(Duration duration, int successCount) {
+        return new TimedOut<>(duration, successCount);
     }
 
-    public static <A> Interrupted<A> interrupted(ImmutableVector<A> passedSamples, Maybe<String> message) {
-        return new Interrupted<>(passedSamples, message);
+    public static <A> Interrupted<A> interrupted(Maybe<String> message, int successCount) {
+        return new Interrupted<>(message, successCount);
     }
 
     public abstract boolean isSuccess();
@@ -73,10 +69,10 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
 
     // All cases succeeded
     public static final class Passed<A> extends TestResult<A> {
-        private final ImmutableVector<A> passedSamples;
+        private final int successCount;
 
-        private Passed(ImmutableVector<A> passedSamples) {
-            this.passedSamples = passedSamples;
+        private Passed(int successCount) {
+            this.successCount = successCount;
         }
 
         @Override
@@ -85,7 +81,7 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
         }
 
         public int getSuccessCount() {
-            return passedSamples.size();
+            return successCount;
         }
 
         @Override
@@ -93,34 +89,28 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
             return aFn.apply(this);
         }
 
-        public ImmutableVector<A> getPassedSamples() {
-            return this.passedSamples;
-        }
-
+        @Override
         public String toString() {
-            return "TestResult.Passed(passedSamples=" + this.getPassedSamples() + ")";
+            return "Passed{" +
+                    "successCount=" + successCount +
+                    '}';
         }
 
-        public boolean equals(final Object o) {
-            if (o == this) return true;
-            if (!(o instanceof TestResult.Passed)) return false;
-            final Passed<?> other = (Passed<?>) o;
-            if (!other.canEqual(this)) return false;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
             if (!super.equals(o)) return false;
-            final Object this$passedSamples = this.getPassedSamples();
-            final Object other$passedSamples = other.getPassedSamples();
-            return Objects.equals(this$passedSamples, other$passedSamples);
+
+            Passed<?> passed = (Passed<?>) o;
+
+            return successCount == passed.successCount;
         }
 
-        protected boolean canEqual(final Object other) {
-            return other instanceof TestResult.Passed;
-        }
-
+        @Override
         public int hashCode() {
-            final int PRIME = 59;
             int result = super.hashCode();
-            final Object $passedSamples = this.getPassedSamples();
-            result = result * PRIME + ($passedSamples == null ? 43 : $passedSamples.hashCode());
+            result = 31 * result + successCount;
             return result;
         }
     }
@@ -128,11 +118,11 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
     // A case was found that proved the property
     public static final class Proved<A> extends TestResult<A> {
         private final A passedSample;
-        private final ImmutableVector<Counterexample<A>> counterexamples;
+        private final int counterexampleCount;
 
-        private Proved(A passedSample, ImmutableVector<Counterexample<A>> counterexamples) {
+        private Proved(A passedSample, int counterexampleCount) {
             this.passedSample = passedSample;
-            this.counterexamples = counterexamples;
+            this.counterexampleCount = counterexampleCount;
         }
 
         @Override
@@ -149,52 +139,47 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
             return this.passedSample;
         }
 
-        public ImmutableVector<Counterexample<A>> getCounterexamples() {
-            return this.counterexamples;
+        public int getCounterexampleCount() {
+            return this.counterexampleCount;
         }
 
+        @Override
         public String toString() {
-            return "TestResult.Proved(passedSample=" + this.getPassedSample() + ", counterexamples=" + this.getCounterexamples() + ")";
+            return "Proved{" +
+                    "passedSample=" + passedSample +
+                    ", counterexampleCount=" + counterexampleCount +
+                    '}';
         }
 
-        public boolean equals(final Object o) {
-            if (o == this) return true;
-            if (!(o instanceof TestResult.Proved)) return false;
-            final Proved<?> other = (Proved<?>) o;
-            if (!other.canEqual(this)) return false;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
             if (!super.equals(o)) return false;
-            final Object this$passedSample = this.getPassedSample();
-            final Object other$passedSample = other.getPassedSample();
-            if (!Objects.equals(this$passedSample, other$passedSample))
-                return false;
-            final Object this$counterexamples = this.getCounterexamples();
-            final Object other$counterexamples = other.getCounterexamples();
-            return Objects.equals(this$counterexamples, other$counterexamples);
+
+            Proved<?> proved = (Proved<?>) o;
+
+            if (counterexampleCount != proved.counterexampleCount) return false;
+            return passedSample.equals(proved.passedSample);
         }
 
-        protected boolean canEqual(final Object other) {
-            return other instanceof TestResult.Proved;
-        }
-
+        @Override
         public int hashCode() {
-            final int PRIME = 59;
             int result = super.hashCode();
-            final Object $passedSample = this.getPassedSample();
-            result = result * PRIME + ($passedSample == null ? 43 : $passedSample.hashCode());
-            final Object $counterexamples = this.getCounterexamples();
-            result = result * PRIME + ($counterexamples == null ? 43 : $counterexamples.hashCode());
+            result = 31 * result + passedSample.hashCode();
+            result = 31 * result + counterexampleCount;
             return result;
         }
     }
 
     // A case was found that falsified the property
     public static final class Falsified<A> extends TestResult<A> {
-        private final ImmutableVector<A> passedSamples;
+        private final int successCount;
         private final Counterexample<A> counterexample;
         private final Maybe<RefinedCounterexample<A>> refinedCounterexample;
 
-        private Falsified(ImmutableVector<A> passedSamples, Counterexample<A> counterexample, Maybe<RefinedCounterexample<A>> refinedCounterexample) {
-            this.passedSamples = passedSamples;
+        private Falsified(int successCount, Counterexample<A> counterexample, Maybe<RefinedCounterexample<A>> refinedCounterexample) {
+            this.successCount = successCount;
             this.counterexample = counterexample;
             this.refinedCounterexample = refinedCounterexample;
         }
@@ -204,12 +189,8 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
             return false;
         }
 
-        public int getSuccessCount() {
-            return passedSamples.size();
-        }
-
         public Falsified<A> withRefinedCounterexample(RefinedCounterexample<A> refinedCounterexample) {
-            return new Falsified<>(passedSamples, counterexample, just(refinedCounterexample));
+            return new Falsified<>(successCount, counterexample, just(refinedCounterexample));
         }
 
         @Override
@@ -217,8 +198,8 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
             return cFn.apply(this);
         }
 
-        public ImmutableVector<A> getPassedSamples() {
-            return this.passedSamples;
+        public int getSuccessCount() {
+            return this.successCount;
         }
 
         public Counterexample<A> getCounterexample() {
@@ -229,52 +210,44 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
             return this.refinedCounterexample;
         }
 
+        @Override
         public String toString() {
-            return "TestResult.Falsified(passedSamples=" + this.getPassedSamples() + ", counterexample=" + this.getCounterexample() + ", refinedCounterexample=" + this.getRefinedCounterexample() + ")";
+            return "Falsified{" +
+                    "successCount=" + successCount +
+                    ", counterexample=" + counterexample +
+                    ", refinedCounterexample=" + refinedCounterexample +
+                    '}';
         }
 
-        public boolean equals(final Object o) {
-            if (o == this) return true;
-            if (!(o instanceof TestResult.Falsified)) return false;
-            final Falsified<?> other = (Falsified<?>) o;
-            if (!other.canEqual(this)) return false;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
             if (!super.equals(o)) return false;
-            final Object this$passedSamples = this.getPassedSamples();
-            final Object other$passedSamples = other.getPassedSamples();
-            if (!Objects.equals(this$passedSamples, other$passedSamples))
-                return false;
-            final Object this$counterexample = this.getCounterexample();
-            final Object other$counterexample = other.getCounterexample();
-            if (!Objects.equals(this$counterexample, other$counterexample))
-                return false;
-            final Object this$refinedCounterexample = this.getRefinedCounterexample();
-            final Object other$refinedCounterexample = other.getRefinedCounterexample();
-            return Objects.equals(this$refinedCounterexample, other$refinedCounterexample);
+
+            Falsified<?> falsified = (Falsified<?>) o;
+
+            if (successCount != falsified.successCount) return false;
+            if (!counterexample.equals(falsified.counterexample)) return false;
+            return refinedCounterexample.equals(falsified.refinedCounterexample);
         }
 
-        protected boolean canEqual(final Object other) {
-            return other instanceof TestResult.Falsified;
-        }
-
+        @Override
         public int hashCode() {
-            final int PRIME = 59;
             int result = super.hashCode();
-            final Object $passedSamples = this.getPassedSamples();
-            result = result * PRIME + ($passedSamples == null ? 43 : $passedSamples.hashCode());
-            final Object $counterexample = this.getCounterexample();
-            result = result * PRIME + ($counterexample == null ? 43 : $counterexample.hashCode());
-            final Object $refinedCounterexample = this.getRefinedCounterexample();
-            result = result * PRIME + ($refinedCounterexample == null ? 43 : $refinedCounterexample.hashCode());
+            result = 31 * result + successCount;
+            result = 31 * result + counterexample.hashCode();
+            result = 31 * result + refinedCounterexample.hashCode();
             return result;
         }
     }
 
     // No cases were found that prove the property
     public static final class Unproved<A> extends TestResult<A> {
-        private final ImmutableVector<Counterexample<A>> counterexamples;
+        private final int counterexampleCount;
 
-        private Unproved(ImmutableVector<Counterexample<A>> counterexamples) {
-            this.counterexamples = counterexamples;
+        private Unproved(int counterexampleCount) {
+            this.counterexampleCount = counterexampleCount;
         }
 
         @Override
@@ -287,45 +260,43 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
             return dFn.apply(this);
         }
 
-        public ImmutableVector<Counterexample<A>> getCounterexamples() {
-            return this.counterexamples;
+        public int getCounterexampleCount() {
+            return this.counterexampleCount;
         }
 
+        @Override
         public String toString() {
-            return "TestResult.Unproved(counterexamples=" + this.getCounterexamples() + ")";
+            return "Unproved{" +
+                    "counterexampleCount=" + counterexampleCount +
+                    '}';
         }
 
-        public boolean equals(final Object o) {
-            if (o == this) return true;
-            if (!(o instanceof TestResult.Unproved)) return false;
-            final Unproved<?> other = (Unproved<?>) o;
-            if (!other.canEqual(this)) return false;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
             if (!super.equals(o)) return false;
-            final Object this$counterexamples = this.getCounterexamples();
-            final Object other$counterexamples = other.getCounterexamples();
-            return Objects.equals(this$counterexamples, other$counterexamples);
+
+            Unproved<?> unproved = (Unproved<?>) o;
+
+            return counterexampleCount == unproved.counterexampleCount;
         }
 
-        protected boolean canEqual(final Object other) {
-            return other instanceof TestResult.Unproved;
-        }
-
+        @Override
         public int hashCode() {
-            final int PRIME = 59;
             int result = super.hashCode();
-            final Object $counterexamples = this.getCounterexamples();
-            result = result * PRIME + ($counterexamples == null ? 43 : $counterexamples.hashCode());
+            result = 31 * result + counterexampleCount;
             return result;
         }
     }
 
     // Generator encountered a supply failure before a case was falsified
     public static final class SupplyFailed<A> extends TestResult<A> {
-        private final ImmutableVector<A> passedSamples;
         private final SupplyFailure supplyFailure;
+        private final int successCount;
 
-        private SupplyFailed(ImmutableVector<A> passedSamples, SupplyFailure supplyFailure) {
-            this.passedSamples = passedSamples;
+        private SupplyFailed(SupplyFailure supplyFailure, int successCount) {
+            this.successCount = successCount;
             this.supplyFailure = supplyFailure;
         }
 
@@ -339,58 +310,53 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
             return eFn.apply(this);
         }
 
-        public ImmutableVector<A> getPassedSamples() {
-            return this.passedSamples;
-        }
-
         public SupplyFailure getSupplyFailure() {
             return this.supplyFailure;
         }
 
+        public int getSuccessCount() {
+            return successCount;
+        }
+
+        @Override
         public String toString() {
-            return "TestResult.SupplyFailed(passedSamples=" + this.getPassedSamples() + ", supplyFailure=" + this.getSupplyFailure() + ")";
+            return "SupplyFailed{" +
+                    "supplyFailure=" + supplyFailure +
+                    ", successCount=" + successCount +
+                    '}';
         }
 
-        public boolean equals(final Object o) {
-            if (o == this) return true;
-            if (!(o instanceof TestResult.SupplyFailed)) return false;
-            final SupplyFailed<?> other = (SupplyFailed<?>) o;
-            if (!other.canEqual(this)) return false;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
             if (!super.equals(o)) return false;
-            final Object this$passedSamples = this.getPassedSamples();
-            final Object other$passedSamples = other.getPassedSamples();
-            if (!Objects.equals(this$passedSamples, other$passedSamples))
-                return false;
-            final Object this$supplyFailure = this.getSupplyFailure();
-            final Object other$supplyFailure = other.getSupplyFailure();
-            return Objects.equals(this$supplyFailure, other$supplyFailure);
+
+            SupplyFailed<?> that = (SupplyFailed<?>) o;
+
+            if (successCount != that.successCount) return false;
+            return supplyFailure.equals(that.supplyFailure);
         }
 
-        protected boolean canEqual(final Object other) {
-            return other instanceof TestResult.SupplyFailed;
-        }
-
+        @Override
         public int hashCode() {
-            final int PRIME = 59;
             int result = super.hashCode();
-            final Object $passedSamples = this.getPassedSamples();
-            result = result * PRIME + ($passedSamples == null ? 43 : $passedSamples.hashCode());
-            final Object $supplyFailure = this.getSupplyFailure();
-            result = result * PRIME + ($supplyFailure == null ? 43 : $supplyFailure.hashCode());
+            result = 31 * result + supplyFailure.hashCode();
+            result = 31 * result + successCount;
             return result;
         }
     }
 
     // An exception was thrown from a test
     public static final class Error<A> extends TestResult<A> {
-        private final ImmutableVector<A> passedSamples;
         private final A errorSample;
         private final Throwable error;
+        private final int successCount;
 
-        private Error(ImmutableVector<A> passedSamples, A errorSample, Throwable error) {
-            this.passedSamples = passedSamples;
+        private Error(A errorSample, Throwable error, int successCount) {
             this.errorSample = errorSample;
             this.error = error;
+            this.successCount = successCount;
         }
 
         @Override
@@ -403,8 +369,8 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
             return fFn.apply(this);
         }
 
-        public ImmutableVector<A> getPassedSamples() {
-            return this.passedSamples;
+        public int getSuccessCount() {
+            return this.successCount;
         }
 
         public A getErrorSample() {
@@ -415,54 +381,47 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
             return this.error;
         }
 
+        @Override
         public String toString() {
-            return "TestResult.Error(passedSamples=" + this.getPassedSamples() + ", errorSample=" + this.getErrorSample() + ", error=" + this.getError() + ")";
+            return "Error{" +
+                    "errorSample=" + errorSample +
+                    ", error=" + error +
+                    ", successCount=" + successCount +
+                    '}';
         }
 
-        public boolean equals(final Object o) {
-            if (o == this) return true;
-            if (!(o instanceof TestResult.Error)) return false;
-            final Error<?> other = (Error<?>) o;
-            if (!other.canEqual(this)) return false;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
             if (!super.equals(o)) return false;
-            final Object this$passedSamples = this.getPassedSamples();
-            final Object other$passedSamples = other.getPassedSamples();
-            if (!Objects.equals(this$passedSamples, other$passedSamples))
+
+            Error<?> error1 = (Error<?>) o;
+
+            if (successCount != error1.successCount) return false;
+            if (errorSample != null ? !errorSample.equals(error1.errorSample) : error1.errorSample != null)
                 return false;
-            final Object this$errorSample = this.getErrorSample();
-            final Object other$errorSample = other.getErrorSample();
-            if (!Objects.equals(this$errorSample, other$errorSample))
-                return false;
-            final Object this$error = this.getError();
-            final Object other$error = other.getError();
-            return Objects.equals(this$error, other$error);
+            return error.equals(error1.error);
         }
 
-        protected boolean canEqual(final Object other) {
-            return other instanceof TestResult.Error;
-        }
-
+        @Override
         public int hashCode() {
-            final int PRIME = 59;
             int result = super.hashCode();
-            final Object $passedSamples = this.getPassedSamples();
-            result = result * PRIME + ($passedSamples == null ? 43 : $passedSamples.hashCode());
-            final Object $errorSample = this.getErrorSample();
-            result = result * PRIME + ($errorSample == null ? 43 : $errorSample.hashCode());
-            final Object $error = this.getError();
-            result = result * PRIME + ($error == null ? 43 : $error.hashCode());
+            result = 31 * result + (errorSample != null ? errorSample.hashCode() : 0);
+            result = 31 * result + error.hashCode();
+            result = 31 * result + successCount;
             return result;
         }
     }
 
     // It took too long to run all samples
     public static final class TimedOut<A> extends TestResult<A> {
-        private final ImmutableVector<A> passedSamples;
         private final Duration duration;
+        private final int successCount;
 
-        private TimedOut(ImmutableVector<A> passedSamples, Duration duration) {
-            this.passedSamples = passedSamples;
+        private TimedOut(Duration duration, int successCount) {
             this.duration = duration;
+            this.successCount = successCount;
         }
 
         @Override
@@ -475,55 +434,50 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
             return gFn.apply(this);
         }
 
-        public ImmutableVector<A> getPassedSamples() {
-            return this.passedSamples;
+        public int getSuccessCount() {
+            return this.successCount;
         }
 
         public Duration getDuration() {
             return this.duration;
         }
 
+        @Override
         public String toString() {
-            return "TestResult.TimedOut(passedSamples=" + this.getPassedSamples() + ", duration=" + this.getDuration() + ")";
+            return "TimedOut{" +
+                    "duration=" + duration +
+                    ", successCount=" + successCount +
+                    '}';
         }
 
-        public boolean equals(final Object o) {
-            if (o == this) return true;
-            if (!(o instanceof TestResult.TimedOut)) return false;
-            final TimedOut<?> other = (TimedOut<?>) o;
-            if (!other.canEqual(this)) return false;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
             if (!super.equals(o)) return false;
-            final Object this$passedSamples = this.getPassedSamples();
-            final Object other$passedSamples = other.getPassedSamples();
-            if (!Objects.equals(this$passedSamples, other$passedSamples))
-                return false;
-            final Object this$duration = this.getDuration();
-            final Object other$duration = other.getDuration();
-            return Objects.equals(this$duration, other$duration);
+
+            TimedOut<?> timedOut = (TimedOut<?>) o;
+
+            if (successCount != timedOut.successCount) return false;
+            return duration.equals(timedOut.duration);
         }
 
-        protected boolean canEqual(final Object other) {
-            return other instanceof TestResult.TimedOut;
-        }
-
+        @Override
         public int hashCode() {
-            final int PRIME = 59;
             int result = super.hashCode();
-            final Object $passedSamples = this.getPassedSamples();
-            result = result * PRIME + ($passedSamples == null ? 43 : $passedSamples.hashCode());
-            final Object $duration = this.getDuration();
-            result = result * PRIME + ($duration == null ? 43 : $duration.hashCode());
+            result = 31 * result + duration.hashCode();
+            result = 31 * result + successCount;
             return result;
         }
     }
 
     // An InterruptedException was thrown while running the test
     public static final class Interrupted<A> extends TestResult<A> {
-        private final ImmutableVector<A> passedSamples;
         private final Maybe<String> message;
+        private final int successCount;
 
-        private Interrupted(ImmutableVector<A> passedSamples, Maybe<String> message) {
-            this.passedSamples = passedSamples;
+        private Interrupted(Maybe<String> message, int successCount) {
+            this.successCount = successCount;
             this.message = message;
         }
 
@@ -537,44 +491,39 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
             return hFn.apply(this);
         }
 
-        public ImmutableVector<A> getPassedSamples() {
-            return this.passedSamples;
+        public int getSuccessCount() {
+            return this.successCount;
         }
 
         public Maybe<String> getMessage() {
             return this.message;
         }
 
+        @Override
         public String toString() {
-            return "TestResult.Interrupted(passedSamples=" + this.getPassedSamples() + ", message=" + this.getMessage() + ")";
+            return "Interrupted{" +
+                    "message=" + message +
+                    ", successCount=" + successCount +
+                    '}';
         }
 
-        public boolean equals(final Object o) {
-            if (o == this) return true;
-            if (!(o instanceof TestResult.Interrupted)) return false;
-            final Interrupted<?> other = (Interrupted<?>) o;
-            if (!other.canEqual(this)) return false;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
             if (!super.equals(o)) return false;
-            final Object this$passedSamples = this.getPassedSamples();
-            final Object other$passedSamples = other.getPassedSamples();
-            if (!Objects.equals(this$passedSamples, other$passedSamples))
-                return false;
-            final Object this$message = this.getMessage();
-            final Object other$message = other.getMessage();
-            return Objects.equals(this$message, other$message);
+
+            Interrupted<?> that = (Interrupted<?>) o;
+
+            if (successCount != that.successCount) return false;
+            return message.equals(that.message);
         }
 
-        protected boolean canEqual(final Object other) {
-            return other instanceof TestResult.Interrupted;
-        }
-
+        @Override
         public int hashCode() {
-            final int PRIME = 59;
             int result = super.hashCode();
-            final Object $passedSamples = this.getPassedSamples();
-            result = result * PRIME + ($passedSamples == null ? 43 : $passedSamples.hashCode());
-            final Object $message = this.getMessage();
-            result = result * PRIME + ($message == null ? 43 : $message.hashCode());
+            result = 31 * result + message.hashCode();
+            result = 31 * result + successCount;
             return result;
         }
     }

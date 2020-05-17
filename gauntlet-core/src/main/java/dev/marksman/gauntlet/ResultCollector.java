@@ -4,7 +4,6 @@ import com.jnape.palatable.lambda.adt.Either;
 import com.jnape.palatable.lambda.adt.Unit;
 import com.jnape.palatable.lambda.adt.choice.Choice3;
 import dev.marksman.collectionviews.ImmutableVector;
-import dev.marksman.collectionviews.Vector;
 import dev.marksman.collectionviews.VectorBuilder;
 
 import java.time.Duration;
@@ -153,25 +152,27 @@ abstract class ResultCollector<A> implements ResultReceiver {
                 boolean finishedOnTime = await(timeout);
                 return status.match(__ ->
                                 finishedOnTime
-                                        ? TestResult.passed(samples)
-                                        : timedOut(getPassedSamples(), timeout),
-                        failure -> TestResult.falsified(getPassedSamples(), counterexample(failure, samples.unsafeGet(cutoffIndex))),
-                        error -> error(getPassedSamples(), samples.unsafeGet(cutoffIndex), error));
+                                        ? TestResult.passed(getSuccessCount())
+                                        : timedOut(timeout, getSuccessCount()),
+                        failure -> TestResult.falsified(counterexample(failure, samples.unsafeGet(cutoffIndex)), getSuccessCount()),
+                        error -> error(samples.unsafeGet(cutoffIndex), error, getSuccessCount()));
             } catch (InterruptedException e) {
-                return TestResult.interrupted(getPassedSamples(), maybe(e.getMessage()));
+                return TestResult.interrupted(maybe(e.getMessage()), getSuccessCount());
             } finally {
                 lock.unlock();
             }
         }
 
-        private ImmutableVector<A> getPassedSamples() {
+        private int getSuccessCount() {
+            // TODO: rewrite getSuccessCount
             return samples
                     .zipWithIndex()
                     .foldLeft((acc, si) -> sampleIndexPassed(si._2())
                                     ? acc.add(si._1())
                                     : acc,
                             VectorBuilder.<A>builder())
-                    .build();
+                    .build()
+                    .size();
         }
 
         private boolean sampleIndexPassed(int index) {
@@ -215,26 +216,26 @@ abstract class ResultCollector<A> implements ResultReceiver {
                 boolean finishedOnTime = await(timeout);
                 return status.match(__ ->
                                 finishedOnTime
-                                        ? unproved(getCounterexamples())
-                                        : timedOut(Vector.empty(), timeout),
-                        passedSample -> proved(passedSample, getCounterexamples()),
-                        error -> error(Vector.empty(), samples.unsafeGet(cutoffIndex), error));
+                                        ? unproved(getCounterexampleCount())
+                                        : timedOut(timeout, 0),
+                        passedSample -> proved(passedSample, getCounterexampleCount()),
+                        error -> error(samples.unsafeGet(cutoffIndex), error, 0));
             } catch (InterruptedException e) {
-                return TestResult.interrupted(Vector.empty(), maybe(e.getMessage()));
+                return TestResult.interrupted(maybe(e.getMessage()), 0);
             } finally {
                 lock.unlock();
             }
         }
 
-        private ImmutableVector<Counterexample<A>> getCounterexamples() {
-            VectorBuilder<Counterexample<A>> builder = Vector.builder();
+        private int getCounterexampleCount() {
+            int result = 0;
             for (int idx = 0; idx < samples.size(); idx++) {
                 EvalFailure failure = collectedFailures[idx];
                 if (failure != null) {
-                    builder = builder.add(counterexample(failure, samples.unsafeGet(idx)));
+                    result += 1;
                 }
             }
-            return builder.build();
+            return result;
         }
     }
 }

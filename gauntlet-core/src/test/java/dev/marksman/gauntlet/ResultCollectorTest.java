@@ -53,7 +53,7 @@ final class ResultCollectorTest {
         @Test
         void noSamplesYieldsPassed() {
             collector = universalResultCollector(Vector.empty());
-            assertEquals(passed(Vector.empty()), collector.getResultBlocking(Duration.ZERO));
+            assertEquals(passed(0), collector.getResultBlocking(Duration.ZERO));
         }
 
         @Test
@@ -64,7 +64,7 @@ final class ResultCollectorTest {
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(passed(samples), result);
+            assertEquals(passed(sampleCount), result);
         }
 
         @Test
@@ -75,7 +75,7 @@ final class ResultCollectorTest {
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(passed(samples), result);
+            assertEquals(passed(sampleCount), result);
         }
 
         @Test
@@ -87,7 +87,7 @@ final class ResultCollectorTest {
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(timedOut(samples.take(samplesToFinishBeforeTimeout), Duration.ZERO),
+            assertEquals(timedOut(Duration.ZERO, 3),
                     result);
         }
 
@@ -100,7 +100,7 @@ final class ResultCollectorTest {
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(falsified(samples.take(failedIndex), counterexample(failure, samples.unsafeGet(failedIndex))),
+            assertEquals(falsified(counterexample(failure, samples.unsafeGet(failedIndex)), failedIndex),
                     result);
         }
 
@@ -115,7 +115,7 @@ final class ResultCollectorTest {
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(falsified(samples.take(firstFailedIndex), counterexample(failure, samples.unsafeGet(firstFailedIndex))),
+            assertEquals(falsified(counterexample(failure, samples.unsafeGet(firstFailedIndex)), firstFailedIndex),
                     result);
         }
 
@@ -129,7 +129,7 @@ final class ResultCollectorTest {
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(error(samples.take(erroredIndex), samples.unsafeGet(erroredIndex), exception),
+            assertEquals(error(samples.unsafeGet(erroredIndex), exception, erroredIndex),
                     result);
         }
 
@@ -145,7 +145,7 @@ final class ResultCollectorTest {
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(error(samples.take(firstErroredIndex), samples.unsafeGet(firstErroredIndex), exception),
+            assertEquals(error(samples.unsafeGet(firstErroredIndex), exception, firstErroredIndex),
                     result);
         }
 
@@ -159,7 +159,7 @@ final class ResultCollectorTest {
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(falsified(samples.take(failedIndex), counterexample(failure, samples.unsafeGet(failedIndex))),
+            assertEquals(falsified(counterexample(failure, samples.unsafeGet(failedIndex)), failedIndex),
                     result);
         }
 
@@ -174,7 +174,7 @@ final class ResultCollectorTest {
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(error(samples.take(errorIndex), samples.unsafeGet(errorIndex), exception),
+            assertEquals(error(samples.unsafeGet(errorIndex), exception, errorIndex),
                     result);
         }
 
@@ -233,7 +233,7 @@ final class ResultCollectorTest {
         @Test
         void noSamplesYieldsUnproved() {
             collector = existentialResultCollector(Vector.empty());
-            assertEquals(unproved(Vector.empty()), collector.getResultBlocking(Duration.ZERO));
+            assertEquals(unproved(0), collector.getResultBlocking(Duration.ZERO));
         }
 
         @Test
@@ -244,7 +244,7 @@ final class ResultCollectorTest {
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(proved(samples.unsafeGet(0), Vector.empty()), result);
+            assertEquals(proved(samples.unsafeGet(0), 0), result);
         }
 
         @Test
@@ -255,7 +255,7 @@ final class ResultCollectorTest {
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(proved(samples.unsafeGet(0), Vector.empty()), result);
+            assertEquals(proved(samples.unsafeGet(0), 0), result);
         }
 
         @Test
@@ -267,7 +267,7 @@ final class ResultCollectorTest {
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(timedOut(Vector.empty(), Duration.ZERO),
+            assertEquals(timedOut(Duration.ZERO, 0),
                     result);
         }
 
@@ -279,9 +279,7 @@ final class ResultCollectorTest {
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(proved(samples.unsafeGet(2),
-                    Vector.of(counterexample(failure, samples.unsafeGet(0)),
-                            counterexample(failure, samples.unsafeGet(1)))),
+            assertEquals(proved(samples.unsafeGet(2), 2),
                     result);
         }
 
@@ -296,7 +294,7 @@ final class ResultCollectorTest {
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(error(Vector.empty(), samples.unsafeGet(1), exception), result);
+            assertEquals(error(samples.unsafeGet(1), exception, 0), result);
         }
 
         @Test
@@ -312,7 +310,7 @@ final class ResultCollectorTest {
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(proved(samples.unsafeGet(1), Vector.of(counterexample(failure, samples.unsafeGet(0)))), result);
+            assertEquals(proved(samples.unsafeGet(1), 1), result);
         }
 
         @Test
@@ -327,7 +325,7 @@ final class ResultCollectorTest {
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(error(Vector.empty(), samples.unsafeGet(firstErroredIndex), exception),
+            assertEquals(error(samples.unsafeGet(firstErroredIndex), exception, 0),
                     result);
         }
 
@@ -338,7 +336,7 @@ final class ResultCollectorTest {
 
             TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(error(Vector.empty(), samples.unsafeGet(3), exception),
+            assertEquals(error(samples.unsafeGet(3), exception, 0),
                     result);
         }
 
