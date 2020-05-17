@@ -77,6 +77,8 @@ public interface GauntletApi {
 
     <A> void assertThat(GeneratorTest<A> generatorTest);
 
+    <A> void assertWithSeed(long initialSeedValue, GeneratorTest<A> generatorTest);
+
     <A> void assertThat(DomainTest<A> domainTest);
 
     Reporter getReporter();

@@ -6,27 +6,20 @@ import dev.marksman.collectionviews.Vector;
 import dev.marksman.kraftwerk.Seed;
 
 final class GeneratedDataSet<A> {
-    private final long initialSeedValue;
     private final ImmutableVector<A> samples;
     private final Maybe<SupplyFailure> supplyFailure;
     private final Seed outputSeed;
 
-    private GeneratedDataSet(long initialSeedValue, ImmutableVector<A> samples, Maybe<SupplyFailure> supplyFailure, Seed outputSeed) {
-        this.initialSeedValue = initialSeedValue;
+    private GeneratedDataSet(ImmutableVector<A> samples, Maybe<SupplyFailure> supplyFailure, Seed outputSeed) {
         this.samples = samples;
         this.supplyFailure = supplyFailure;
         this.outputSeed = outputSeed;
     }
 
-    public static <A> GeneratedDataSet<A> generatedDataSet(long initialSeedValue,
-                                                           Iterable<A> values,
+    public static <A> GeneratedDataSet<A> generatedDataSet(Iterable<A> values,
                                                            Maybe<SupplyFailure> supplyFailure,
                                                            Seed outputSeed) {
-        return new GeneratedDataSet<>(initialSeedValue, Vector.copyFrom(values), supplyFailure, outputSeed);
-    }
-
-    public long getInitialSeedValue() {
-        return this.initialSeedValue;
+        return new GeneratedDataSet<>(Vector.copyFrom(values), supplyFailure, outputSeed);
     }
 
     public ImmutableVector<A> getSamples() {
