@@ -22,12 +22,12 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
     }
 
     public static <A> Falsified<A> falsified(Counterexample<A> counterexample, int successCount) {
-        return new Falsified<>(successCount, counterexample, nothing());
+        return new Falsified<>(counterexample, successCount, nothing());
     }
 
     public static <A> Falsified<A> falsified(Counterexample<A> counterexample, int successCount,
                                              Maybe<RefinedCounterexample<A>> refinedCounterexample) {
-        return new Falsified<>(successCount, counterexample, refinedCounterexample);
+        return new Falsified<>(counterexample, successCount, refinedCounterexample);
     }
 
     public static <A> Unproved<A> unproved(int counterexampleCount) {
@@ -87,6 +87,26 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
         @Override
         public <R> R match(Fn1<? super Passed<A>, ? extends R> aFn, Fn1<? super Proved<A>, ? extends R> bFn, Fn1<? super Falsified<A>, ? extends R> cFn, Fn1<? super Unproved<A>, ? extends R> dFn, Fn1<? super SupplyFailed<A>, ? extends R> eFn, Fn1<? super Error<A>, ? extends R> fFn, Fn1<? super TimedOut<A>, ? extends R> gFn, Fn1<? super Interrupted<A>, ? extends R> hFn) {
             return aFn.apply(this);
+        }
+
+        public Passed<A> combine(Passed<A> other) {
+            return new Passed<>(successCount + other.getSuccessCount());
+        }
+
+        public Falsified<A> combine(Falsified<A> other) {
+            return new Falsified<>(other.getCounterexample(), other.getSuccessCount() + successCount, other.getRefinedCounterexample());
+        }
+
+        public Error<A> combine(Error<A> other) {
+            return new Error<>(other.getErrorSample(), other.getError(), other.getSuccessCount() + successCount);
+        }
+
+        public TimedOut<A> combine(TimedOut<A> other) {
+            return new TimedOut<>(other.getDuration(), other.getSuccessCount() + successCount);
+        }
+
+        public Interrupted<A> combine(Interrupted<A> other) {
+            return new Interrupted<>(other.getMessage(), other.getSuccessCount() + successCount);
         }
 
         @Override
@@ -174,11 +194,11 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
 
     // A case was found that falsified the property
     public static final class Falsified<A> extends TestResult<A> {
-        private final int successCount;
         private final Counterexample<A> counterexample;
+        private final int successCount;
         private final Maybe<RefinedCounterexample<A>> refinedCounterexample;
 
-        private Falsified(int successCount, Counterexample<A> counterexample, Maybe<RefinedCounterexample<A>> refinedCounterexample) {
+        private Falsified(Counterexample<A> counterexample, int successCount, Maybe<RefinedCounterexample<A>> refinedCounterexample) {
             this.successCount = successCount;
             this.counterexample = counterexample;
             this.refinedCounterexample = refinedCounterexample;
@@ -190,7 +210,7 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
         }
 
         public Falsified<A> withRefinedCounterexample(RefinedCounterexample<A> refinedCounterexample) {
-            return new Falsified<>(successCount, counterexample, just(refinedCounterexample));
+            return new Falsified<>(counterexample, successCount, just(refinedCounterexample));
         }
 
         @Override
@@ -213,8 +233,8 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
         @Override
         public String toString() {
             return "Falsified{" +
-                    "successCount=" + successCount +
-                    ", counterexample=" + counterexample +
+                    "counterexample=" + counterexample +
+                    ", successCount=" + successCount +
                     ", refinedCounterexample=" + refinedCounterexample +
                     '}';
         }
@@ -262,6 +282,26 @@ public abstract class TestResult<A> implements CoProduct8<TestResult.Passed<A>, 
 
         public int getCounterexampleCount() {
             return this.counterexampleCount;
+        }
+
+        public Unproved<A> combine(Unproved<A> other) {
+            return new Unproved<>(counterexampleCount + other.getCounterexampleCount());
+        }
+
+        public Proved<A> combine(Proved<A> other) {
+            return new Proved<>(other.getPassedSample(), counterexampleCount + other.getCounterexampleCount());
+        }
+
+        public Error<A> combine(Error<A> other) {
+            return other;
+        }
+
+        public TimedOut<A> combine(TimedOut<A> other) {
+            return other;
+        }
+
+        public Interrupted<A> combine(Interrupted<A> other) {
+            return other;
         }
 
         @Override
