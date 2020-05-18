@@ -1,5 +1,6 @@
 package dev.marksman.gauntlet;
 
+import com.jnape.palatable.lambda.adt.Either;
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.collectionviews.Vector;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,17 +12,17 @@ import java.time.Duration;
 
 import static com.jnape.palatable.lambda.adt.Either.left;
 import static com.jnape.palatable.lambda.adt.Either.right;
+import static dev.marksman.gauntlet.Abnormal.error;
+import static dev.marksman.gauntlet.Abnormal.timedOut;
 import static dev.marksman.gauntlet.Counterexample.counterexample;
 import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
+import static dev.marksman.gauntlet.ExistentialTestResult.proved;
+import static dev.marksman.gauntlet.ExistentialTestResult.unproved;
 import static dev.marksman.gauntlet.Reasons.reasons;
 import static dev.marksman.gauntlet.ResultCollector.existentialResultCollector;
 import static dev.marksman.gauntlet.ResultCollector.universalResultCollector;
-import static dev.marksman.gauntlet.TestResult.error;
-import static dev.marksman.gauntlet.TestResult.falsified;
-import static dev.marksman.gauntlet.TestResult.passed;
-import static dev.marksman.gauntlet.TestResult.proved;
-import static dev.marksman.gauntlet.TestResult.timedOut;
-import static dev.marksman.gauntlet.TestResult.unproved;
+import static dev.marksman.gauntlet.UniversalTestResult.falsified;
+import static dev.marksman.gauntlet.UniversalTestResult.unfalsified;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,7 +44,7 @@ final class ResultCollectorTest {
     @DisplayName("universal")
     class Universal {
 
-        private ResultCollector<Integer> collector;
+        private ResultCollector.UniversalResultCollector<Integer> collector;
 
         @BeforeEach
         void setUp() {
@@ -53,7 +54,8 @@ final class ResultCollectorTest {
         @Test
         void noSamplesYieldsPassed() {
             collector = universalResultCollector(Vector.empty());
-            assertEquals(passed(0), collector.getResultBlocking(Duration.ZERO));
+            assertEquals(universal(unfalsified(0)),
+                    collector.getResultBlocking(Duration.ZERO));
         }
 
         @Test
@@ -62,9 +64,9 @@ final class ResultCollectorTest {
                 collector.reportResult(sampleIndex, right(evalSuccess()));
             }
 
-            TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
+            Either<Abnormal<Integer>, UniversalTestResult<Integer>> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(passed(sampleCount), result);
+            assertEquals(universal(unfalsified(sampleCount)), result);
         }
 
         @Test
@@ -73,9 +75,9 @@ final class ResultCollectorTest {
                 collector.reportResult(sampleIndex, right(evalSuccess()));
             }
 
-            TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
+            Either<Abnormal<Integer>, UniversalTestResult<Integer>> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(passed(sampleCount), result);
+            assertEquals(universal(unfalsified(sampleCount)), result);
         }
 
         @Test
@@ -85,9 +87,9 @@ final class ResultCollectorTest {
                 collector.reportResult(sampleIndex, right(evalSuccess()));
             }
 
-            TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
+            Either<Abnormal<Integer>, UniversalTestResult<Integer>> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(timedOut(Duration.ZERO, 3),
+            assertEquals(universal(timedOut(Duration.ZERO, 3)),
                     result);
         }
 
@@ -98,9 +100,9 @@ final class ResultCollectorTest {
                 collector.reportResult(sampleIndex, sampleIndex == failedIndex ? right(failure) : right(evalSuccess()));
             }
 
-            TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
+            Either<Abnormal<Integer>, UniversalTestResult<Integer>> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(falsified(counterexample(failure, samples.unsafeGet(failedIndex)), failedIndex),
+            assertEquals(universal(falsified(counterexample(failure, samples.unsafeGet(failedIndex)), failedIndex)),
                     result);
         }
 
@@ -113,9 +115,9 @@ final class ResultCollectorTest {
                         : right(evalSuccess()));
             }
 
-            TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
+            Either<Abnormal<Integer>, UniversalTestResult<Integer>> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(falsified(counterexample(failure, samples.unsafeGet(firstFailedIndex)), firstFailedIndex),
+            assertEquals(universal(falsified(counterexample(failure, samples.unsafeGet(firstFailedIndex)), firstFailedIndex)),
                     result);
         }
 
@@ -127,9 +129,9 @@ final class ResultCollectorTest {
                 collector.reportResult(sampleIndex, sampleIndex == erroredIndex ? left(exception) : right(evalSuccess()));
             }
 
-            TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
+            Either<Abnormal<Integer>, UniversalTestResult<Integer>> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(error(samples.unsafeGet(erroredIndex), exception, erroredIndex),
+            assertEquals(universal(error(samples.unsafeGet(erroredIndex), exception, erroredIndex)),
                     result);
         }
 
@@ -143,9 +145,9 @@ final class ResultCollectorTest {
                         : right(evalSuccess()));
             }
 
-            TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
+            Either<Abnormal<Integer>, UniversalTestResult<Integer>> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(error(samples.unsafeGet(firstErroredIndex), exception, firstErroredIndex),
+            assertEquals(universal(error(samples.unsafeGet(firstErroredIndex), exception, firstErroredIndex)),
                     result);
         }
 
@@ -157,9 +159,9 @@ final class ResultCollectorTest {
             }
             collector.reportResult(failedIndex, right(failure));
 
-            TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
+            Either<Abnormal<Integer>, UniversalTestResult<Integer>> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(falsified(counterexample(failure, samples.unsafeGet(failedIndex)), failedIndex),
+            assertEquals(universal(falsified(counterexample(failure, samples.unsafeGet(failedIndex)), failedIndex)),
                     result);
         }
 
@@ -172,9 +174,9 @@ final class ResultCollectorTest {
             }
             collector.reportResult(errorIndex, left(exception));
 
-            TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
+            Either<Abnormal<Integer>, UniversalTestResult<Integer>> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(error(samples.unsafeGet(errorIndex), exception, errorIndex),
+            assertEquals(universal(error(samples.unsafeGet(errorIndex), exception, errorIndex)),
                     result);
         }
 
@@ -223,7 +225,7 @@ final class ResultCollectorTest {
     @DisplayName("existential")
     class Existential {
 
-        private ResultCollector<Integer> collector;
+        private ResultCollector.ExistentialResultCollector<Integer> collector;
 
         @BeforeEach
         void setUp() {
@@ -233,7 +235,8 @@ final class ResultCollectorTest {
         @Test
         void noSamplesYieldsUnproved() {
             collector = existentialResultCollector(Vector.empty());
-            assertEquals(unproved(0), collector.getResultBlocking(Duration.ZERO));
+            assertEquals(existential(unproved(0)),
+                    collector.getResultBlocking(Duration.ZERO));
         }
 
         @Test
@@ -242,9 +245,10 @@ final class ResultCollectorTest {
                 collector.reportResult(sampleIndex, right(evalSuccess()));
             }
 
-            TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
+            Either<Abnormal<Integer>, ExistentialTestResult<Integer>> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(proved(samples.unsafeGet(0), 0), result);
+            assertEquals(existential(proved(samples.unsafeGet(0), 0)),
+                    result);
         }
 
         @Test
@@ -253,9 +257,10 @@ final class ResultCollectorTest {
                 collector.reportResult(sampleIndex, right(evalSuccess()));
             }
 
-            TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
+            Either<Abnormal<Integer>, ExistentialTestResult<Integer>> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(proved(samples.unsafeGet(0), 0), result);
+            assertEquals(existential(proved(samples.unsafeGet(0), 0)),
+                    result);
         }
 
         @Test
@@ -265,9 +270,9 @@ final class ResultCollectorTest {
                 collector.reportResult(sampleIndex, right(failure));
             }
 
-            TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
+            Either<Abnormal<Integer>, ExistentialTestResult<Integer>> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(timedOut(Duration.ZERO, 0),
+            assertEquals(existential(timedOut(Duration.ZERO, 0)),
                     result);
         }
 
@@ -277,9 +282,9 @@ final class ResultCollectorTest {
                 collector.reportResult(sampleIndex, sampleIndex < 2 ? right(failure) : right(evalSuccess()));
             }
 
-            TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
+            Either<Abnormal<Integer>, ExistentialTestResult<Integer>> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(proved(samples.unsafeGet(2), 2),
+            assertEquals(existential(proved(samples.unsafeGet(2), 2)),
                     result);
         }
 
@@ -292,9 +297,10 @@ final class ResultCollectorTest {
             collector.reportResult(0, right(failure));
             collector.reportResult(1, left(exception));
 
-            TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
+            Either<Abnormal<Integer>, ExistentialTestResult<Integer>> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(error(samples.unsafeGet(1), exception, 0), result);
+            assertEquals(existential(error(samples.unsafeGet(1), exception, 0)),
+                    result);
         }
 
         @Test
@@ -308,9 +314,10 @@ final class ResultCollectorTest {
                 collector.reportResult(sampleIndex, right(evalSuccess()));
             }
 
-            TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
+            Either<Abnormal<Integer>, ExistentialTestResult<Integer>> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(proved(samples.unsafeGet(1), 1), result);
+            assertEquals(existential(proved(samples.unsafeGet(1), 1)),
+                    result);
         }
 
         @Test
@@ -323,9 +330,9 @@ final class ResultCollectorTest {
                         : right(failure));
             }
 
-            TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
+            Either<Abnormal<Integer>, ExistentialTestResult<Integer>> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(error(samples.unsafeGet(firstErroredIndex), exception, 0),
+            assertEquals(existential(error(samples.unsafeGet(firstErroredIndex), exception, 0)),
                     result);
         }
 
@@ -334,9 +341,9 @@ final class ResultCollectorTest {
             Exception exception = new Exception("error");
             collector.reportResult(3, left(exception));
 
-            TestResult<Integer> result = collector.getResultBlocking(Duration.ZERO);
+            Either<Abnormal<Integer>, ExistentialTestResult<Integer>> result = collector.getResultBlocking(Duration.ZERO);
 
-            assertEquals(error(samples.unsafeGet(3), exception, 0),
+            assertEquals(existential(error(samples.unsafeGet(3), exception, 0)),
                     result);
         }
 
@@ -379,4 +386,21 @@ final class ResultCollectorTest {
             assertTrue(collector.shouldRun(2));
         }
     }
+
+    private static <A> Either<Abnormal<A>, UniversalTestResult<A>> universal(UniversalTestResult<A> result) {
+        return right(result);
+    }
+
+    private static <A> Either<Abnormal<A>, ExistentialTestResult<A>> existential(ExistentialTestResult<A> result) {
+        return right(result);
+    }
+
+    private static <A> Either<Abnormal<A>, UniversalTestResult<A>> universal(Abnormal<A> result) {
+        return left(result);
+    }
+
+    private static <A> Either<Abnormal<A>, ExistentialTestResult<A>> existential(Abnormal<A> result) {
+        return left(result);
+    }
+
 }

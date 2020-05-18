@@ -1,5 +1,6 @@
 package dev.marksman.gauntlet;
 
+import com.jnape.palatable.lambda.adt.Either;
 import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.io.IO;
 import dev.marksman.kraftwerk.GeneratorParameters;
@@ -15,7 +16,7 @@ import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.io.IO.io;
 import static dev.marksman.gauntlet.GeneratedDataSet.generatedDataSet;
 import static dev.marksman.gauntlet.GeneratorTestSettings.generatorTestSettings;
-import static dev.marksman.gauntlet.Quantifier.UNIVERSAL;
+import static dev.marksman.gauntlet.Quantifier.EXISTENTIAL;
 import static dev.marksman.gauntlet.ReportData.reportData;
 import static dev.marksman.gauntlet.TestRunnerSettings.testRunnerSettings;
 
@@ -23,8 +24,8 @@ final class Core implements GauntletApi {
     private static final Random seedGenerator = new Random();
     private static final int REFINEMENT_BLOCK_SIZE = RefinementTest.DEFAULT_BLOCK_SIZE;
 
-    private final Maybe<Executor> executorOverride;
-    private final TestRunner testRunner;
+    private final UniversalTestRunner universalTestRunner;
+    private final ExistentialTestRunner existentialTestRunner;
     private final RefinementTestRunner refinementTestRunner;
     private final Reporter reporter;
     private final ReportSettings reportSettings;
@@ -33,8 +34,10 @@ final class Core implements GauntletApi {
     private final int defaultSampleCount;
     private final int defaultMaximumShrinkCount;
     private final Duration defaultTimeout;
+    private final Maybe<Executor> executorOverride;
 
-    public Core(TestRunner testRunner,
+    public Core(UniversalTestRunner universalTestRunner,
+                ExistentialTestRunner existentialTestRunner,
                 RefinementTestRunner refinementTestRunner,
                 Reporter reporter,
                 ReportSettings reportSettings,
@@ -45,7 +48,8 @@ final class Core implements GauntletApi {
                 Duration defaultTimeout,
                 Maybe<Executor> executorOverride) {
         this.executorOverride = executorOverride;
-        this.testRunner = testRunner;
+        this.universalTestRunner = universalTestRunner;
+        this.existentialTestRunner = existentialTestRunner;
         this.refinementTestRunner = refinementTestRunner;
         this.reporter = reporter;
         this.reportSettings = reportSettings;
@@ -93,42 +97,42 @@ final class Core implements GauntletApi {
 
     @Override
     public GauntletApi withDefaultSampleCount(int sampleCount) {
-        return new Core(testRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, sampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
+        return new Core(universalTestRunner, existentialTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, sampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
     }
 
     @Override
     public GauntletApi withDefaultMaximumShrinkCount(int maximumShrinkCount) {
-        return new Core(testRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, maximumShrinkCount, defaultTimeout, executorOverride);
+        return new Core(universalTestRunner, existentialTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, maximumShrinkCount, defaultTimeout, executorOverride);
     }
 
     @Override
     public GauntletApi withExecutor(Executor executor) {
-        return new Core(testRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, just(executor));
+        return new Core(universalTestRunner, existentialTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, just(executor));
     }
 
     @Override
     public GauntletApi withGeneratorParameters(GeneratorParameters generatorParameters) {
-        return new Core(testRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
+        return new Core(universalTestRunner, existentialTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
     }
 
     @Override
     public GauntletApi withReporter(Reporter reporter) {
-        return new Core(testRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
+        return new Core(universalTestRunner, existentialTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
     }
 
     @Override
     public GauntletApi withReportSettings(ReportSettings reportSettings) {
-        return new Core(testRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
+        return new Core(universalTestRunner, existentialTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
     }
 
     @Override
     public GauntletApi withReportRenderer(ReportRenderer reportRenderer) {
-        return new Core(testRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
+        return new Core(universalTestRunner, existentialTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, defaultTimeout, executorOverride);
     }
 
     @Override
     public GauntletApi withDefaultTimeout(Duration timeout) {
-        return new Core(testRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, timeout, executorOverride);
+        return new Core(universalTestRunner, existentialTestRunner, refinementTestRunner, reporter, reportSettings, reportRenderer, generatorParameters, defaultSampleCount, defaultMaximumShrinkCount, timeout, executorOverride);
     }
 
     @Override
@@ -145,9 +149,14 @@ final class Core implements GauntletApi {
     @Override
     public <A> void assertThat(DomainTest<A> domainTest) {
         TestRunnerSettings settings = createDomainSettings(domainTest.getSettingsAdjustments());
-        TestResult<A> result = testRunner.run(settings, domainTest.getQuantifier(), domainTest.getDomain().getElements(),
-                domainTest.getProperty())
-                .unsafePerformIO();
+        TestResult<A> result;
+        if (domainTest.getQuantifier() == EXISTENTIAL) {
+            Either<Abnormal<A>, ExistentialTestResult<A>> etr = existentialTestRunner.run(settings, domainTest.getDomain().getElements(), domainTest.getProperty()).unsafePerformIO();
+            result = etr.match(TestResult::testResult, TestResult::testResult);
+        } else {
+            Either<Abnormal<A>, UniversalTestResult<A>> etr = universalTestRunner.run(settings, domainTest.getDomain().getElements(), domainTest.getProperty()).unsafePerformIO();
+            result = etr.match(TestResult::testResult, TestResult::testResult);
+        }
         ReportData<A> reportData = reportData(domainTest.getProperty(),
                 result,
                 domainTest.getDomain().getPrettyPrinter(),
@@ -204,25 +213,24 @@ final class Core implements GauntletApi {
         GeneratorTestSettings settings = createGeneratorSettings(generatorTest.getSettingsAdjustments());
         GeneratedDataSet<A> dataSet = generateDataSet(settings, generatorTest.getArbitrary(), inputSeed);
         TestRunnerSettings testRunnerSettings = TestRunnerSettings.testRunnerSettings(settings.getTimeout(), settings.getExecutor());
-        TestResult<A> result = testRunner.run(testRunnerSettings, UNIVERSAL, dataSet.getSamples(), generatorTest.getProperty())
+        Either<Abnormal<A>, UniversalTestResult<A>> utr = universalTestRunner.run(testRunnerSettings, dataSet.getSamples(), generatorTest.getProperty())
                 .unsafePerformIO();
-        // TODO: refactor this
-        result = maybeApplySupplyFailure(dataSet.getSupplyFailure(), result);
-
+        TestResult<A> result = utr.match(TestResult::testResult, TestResult::testResult);
+        // TODO: handle supply failure
         // TODO: refine result
         ReportData<A> reportData = reportData(generatorTest.getProperty(), result, generatorTest.getArbitrary().getPrettyPrinter(),
                 just(initialSeedValue));
         reporter.report(reportSettings, reportRenderer, reportData);
     }
 
-    private <A> TestResult<A> maybeApplySupplyFailure(Maybe<SupplyFailure> supplyFailureMaybe, TestResult<A> input) {
-        // supply failure only matters if test has passed
-        return supplyFailureMaybe
-                .match(__ -> input,
-                        supplyFailure -> input.projectA()
-                                .match(__ -> input,
-                                        passed -> TestResult.supplyFailed(supplyFailure, passed.getSuccessCount())));
-    }
+//    private <A> TestResult<A> maybeApplySupplyFailure(Maybe<SupplyFailure> supplyFailureMaybe, TestResult<A> input) {
+//        // supply failure only matters if test has passed
+//        return supplyFailureMaybe
+//                .match(__ -> input,
+//                        supplyFailure -> input.projectA()
+//                                .match(__ -> input,
+//                                        passed -> Exhausted.exhausted(supplyFailure, passed.getSuccessCount())));
+//    }
 
     private <A> GeneratedDataSet<A> generateDataSet(GeneratorTestSettings settings,
                                                     Arbitrary<A> arbitrary,

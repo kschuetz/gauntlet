@@ -12,12 +12,10 @@ import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.concurrent.Executor;
 
-import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.maybe;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.io.IO.io;
 import static dev.marksman.gauntlet.EvaluateSampleTask.evaluateSampleTask;
-import static dev.marksman.gauntlet.RefinedCounterexample.refinedCounterexample;
 import static dev.marksman.gauntlet.ResultCollector.universalResultCollector;
 
 public final class RefinementTestRunner {
@@ -92,42 +90,42 @@ public final class RefinementTestRunner {
                 return nothing();
             }
 
-            Iterator<A> source = shrinkStrategy.apply(sample).iterator();
-            while (shrinkCount < maximumShrinkCount) {
-                int actualBlockSize = Math.min(blockSize, maximumShrinkCount - shrinkCount);
-                ImmutableVector<A> block = readBlock(actualBlockSize, source);
-                if (block.isEmpty()) {
-                    return nothing();
-                }
-                TestResult<A> result = runBlock(block, TIMEOUT_TODO);
-
-                if (result instanceof TestResult.Falsified<?>) {
-                    TestResult.Falsified<A> falsified = (TestResult.Falsified<A>) result;
-                    return just(refinedCounterexample(falsified.getCounterexample(), 1 + shrinkCount + falsified.getSuccessCount()));
-                } else if (result instanceof TestResult.Passed<?>) {
-                    TestResult.Passed<A> passed = (TestResult.Passed<A>) result;
-                    shrinkCount += passed.getSuccessCount();
-                } else if (result instanceof TestResult.Proved<?>) {
-                    throw new IllegalStateException("TestResult.Proved should never happen in a shrink test");
-                } else if (result instanceof TestResult.Unproved<?>) {
-                    throw new IllegalStateException("TestResult.Unproved should never happen in a shrink test");
-                } else {
-                    // an error occurred - abort
-                    return nothing();
-                }
-            }
+//            Iterator<A> source = shrinkStrategy.apply(sample).iterator();
+//            while (shrinkCount < maximumShrinkCount) {
+//                int actualBlockSize = Math.min(blockSize, maximumShrinkCount - shrinkCount);
+//                ImmutableVector<A> block = readBlock(actualBlockSize, source);
+//                if (block.isEmpty()) {
+//                    return nothing();
+//                }
+//                TestResult<A> result = runBlock(block, TIMEOUT_TODO);
+//
+//                if (result instanceof Falsified<?>) {
+//                    Falsified<A> falsified = (Falsified<A>) result;
+//                    return just(refinedCounterexample(falsified.getCounterexample(), 1 + shrinkCount + falsified.getSuccessCount()));
+//                } else if (result instanceof Unfalsified<?>) {
+//                    Unfalsified<A> unfalsified = (Unfalsified<A>) result;
+//                    shrinkCount += unfalsified.getSuccessCount();
+//                } else if (result instanceof Proved<?>) {
+//                    throw new IllegalStateException("TestResult.Proved should never happen in a shrink test");
+//                } else if (result instanceof Unproved<?>) {
+//                    throw new IllegalStateException("TestResult.Unproved should never happen in a shrink test");
+//                } else {
+//                    // an error occurred - abort
+//                    return nothing();
+//                }
+//            }
             return nothing();
         }
 
         private TestResult<A> runBlock(ImmutableVector<A> samples,
                                        Duration timeout) {
             int sampleCount = samples.size();
-            ResultCollector<A> collector = universalResultCollector(samples);
+            ResultCollector.UniversalResultCollector<A> collector = universalResultCollector(samples);
             for (int sampleIndex = 0; sampleIndex < sampleCount; sampleIndex++) {
                 EvaluateSampleTask<A> task = evaluateSampleTask(collector, property, sampleIndex, samples.unsafeGet(sampleIndex));
                 executor.execute(task);
             }
-            return collector.getResultBlocking(timeout);
+            return collector.getResultBlocking(timeout).match(TestResult::testResult, TestResult::testResult);
         }
     }
 }

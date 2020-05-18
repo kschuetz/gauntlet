@@ -11,13 +11,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static com.jnape.palatable.lambda.adt.Either.left;
+import static com.jnape.palatable.lambda.adt.Either.right;
 import static com.jnape.palatable.lambda.adt.Maybe.maybe;
 import static com.jnape.palatable.lambda.adt.Unit.UNIT;
+import static dev.marksman.gauntlet.Abnormal.error;
+import static dev.marksman.gauntlet.Abnormal.interrupted;
+import static dev.marksman.gauntlet.Abnormal.timedOut;
 import static dev.marksman.gauntlet.Counterexample.counterexample;
-import static dev.marksman.gauntlet.TestResult.error;
-import static dev.marksman.gauntlet.TestResult.proved;
-import static dev.marksman.gauntlet.TestResult.timedOut;
-import static dev.marksman.gauntlet.TestResult.unproved;
+import static dev.marksman.gauntlet.ExistentialTestResult.proved;
+import static dev.marksman.gauntlet.ExistentialTestResult.unproved;
+import static dev.marksman.gauntlet.UniversalTestResult.falsified;
+import static dev.marksman.gauntlet.UniversalTestResult.unfalsified;
 
 abstract class ResultCollector<A> implements ResultReceiver {
     protected final ImmutableVector<A> samples;
@@ -37,11 +42,11 @@ abstract class ResultCollector<A> implements ResultReceiver {
         this.reported = new CheckList(sampleCount);
     }
 
-    static <A> ResultCollector<A> universalResultCollector(ImmutableVector<A> samples) {
+    static <A> UniversalResultCollector<A> universalResultCollector(ImmutableVector<A> samples) {
         return new UniversalResultCollector<>(samples);
     }
 
-    static <A> ResultCollector<A> existentialResultCollector(ImmutableVector<A> samples) {
+    static <A> ExistentialResultCollector<A> existentialResultCollector(ImmutableVector<A> samples) {
         return new ExistentialResultCollector<>(samples);
     }
 
@@ -98,8 +103,6 @@ abstract class ResultCollector<A> implements ResultReceiver {
         }
     }
 
-    public abstract TestResult<A> getResultBlocking(Duration timeout);
-
     protected abstract void handleSuccess(int sampleIndex);
 
     protected abstract void handleFailure(int sampleIndex, EvalFailure failure);
@@ -146,18 +149,18 @@ abstract class ResultCollector<A> implements ResultReceiver {
             this.status = Choice3.c(error);
         }
 
-        public TestResult<A> getResultBlocking(Duration timeout) {
+        public Either<Abnormal<A>, UniversalTestResult<A>> getResultBlocking(Duration timeout) {
             lock.lock();
             try {
                 boolean finishedOnTime = await(timeout);
-                return status.match(__ ->
-                                finishedOnTime
-                                        ? TestResult.passed(getSuccessCount())
-                                        : timedOut(timeout, getSuccessCount()),
-                        failure -> TestResult.falsified(counterexample(failure, samples.unsafeGet(cutoffIndex)), getSuccessCount()),
-                        error -> error(samples.unsafeGet(cutoffIndex), error, getSuccessCount()));
+                return status.match(__ -> finishedOnTime
+                                ? right(unfalsified(getSuccessCount()))
+                                : left(timedOut(timeout, getSuccessCount())),
+                        failure -> right(falsified(counterexample(failure, samples.unsafeGet(cutoffIndex)),
+                                getSuccessCount())),
+                        error -> left(error(samples.unsafeGet(cutoffIndex), error, getSuccessCount())));
             } catch (InterruptedException e) {
-                return TestResult.interrupted(maybe(e.getMessage()), getSuccessCount());
+                return left(interrupted(maybe(e.getMessage()), getSuccessCount()));
             } finally {
                 lock.unlock();
             }
@@ -210,18 +213,18 @@ abstract class ResultCollector<A> implements ResultReceiver {
             status = Choice3.c(error);
         }
 
-        public TestResult<A> getResultBlocking(Duration timeout) {
+        public Either<Abnormal<A>, ExistentialTestResult<A>> getResultBlocking(Duration timeout) {
             lock.lock();
             try {
                 boolean finishedOnTime = await(timeout);
                 return status.match(__ ->
                                 finishedOnTime
-                                        ? unproved(getCounterexampleCount())
-                                        : timedOut(timeout, 0),
-                        passedSample -> proved(passedSample, getCounterexampleCount()),
-                        error -> error(samples.unsafeGet(cutoffIndex), error, 0));
+                                        ? right(unproved(getCounterexampleCount()))
+                                        : left(timedOut(timeout, 0)),
+                        passedSample -> right(proved(passedSample, getCounterexampleCount())),
+                        error -> left(error(samples.unsafeGet(cutoffIndex), error, 0)));
             } catch (InterruptedException e) {
-                return TestResult.interrupted(maybe(e.getMessage()), 0);
+                return left(interrupted(maybe(e.getMessage()), 0));
             } finally {
                 lock.unlock();
             }

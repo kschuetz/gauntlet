@@ -16,25 +16,29 @@ public final class DefaultReportRenderer implements ReportRenderer {
     @Override
     public <A> String renderReport(ReportSettings settings, ReportData<A> reportData) {
         return reportData.getResult()
-                .match(passed -> renderReportForPassed(settings, reportData, passed),
-                        proved -> renderReportForProved(settings, reportData, proved),
-                        falsified -> renderReportForFalsified(settings, reportData, falsified),
-                        unproved -> renderReportForUnproved(settings, reportData, unproved),
-                        supplyFailed -> renderReportForSupplyFailed(settings, reportData, supplyFailed),
-                        error -> renderReportForError(settings, reportData, error),
-                        timedOut -> renderReportForTimedOut(settings, reportData, timedOut),
-                        interrupted -> renderReportForInterrupted(settings, reportData, interrupted));
+                .match(utr ->
+                                utr.match(unfalsified -> renderReportForUnfalsified(settings, reportData, unfalsified),
+                                        falsified -> renderReportForFalsified(settings, reportData, falsified)),
+                        etr ->
+                                etr.match(unproved -> renderReportForUnproved(settings, reportData, unproved),
+                                        proved -> renderReportForProved(settings, reportData, proved)),
+                        abnormal ->
+                                abnormal.match(error -> renderReportForError(settings, reportData, error),
+                                        exhausted -> renderReportForExhausted(settings, reportData, exhausted),
+                                        timedOut -> renderReportForTimedOut(settings, reportData, timedOut),
+                                        interrupted -> renderReportForInterrupted(settings, reportData, interrupted)));
+
     }
 
-    private <A> String renderReportForPassed(ReportSettings settings, ReportData<A> reportData, TestResult.Passed<A> result) {
+    private <A> String renderReportForUnfalsified(ReportSettings settings, ReportData<A> reportData, UniversalTestResult.Unfalsified<A> result) {
         return "";
     }
 
-    private <A> String renderReportForProved(ReportSettings settings, ReportData<A> reportData, TestResult.Proved<A> result) {
+    private <A> String renderReportForProved(ReportSettings settings, ReportData<A> reportData, ExistentialTestResult.Proved<A> result) {
         return "";
     }
 
-    private <A> String renderReportForFalsified(ReportSettings settings, ReportData<A> reportData, TestResult.Falsified<A> result) {
+    private <A> String renderReportForFalsified(ReportSettings settings, ReportData<A> reportData, UniversalTestResult.Falsified<A> result) {
         Fn1<? super A, String> prettyPrinter = reportData.getPrettyPrinter();
         MutableReportBuilder output = new MutableReportBuilder();
         output.write("Counterexample found after ");
@@ -65,23 +69,23 @@ public final class DefaultReportRenderer implements ReportRenderer {
         return output.render();
     }
 
-    private <A> String renderReportForUnproved(ReportSettings settings, ReportData<A> reportData, TestResult.Unproved<A> result) {
+    private <A> String renderReportForUnproved(ReportSettings settings, ReportData<A> reportData, ExistentialTestResult.Unproved<A> result) {
         return "Property '" + reportData.getProp().getName() + "' remains unproved with the given data";
     }
 
-    private <A> String renderReportForSupplyFailed(ReportSettings settings, ReportData<A> reportData, TestResult.SupplyFailed<A> result) {
+    private <A> String renderReportForExhausted(ReportSettings settings, ReportData<A> reportData, Abnormal.Exhausted<A> result) {
         return "Supply failure";
     }
 
-    private <A> String renderReportForError(ReportSettings settings, ReportData<A> reportData, TestResult.Error<A> result) {
+    private <A> String renderReportForError(ReportSettings settings, ReportData<A> reportData, Abnormal.Error<A> result) {
         return "Test threw an error: " + result.getError();
     }
 
-    private <A> String renderReportForTimedOut(ReportSettings settings, ReportData<A> reportData, TestResult.TimedOut<A> result) {
+    private <A> String renderReportForTimedOut(ReportSettings settings, ReportData<A> reportData, Abnormal.TimedOut<A> result) {
         return "Timed out";
     }
 
-    private <A> String renderReportForInterrupted(ReportSettings settings, ReportData<A> reportData, TestResult.Interrupted<A> result) {
+    private <A> String renderReportForInterrupted(ReportSettings settings, ReportData<A> reportData, Abnormal.Interrupted<A> result) {
         return "Interrupted";
     }
 
