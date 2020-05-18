@@ -51,29 +51,29 @@ public final class GeneratorOutput<A> implements Functor<A, GeneratorOutput<?>> 
         return this.value;
     }
 
-    public boolean equals(final Object o) {
-        if (o == this) return true;
-        if (!(o instanceof GeneratorOutput)) return false;
-        final GeneratorOutput<?> other = (GeneratorOutput<?>) o;
-        final Object this$nextState = this.getNextState();
-        final Object other$nextState = other.getNextState();
-        if (this$nextState == null ? other$nextState != null : !this$nextState.equals(other$nextState)) return false;
-        final Object this$value = this.getValue();
-        final Object other$value = other.getValue();
-        return this$value == null ? other$value == null : this$value.equals(other$value);
-    }
-
-    public int hashCode() {
-        final int PRIME = 59;
-        int result = 1;
-        final Object $nextState = this.getNextState();
-        result = result * PRIME + ($nextState == null ? 43 : $nextState.hashCode());
-        final Object $value = this.getValue();
-        result = result * PRIME + ($value == null ? 43 : $value.hashCode());
-        return result;
-    }
-
+    @Override
     public String toString() {
-        return "GeneratorOutput(nextState=" + this.getNextState() + ", value=" + this.getValue() + ")";
+        return "GeneratorOutput{" +
+                "nextState=" + nextState +
+                ", value=" + value +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GeneratorOutput<?> that = (GeneratorOutput<?>) o;
+
+        if (!nextState.equals(that.nextState)) return false;
+        return value.equals(that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = nextState.hashCode();
+        result = 31 * result + value.hashCode();
+        return result;
     }
 }
