@@ -152,11 +152,12 @@ final class Core implements GauntletApi {
     public <A> void assertThat(DomainTest<A> domainTest) {
         TestRunnerSettings settings = createDomainSettings(domainTest.getSettingsAdjustments());
         TestResult<A> result;
+        IteratorSampleReader<A> sampleReader = iteratorSampleReader(domainTest.getDomain().getElements().iterator());
         if (domainTest.getQuantifier() == EXISTENTIAL) {
-            Either<Abnormal<A>, ExistentialTestResult<A>> etr = existentialTestRunner.run(settings, domainTest.getDomain().getElements(), domainTest.getProperty()).unsafePerformIO();
+            Either<Abnormal<A>, ExistentialTestResult<A>> etr = existentialTestRunner.run(settings, domainTest.getProperty(), sampleReader);
             result = etr.match(TestResult::testResult, TestResult::testResult);
         } else {
-            Either<Abnormal<A>, UniversalTestResult<A>> etr = universalTestRunner.run(settings, domainTest.getProperty(), iteratorSampleReader(domainTest.getDomain().getElements().iterator()));
+            Either<Abnormal<A>, UniversalTestResult<A>> etr = universalTestRunner.run(settings, domainTest.getProperty(), sampleReader);
             result = etr.match(TestResult::testResult, TestResult::testResult);
         }
         ReportData<A> reportData = reportData(domainTest.getProperty(),
