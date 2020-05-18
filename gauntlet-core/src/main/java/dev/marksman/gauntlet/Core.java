@@ -7,14 +7,12 @@ import dev.marksman.kraftwerk.GeneratorParameters;
 import dev.marksman.kraftwerk.Seed;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.Executor;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.io.IO.io;
-import static dev.marksman.gauntlet.GeneratedDataSet.generatedDataSet;
 import static dev.marksman.gauntlet.GeneratedSampleReader.generatedSampleReader;
 import static dev.marksman.gauntlet.GeneratorTestSettings.generatorTestSettings;
 import static dev.marksman.gauntlet.IteratorSampleReader.iteratorSampleReader;
@@ -209,7 +207,6 @@ final class Core implements GauntletApi {
     //    - test all anyway.  if falsified, fail as normal.
     //    - if cannot falsify, fail with SupplyFailure
     // if all inputs can be generated, submit test tasks to executor along with sample index
-
     private <A> void runGeneratorTest(long initialSeedValue,
                                       Seed inputSeed,
                                       GeneratorTest<A> generatorTest) {
@@ -222,46 +219,6 @@ final class Core implements GauntletApi {
         ReportData<A> reportData = reportData(generatorTest.getProperty(), result, generatorTest.getArbitrary().getPrettyPrinter(),
                 just(initialSeedValue));
         reporter.report(reportSettings, reportRenderer, reportData);
-    }
-
-//    private <A> TestResult<A> maybeApplySupplyFailure(Maybe<SupplyFailure> supplyFailureMaybe, TestResult<A> input) {
-//        // supply failure only matters if test has passed
-//        return supplyFailureMaybe
-//                .match(__ -> input,
-//                        supplyFailure -> input.projectA()
-//                                .match(__ -> input,
-//                                        passed -> Exhausted.exhausted(supplyFailure, passed.getSuccessCount())));
-//    }
-
-    private <A> GeneratedDataSet<A> generateDataSet(GeneratorTestSettings settings,
-                                                    Arbitrary<A> arbitrary,
-                                                    Seed inputSeed) {
-        return buildDataSetFromSupply(arbitrary.supplyStrategy(settings.getGeneratorParameters()),
-                settings.getSampleCount(),
-                inputSeed);
-    }
-
-    private <A> GeneratedDataSet<A> buildDataSetFromSupply(SupplyStrategy<A> supplyStrategy,
-                                                           int sampleCount,
-                                                           Seed inputSeed) {
-        Maybe<SupplyFailure> supplyFailure = nothing();
-        ArrayList<A> values = new ArrayList<>(sampleCount);
-        Seed state = inputSeed;
-        StatefulSupply<A> supply = supplyStrategy.createSupply();
-        for (int i = 0; i < sampleCount; i++) {
-            GeneratorOutput<A> next = supply.getNext(state);
-            supplyFailure = next.getValue()
-                    .match(Maybe::just,
-                            value -> {
-                                values.add(value);
-                                return nothing();
-                            });
-            state = next.getNextState();
-            if (!supplyFailure.equals(nothing())) {
-                break;
-            }
-        }
-        return generatedDataSet(values, supplyFailure, state);
     }
 
 }
