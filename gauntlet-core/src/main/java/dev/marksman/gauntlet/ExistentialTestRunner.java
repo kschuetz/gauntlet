@@ -27,7 +27,7 @@ public final class ExistentialTestRunner {
     public <A> Either<Abnormal<A>, ExistentialTestResult<A>> run(TestRunnerSettings settings,
                                                                  Prop<A> property,
                                                                  SampleReader<A> sampleReader) {
-        LocalDateTime deadline = getDeadline(settings.getTimeout()).unsafePerformIO();
+        LocalDateTime deadline = getDeadline(settings.getTimeout(), LocalDateTime.now());
         ExistentialTestResult.Unproved<A> accumulator = unproved(0);
         SampleBlock<A> block = sampleReader.readBlock(BLOCK_SIZE);
         while (!block.isEmpty()) {

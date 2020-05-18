@@ -220,5 +220,4 @@ final class Core implements GauntletApi {
                 just(initialSeedValue));
         reporter.report(reportSettings, reportRenderer, reportData);
     }
-
 }

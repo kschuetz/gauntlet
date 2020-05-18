@@ -27,7 +27,7 @@ public final class UniversalTestRunner {
     public <A> Either<Abnormal<A>, UniversalTestResult<A>> run(TestRunnerSettings settings,
                                                                Prop<A> property,
                                                                SampleReader<A> sampleReader) {
-        LocalDateTime deadline = getDeadline(settings.getTimeout()).unsafePerformIO();
+        LocalDateTime deadline = getDeadline(settings.getTimeout(), LocalDateTime.now());
         UniversalTestResult.Unfalsified<A> accumulator = unfalsified(0);
         SampleBlock<A> block = sampleReader.readBlock(BLOCK_SIZE);
         while (!block.isEmpty()) {
