@@ -24,4 +24,8 @@ public final class SampleBlock<A> {
     public Maybe<SupplyFailure> getSupplyFailure() {
         return supplyFailure;
     }
+
+    public boolean isEmpty() {
+        return samples.isEmpty();
+    }
 }

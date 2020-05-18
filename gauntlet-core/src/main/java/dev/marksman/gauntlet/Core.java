@@ -15,7 +15,9 @@ import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.io.IO.io;
 import static dev.marksman.gauntlet.GeneratedDataSet.generatedDataSet;
+import static dev.marksman.gauntlet.GeneratedSampleReader.generatedSampleReader;
 import static dev.marksman.gauntlet.GeneratorTestSettings.generatorTestSettings;
+import static dev.marksman.gauntlet.IteratorSampleReader.iteratorSampleReader;
 import static dev.marksman.gauntlet.Quantifier.EXISTENTIAL;
 import static dev.marksman.gauntlet.ReportData.reportData;
 import static dev.marksman.gauntlet.TestRunnerSettings.testRunnerSettings;
@@ -154,7 +156,7 @@ final class Core implements GauntletApi {
             Either<Abnormal<A>, ExistentialTestResult<A>> etr = existentialTestRunner.run(settings, domainTest.getDomain().getElements(), domainTest.getProperty()).unsafePerformIO();
             result = etr.match(TestResult::testResult, TestResult::testResult);
         } else {
-            Either<Abnormal<A>, UniversalTestResult<A>> etr = universalTestRunner.run(settings, domainTest.getDomain().getElements(), domainTest.getProperty()).unsafePerformIO();
+            Either<Abnormal<A>, UniversalTestResult<A>> etr = universalTestRunner.run(settings, domainTest.getProperty(), iteratorSampleReader(domainTest.getDomain().getElements().iterator()));
             result = etr.match(TestResult::testResult, TestResult::testResult);
         }
         ReportData<A> reportData = reportData(domainTest.getProperty(),
@@ -211,12 +213,10 @@ final class Core implements GauntletApi {
                                       Seed inputSeed,
                                       GeneratorTest<A> generatorTest) {
         GeneratorTestSettings settings = createGeneratorSettings(generatorTest.getSettingsAdjustments());
-        GeneratedDataSet<A> dataSet = generateDataSet(settings, generatorTest.getArbitrary(), inputSeed);
+        GeneratedSampleReader<A> sampleReader = generatedSampleReader(settings.getSampleCount(), generatorTest.getArbitrary().supplyStrategy(settings.getGeneratorParameters()), inputSeed);
         TestRunnerSettings testRunnerSettings = TestRunnerSettings.testRunnerSettings(settings.getTimeout(), settings.getExecutor());
-        Either<Abnormal<A>, UniversalTestResult<A>> utr = universalTestRunner.run(testRunnerSettings, dataSet.getSamples(), generatorTest.getProperty())
-                .unsafePerformIO();
+        Either<Abnormal<A>, UniversalTestResult<A>> utr = universalTestRunner.run(testRunnerSettings, generatorTest.getProperty(), sampleReader);
         TestResult<A> result = utr.match(TestResult::testResult, TestResult::testResult);
-        // TODO: handle supply failure
         // TODO: refine result
         ReportData<A> reportData = reportData(generatorTest.getProperty(), result, generatorTest.getArbitrary().getPrettyPrinter(),
                 just(initialSeedValue));
