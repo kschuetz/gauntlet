@@ -175,8 +175,7 @@ final class Core implements GauntletApi {
         ReportData<A> reportData = reportData(domainTest.getProperty(),
                 result,
                 domainTest.getDomain().getPrettyPrinter(),
-                nothing(),
-                nothing(), 1, 1);
+                nothing(), nothing(), nothing());
         reporter.report(reportSettings, reportRenderer, reportData);
     }
 
@@ -232,7 +231,7 @@ final class Core implements GauntletApi {
         TestResult<A> result = utr.match(TestResult::testResult, TestResult::testResult);
         // TODO: refine result
         ReportData<A> reportData = reportData(generatorTest.getProperty(), result, generatorTest.getArbitrary().getPrettyPrinter(),
-                just(initialSeedValue), nothing(), 1, 1);
+                just(initialSeedValue), nothing(), nothing());
         reporter.report(reportSettings, reportRenderer, reportData);
     }
 }
