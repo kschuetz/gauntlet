@@ -1,5 +1,5 @@
 package dev.marksman.gauntlet;
 
 public interface ReportRenderer {
-    <A, P> String renderReport(ReportSettings settings, ReportData<A, P> reportData);
+    <A> String renderReport(ReportSettings settings, ReportData<A> reportData);
 }

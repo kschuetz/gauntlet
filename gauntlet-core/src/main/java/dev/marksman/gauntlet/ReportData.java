@@ -3,17 +3,17 @@ package dev.marksman.gauntlet;
 import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.functions.Fn1;
 
-public final class ReportData<A, P> {
+public final class ReportData<A> {
     private final Prop<A> prop;
     private final TestResult<A> result;
     private final Fn1<? super A, String> prettyPrinter;
     private final Maybe<Long> initialSeedValue;
-    private final P testParameters;
+    private final Maybe<String> testParameters;
     private final int groupSize;
     private final int indexInGroup;
 
     private ReportData(Prop<A> prop, TestResult<A> result, Fn1<? super A, String> prettyPrinter, Maybe<Long> initialSeedValue,
-                       P testParameters, int groupSize, int indexInGroup) {
+                       Maybe<String> testParameters, int groupSize, int indexInGroup) {
         this.prop = prop;
         this.result = result;
         this.prettyPrinter = prettyPrinter;
@@ -23,12 +23,12 @@ public final class ReportData<A, P> {
         this.indexInGroup = indexInGroup;
     }
 
-    public static <A, P> ReportData<A, P> reportData(Prop<A> prop, TestResult<A> testResult, Fn1<? super A, String> prettyPrinter, Maybe<Long> initialSeedValue,
-                                                     P testParameters, int indexInGroup, int groupSize) {
+    public static <A, P> ReportData<A> reportData(Prop<A> prop, TestResult<A> testResult, Fn1<? super A, String> prettyPrinter, Maybe<Long> initialSeedValue,
+                                                  Maybe<String> testParameters, int indexInGroup, int groupSize) {
         return new ReportData<>(prop, testResult, prettyPrinter, initialSeedValue, testParameters, groupSize, indexInGroup);
     }
 
-    public P getTestParameters() {
+    public Maybe<String> getTestParameters() {
         return testParameters;
     }
 

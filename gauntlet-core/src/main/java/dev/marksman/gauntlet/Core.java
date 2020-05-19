@@ -2,7 +2,6 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Either;
 import com.jnape.palatable.lambda.adt.Maybe;
-import com.jnape.palatable.lambda.adt.Unit;
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.io.IO;
 import dev.marksman.kraftwerk.GeneratorParameters;
@@ -14,7 +13,6 @@ import java.util.concurrent.Executor;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
-import static com.jnape.palatable.lambda.adt.Unit.UNIT;
 import static com.jnape.palatable.lambda.io.IO.io;
 import static dev.marksman.gauntlet.GeneratedSampleReader.generatedSampleReader;
 import static dev.marksman.gauntlet.GeneratorTestSettings.generatorTestSettings;
@@ -174,11 +172,11 @@ final class Core implements GauntletApi {
             Either<Abnormal<A>, UniversalTestResult<A>> etr = universalTestRunner.run(settings, domainTest.getProperty(), sampleReader);
             result = etr.match(TestResult::testResult, TestResult::testResult);
         }
-        ReportData<A, Unit> reportData = reportData(domainTest.getProperty(),
+        ReportData<A> reportData = reportData(domainTest.getProperty(),
                 result,
                 domainTest.getDomain().getPrettyPrinter(),
                 nothing(),
-                UNIT, 1, 1);
+                nothing(), 1, 1);
         reporter.report(reportSettings, reportRenderer, reportData);
     }
 
@@ -233,8 +231,8 @@ final class Core implements GauntletApi {
         Either<Abnormal<A>, UniversalTestResult<A>> utr = universalTestRunner.run(testRunnerSettings, generatorTest.getProperty(), sampleReader);
         TestResult<A> result = utr.match(TestResult::testResult, TestResult::testResult);
         // TODO: refine result
-        ReportData<A, Unit> reportData = reportData(generatorTest.getProperty(), result, generatorTest.getArbitrary().getPrettyPrinter(),
-                just(initialSeedValue), UNIT, 1, 1);
+        ReportData<A> reportData = reportData(generatorTest.getProperty(), result, generatorTest.getArbitrary().getPrettyPrinter(),
+                just(initialSeedValue), nothing(), 1, 1);
         reporter.report(reportSettings, reportRenderer, reportData);
     }
 }
