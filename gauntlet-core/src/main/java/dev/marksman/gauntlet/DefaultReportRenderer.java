@@ -14,7 +14,7 @@ public final class DefaultReportRenderer implements ReportRenderer {
     }
 
     @Override
-    public <A> String renderReport(ReportSettings settings, ReportData<A> reportData) {
+    public <A, P> String renderReport(ReportSettings settings, ReportData<A, P> reportData) {
         return reportData.getResult()
                 .match(utr ->
                                 utr.match(unfalsified -> renderReportForUnfalsified(settings, reportData, unfalsified),
@@ -30,15 +30,15 @@ public final class DefaultReportRenderer implements ReportRenderer {
 
     }
 
-    private <A> String renderReportForUnfalsified(ReportSettings settings, ReportData<A> reportData, UniversalTestResult.Unfalsified<A> result) {
+    private <A, P> String renderReportForUnfalsified(ReportSettings settings, ReportData<A, P> reportData, UniversalTestResult.Unfalsified<A> result) {
         return "";
     }
 
-    private <A> String renderReportForProved(ReportSettings settings, ReportData<A> reportData, ExistentialTestResult.Proved<A> result) {
+    private <A, P> String renderReportForProved(ReportSettings settings, ReportData<A, P> reportData, ExistentialTestResult.Proved<A> result) {
         return "";
     }
 
-    private <A> String renderReportForFalsified(ReportSettings settings, ReportData<A> reportData, UniversalTestResult.Falsified<A> result) {
+    private <A, P> String renderReportForFalsified(ReportSettings settings, ReportData<A, P> reportData, UniversalTestResult.Falsified<A> result) {
         Fn1<? super A, String> prettyPrinter = reportData.getPrettyPrinter();
         MutableReportBuilder output = new MutableReportBuilder();
         output.write("Counterexample found after ");
@@ -69,23 +69,23 @@ public final class DefaultReportRenderer implements ReportRenderer {
         return output.render();
     }
 
-    private <A> String renderReportForUnproved(ReportSettings settings, ReportData<A> reportData, ExistentialTestResult.Unproved<A> result) {
+    private <A, P> String renderReportForUnproved(ReportSettings settings, ReportData<A, P> reportData, ExistentialTestResult.Unproved<A> result) {
         return "Property '" + reportData.getProp().getName() + "' remains unproved with the given data";
     }
 
-    private <A> String renderReportForExhausted(ReportSettings settings, ReportData<A> reportData, Abnormal.Exhausted<A> result) {
+    private <A, P> String renderReportForExhausted(ReportSettings settings, ReportData<A, P> reportData, Abnormal.Exhausted<A> result) {
         return "Supply failure";
     }
 
-    private <A> String renderReportForError(ReportSettings settings, ReportData<A> reportData, Abnormal.Error<A> result) {
+    private <A, P> String renderReportForError(ReportSettings settings, ReportData<A, P> reportData, Abnormal.Error<A> result) {
         return "Test threw an error: " + result.getError();
     }
 
-    private <A> String renderReportForTimedOut(ReportSettings settings, ReportData<A> reportData, Abnormal.TimedOut<A> result) {
+    private <A, P> String renderReportForTimedOut(ReportSettings settings, ReportData<A, P> reportData, Abnormal.TimedOut<A> result) {
         return "Timed out";
     }
 
-    private <A> String renderReportForInterrupted(ReportSettings settings, ReportData<A> reportData, Abnormal.Interrupted<A> result) {
+    private <A, P> String renderReportForInterrupted(ReportSettings settings, ReportData<A, P> reportData, Abnormal.Interrupted<A> result) {
         return "Interrupted";
     }
 

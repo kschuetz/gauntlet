@@ -10,7 +10,7 @@ public final class DefaultReporter implements Reporter {
     }
 
     @Override
-    public <A> void report(ReportSettings reportSettings, ReportRenderer renderer, ReportData<A> reportData) {
+    public <A, P> void report(ReportSettings reportSettings, ReportRenderer renderer, ReportData<A, P> reportData) {
         if (reportData.getResult().isSuccess()) {
             if (reportSettings.getSuccessVerbosity() == EXTRA) {
                 System.out.println(renderer.renderReport(reportSettings, reportData));
