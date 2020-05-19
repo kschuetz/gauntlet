@@ -2,6 +2,7 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Either;
 import com.jnape.palatable.lambda.adt.Maybe;
+import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.io.IO;
 import dev.marksman.kraftwerk.GeneratorParameters;
 import dev.marksman.kraftwerk.Seed;
@@ -144,6 +145,19 @@ final class Core implements GauntletApi {
     public <A> void assertWithSeed(long initialSeedValue, GeneratorTest<A> generatorTest) {
         Seed inputSeed = Seed.create(initialSeedValue);
         runGeneratorTest(initialSeedValue, inputSeed, generatorTest);
+    }
+
+    @Override
+    public <A, P> void assertForEach(TestParametersSource<P> parametersSource, Fn1<P, GeneratorTest<A>> createTest) {
+        assertForEachWithSeed(seedGenerator.nextLong(), parametersSource, createTest);
+    }
+
+    @Override
+    public <A, P> void assertForEachWithSeed(long initialSeedValue, TestParametersSource<P> parametersSource, Fn1<P, GeneratorTest<A>> createTest) {
+        Seed inputSeed = Seed.create(initialSeedValue);
+        TestParameterCollection<P> testParameterCollection = parametersSource.getTestParameterCollection(generatorParameters, inputSeed);
+        Seed currentSeed = testParameterCollection.getOutputSeed();
+        // TODO
     }
 
     @Override

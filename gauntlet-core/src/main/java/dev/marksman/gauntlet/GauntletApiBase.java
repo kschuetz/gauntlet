@@ -3,6 +3,7 @@ package dev.marksman.gauntlet;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
+import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.kraftwerk.GeneratorParameters;
 
 import java.time.Duration;
@@ -101,6 +102,16 @@ public abstract class GauntletApiBase implements GauntletApi {
     @Override
     public <A> void assertWithSeed(long initialSeedValue, GeneratorTest<A> generatorTest) {
         getApi().assertWithSeed(initialSeedValue, generatorTest);
+    }
+
+    @Override
+    public <A, P> void assertForEach(TestParametersSource<P> parametersSource, Fn1<P, GeneratorTest<A>> createTest) {
+        getApi().assertForEach(parametersSource, createTest);
+    }
+
+    @Override
+    public <A, P> void assertForEachWithSeed(long initialSeedValue, TestParametersSource<P> parametersSource, Fn1<P, GeneratorTest<A>> createTest) {
+        getApi().assertForEachWithSeed(initialSeedValue, parametersSource, createTest);
     }
 
     @Override
