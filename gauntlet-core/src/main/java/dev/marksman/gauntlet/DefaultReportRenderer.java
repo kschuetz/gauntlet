@@ -41,6 +41,7 @@ public final class DefaultReportRenderer implements ReportRenderer {
     private <A> String renderReportForFalsified(ReportSettings settings, ReportData<A> reportData, UniversalTestResult.Falsified<A> result) {
         Fn1<? super A, String> prettyPrinter = reportData.getPrettyPrinter();
         MutableReportBuilder output = new MutableReportBuilder();
+        reportData.getTestParameterData().toOptional().ifPresent(tpd -> renderTestParameterData(tpd, output));
         output.write("Counterexample found after ");
         int successCount = result.getSuccessCount();
         output.write(successCount);
@@ -70,7 +71,7 @@ public final class DefaultReportRenderer implements ReportRenderer {
     }
 
     private void renderTestParameterData(TestParameterReportData data, MutableReportBuilder output) {
-        output.write("For test parameter: ");
+        output.write("For test created with parameter: ");
         output.write(data.getTestParameterValue());
         output.newLine();
         output.write("  (run ");

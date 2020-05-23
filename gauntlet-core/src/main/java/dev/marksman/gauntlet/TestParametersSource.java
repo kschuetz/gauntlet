@@ -12,6 +12,10 @@ public interface TestParametersSource<A> {
         return GenerateParametersForTest.generateParametersForTest(sampleCount, generator);
     }
 
+    static <A> GenerateParametersForTest<A> generateParametersForTests(Generator<A> generator) {
+        return GenerateParametersForTest.generateParametersForTest(generator);
+    }
+
     @SafeVarargs
     static <A> TestParametersSource<A> testParametersOf(A first, A... more) {
         return EnumeratedTestParameters.enumeratedTestParameters(cons(first, asList(more)));

@@ -13,6 +13,8 @@ import static dev.marksman.gauntlet.SettingAdjustment.absolute;
 import static dev.marksman.gauntlet.SettingAdjustment.modify;
 
 public final class GenerateParametersForTest<A> implements TestParametersSource<A> {
+    public static int DEFAULT_SAMPLE_COUNT = 10;
+
     private final int sampleCount;
     private final Generator<A> generator;
     private final SettingAdjustment<GeneratorParameters> generatorParametersAdjustment;
@@ -28,6 +30,10 @@ public final class GenerateParametersForTest<A> implements TestParametersSource<
             throw new IllegalArgumentException("sampleCount must be > 0");
         }
         return new GenerateParametersForTest<>(sampleCount, generator, SettingAdjustment.inherit());
+    }
+
+    static <A> GenerateParametersForTest<A> generateParametersForTest(Generator<A> generator) {
+        return generateParametersForTest(DEFAULT_SAMPLE_COUNT, generator);
     }
 
     @Override
