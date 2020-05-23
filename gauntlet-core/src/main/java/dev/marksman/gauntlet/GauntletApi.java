@@ -78,7 +78,7 @@ public interface GauntletApi {
 
     <A> void assertThat(GeneratorTest<A> generatorTest);
 
-    <A> void assertWithSeed(long initialSeedValue, GeneratorTest<A> generatorTest);
+    <A> void assertThatWithSeed(long initialSeedValue, GeneratorTest<A> generatorTest);
 
     <A, P> void assertForEach(TestParametersSource<P> parametersSource, Fn1<P, GeneratorTest<A>> createTest);
 

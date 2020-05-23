@@ -2,20 +2,25 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Either;
 import com.jnape.palatable.lambda.adt.Maybe;
+import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.io.IO;
+import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.kraftwerk.GeneratorParameters;
 import dev.marksman.kraftwerk.Seed;
 
 import java.time.Duration;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.Executor;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
+import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
 import static com.jnape.palatable.lambda.io.IO.io;
 import static dev.marksman.gauntlet.GeneratedSampleReader.generatedSampleReader;
 import static dev.marksman.gauntlet.GeneratorTestSettings.generatorTestSettings;
+import static dev.marksman.gauntlet.IndexInGroup.indexInGroup;
 import static dev.marksman.gauntlet.IteratorSampleReader.iteratorSampleReader;
 import static dev.marksman.gauntlet.Quantifier.EXISTENTIAL;
 import static dev.marksman.gauntlet.ReportData.reportData;
@@ -138,13 +143,13 @@ final class Core implements GauntletApi {
 
     @Override
     public <A> void assertThat(GeneratorTest<A> generatorTest) {
-        assertWithSeed(seedGenerator.nextLong(), generatorTest);
+        assertThatWithSeed(seedGenerator.nextLong(), generatorTest);
     }
 
     @Override
-    public <A> void assertWithSeed(long initialSeedValue, GeneratorTest<A> generatorTest) {
+    public <A> void assertThatWithSeed(long initialSeedValue, GeneratorTest<A> generatorTest) {
         Seed inputSeed = Seed.create(initialSeedValue);
-        runGeneratorTest(initialSeedValue, inputSeed, generatorTest);
+        runSingleGeneratorTest(initialSeedValue, inputSeed, generatorTest);
     }
 
     @Override
@@ -157,7 +162,22 @@ final class Core implements GauntletApi {
         Seed inputSeed = Seed.create(initialSeedValue);
         TestParameterCollection<P> testParameterCollection = parametersSource.getTestParameterCollection(generatorParameters, inputSeed);
         Seed currentSeed = testParameterCollection.getOutputSeed();
-        // TODO
+        ImmutableNonEmptyVector<P> parameterValues = testParameterCollection.getValues();
+        int index = 1;
+        int groupSize = parameterValues.size();
+        for (P parameter : parameterValues) {
+            GeneratorTest<A> generatorTest = createTest.apply(parameter);
+            Tuple2<TestResult<A>, Seed> resultWithOutputSeed = runGeneratorTest(currentSeed, generatorTest);
+            TestResult<A> result = resultWithOutputSeed._1();
+            currentSeed = resultWithOutputSeed._2();
+
+            TestParameterReportData testParameterData = TestParameterReportData.testParameterReportData(Objects.toString(parameter), indexInGroup(index, groupSize));
+            ReportData<A> reportData = reportData(generatorTest.getProperty(), result, generatorTest.getArbitrary().getPrettyPrinter(),
+                    just(initialSeedValue), just(testParameterData));
+            reporter.report(reportSettings, reportRenderer, reportData);
+
+            index += 1;
+        }
     }
 
     @Override
@@ -175,7 +195,7 @@ final class Core implements GauntletApi {
         ReportData<A> reportData = reportData(domainTest.getProperty(),
                 result,
                 domainTest.getDomain().getPrettyPrinter(),
-                nothing(), nothing(), nothing());
+                nothing(), nothing());
         reporter.report(reportSettings, reportRenderer, reportData);
     }
 
@@ -221,17 +241,24 @@ final class Core implements GauntletApi {
     //    - test all anyway.  if falsified, fail as normal.
     //    - if cannot falsify, fail with SupplyFailure
     // if all inputs can be generated, submit test tasks to executor along with sample index
-    private <A> void runGeneratorTest(long initialSeedValue,
-                                      Seed inputSeed,
-                                      GeneratorTest<A> generatorTest) {
+    private <A> void runSingleGeneratorTest(long initialSeedValue,
+                                            Seed inputSeed,
+                                            GeneratorTest<A> generatorTest) {
+        TestResult<A> result = runGeneratorTest(inputSeed, generatorTest)._1();
+        ReportData<A> reportData = reportData(generatorTest.getProperty(), result, generatorTest.getArbitrary().getPrettyPrinter(),
+                just(initialSeedValue), nothing());
+        reporter.report(reportSettings, reportRenderer, reportData);
+    }
+
+    private <A> Tuple2<TestResult<A>, Seed> runGeneratorTest(Seed inputSeed,
+                                                             GeneratorTest<A> generatorTest) {
         GeneratorTestSettings settings = createGeneratorSettings(generatorTest.getSettingsAdjustments());
         GeneratedSampleReader<A> sampleReader = generatedSampleReader(settings.getSampleCount(), generatorTest.getArbitrary().supplyStrategy(settings.getGeneratorParameters()), inputSeed);
         TestRunnerSettings testRunnerSettings = TestRunnerSettings.testRunnerSettings(settings.getTimeout(), settings.getExecutor());
         Either<Abnormal<A>, UniversalTestResult<A>> utr = universalTestRunner.run(testRunnerSettings, generatorTest.getProperty(), sampleReader);
         TestResult<A> result = utr.match(TestResult::testResult, TestResult::testResult);
         // TODO: refine result
-        ReportData<A> reportData = reportData(generatorTest.getProperty(), result, generatorTest.getArbitrary().getPrettyPrinter(),
-                just(initialSeedValue), nothing(), nothing());
-        reporter.report(reportSettings, reportRenderer, reportData);
+        return tuple(result, sampleReader.getOutputSeed());
     }
+
 }

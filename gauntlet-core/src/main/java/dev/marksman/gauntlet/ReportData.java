@@ -8,28 +8,21 @@ public final class ReportData<A> {
     private final TestResult<A> result;
     private final Fn1<? super A, String> prettyPrinter;
     private final Maybe<Long> initialSeedValue;
-    private final Maybe<String> testParameters;
-    private final Maybe<IndexInGroup> indexInGroup;
+    private final Maybe<TestParameterReportData> testParameterData;
 
-    private ReportData(Prop<A> prop, TestResult<A> result, Fn1<? super A, String> prettyPrinter, Maybe<Long> initialSeedValue,
-                       Maybe<String> testParameters, Maybe<IndexInGroup> indexInGroup) {
+    private ReportData(Prop<A> prop, TestResult<A> result, Fn1<? super A, String> prettyPrinter,
+                       Maybe<Long> initialSeedValue, Maybe<TestParameterReportData> testParameterData) {
         this.prop = prop;
         this.result = result;
         this.prettyPrinter = prettyPrinter;
         this.initialSeedValue = initialSeedValue;
-        this.testParameters = testParameters;
-        this.indexInGroup = indexInGroup;
+        this.testParameterData = testParameterData;
     }
 
-    public static <A> ReportData<A> reportData(Prop<A> prop, TestResult<A> testResult, Fn1<? super A, String> prettyPrinter, Maybe<Long> initialSeedValue,
-                                               Maybe<String> testParameters, Maybe<IndexInGroup> indexInGroup) {
-        return new ReportData<>(prop, testResult, prettyPrinter, initialSeedValue, testParameters, indexInGroup);
+    public static <A> ReportData<A> reportData(Prop<A> prop, TestResult<A> testResult, Fn1<? super A, String> prettyPrinter,
+                                               Maybe<Long> initialSeedValue, Maybe<TestParameterReportData> testParameterData) {
+        return new ReportData<>(prop, testResult, prettyPrinter, initialSeedValue, testParameterData);
     }
-
-    public Maybe<String> getTestParameters() {
-        return testParameters;
-    }
-
 
     public Prop<A> getProp() {
         return this.prop;
@@ -47,7 +40,7 @@ public final class ReportData<A> {
         return this.initialSeedValue;
     }
 
-    public Maybe<IndexInGroup> getIndexInGroup() {
-        return indexInGroup;
+    public Maybe<TestParameterReportData> getTestParameterData() {
+        return testParameterData;
     }
 }

@@ -69,6 +69,18 @@ public final class DefaultReportRenderer implements ReportRenderer {
         return output.render();
     }
 
+    private void renderTestParameterData(TestParameterReportData data, MutableReportBuilder output) {
+        output.write("For test parameter: ");
+        output.write(data.getTestParameterValue());
+        output.newLine();
+        output.write("  (run ");
+        output.write(data.getIndexInGroup().getOneBasedIndex());
+        output.write(" of ");
+        output.write(data.getIndexInGroup().getGroupSize());
+        output.write(" in parameterized test group)");
+        output.newLine();
+    }
+
     private <A> String renderReportForUnproved(ReportSettings settings, ReportData<A> reportData, ExistentialTestResult.Unproved<A> result) {
         return "Property '" + reportData.getProp().getName() + "' remains unproved with the given data";
     }

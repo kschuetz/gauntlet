@@ -100,8 +100,8 @@ public abstract class GauntletApiBase implements GauntletApi {
     }
 
     @Override
-    public <A> void assertWithSeed(long initialSeedValue, GeneratorTest<A> generatorTest) {
-        getApi().assertWithSeed(initialSeedValue, generatorTest);
+    public <A> void assertThatWithSeed(long initialSeedValue, GeneratorTest<A> generatorTest) {
+        getApi().assertThatWithSeed(initialSeedValue, generatorTest);
     }
 
     @Override
