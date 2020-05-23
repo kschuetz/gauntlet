@@ -11,7 +11,7 @@
 
     <artifactId>gauntlet-hamcrest</artifactId>
     <name>gauntlet-hamcrest</name>
-    <version>0.2.0</version>
+    <version>0.2.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <description>
         Hamcrest extensions for Gauntlet
