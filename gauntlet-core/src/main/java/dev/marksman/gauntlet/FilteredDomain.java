@@ -9,17 +9,18 @@ import static dev.marksman.gauntlet.filter.Filter.filter;
 
 final class FilteredDomain<A> implements Domain<A> {
     private final Object lock;
-    private final Fn1<? super A, String> prettyPrinter;
+    private final PrettyPrinter<A> prettyPrinter;
     private ImmutableVector<A> sourceElements;
     private Filter<A> filter;
     private volatile ImmutableVector<A> filteredElements;
 
-    FilteredDomain(ImmutableVector<A> sourceElements, Filter<A> filter, Fn1<? super A, String> prettyPrinter) {
+    @SuppressWarnings("unchecked")
+    FilteredDomain(ImmutableVector<A> sourceElements, Filter<A> filter, PrettyPrinter<? super A> prettyPrinter) {
         this.lock = new Object();
         this.sourceElements = sourceElements;
         this.filteredElements = null;
         this.filter = filter;
-        this.prettyPrinter = prettyPrinter;
+        this.prettyPrinter = (PrettyPrinter<A>) prettyPrinter;
     }
 
     @Override
@@ -35,12 +36,12 @@ final class FilteredDomain<A> implements Domain<A> {
     }
 
     @Override
-    public Fn1<? super A, String> getPrettyPrinter() {
+    public PrettyPrinter<A> getPrettyPrinter() {
         return prettyPrinter;
     }
 
     @Override
-    public Domain<A> withPrettyPrinter(Fn1<? super A, String> prettyPrinter) {
+    public Domain<A> withPrettyPrinter(PrettyPrinter<? super A> prettyPrinter) {
         synchronized (lock) {
             if (filteredElements == null) {
                 return new FilteredDomain<>(sourceElements, filter, prettyPrinter);

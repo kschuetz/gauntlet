@@ -16,6 +16,7 @@ import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.adt.Unit.UNIT;
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
+import static dev.marksman.gauntlet.PrettyPrinter.defaultPrettyPrinter;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkChoice2;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkChoice3;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkMaybe;
@@ -124,7 +125,7 @@ final class CoProductArbitraries {
                                 generateWhich.prepare(parameters)),
                 shrinkStrategy,
                 // TODO: prettyPrinter
-                Object::toString);
+                defaultPrettyPrinter());
     }
 
     private static <A, B, C> Arbitrary<Choice3<A, B, C>> arbitraryCoProduct3(Weighted<Arbitrary<A>> a,
@@ -143,7 +144,7 @@ final class CoProductArbitraries {
                                 generateWhich.prepare(parameters)),
                 shrinkStrategy,
                 // TODO: prettyPrinter
-                Object::toString);
+                defaultPrettyPrinter());
     }
 
     private static void validateWeights(int sum) {

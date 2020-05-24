@@ -4,25 +4,25 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.collectionviews.Vector;
 
-import java.util.Objects;
-
+import static dev.marksman.gauntlet.PrettyPrinter.defaultPrettyPrinter;
 import static dev.marksman.gauntlet.filter.Filter.filter;
 
 final class EnumeratedDomain<A> implements Domain<A> {
     private final ImmutableVector<A> elements;
-    private final Fn1<? super A, String> prettyPrinter;
+    private final PrettyPrinter<A> prettyPrinter;
 
-    EnumeratedDomain(ImmutableVector<A> elements, Fn1<? super A, String> prettyPrinter) {
+    @SuppressWarnings("unchecked")
+    EnumeratedDomain(ImmutableVector<A> elements, PrettyPrinter<? super A> prettyPrinter) {
         this.elements = elements;
-        this.prettyPrinter = prettyPrinter;
+        this.prettyPrinter = (PrettyPrinter<A>) prettyPrinter;
     }
 
     static <A> EnumeratedDomain<A> enumeratedDomain(Iterable<A> elements) {
-        return new EnumeratedDomain<>(Vector.copyFrom(elements), Objects::toString);
+        return new EnumeratedDomain<>(Vector.copyFrom(elements), defaultPrettyPrinter());
     }
 
     @Override
-    public Domain<A> withPrettyPrinter(Fn1<? super A, String> prettyPrinter) {
+    public EnumeratedDomain<A> withPrettyPrinter(PrettyPrinter<? super A> prettyPrinter) {
         return new EnumeratedDomain<>(elements, prettyPrinter);
     }
 
@@ -35,7 +35,7 @@ final class EnumeratedDomain<A> implements Domain<A> {
         return this.elements;
     }
 
-    public Fn1<? super A, String> getPrettyPrinter() {
+    public PrettyPrinter<A> getPrettyPrinter() {
         return this.prettyPrinter;
     }
 }

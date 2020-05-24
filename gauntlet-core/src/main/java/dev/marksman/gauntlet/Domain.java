@@ -43,9 +43,9 @@ public interface Domain<A> {
 
     ImmutableVector<A> getElements();
 
-    Fn1<? super A, String> getPrettyPrinter();
+    PrettyPrinter<A> getPrettyPrinter();
 
-    Domain<A> withPrettyPrinter(Fn1<? super A, String> prettyPrinter);
+    Domain<A> withPrettyPrinter(PrettyPrinter<? super A> prettyPrinter);
 
     Domain<A> suchThat(Fn1<? super A, Boolean> predicate);
 }

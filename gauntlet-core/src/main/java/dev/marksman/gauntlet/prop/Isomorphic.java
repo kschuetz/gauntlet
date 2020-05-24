@@ -6,25 +6,29 @@ import dev.marksman.collectionviews.NonEmptyVectorBuilder;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
 import dev.marksman.gauntlet.EvalResult;
+import dev.marksman.gauntlet.PrettyPrinter;
 import dev.marksman.gauntlet.Prop;
 
 import java.util.Objects;
 
 import static dev.marksman.gauntlet.EvalFailure.evalFailure;
 import static dev.marksman.gauntlet.EvalSuccess.evalSuccess;
+import static dev.marksman.gauntlet.PrettyPrintParameters.defaultPrettyPrintParameters;
+import static dev.marksman.gauntlet.PrettyPrinter.defaultPrettyPrinter;
 import static dev.marksman.gauntlet.PrettyPrinting.productStringFromList;
 import static dev.marksman.gauntlet.Reasons.reasons;
 
 public final class Isomorphic<A, B> implements Prop<A> {
     private final Fn2<? super B, ? super B, Boolean> equivalenceRelation;
-    private final Fn1<? super B, String> prettyPrinter;
+    private final PrettyPrinter<B> prettyPrinter;
     private final ImmutableNonEmptyFiniteIterable<Fn1<A, B>> fns;
 
+    @SuppressWarnings("unchecked")
     private Isomorphic(Fn2<? super B, ? super B, Boolean> equivalenceRelation,
-                       Fn1<? super B, String> prettyPrinter,
+                       PrettyPrinter<? super B> prettyPrinter,
                        ImmutableNonEmptyFiniteIterable<Fn1<A, B>> fns) {
         this.equivalenceRelation = equivalenceRelation;
-        this.prettyPrinter = prettyPrinter;
+        this.prettyPrinter = (PrettyPrinter<B>) prettyPrinter;
         this.fns = fns;
     }
 
@@ -37,7 +41,7 @@ public final class Isomorphic<A, B> implements Prop<A> {
         for (Fn1<? super A, ? extends B> f : more) {
             builder = builder.add((Fn1<A, B>) f);
         }
-        return new Isomorphic<>(Objects::equals, (Fn1<? super B, String>) Object::toString, builder.build());
+        return new Isomorphic<>(Objects::equals, defaultPrettyPrinter(), builder.build());
     }
 
     /**
@@ -57,7 +61,7 @@ public final class Isomorphic<A, B> implements Prop<A> {
      * @param prettyPrinter a function to convert a value of type {@code B} to a {@code String}
      * @return a new {@code Isomorphic<A, B>} that is the same as this one, with the pretty printer updated
      */
-    public Isomorphic<A, B> withPrettyPrinter(Fn1<? super B, String> prettyPrinter) {
+    public Isomorphic<A, B> withPrettyPrinter(PrettyPrinter<? super B> prettyPrinter) {
         return new Isomorphic<>(equivalenceRelation, prettyPrinter, fns);
     }
 
@@ -75,7 +79,7 @@ public final class Isomorphic<A, B> implements Prop<A> {
         if (success) {
             return evalSuccess();
         } else {
-            String results = productStringFromList(prettyPrinter, fns.fmap(f -> f.apply(data)));
+            String results = productStringFromList(a -> prettyPrinter.prettyPrint(defaultPrettyPrintParameters(), a), fns.fmap(f -> f.apply(data)));
             return evalFailure(this, reasons("results are not equal: " + results));
         }
     }

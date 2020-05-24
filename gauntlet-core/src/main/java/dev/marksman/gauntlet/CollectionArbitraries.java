@@ -20,6 +20,7 @@ import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
+import static dev.marksman.gauntlet.PrettyPrinter.defaultPrettyPrinter;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkArrayList;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkHashSet;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkNonEmptyVector;
@@ -37,7 +38,7 @@ final class CollectionArbitraries {
                                 vectorAggregator()),
                 just(shrinkVector(elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
-                Object::toString);
+                defaultPrettyPrinter());
     }
 
     static <A> Arbitrary<ImmutableVector<A>> vectorOfN(int count, Arbitrary<A> elements) {
@@ -47,7 +48,7 @@ final class CollectionArbitraries {
                                 vectorAggregator()),
                 just(shrinkVector(count, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
-                Object::toString);
+                defaultPrettyPrinter());
     }
 
     static <A> Arbitrary<ImmutableNonEmptyVector<A>> nonEmptyVector(Arbitrary<A> elements) {
@@ -58,7 +59,7 @@ final class CollectionArbitraries {
                                 .fmap(ImmutableVector::toNonEmptyOrThrow),
                 just(shrinkNonEmptyVector(elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
-                Object::toString);
+                defaultPrettyPrinter());
     }
 
     static <A> Arbitrary<ImmutableNonEmptyVector<A>> nonEmptyVectorOfN(int count, Arbitrary<A> elements) {
@@ -72,7 +73,7 @@ final class CollectionArbitraries {
                                 .fmap(ImmutableVector::toNonEmptyOrThrow),
                 just(shrinkNonEmptyVector(count, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
-                Object::toString);
+                defaultPrettyPrinter());
     }
 
 
@@ -83,7 +84,7 @@ final class CollectionArbitraries {
                                 collectionAggregator(ArrayList::new)),
                 just(shrinkArrayList(elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
-                Object::toString);
+                defaultPrettyPrinter());
     }
 
 
@@ -94,7 +95,7 @@ final class CollectionArbitraries {
                                 collectionAggregator(ArrayList::new)),
                 just(shrinkArrayList(count, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
-                Object::toString);
+                defaultPrettyPrinter());
     }
 
 
@@ -105,7 +106,7 @@ final class CollectionArbitraries {
                                 collectionAggregator(ArrayList::new)),
                 just(shrinkArrayList(1, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
-                Object::toString);
+                defaultPrettyPrinter());
     }
 
 
@@ -116,7 +117,7 @@ final class CollectionArbitraries {
                                 collectionAggregator(HashSet::new)),
                 just(shrinkHashSet(1, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
-                Object::toString);
+                defaultPrettyPrinter());
     }
 
 
@@ -127,7 +128,7 @@ final class CollectionArbitraries {
                                 collectionAggregator(HashSet::new)),
                 just(shrinkHashSet(1, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
-                Object::toString);
+                defaultPrettyPrinter());
     }
 
     static <K, V> Arbitrary<HashMap<K, V>> hashMap(Arbitrary<K> keys,
@@ -154,7 +155,7 @@ final class CollectionArbitraries {
                             sizeGenerator(sizeRange, parameters),
                             parameters);
                 },
-                nothing(), Object::toString);
+                nothing(), defaultPrettyPrinter());
     }
 
     static Arbitrary<Arbitrary<?>> arbitraryArbitrary() {

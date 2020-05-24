@@ -1,6 +1,5 @@
 package dev.marksman.gauntlet;
 
-import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 
 import static com.jnape.palatable.lambda.adt.Unit.UNIT;
@@ -39,7 +38,8 @@ public final class DefaultReportRenderer implements ReportRenderer {
     }
 
     private <A> String renderReportForFalsified(ReportSettings settings, ReportData<A> reportData, UniversalTestResult.Falsified<A> result) {
-        Fn1<? super A, String> prettyPrinter = reportData.getPrettyPrinter();
+        PrettyPrinter<A> prettyPrinter = reportData.getPrettyPrinter();
+        PrettyPrintParameters prettyPrintParameters = PrettyPrintParameters.prettyPrintParameters(settings.getFailureVerbosity());
         MutableReportBuilder output = new MutableReportBuilder();
         reportData.getTestParameterData().toOptional().ifPresent(tpd -> renderTestParameterData(tpd, output));
         output.write("Counterexample found after ");
@@ -54,7 +54,7 @@ public final class DefaultReportRenderer implements ReportRenderer {
         Counterexample<A> counterexample = result.getRefinedCounterexample()
                 .match(__ -> result.getCounterexample(), RefinedCounterexample::getCounterexample);
         output.write("Counterexample: ");
-        output.write(prettyPrinter.apply(counterexample.getSample()));
+        output.write(prettyPrinter.prettyPrint(prettyPrintParameters, counterexample.getSample()));
         output.newLine();
         result.getRefinedCounterexample().toOptional().ifPresent(rc -> {
             output.indent();
@@ -62,7 +62,7 @@ public final class DefaultReportRenderer implements ReportRenderer {
             output.write(rc.getShrinkCount());
             output.write(rc.getShrinkCount() == 1 ? " shrink" : " shrinks");
             output.write(" from original: ");
-            output.write(prettyPrinter.apply(result.getCounterexample().getSample()));
+            output.write(prettyPrinter.prettyPrint(prettyPrintParameters, result.getCounterexample().getSample()));
             output.write(")");
             output.newLine();
         });

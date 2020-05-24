@@ -24,6 +24,7 @@ import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.optics.functions.View.view;
 import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
 import static dev.marksman.gauntlet.CompositeArbitraries.combine;
+import static dev.marksman.gauntlet.PrettyPrinter.defaultPrettyPrinter;
 
 /**
  * An {@code Arbitrary} differs from a {@code Generator} in that an {@code Arbitrary} adds the following capabilities:
@@ -51,19 +52,20 @@ public final class Arbitrary<A> {
     private final ImmutableFiniteIterable<Fn1<GeneratorParameters, GeneratorParameters>> parameterTransforms;
     private final Filter<A> filter;
     private final Maybe<ShrinkStrategy<A>> shrinkStrategy;
-    private final Fn1<? super A, String> prettyPrinter;
+    private final PrettyPrinter<A> prettyPrinter;
     private final int maxDiscards;
 
+    @SuppressWarnings("unchecked")
     private Arbitrary(Fn1<GeneratorParameters, SupplyStrategy<A>> generator,
                       ImmutableFiniteIterable<Fn1<GeneratorParameters, GeneratorParameters>> parameterTransforms,
                       Filter<A> filter, Maybe<ShrinkStrategy<A>> shrinkStrategy,
-                      Fn1<? super A, String> prettyPrinter,
+                      PrettyPrinter<? super A> prettyPrinter,
                       int maxDiscards) {
         this.generator = generator;
         this.parameterTransforms = parameterTransforms;
         this.filter = filter;
         this.shrinkStrategy = shrinkStrategy;
-        this.prettyPrinter = prettyPrinter;
+        this.prettyPrinter = (PrettyPrinter<A>) prettyPrinter;
         this.maxDiscards = maxDiscards;
     }
 
@@ -76,12 +78,12 @@ public final class Arbitrary<A> {
     public static <A> Arbitrary<A> arbitrary(Generator<A> generator) {
         Fn0<String> labelSupplier = () -> generator.getLabel().orElseGet(generator::toString);
         return arbitrary(p -> new UnfilteredSupplyStrategy<>(generator.prepare(p), labelSupplier),
-                nothing(), Object::toString);
+                nothing(), defaultPrettyPrinter());
     }
 
     static <A> Arbitrary<A> arbitrary(Fn1<GeneratorParameters, SupplyStrategy<A>> generator,
                                       Maybe<ShrinkStrategy<A>> shrinkStrategy,
-                                      Fn1<? super A, String> prettyPrinter) {
+                                      PrettyPrinter<? super A> prettyPrinter) {
         return new Arbitrary<>(generator, emptyImmutableFiniteIterable(), Filter.emptyFilter(), shrinkStrategy,
                 prettyPrinter, Gauntlet.DEFAULT_MAX_DISCARDS);
     }
@@ -100,7 +102,7 @@ public final class Arbitrary<A> {
         return shrinkStrategy;
     }
 
-    public Fn1<? super A, String> getPrettyPrinter() {
+    public PrettyPrinter<A> getPrettyPrinter() {
         return prettyPrinter;
     }
 
@@ -157,7 +159,7 @@ public final class Arbitrary<A> {
     /**
      * @return a new {@code Arbitrary} that is the same as this one, with the pretty-printer changed to the one provided.
      */
-    public Arbitrary<A> withPrettyPrinter(Fn1<? super A, String> prettyPrinter) {
+    public Arbitrary<A> withPrettyPrinter(PrettyPrinter<? super A> prettyPrinter) {
         return new Arbitrary<>(generator, parameterTransforms, filter, shrinkStrategy, prettyPrinter, maxDiscards);
     }
 
