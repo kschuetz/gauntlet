@@ -76,15 +76,13 @@ public interface GauntletApi {
         return domainTestApi(EXISTENTIAL, cartesianProduct(domainA, domainB, domainC, domainD));
     }
 
-    <A> void assertThat(GeneratorTest<A> generatorTest);
+    <A> void assertThat(Test<A> test);
 
     <A> void assertThatWithSeed(long initialSeedValue, GeneratorTest<A> generatorTest);
 
-    <A, P> void assertForEach(TestParametersSource<P> parametersSource, Fn1<P, GeneratorTest<A>> createTest);
+    <A, P> void assertForEach(TestParametersSource<P> parametersSource, Fn1<P, Test<A>> createTest);
 
-    <A, P> void assertForEachWithSeed(long initialSeedValue, TestParametersSource<P> parametersSource, Fn1<P, GeneratorTest<A>> createTest);
-
-    <A> void assertThat(DomainTest<A> domainTest);
+    <A, P> void assertForEachWithSeed(long initialSeedValue, TestParametersSource<P> parametersSource, Fn1<P, Test<A>> createTest);
 
     Reporter getReporter();
 

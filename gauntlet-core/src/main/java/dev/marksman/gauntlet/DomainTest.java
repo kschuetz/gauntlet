@@ -1,6 +1,6 @@
 package dev.marksman.gauntlet;
 
-public final class DomainTest<A> {
+public final class DomainTest<A> extends Test<A> {
     private final Quantifier quantifier;
     private final Domain<A> domain;
     private final Prop<A> property;
@@ -34,5 +34,10 @@ public final class DomainTest<A> {
 
     public DomainTestSettingsAdjustments getSettingsAdjustments() {
         return settings;
+    }
+
+    @Override
+    public PrettyPrinter<A> getPrettyPrinter() {
+        return domain.getPrettyPrinter();
     }
 }

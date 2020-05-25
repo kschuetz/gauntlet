@@ -1,6 +1,6 @@
 package dev.marksman.gauntlet;
 
-public final class GeneratorTest<A> {
+public final class GeneratorTest<A> extends Test<A> {
     private final Arbitrary<A> arbitrary;
     private final Prop<A> property;
     private final GeneratorTestSettingsAdjustments settings;
@@ -25,5 +25,10 @@ public final class GeneratorTest<A> {
 
     public GeneratorTestSettingsAdjustments getSettingsAdjustments() {
         return settings;
+    }
+
+    @Override
+    public PrettyPrinter<A> getPrettyPrinter() {
+        return arbitrary.getPrettyPrinter();
     }
 }

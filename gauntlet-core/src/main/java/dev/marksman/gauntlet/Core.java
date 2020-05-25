@@ -29,6 +29,7 @@ import static dev.marksman.gauntlet.TestRunnerSettings.testRunnerSettings;
 final class Core implements GauntletApi {
     private static final Random seedGenerator = new Random();
     private static final int REFINEMENT_BLOCK_SIZE = RefinementTest.DEFAULT_BLOCK_SIZE;
+    private static final String UNSUPPORTED_TEST_TYPE = "Unsupported test type";
 
     private final UniversalTestRunner universalTestRunner;
     private final ExistentialTestRunner existentialTestRunner;
@@ -142,8 +143,14 @@ final class Core implements GauntletApi {
     }
 
     @Override
-    public <A> void assertThat(GeneratorTest<A> generatorTest) {
-        assertThatWithSeed(seedGenerator.nextLong(), generatorTest);
+    public <A> void assertThat(Test<A> test) {
+        if (test instanceof GeneratorTest<?>) {
+            assertThatWithSeed(seedGenerator.nextLong(), (GeneratorTest<A>) test);
+        } else if (test instanceof DomainTest<?>) {
+            runSingleDomainTest((DomainTest<A>) test);
+        } else {
+            throw new IllegalArgumentException(UNSUPPORTED_TEST_TYPE);
+        }
     }
 
     @Override
@@ -153,12 +160,12 @@ final class Core implements GauntletApi {
     }
 
     @Override
-    public <A, P> void assertForEach(TestParametersSource<P> parametersSource, Fn1<P, GeneratorTest<A>> createTest) {
+    public <A, P> void assertForEach(TestParametersSource<P> parametersSource, Fn1<P, Test<A>> createTest) {
         assertForEachWithSeed(seedGenerator.nextLong(), parametersSource, createTest);
     }
 
     @Override
-    public <A, P> void assertForEachWithSeed(long initialSeedValue, TestParametersSource<P> parametersSource, Fn1<P, GeneratorTest<A>> createTest) {
+    public <A, P> void assertForEachWithSeed(long initialSeedValue, TestParametersSource<P> parametersSource, Fn1<P, Test<A>> createTest) {
         Seed inputSeed = Seed.create(initialSeedValue);
         TestParameterCollection<P> testParameterCollection = parametersSource.getTestParameterCollection(generatorParameters, inputSeed);
         Seed currentSeed = testParameterCollection.getOutputSeed();
@@ -166,13 +173,22 @@ final class Core implements GauntletApi {
         int index = 1;
         int groupSize = parameterValues.size();
         for (P parameter : parameterValues) {
-            GeneratorTest<A> generatorTest = createTest.apply(parameter);
-            Tuple2<TestResult<A>, Seed> resultWithOutputSeed = runGeneratorTest(currentSeed, generatorTest);
-            TestResult<A> result = resultWithOutputSeed._1();
-            currentSeed = resultWithOutputSeed._2();
+            Test<A> test = createTest.apply(parameter);
+            TestResult<A> result;
+            if (test instanceof GeneratorTest<?>) {
+                GeneratorTest<A> generatorTest = (GeneratorTest<A>) test;
+                Tuple2<TestResult<A>, Seed> resultWithOutputSeed = runGeneratorTest(currentSeed, generatorTest);
+                result = resultWithOutputSeed._1();
+                currentSeed = resultWithOutputSeed._2();
+            } else if (test instanceof DomainTest<?>) {
+                DomainTest<A> domainTest = (DomainTest<A>) test;
+                result = runDomainTest(domainTest);
+            } else {
+                throw new IllegalArgumentException(UNSUPPORTED_TEST_TYPE);
+            }
 
             TestParameterReportData testParameterData = TestParameterReportData.testParameterReportData(Objects.toString(parameter), indexInGroup(index, groupSize));
-            ReportData<A> reportData = reportData(generatorTest.getProperty(), result, generatorTest.getArbitrary().getPrettyPrinter(),
+            ReportData<A> reportData = reportData(test.getProperty(), result, test.getPrettyPrinter(),
                     just(initialSeedValue), just(testParameterData));
             reporter.report(reportSettings, reportRenderer, reportData);
 
@@ -180,18 +196,8 @@ final class Core implements GauntletApi {
         }
     }
 
-    @Override
-    public <A> void assertThat(DomainTest<A> domainTest) {
-        TestRunnerSettings settings = createDomainSettings(domainTest.getSettingsAdjustments());
-        TestResult<A> result;
-        IteratorSampleReader<A> sampleReader = iteratorSampleReader(domainTest.getDomain().getElements().iterator());
-        if (domainTest.getQuantifier() == EXISTENTIAL) {
-            Either<Abnormal<A>, ExistentialTestResult<A>> etr = existentialTestRunner.run(settings, domainTest.getProperty(), sampleReader);
-            result = etr.match(TestResult::testResult, TestResult::testResult);
-        } else {
-            Either<Abnormal<A>, UniversalTestResult<A>> etr = universalTestRunner.run(settings, domainTest.getProperty(), sampleReader);
-            result = etr.match(TestResult::testResult, TestResult::testResult);
-        }
+    private <A> void runSingleDomainTest(DomainTest<A> domainTest) {
+        TestResult<A> result = runDomainTest(domainTest);
         ReportData<A> reportData = reportData(domainTest.getProperty(),
                 result,
                 domainTest.getDomain().getPrettyPrinter(),
@@ -261,4 +267,17 @@ final class Core implements GauntletApi {
         return tuple(result, sampleReader.getOutputSeed());
     }
 
+    private <A> TestResult<A> runDomainTest(DomainTest<A> domainTest) {
+        TestRunnerSettings settings = createDomainSettings(domainTest.getSettingsAdjustments());
+        TestResult<A> result;
+        IteratorSampleReader<A> sampleReader = iteratorSampleReader(domainTest.getDomain().getElements().iterator());
+        if (domainTest.getQuantifier() == EXISTENTIAL) {
+            Either<Abnormal<A>, ExistentialTestResult<A>> etr = existentialTestRunner.run(settings, domainTest.getProperty(), sampleReader);
+            result = etr.match(TestResult::testResult, TestResult::testResult);
+        } else {
+            Either<Abnormal<A>, UniversalTestResult<A>> etr = universalTestRunner.run(settings, domainTest.getProperty(), sampleReader);
+            result = etr.match(TestResult::testResult, TestResult::testResult);
+        }
+        return result;
+    }
 }
