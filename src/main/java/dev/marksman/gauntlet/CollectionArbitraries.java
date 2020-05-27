@@ -142,7 +142,7 @@ final class CollectionArbitraries {
     }
 
     static Arbitrary<ImmutableVector<?>> homogeneousCollection() {
-        return null;
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
     static Arbitrary<ImmutableVector<?>> homogeneousCollection(IntRange sizeRange) {
