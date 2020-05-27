@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.marksman</groupId>
     <artifactId>gauntlet</artifactId>
-    <version>0.2.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <version>0.2.2-SNAPSHOT</version>
 
     <name>gauntlet</name>
-    <modules>
-        <module>gauntlet-core</module>
-        <module>gauntlet-hamcrest</module>
-    </modules>
+    <description>
+        Property-based testing
+    </description>
+
+    <url>http://www.github.com/kschuetz/gauntlet</url>
 
     <properties>
         <lambda.version>5.2.0</lambda.version>
-        <kraftwerk.version>0.8.1</kraftwerk.version>
+        <kraftwerk.version>0.8.2-SNAPSHOT</kraftwerk.version>
         <collection-views.version>1.2.2</collection-views.version>
         <junit.version>5.5.0</junit.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
@@ -60,54 +59,52 @@
         </developer>
     </developers>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.jnape.palatable</groupId>
-                <artifactId>lambda</artifactId>
-                <version>${lambda.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>dev.marksman</groupId>
-                <artifactId>kraftwerk</artifactId>
-                <version>${kraftwerk.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>dev.marksman</groupId>
-                <artifactId>collection-views</artifactId>
-                <version>${collection-views.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-engine</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>3.3.3</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-junit-jupiter</artifactId>
-                <version>3.3.3</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest</artifactId>
-                <version>${hamcrest.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>1.18.12</version>
-                <scope>provided</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.jnape.palatable</groupId>
+            <artifactId>lambda</artifactId>
+            <version>${lambda.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.marksman</groupId>
+            <artifactId>kraftwerk</artifactId>
+            <version>${kraftwerk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.marksman</groupId>
+            <artifactId>collection-views</artifactId>
+            <version>${collection-views.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>3.3.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>3.3.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>${hamcrest.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.12</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>

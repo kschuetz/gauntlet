@@ -77,11 +77,11 @@ final class ShrinkNumerics {
     }
 
     static ShrinkStrategy<Float> shrinkFloat() {
-        return shrinkFloat(FloatRange.fullRange());
+        return shrinkFloat(FloatRange.inclusive(-Float.MAX_VALUE, Float.MAX_VALUE));
     }
 
     static ShrinkStrategy<Double> shrinkDouble() {
-        return shrinkDouble(DoubleRange.fullRange());
+        return shrinkDouble(DoubleRange.inclusive(-Double.MAX_VALUE, Double.MAX_VALUE));
     }
 
     /**

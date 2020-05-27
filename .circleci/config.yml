@@ -9,8 +9,6 @@ shared: &shared
     - restore_cache:
         key: gauntlet-{{ checksum "pom.xml" }}
 
-    - run: mvn install -DskipTests
-
     - run: mvn dependency:go-offline
 
     - save_cache:
