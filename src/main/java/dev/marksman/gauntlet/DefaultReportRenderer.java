@@ -65,6 +65,7 @@ public final class DefaultReportRenderer implements ReportRenderer {
             output.write(prettyPrinter.prettyPrint(prettyPrintParameters, result.getCounterexample().getSample()));
             output.write(")");
             output.newLine();
+            output.unindent();
         });
         writeEvalFailure(output, counterexample.getFailure(), 0);
         return output.render();

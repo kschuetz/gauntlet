@@ -1,7 +1,7 @@
 package dev.marksman.gauntlet;
 
+import com.jnape.palatable.lambda.adt.Either;
 import com.jnape.palatable.lambda.adt.Maybe;
-import com.jnape.palatable.lambda.io.IO;
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.collectionviews.VectorBuilder;
@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.concurrent.Executor;
 
+import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.maybe;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
-import static com.jnape.palatable.lambda.io.IO.io;
 import static dev.marksman.gauntlet.EvaluateSampleTask.evaluateSampleTask;
 import static dev.marksman.gauntlet.ResultCollector.universalResultCollector;
 
@@ -36,16 +36,14 @@ public final class RefinementTestRunner {
         return INSTANCE;
     }
 
-    public <A> IO<Maybe<RefinedCounterexample<A>>> run(RefinementTest<A> refinementTest) {
-        return io(() -> {
-            LocalDateTime deadline = LocalDateTime.now().plus(refinementTest.getTimeout());
+    public <A> Maybe<RefinedCounterexample<A>> run(RefinementTest<A> refinementTest) {
+        LocalDateTime deadline = LocalDateTime.now().plus(refinementTest.getTimeout());
 
-            Session<A> session = new Session<>(refinementTest.getExecutor(),
-                    refinementTest.getShrinkStrategy(), refinementTest.getProperty(), refinementTest.getMaximumShrinkCount(),
-                    deadline, refinementTest.getBlockSize());
+        Session<A> session = new Session<>(refinementTest.getExecutor(),
+                refinementTest.getShrinkStrategy(), refinementTest.getProperty(), refinementTest.getMaximumShrinkCount(),
+                deadline, refinementTest.getBlockSize());
 
-            return session.run(refinementTest.getSample());
-        });
+        return session.run(refinementTest.getSample());
     }
 
     private static class Session<A> {
@@ -90,42 +88,42 @@ public final class RefinementTestRunner {
                 return nothing();
             }
 
-//            Iterator<A> source = shrinkStrategy.apply(sample).iterator();
-//            while (shrinkCount < maximumShrinkCount) {
-//                int actualBlockSize = Math.min(blockSize, maximumShrinkCount - shrinkCount);
-//                ImmutableVector<A> block = readBlock(actualBlockSize, source);
-//                if (block.isEmpty()) {
-//                    return nothing();
-//                }
-//                TestResult<A> result = runBlock(block, TIMEOUT_TODO);
-//
-//                if (result instanceof Falsified<?>) {
-//                    Falsified<A> falsified = (Falsified<A>) result;
-//                    return just(refinedCounterexample(falsified.getCounterexample(), 1 + shrinkCount + falsified.getSuccessCount()));
-//                } else if (result instanceof Unfalsified<?>) {
-//                    Unfalsified<A> unfalsified = (Unfalsified<A>) result;
-//                    shrinkCount += unfalsified.getSuccessCount();
-//                } else if (result instanceof Proved<?>) {
-//                    throw new IllegalStateException("TestResult.Proved should never happen in a shrink test");
-//                } else if (result instanceof Unproved<?>) {
-//                    throw new IllegalStateException("TestResult.Unproved should never happen in a shrink test");
-//                } else {
-//                    // an error occurred - abort
-//                    return nothing();
-//                }
-//            }
+            Iterator<A> source = shrinkStrategy.apply(sample).iterator();
+            while (shrinkCount < maximumShrinkCount) {
+                int actualBlockSize = Math.min(blockSize, maximumShrinkCount - shrinkCount);
+                ImmutableVector<A> block = readBlock(actualBlockSize, source);
+                if (block.isEmpty()) {
+                    return nothing();
+                }
+                Either<Abnormal<A>, UniversalTestResult<A>> result = runBlock(block, TIMEOUT_TODO);
+
+                Abnormal<A> error = result.projectA().orElse(null);
+                if (error != null) {
+                    // an error occurred - abort
+                    return nothing();
+                }
+                UniversalTestResult<A> utr = result.projectB().orElseThrow(AssertionError::new);
+
+                UniversalTestResult.Falsified<A> falsified = utr.projectB().orElse(null);
+                if (falsified != null) {
+                    return just(RefinedCounterexample.refinedCounterexample(falsified.getCounterexample(), 1 + shrinkCount + falsified.getSuccessCount()));
+                }
+
+                UniversalTestResult.Unfalsified<A> unfalsified = utr.projectA().orElseThrow(AssertionError::new);
+                shrinkCount += unfalsified.getSuccessCount();
+            }
             return nothing();
         }
 
-        private TestResult<A> runBlock(ImmutableVector<A> samples,
-                                       Duration timeout) {
+        private Either<Abnormal<A>, UniversalTestResult<A>> runBlock(ImmutableVector<A> samples,
+                                                                     Duration timeout) {
             int sampleCount = samples.size();
             ResultCollector.UniversalResultCollector<A> collector = universalResultCollector(samples);
             for (int sampleIndex = 0; sampleIndex < sampleCount; sampleIndex++) {
                 EvaluateSampleTask<A> task = evaluateSampleTask(collector, property, sampleIndex, samples.unsafeGet(sampleIndex));
                 executor.execute(task);
             }
-            return collector.getResultBlocking(timeout).match(TestResult::testResult, TestResult::testResult);
+            return collector.getResultBlocking(timeout);
         }
     }
 }

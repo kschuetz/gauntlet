@@ -4,8 +4,8 @@ import com.jnape.palatable.lambda.adt.Either;
 import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.functions.Fn1;
-import com.jnape.palatable.lambda.io.IO;
 import dev.marksman.collectionviews.ImmutableNonEmptyVector;
+import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.GeneratorParameters;
 import dev.marksman.kraftwerk.Seed;
 
@@ -17,12 +17,12 @@ import java.util.concurrent.Executor;
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
-import static com.jnape.palatable.lambda.io.IO.io;
 import static dev.marksman.gauntlet.GeneratedSampleReader.generatedSampleReader;
 import static dev.marksman.gauntlet.GeneratorTestSettings.generatorTestSettings;
 import static dev.marksman.gauntlet.IndexInGroup.indexInGroup;
 import static dev.marksman.gauntlet.IteratorSampleReader.iteratorSampleReader;
 import static dev.marksman.gauntlet.Quantifier.EXISTENTIAL;
+import static dev.marksman.gauntlet.RefinementTest.refinementTest;
 import static dev.marksman.gauntlet.ReportData.reportData;
 import static dev.marksman.gauntlet.TestRunnerSettings.testRunnerSettings;
 
@@ -218,23 +218,20 @@ final class Core implements GauntletApi {
                 adjustments.getExecutor().apply(this::getExecutor));
     }
 
-    private <A> IO<TestResult<A>> refineResult(GeneratorTest<A> testData,
-                                               TestResult<A> initialResult) {
-        return io(initialResult);
-//        if (!(initialResult.getResult() instanceof TestResult.Falsified<?>)) {
-//            return io(initialResult);
-//        }
-//        TestResult.Falsified<A> falsified = (TestResult.Falsified<A>) initialResult.getResult();
-//        ShrinkStrategy<A> shrinkStrategy = testData.getArbitrary().getShrinkStrategy().orElse(null);
-//        if (shrinkStrategy == null) {
-//            return io(initialResult);
-//        }
-//        return refinementTestRunner
-//                .run(refinementTest(shrinkStrategy, testData.getProperty(), falsified.getCounterexample().getSample(),
-//                        testData.getMaximumShrinkCount(), testData.getTimeout(), getExecutor(), REFINEMENT_BLOCK_SIZE))
-//                .fmap(maybeRefinedResult -> maybeRefinedResult
-//                        .match(__ -> initialResult,
-//                                refined -> initialResult.withResult(falsified.withRefinedCounterexample(refined))));
+    private <A> UniversalTestResult.Falsified<A> refineResult(GeneratorTestSettings settings,
+                                                              Prop<A> property,
+                                                              Maybe<ShrinkStrategy<A>> maybeShrinkStrategy,
+                                                              UniversalTestResult.Falsified<A> initialResult) {
+        ShrinkStrategy<A> shrinkStrategy = maybeShrinkStrategy.orElse(null);
+        if (shrinkStrategy == null) {
+            return initialResult;
+        }
+        RefinementTest<A> refinementTest = refinementTest(shrinkStrategy, property, initialResult.getCounterexample().getSample(),
+                settings.getMaximumShrinkCount(), settings.getTimeout(), settings.getExecutor(), REFINEMENT_BLOCK_SIZE);
+
+        return refinementTestRunner.run(refinementTest)
+                .match(__ -> initialResult,
+                        initialResult::withRefinedCounterexample);
     }
 
     private Executor getExecutor() {
@@ -261,9 +258,11 @@ final class Core implements GauntletApi {
         GeneratorTestSettings settings = createGeneratorSettings(generatorTest.getSettingsAdjustments());
         GeneratedSampleReader<A> sampleReader = generatedSampleReader(settings.getSampleCount(), generatorTest.getArbitrary().supplyStrategy(settings.getGeneratorParameters()), inputSeed);
         TestRunnerSettings testRunnerSettings = TestRunnerSettings.testRunnerSettings(settings.getTimeout(), settings.getExecutor());
-        Either<Abnormal<A>, UniversalTestResult<A>> utr = universalTestRunner.run(testRunnerSettings, generatorTest.getProperty(), sampleReader);
-        TestResult<A> result = utr.match(TestResult::testResult, TestResult::testResult);
-        // TODO: refine result
+        Either<Abnormal<A>, UniversalTestResult<A>> testResult = universalTestRunner.run(testRunnerSettings, generatorTest.getProperty(), sampleReader);
+
+        TestResult<A> result = testResult.match(TestResult::testResult,
+                utr -> utr.match(TestResult::testResult,
+                        falsified -> TestResult.testResult(refineResult(settings, generatorTest.getProperty(), generatorTest.getArbitrary().getShrinkStrategy(), falsified))));
         return tuple(result, sampleReader.getOutputSeed());
     }
 

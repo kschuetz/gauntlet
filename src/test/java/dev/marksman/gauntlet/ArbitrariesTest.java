@@ -78,16 +78,13 @@ final class ArbitrariesTest extends GauntletApiBase {
     @Nested
     @DisplayName("shorts")
     class Shorts {
-        // TODO: fix kraftwerk short generator
         @Test
-        @Disabled
         void allInRange() {
             assertForEach(generateParametersForTests(generateShortRange()),
                     range -> all(shorts(range)).satisfy(inRange(range)));
         }
 
         @Test
-        @Disabled
         void allNaturalsInRange() {
             assertThat(all(shortNaturals()).satisfy(inRange(ShortRange.inclusive((short) 0, Short.MAX_VALUE))));
         }
@@ -96,9 +93,7 @@ final class ArbitrariesTest extends GauntletApiBase {
     @Nested
     @DisplayName("bytes")
     class Bytes {
-        // TODO: fix kraftwerk byte generator
         @Test
-        @Disabled
         void allInRange() {
             assertForEach(generateParametersForTests(generateByteRange()),
                     range -> all(bytes(range)).satisfy(inRange(range)));
@@ -198,7 +193,6 @@ final class ArbitrariesTest extends GauntletApiBase {
         //Counterexample: 08:54:00.475576586
 
         @Test
-        @Disabled
         void allInRange() {
             assertForEach(generateParametersForTests(generateLocalTimeRange()),
                     range -> all(localTimes(range)).satisfy(inRange(range)));
@@ -214,7 +208,6 @@ final class ArbitrariesTest extends GauntletApiBase {
         //Counterexample found after 2 successes using seed 1717198910286683303
         //Counterexample: 2113-03-03T17:12:17.559301675
 
-        @Disabled
         @Test
         void allInRange() {
             assertForEach(generateParametersForTests(generateLocalDateTimeRange()),

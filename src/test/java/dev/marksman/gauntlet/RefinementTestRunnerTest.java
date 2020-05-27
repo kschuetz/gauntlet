@@ -2,7 +2,6 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Maybe;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -14,7 +13,7 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkInt;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Disabled
+
 final class RefinementTestRunnerTest {
     private static final int BLOCK_SIZE = 3;
 
@@ -36,8 +35,7 @@ final class RefinementTestRunnerTest {
         RefinementTest<Integer> testParams = refinementTest(shrinkInt(), odd,
                 11, 1000, timeout, executorService, BLOCK_SIZE);
 
-        RefinedCounterexample<Integer> result = runner.run(testParams)
-                .unsafePerformIO().orElseThrow(AssertionError::new);
+        RefinedCounterexample<Integer> result = runner.run(testParams).orElseThrow(AssertionError::new);
 
         assertEquals(0, result.getCounterexample().getSample());
         assertEquals(1, result.getShrinkCount());
@@ -48,8 +46,7 @@ final class RefinementTestRunnerTest {
         RefinementTest<Integer> testParams = refinementTest(shrinkInt(), lessThan100,
                 105, 1000, timeout, executorService, BLOCK_SIZE);
 
-        RefinedCounterexample<Integer> result = runner.run(testParams)
-                .unsafePerformIO().orElseThrow(AssertionError::new);
+        RefinedCounterexample<Integer> result = runner.run(testParams).orElseThrow(AssertionError::new);
 
         assertEquals(100, result.getCounterexample().getSample());
         assertEquals(14, result.getShrinkCount());
@@ -59,8 +56,7 @@ final class RefinementTestRunnerTest {
     void doesNotFind() {
         RefinementTest<Integer> testParams = refinementTest(shrinkInt(), lessThan100, 100, 1000, timeout, executorService, BLOCK_SIZE);
 
-        Maybe<RefinedCounterexample<Integer>> result = runner.run(testParams)
-                .unsafePerformIO();
+        Maybe<RefinedCounterexample<Integer>> result = runner.run(testParams);
 
         assertEquals(nothing(), result);
     }
@@ -69,8 +65,7 @@ final class RefinementTestRunnerTest {
     void returnsBestCandidateWhenShrinkCountExceeded() {
         RefinementTest<Integer> testParams = refinementTest(shrinkInt(), lessThan100, 105, 10, timeout, executorService, BLOCK_SIZE);
 
-        RefinedCounterexample<Integer> result = runner.run(testParams)
-                .unsafePerformIO().orElseThrow(AssertionError::new);
+        RefinedCounterexample<Integer> result = runner.run(testParams).orElseThrow(AssertionError::new);
 
         assertEquals(101, result.getCounterexample().getSample());
         assertEquals(6, result.getShrinkCount());
