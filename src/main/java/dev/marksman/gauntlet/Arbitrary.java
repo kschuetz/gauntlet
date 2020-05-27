@@ -6,8 +6,8 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.functions.Fn0;
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.optics.Iso;
-import dev.marksman.collectionviews.ImmutableNonEmptyVector;
-import dev.marksman.collectionviews.ImmutableVector;
+import dev.marksman.collectionviews.NonEmptyVector;
+import dev.marksman.collectionviews.Vector;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.filter.Filter;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
@@ -181,19 +181,19 @@ public final class Arbitrary<A> {
         return new Arbitrary<>(generator, parameterTransforms.append(modifyFn), filter, shrinkStrategy, prettyPrinter, maxDiscards);
     }
 
-    public Arbitrary<ImmutableVector<A>> vector() {
+    public Arbitrary<Vector<A>> vector() {
         return CollectionArbitraries.vector(this);
     }
 
-    public Arbitrary<ImmutableVector<A>> vectorOfN(int count) {
+    public Arbitrary<Vector<A>> vectorOfN(int count) {
         return CollectionArbitraries.vectorOfN(count, this);
     }
 
-    public Arbitrary<ImmutableNonEmptyVector<A>> nonEmptyVector() {
+    public Arbitrary<NonEmptyVector<A>> nonEmptyVector() {
         return CollectionArbitraries.nonEmptyVector(this);
     }
 
-    public Arbitrary<ImmutableNonEmptyVector<A>> nonEmptyVectorOfN(int count) {
+    public Arbitrary<NonEmptyVector<A>> nonEmptyVectorOfN(int count) {
         return CollectionArbitraries.nonEmptyVectorOfN(count, this);
     }
 

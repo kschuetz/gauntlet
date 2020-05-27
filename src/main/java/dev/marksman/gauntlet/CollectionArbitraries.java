@@ -4,14 +4,14 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.builtin.fn2.ToMap;
 import com.jnape.palatable.lambda.optics.Iso;
-import dev.marksman.collectionviews.ImmutableNonEmptyVector;
-import dev.marksman.collectionviews.ImmutableVector;
+import dev.marksman.collectionviews.NonEmptyVector;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.collectionviews.VectorBuilder;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.Generate;
 import dev.marksman.kraftwerk.GeneratorParameters;
 import dev.marksman.kraftwerk.Generators;
+import dev.marksman.kraftwerk.aggregator.Aggregator;
 import dev.marksman.kraftwerk.constraints.IntRange;
 
 import java.util.ArrayList;
@@ -25,47 +25,47 @@ import static dev.marksman.gauntlet.ArbitraryGenerator.generateArbitrary;
 import static dev.marksman.gauntlet.PrettyPrinter.defaultPrettyPrinter;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkArrayList;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkHashSet;
-import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkImmutableNonEmptyVector;
-import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkImmutableVector;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkNonEmptyVector;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkVector;
 import static dev.marksman.kraftwerk.Generators.generateInt;
 import static dev.marksman.kraftwerk.Generators.generateSize;
+import static dev.marksman.kraftwerk.aggregator.Aggregator.aggregator;
 import static dev.marksman.kraftwerk.aggregator.Aggregators.collectionAggregator;
-import static dev.marksman.kraftwerk.aggregator.Aggregators.vectorAggregator;
 
 final class CollectionArbitraries {
-    static <A> Arbitrary<ImmutableVector<A>> vector(Arbitrary<A> elements) {
+
+    static <A> Arbitrary<Vector<A>> vector(Arbitrary<A> elements) {
         return arbitrary(parameters ->
                         new CollectionSupplyStrategy<>(elements.supplyStrategy(parameters),
                                 sizeGenerator(parameters),
                                 vectorAggregator()),
-                just(shrinkImmutableVector(elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
+                just(shrinkVector(elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
                 defaultPrettyPrinter());
     }
 
-    static <A> Arbitrary<ImmutableVector<A>> vectorOfN(int count, Arbitrary<A> elements) {
+    static <A> Arbitrary<Vector<A>> vectorOfN(int count, Arbitrary<A> elements) {
         return arbitrary(parameters ->
                         new CollectionSupplyStrategy<>(elements.supplyStrategy(parameters),
                                 Generators.constant(count).prepare(parameters),
                                 vectorAggregator()),
-                just(shrinkImmutableVector(count, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
+                just(shrinkVector(count, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
                 defaultPrettyPrinter());
     }
 
-    static <A> Arbitrary<ImmutableNonEmptyVector<A>> nonEmptyVector(Arbitrary<A> elements) {
+    static <A> Arbitrary<NonEmptyVector<A>> nonEmptyVector(Arbitrary<A> elements) {
         return arbitrary(parameters ->
                         new CollectionSupplyStrategy<>(elements.supplyStrategy(parameters),
                                 sizeGenerator(1, parameters),
                                 vectorAggregator())
-                                .fmap(ImmutableVector::toNonEmptyOrThrow),
-                just(shrinkImmutableNonEmptyVector(elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
+                                .fmap(Vector::toNonEmptyOrThrow),
+                just(shrinkNonEmptyVector(elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
                 defaultPrettyPrinter());
     }
 
-    static <A> Arbitrary<ImmutableNonEmptyVector<A>> nonEmptyVectorOfN(int count, Arbitrary<A> elements) {
+    static <A> Arbitrary<NonEmptyVector<A>> nonEmptyVectorOfN(int count, Arbitrary<A> elements) {
         if (count < 1) {
             throw new IllegalArgumentException("count must be >= 1");
         }
@@ -73,8 +73,8 @@ final class CollectionArbitraries {
                         new CollectionSupplyStrategy<>(elements.supplyStrategy(parameters),
                                 Generators.constant(count).prepare(parameters),
                                 vectorAggregator())
-                                .fmap(ImmutableVector::toNonEmptyOrThrow),
-                just(shrinkImmutableNonEmptyVector(count, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
+                                .fmap(Vector::toNonEmptyOrThrow),
+                just(shrinkNonEmptyVector(count, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
                 defaultPrettyPrinter());
     }
@@ -145,6 +145,15 @@ final class CollectionArbitraries {
     }
 
     static <Collection> Arbitrary<Collection> customHomogeneousCollection(Fn1<? super Vector<?>, ? extends Collection> fromVector,
+                                                                          Fn1<? super Collection, ? extends Vector<?>> toVector) {
+        return homogeneousVector().convert(fromVector, toVector);
+    }
+
+    static <Collection> Arbitrary<Collection> customHomogeneousCollection(Iso<? super Vector<?>, ? extends Vector<?>, ? extends Collection, ? super Collection> iso) {
+        return homogeneousVector().convert(iso);
+    }
+
+    static <Collection> Arbitrary<Collection> customHomogeneousCollection(Fn1<? super Vector<?>, ? extends Collection> fromVector,
                                                                           Fn1<? super Collection, ? extends Vector<?>> toVector,
                                                                           IntRange sizeRange) {
         return homogeneousVector(sizeRange).convert(fromVector, toVector);
@@ -182,7 +191,7 @@ final class CollectionArbitraries {
         return Arbitrary.arbitrary(generateArbitrary());
     }
 
-    private static <K, V> Arbitrary<HashMap<K, V>> convertToHashMap(Arbitrary<ImmutableVector<Tuple2<K, V>>> entries) {
+    private static <K, V> Arbitrary<HashMap<K, V>> convertToHashMap(Arbitrary<Vector<Tuple2<K, V>>> entries) {
         return entries.convert(pairs -> ToMap.toMap(HashMap::new, pairs),
                 (HashMap<K, V> map) -> {
                     VectorBuilder<Tuple2<K, V>> builder = Vector.builder();
@@ -193,7 +202,7 @@ final class CollectionArbitraries {
                 });
     }
 
-    private static <K, V> Arbitrary<HashMap<K, V>> convertToNonEmptyHashMap(Arbitrary<ImmutableNonEmptyVector<Tuple2<K, V>>> entries) {
+    private static <K, V> Arbitrary<HashMap<K, V>> convertToNonEmptyHashMap(Arbitrary<NonEmptyVector<Tuple2<K, V>>> entries) {
         return entries.convert(pairs -> ToMap.toMap(HashMap::new, pairs),
                 (HashMap<K, V> map) -> {
                     VectorBuilder<Tuple2<K, V>> builder = Vector.builder();
@@ -218,5 +227,10 @@ final class CollectionArbitraries {
     private static Generate<Integer> sizeGenerator(IntRange sizeRange, GeneratorParameters parameters) {
         return generateInt(sizeRange)
                 .prepare(parameters);
+    }
+
+    // TODO: move to kraftwerk?
+    private static <A> Aggregator<A, VectorBuilder<A>, Vector<A>> vectorAggregator() {
+        return aggregator(VectorBuilder::builder, VectorBuilder::add, VectorBuilder::build);
     }
 }

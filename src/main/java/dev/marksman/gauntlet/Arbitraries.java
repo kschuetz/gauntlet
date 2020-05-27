@@ -9,8 +9,8 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
 import com.jnape.palatable.lambda.adt.hlist.Tuple5;
-import dev.marksman.collectionviews.ImmutableNonEmptyVector;
-import dev.marksman.collectionviews.ImmutableVector;
+import com.jnape.palatable.lambda.functions.Fn1;
+import com.jnape.palatable.lambda.optics.Iso;
 import dev.marksman.collectionviews.NonEmptyVector;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.kraftwerk.Generator;
@@ -47,6 +47,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
+import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkBoolean;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkByte;
@@ -420,20 +421,75 @@ public final class Arbitraries {
         return CoProductArbitraries.arbitraryEither(weights, left, right);
     }
 
-    public static <A> Arbitrary<ImmutableVector<A>> vectorsOf(Arbitrary<A> elements) {
+    public static <Collection> Arbitrary<Collection> homogeneousCollections(Fn1<? super Vector<?>, ? extends Collection> fromVector,
+                                                                            Fn1<? super Collection, ? extends Vector<?>> toVector) {
+        return CollectionArbitraries.customHomogeneousCollection(fromVector, toVector);
+    }
+
+    public static <Collection> Arbitrary<Collection> homogeneousCollections(Iso<? super Vector<?>, ? extends Vector<?>, ? extends Collection, ? super Collection> iso) {
+        return CollectionArbitraries.customHomogeneousCollection(iso);
+    }
+
+    public static <Collection> Arbitrary<Collection> homogeneousCollections(Fn1<? super Vector<?>, ? extends Collection> fromVector,
+                                                                            Fn1<? super Collection, ? extends Vector<?>> toVector,
+                                                                            int size) {
+        return CollectionArbitraries.customHomogeneousCollection(fromVector, toVector, IntRange.inclusive(size, size));
+    }
+
+    public static <Collection> Arbitrary<Collection> homogeneousCollections(Iso<? super Vector<?>, ? extends Vector<?>, ? extends Collection, ? super Collection> iso,
+                                                                            int size) {
+        return CollectionArbitraries.customHomogeneousCollection(iso, IntRange.inclusive(size, size));
+    }
+
+    public static <Collection> Arbitrary<Collection> homogeneousCollections(Fn1<? super Vector<?>, ? extends Collection> fromVector,
+                                                                            Fn1<? super Collection, ? extends Vector<?>> toVector,
+                                                                            IntRange sizeRange) {
+        return CollectionArbitraries.customHomogeneousCollection(fromVector, toVector, sizeRange);
+    }
+
+    public static <Collection> Arbitrary<Collection> homogeneousCollections(Iso<? super Vector<?>, ? extends Vector<?>, ? extends Collection, ? super Collection> iso,
+                                                                            IntRange sizeRange) {
+        return CollectionArbitraries.customHomogeneousCollection(iso, sizeRange);
+    }
+
+    public static Arbitrary<Vector<?>> vectors() {
+        return CollectionArbitraries.homogeneousVector();
+    }
+
+    public static Arbitrary<Vector<?>> vectors(int size) {
+        return CollectionArbitraries.homogeneousVector(IntRange.inclusive(size, size));
+    }
+
+    public static Arbitrary<Vector<?>> vectors(IntRange sizeRange) {
+        return CollectionArbitraries.homogeneousVector(sizeRange).convert(Vector::copyFrom, id());
+    }
+
+    public static <A> Arbitrary<Vector<A>> vectorsOf(Arbitrary<A> elements) {
         return CollectionArbitraries.vector(elements);
     }
 
-    public static <A> Arbitrary<ImmutableVector<A>> vectorsOf(int count, Arbitrary<A> elements) {
-        return CollectionArbitraries.vectorOfN(count, elements);
+    public static <A> Arbitrary<Vector<A>> vectorsOf(int size, Arbitrary<A> elements) {
+        return CollectionArbitraries.vectorOfN(size, elements);
     }
 
-    public static <A> Arbitrary<ImmutableNonEmptyVector<A>> nonEmptyVectorsOf(Arbitrary<A> elements) {
+    public static <A> Arbitrary<NonEmptyVector<A>> nonEmptyVectorsOf(Arbitrary<A> elements) {
         return CollectionArbitraries.nonEmptyVector(elements);
     }
 
-    public static <A> Arbitrary<ImmutableNonEmptyVector<A>> nonEmptyVectorsOf(int count, Arbitrary<A> elements) {
-        return CollectionArbitraries.nonEmptyVectorOfN(count, elements);
+    public static <A> Arbitrary<NonEmptyVector<A>> nonEmptyVectorsOf(int size, Arbitrary<A> elements) {
+        return CollectionArbitraries.nonEmptyVectorOfN(size, elements);
+    }
+
+    public static Arbitrary<ArrayList<?>> arrayLists() {
+        return homogeneousCollections(vector -> vector.toCollection(ArrayList::new), Vector::wrap);
+    }
+
+    public static Arbitrary<ArrayList<?>> arrayLists(int size) {
+        return arrayLists(IntRange.inclusive(size, size));
+    }
+
+    public static Arbitrary<ArrayList<?>> arrayLists(IntRange sizeRange) {
+        return CollectionArbitraries.customHomogeneousCollection(vec -> vec.toCollection(ArrayList::new), Vector::wrap, sizeRange);
     }
 
     public static <A> Arbitrary<ArrayList<A>> arrayListsOf(Arbitrary<A> elements) {
@@ -625,4 +681,6 @@ public final class Arbitraries {
     public static <A> Arbitrary<NonEmptyVector<A>> nonEmptyShufflesOf(NonEmptyVector<A> elements) {
         return arbitrary(generateShuffled(elements));
     }
+
+
 }
