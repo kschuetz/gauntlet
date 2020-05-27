@@ -23,7 +23,7 @@ public final class ArbitraryGenerator {
     }
 
     public static Generator<Arbitrary<?>> generateArbitrary() {
-        return ARBITRARY_GENERATOR;
+        return ARBITRARY_GENERATOR.labeled("arbitrary");
     }
 
 }

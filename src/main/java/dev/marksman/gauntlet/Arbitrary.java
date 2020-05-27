@@ -163,7 +163,7 @@ public final class Arbitrary<A> {
         return new Arbitrary<>(generator, parameterTransforms, filter, shrinkStrategy, prettyPrinter, maxDiscards);
     }
 
-    public <B> Arbitrary<B> convert(Fn1<A, B> ab, Fn1<B, A> ba) {
+    public <B> Arbitrary<B> convert(Fn1<? super A, ? extends B> ab, Fn1<? super B, ? extends A> ba) {
         return new Arbitrary<>(generator.fmap(vs -> vs.fmap(ab)),
                 parameterTransforms,
                 filter.contraMap(ba),
@@ -225,7 +225,7 @@ public final class Arbitrary<A> {
         return Weighted.weighted(weight, this);
     }
 
-    public <B> Arbitrary<B> convert(Iso<A, A, B, B> iso) {
+    public <B> Arbitrary<B> convert(Iso<? super A, ? extends A, ? extends B, ? super B> iso) {
         return convert(view(iso), view(iso.mirror()));
     }
 

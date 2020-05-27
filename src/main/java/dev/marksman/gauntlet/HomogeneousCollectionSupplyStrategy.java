@@ -1,6 +1,5 @@
 package dev.marksman.gauntlet;
 
-import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.collectionviews.VectorBuilder;
 import dev.marksman.kraftwerk.Generate;
@@ -8,7 +7,7 @@ import dev.marksman.kraftwerk.GeneratorParameters;
 import dev.marksman.kraftwerk.Result;
 import dev.marksman.kraftwerk.Seed;
 
-class HomogeneousCollectionSupplyStrategy implements SupplyStrategy<ImmutableVector<?>> {
+final class HomogeneousCollectionSupplyStrategy implements SupplyStrategy<Vector<?>> {
     private final SupplyStrategy<Arbitrary<?>> arbitrarySupply;
     private final Generate<Integer> sizeGenerator;
     private final GeneratorParameters generatorParameters;
@@ -22,7 +21,7 @@ class HomogeneousCollectionSupplyStrategy implements SupplyStrategy<ImmutableVec
     }
 
     @Override
-    public StatefulSupply<ImmutableVector<?>> createSupply() {
+    public StatefulSupply<Vector<?>> createSupply() {
         return new HomogeneousCollectionSupply(arbitrarySupply.createSupply());
     }
 
@@ -31,14 +30,14 @@ class HomogeneousCollectionSupplyStrategy implements SupplyStrategy<ImmutableVec
         return arbitrarySupply.getSupplyTree();
     }
 
-    class HomogeneousCollectionSupply implements StatefulSupply<ImmutableVector<?>> {
+    class HomogeneousCollectionSupply implements StatefulSupply<Vector<?>> {
         private final StatefulSupply<Arbitrary<?>> arbitrarySupply;
 
         HomogeneousCollectionSupply(StatefulSupply<Arbitrary<?>> arbitrarySupply) {
             this.arbitrarySupply = arbitrarySupply;
         }
 
-        public GeneratorOutput<ImmutableVector<?>> getNext(Seed input) {
+        public GeneratorOutput<Vector<?>> getNext(Seed input) {
             Result<? extends Seed, Integer> sizeResult = sizeGenerator.apply(input);
             Seed state = sizeResult.getNextState();
             int size = sizeResult.getValue();
@@ -63,7 +62,7 @@ class HomogeneousCollectionSupplyStrategy implements SupplyStrategy<ImmutableVec
                 size--;
             }
 
-            ImmutableVector<?> output = builder.build();
+            Vector<?> output = builder.build();
             return GeneratorOutput.success(state, output);
         }
     }

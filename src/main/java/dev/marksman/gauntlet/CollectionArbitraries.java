@@ -1,7 +1,9 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
+import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.builtin.fn2.ToMap;
+import com.jnape.palatable.lambda.optics.Iso;
 import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.collectionviews.Vector;
@@ -17,7 +19,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
-import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 import static dev.marksman.gauntlet.ArbitraryGenerator.generateArbitrary;
@@ -26,6 +27,7 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkArray
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkHashSet;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkImmutableNonEmptyVector;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkImmutableVector;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkVector;
 import static dev.marksman.kraftwerk.Generators.generateInt;
 import static dev.marksman.kraftwerk.Generators.generateSize;
 import static dev.marksman.kraftwerk.aggregator.Aggregators.collectionAggregator;
@@ -142,21 +144,38 @@ final class CollectionArbitraries {
         return convertToNonEmptyHashMap(Arbitraries.tuplesOf(keys, values).nonEmptyVector());
     }
 
-    static Arbitrary<ImmutableVector<?>> homogeneousCollection() {
-        throw new UnsupportedOperationException("not implemented yet");
+    static <Collection> Arbitrary<Collection> customHomogeneousCollection(Fn1<? super Vector<?>, ? extends Collection> fromVector,
+                                                                          Fn1<? super Collection, ? extends Vector<?>> toVector,
+                                                                          IntRange sizeRange) {
+        return homogeneousVector(sizeRange).convert(fromVector, toVector);
     }
 
-    static Arbitrary<ImmutableVector<?>> homogeneousCollection(IntRange sizeRange) {
+    static <Collection> Arbitrary<Collection> customHomogeneousCollection(Iso<? super Vector<?>, ? extends Vector<?>, ? extends Collection, ? super Collection> iso,
+                                                                          IntRange sizeRange) {
+        return homogeneousVector(sizeRange).convert(iso);
+    }
+
+    static Arbitrary<Vector<?>> homogeneousVector() {
+        return homogeneousVector(CollectionArbitraries::sizeGenerator);
+    }
+
+    static Arbitrary<Vector<?>> homogeneousVector(IntRange sizeRange) {
         if (sizeRange.minInclusive() < 0 || sizeRange.maxInclusive() < 0) {
             throw new IllegalArgumentException("size must be >= 0");
         }
+        return homogeneousVector(parameters -> sizeGenerator(sizeRange, parameters));
+    }
+
+    @SuppressWarnings("unchecked")
+    static Arbitrary<Vector<?>> homogeneousVector(Fn1<GeneratorParameters, Generate<Integer>> buildSizeGenerator) {
+        ShrinkStrategy<Vector<?>> shrink = (ShrinkStrategy<Vector<?>>) (ShrinkStrategy<? extends Vector<?>>) shrinkVector(ShrinkStrategy.none());
         return arbitrary(parameters -> {
                     SupplyStrategy<Arbitrary<?>> arbitrarySupply = arbitraryArbitrary().supplyStrategy(parameters);
                     return new HomogeneousCollectionSupplyStrategy(arbitrarySupply,
-                            sizeGenerator(sizeRange, parameters),
+                            buildSizeGenerator.apply(parameters),
                             parameters);
                 },
-                nothing(), defaultPrettyPrinter());
+                just(shrink), defaultPrettyPrinter());
     }
 
     static Arbitrary<Arbitrary<?>> arbitraryArbitrary() {
