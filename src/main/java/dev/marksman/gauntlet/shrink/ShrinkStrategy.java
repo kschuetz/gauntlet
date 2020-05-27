@@ -20,11 +20,11 @@ public interface ShrinkStrategy<A> {
         return new FilterShrinkStrategy<>(this, Filter.filter(predicate));
     }
 
-    default <B> ShrinkStrategy<B> convert(Iso<A, A, B, B> iso) {
+    default <B> ShrinkStrategy<B> convert(Iso<? super A, ? extends A, ? extends B, ? super B> iso) {
         return convert(view(iso), view(iso.mirror()));
     }
 
-    default <B> ShrinkStrategy<B> convert(Fn1<A, B> ab, Fn1<B, A> ba) {
+    default <B> ShrinkStrategy<B> convert(Fn1<? super A, ? extends B> ab, Fn1<? super B, ? extends A> ba) {
         ShrinkStrategy<A> orig = this;
         return input -> orig.apply(ba.apply(input)).fmap(ab);
     }

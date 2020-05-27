@@ -24,8 +24,8 @@ import static dev.marksman.gauntlet.ArbitraryGenerator.generateArbitrary;
 import static dev.marksman.gauntlet.PrettyPrinter.defaultPrettyPrinter;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkArrayList;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkHashSet;
-import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkNonEmptyVector;
-import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkVector;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkImmutableNonEmptyVector;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkImmutableVector;
 import static dev.marksman.kraftwerk.Generators.generateInt;
 import static dev.marksman.kraftwerk.Generators.generateSize;
 import static dev.marksman.kraftwerk.aggregator.Aggregators.collectionAggregator;
@@ -37,7 +37,7 @@ final class CollectionArbitraries {
                         new CollectionSupplyStrategy<>(elements.supplyStrategy(parameters),
                                 sizeGenerator(parameters),
                                 vectorAggregator()),
-                just(shrinkVector(elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
+                just(shrinkImmutableVector(elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
                 defaultPrettyPrinter());
     }
@@ -47,7 +47,7 @@ final class CollectionArbitraries {
                         new CollectionSupplyStrategy<>(elements.supplyStrategy(parameters),
                                 Generators.constant(count).prepare(parameters),
                                 vectorAggregator()),
-                just(shrinkVector(count, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
+                just(shrinkImmutableVector(count, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
                 defaultPrettyPrinter());
     }
@@ -58,7 +58,7 @@ final class CollectionArbitraries {
                                 sizeGenerator(1, parameters),
                                 vectorAggregator())
                                 .fmap(ImmutableVector::toNonEmptyOrThrow),
-                just(shrinkNonEmptyVector(elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
+                just(shrinkImmutableNonEmptyVector(elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
                 defaultPrettyPrinter());
     }
@@ -72,7 +72,7 @@ final class CollectionArbitraries {
                                 Generators.constant(count).prepare(parameters),
                                 vectorAggregator())
                                 .fmap(ImmutableVector::toNonEmptyOrThrow),
-                just(shrinkNonEmptyVector(count, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
+                just(shrinkImmutableNonEmptyVector(count, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
                 defaultPrettyPrinter());
     }

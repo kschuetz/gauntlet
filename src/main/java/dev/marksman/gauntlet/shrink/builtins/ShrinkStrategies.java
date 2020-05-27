@@ -21,6 +21,7 @@ import com.jnape.palatable.lambda.functions.Fn5;
 import com.jnape.palatable.lambda.optics.Iso;
 import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.collectionviews.ImmutableVector;
+import dev.marksman.collectionviews.NonEmptyVector;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.gauntlet.shrink.ShrinkResult;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
@@ -36,6 +37,7 @@ import java.util.HashSet;
 
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
+import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
 import static com.jnape.palatable.lambda.functions.builtin.fn2.Into.into;
 import static com.jnape.palatable.lambda.optics.functions.View.view;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkCollection.shrinkCollection;
@@ -267,27 +269,39 @@ public final class ShrinkStrategies {
                 view(iso.mirror()));
     }
 
-    public static <A> ShrinkStrategy<ImmutableVector<A>> shrinkVector(ShrinkStrategy<A> element) {
+    public static <A> ShrinkStrategy<Vector<A>> shrinkVector(ShrinkStrategy<A> element) {
         return shrinkCollection(0, element);
     }
 
-    public static <A> ShrinkStrategy<ImmutableVector<A>> shrinkVector(int minimumSize, ShrinkStrategy<A> element) {
+    public static <A> ShrinkStrategy<Vector<A>> shrinkVector(int minimumSize, ShrinkStrategy<A> element) {
         return shrinkCollection(minimumSize, element);
     }
 
-    public static <A> ShrinkStrategy<ImmutableNonEmptyVector<A>> shrinkNonEmptyVector(ShrinkStrategy<A> element) {
-        return shrinkCollection(1, element)
-                .convert(ImmutableVector::toNonEmptyOrThrow,
-                        vector -> vector);
+    public static <A> ShrinkStrategy<ImmutableVector<A>> shrinkImmutableVector(ShrinkStrategy<A> element) {
+        return shrinkCustomCollection(Vector::copyFrom, id(), element);
     }
 
-    public static <A> ShrinkStrategy<ImmutableNonEmptyVector<A>> shrinkNonEmptyVector(int minimumSize, ShrinkStrategy<A> element) {
+    public static <A> ShrinkStrategy<ImmutableVector<A>> shrinkImmutableVector(int minimumSize, ShrinkStrategy<A> element) {
+        return shrinkCustomCollection(Vector::copyFrom, id(), minimumSize, element);
+    }
+
+    public static <A> ShrinkStrategy<NonEmptyVector<A>> shrinkNonEmptyVector(ShrinkStrategy<A> element) {
+        return shrinkCustomCollection(NonEmptyVector::copyFromOrThrow, id(), 1, element);
+    }
+
+    public static <A> ShrinkStrategy<NonEmptyVector<A>> shrinkNonEmptyVector(int minimumSize, ShrinkStrategy<A> element) {
         if (minimumSize < 1) {
             throw new IllegalArgumentException("minSize must be >= 1");
         }
-        return shrinkCollection(minimumSize, element)
-                .convert(ImmutableVector::toNonEmptyOrThrow,
-                        vector -> vector);
+        return shrinkCustomCollection(NonEmptyVector::copyFromOrThrow, id(), minimumSize, element);
+    }
+
+    public static <A> ShrinkStrategy<ImmutableNonEmptyVector<A>> shrinkImmutableNonEmptyVector(ShrinkStrategy<A> element) {
+        return shrinkCustomCollection(NonEmptyVector::copyFromOrThrow, id(), element);
+    }
+
+    public static <A> ShrinkStrategy<ImmutableNonEmptyVector<A>> shrinkImmutableNonEmptyVector(int minimumSize, ShrinkStrategy<A> element) {
+        return shrinkCustomCollection(NonEmptyVector::copyFromOrThrow, id(), minimumSize, element);
     }
 
     public static <A> ShrinkStrategy<ArrayList<A>> shrinkArrayList(ShrinkStrategy<A> element) {
@@ -308,5 +322,29 @@ public final class ShrinkStrategies {
         return shrinkCollection(minimumSize, element)
                 .convert(vector -> vector.toCollection(HashSet::new),
                         hashSet -> Vector.copyFrom(hashSet).toNonEmptyOrThrow());
+    }
+
+    public static <A, Collection> ShrinkStrategy<Collection> shrinkCustomCollection(Fn1<? super Vector<A>, ? extends Collection> fromVector,
+                                                                                    Fn1<? super Collection, ? extends Vector<A>> toVector,
+                                                                                    ShrinkStrategy<A> element) {
+        return shrinkCollection(0, element).convert(fromVector, toVector);
+    }
+
+    public static <A, Collection> ShrinkStrategy<Collection> shrinkCustomCollection(Fn1<? super Vector<A>, ? extends Collection> fromVector,
+                                                                                    Fn1<? super Collection, ? extends Vector<A>> toVector,
+                                                                                    int minimumSize,
+                                                                                    ShrinkStrategy<A> element) {
+        return shrinkCollection(minimumSize, element).convert(fromVector, toVector);
+    }
+
+    public static <A, Collection> ShrinkStrategy<Collection> shrinkCustomCollection(Iso<? super Vector<A>, ? extends Vector<A>, ? extends Collection, ? super Collection> iso,
+                                                                                    ShrinkStrategy<A> element) {
+        return shrinkCollection(0, element).convert(iso);
+    }
+
+    public static <A, Collection> ShrinkStrategy<Collection> shrinkCustomCollection(Iso<? super Vector<A>, ? extends Vector<A>, ? extends Collection, ? super Collection> iso,
+                                                                                    int minimumSize,
+                                                                                    ShrinkStrategy<A> element) {
+        return shrinkCollection(minimumSize, element).convert(iso);
     }
 }

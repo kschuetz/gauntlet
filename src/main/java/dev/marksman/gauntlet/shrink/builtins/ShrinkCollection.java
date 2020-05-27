@@ -1,6 +1,5 @@
 package dev.marksman.gauntlet.shrink.builtins;
 
-import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.gauntlet.shrink.ShrinkResult;
 import dev.marksman.gauntlet.shrink.ShrinkResultBuilder;
@@ -10,7 +9,7 @@ final class ShrinkCollection {
     private ShrinkCollection() {
     }
 
-    static <A> ShrinkStrategy<ImmutableVector<A>> shrinkCollection(int minimumSize, ShrinkStrategy<A> element) {
+    static <A> ShrinkStrategy<Vector<A>> shrinkCollection(int minimumSize, ShrinkStrategy<A> element) {
         if (minimumSize < 0) {
             throw new IllegalArgumentException("minimumSize must be >= 0");
         }
@@ -20,7 +19,7 @@ final class ShrinkCollection {
                 return ShrinkResult.empty();
             }
             // TODO: implement ShrinkVector.  This is a start.
-            return ShrinkResultBuilder.<ImmutableVector<A>>shrinkResultBuilder()
+            return ShrinkResultBuilder.<Vector<A>>shrinkResultBuilder()
                     .when(minimumSize == 0, b -> b.append(Vector.empty()))
                     .lazyAppend(() -> evenElements(input))
                     .lazyAppend(() -> oddElements(input))
@@ -28,12 +27,12 @@ final class ShrinkCollection {
         };
     }
 
-    private static <A> ImmutableVector<A> evenElements(ImmutableVector<A> vector) {
+    private static <A> Vector<A> evenElements(Vector<A> vector) {
         int newSize = (1 + vector.size()) / 2;
         return Vector.lazyFill(newSize, idx -> vector.unsafeGet(idx * 2));
     }
 
-    private static <A> ImmutableVector<A> oddElements(ImmutableVector<A> vector) {
+    private static <A> Vector<A> oddElements(Vector<A> vector) {
         int newSize = vector.size() / 2;
         return Vector.lazyFill(newSize, idx -> vector.unsafeGet(1 + idx * 2));
     }

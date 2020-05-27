@@ -25,12 +25,12 @@ final class ShrinkStrategyNone<A> implements ShrinkStrategy<A> {
     }
 
     @Override
-    public <B> ShrinkStrategy<B> convert(Iso<A, A, B, B> iso) {
+    public <B> ShrinkStrategy<B> convert(Iso<? super A, ? extends A, ? extends B, ? super B> iso) {
         return shrinkNone();
     }
 
     @Override
-    public <B> ShrinkStrategy<B> convert(Fn1<A, B> ab, Fn1<B, A> ba) {
+    public <B> ShrinkStrategy<B> convert(Fn1<? super A, ? extends B> ab, Fn1<? super B, ? extends A> ba) {
         return shrinkNone();
     }
 }
