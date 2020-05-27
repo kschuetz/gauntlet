@@ -137,6 +137,11 @@ final class ArbitrariesTest extends GauntletApiBase {
         //Counterexample found after 0 successes using seed 2406810347792536945
         //Counterexample: 3.4028233E38
 
+        //java.lang.AssertionError: For test created with parameter: FloatRange{0.0 .. 1.4E-45}
+        //(run 7 of 10 in parameterized test group)
+        //Counterexample found after 0 successes using seed -1233798184509104853
+        //Counterexample: 2.8E-45
+
         @Test
         @Disabled
         void allInRange() {
