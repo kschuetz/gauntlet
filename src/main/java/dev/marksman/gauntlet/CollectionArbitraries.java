@@ -20,6 +20,7 @@ import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
+import static dev.marksman.gauntlet.ArbitraryGenerator.generateArbitrary;
 import static dev.marksman.gauntlet.PrettyPrinter.defaultPrettyPrinter;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkArrayList;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkHashSet;
@@ -159,10 +160,7 @@ final class CollectionArbitraries {
     }
 
     static Arbitrary<Arbitrary<?>> arbitraryArbitrary() {
-        return Arbitrary.arbitrary(Generators.chooseOneOfValues(Arbitraries.ints(),
-                Arbitraries.strings(),
-                Arbitraries.doubles(),
-                Arbitraries.localDates()));
+        return Arbitrary.arbitrary(generateArbitrary());
     }
 
     private static <K, V> Arbitrary<HashMap<K, V>> convertToHashMap(Arbitrary<ImmutableVector<Tuple2<K, V>>> entries) {
