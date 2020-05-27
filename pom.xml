@@ -5,7 +5,7 @@
 
     <groupId>dev.marksman</groupId>
     <artifactId>gauntlet</artifactId>
-    <version>0.2.2-SNAPSHOT</version>
+    <version>0.3.0-SNAPSHOT</version>
 
     <name>gauntlet</name>
     <description>
@@ -16,7 +16,7 @@
 
     <properties>
         <lambda.version>5.2.0</lambda.version>
-        <kraftwerk.version>0.8.2-SNAPSHOT</kraftwerk.version>
+        <kraftwerk.version>0.8.2</kraftwerk.version>
         <collection-views.version>1.2.2</collection-views.version>
         <junit.version>5.5.0</junit.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
