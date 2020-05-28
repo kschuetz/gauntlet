@@ -30,6 +30,6 @@ public interface PrettyPrinter<A> extends Contravariant<A, PrettyPrinter<?>> {
 
     @Override
     default <B> PrettyPrinter<B> contraMap(Fn1<? super B, ? extends A> fn1) {
-        return null;
+        return (parameters, value) -> prettyPrint(parameters, fn1.apply(value));
     }
 }
