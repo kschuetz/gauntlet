@@ -144,6 +144,10 @@ final class CollectionArbitraries {
         return convertToNonEmptyHashMap(Arbitraries.tuplesOf(keys, values).nonEmptyVector());
     }
 
+    /**
+     * NOTE: the homogeneous collection methods are going away. Do not use.
+     * Once higher-order arbitraries are supported, the API will change.
+     */
     static <Collection> Arbitrary<Collection> customHomogeneousCollection(Fn1<? super Vector<?>, ? extends Collection> fromVector,
                                                                           Fn1<? super Collection, ? extends Vector<?>> toVector) {
         return homogeneousVector().convert(fromVector, toVector);
