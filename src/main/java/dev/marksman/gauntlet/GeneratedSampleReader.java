@@ -10,18 +10,18 @@ import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.gauntlet.SampleBlock.sampleBlock;
 
 final class GeneratedSampleReader<A> implements SampleReader<A> {
-    private final StatefulSupply<A> supply;
+    private final Supply<A> supply;
     private int samplesRemaining;
     private Seed currentSeed;
 
-    private GeneratedSampleReader(int samplesRequested, StatefulSupply<A> supply, Seed inputSeed) {
+    private GeneratedSampleReader(int samplesRequested, Supply<A> supply, Seed inputSeed) {
         this.samplesRemaining = Math.max(0, samplesRequested);
         this.supply = supply;
         this.currentSeed = inputSeed;
     }
 
-    static <A> GeneratedSampleReader<A> generatedSampleReader(int samplesRequested, SupplyStrategy<A> supplyStrategy, Seed inputSeed) {
-        return new GeneratedSampleReader<>(samplesRequested, supplyStrategy.createSupply(), inputSeed);
+    static <A> GeneratedSampleReader<A> generatedSampleReader(int samplesRequested, Supply<A> supply, Seed inputSeed) {
+        return new GeneratedSampleReader<>(samplesRequested, supply, inputSeed);
     }
 
     public Seed getOutputSeed() {

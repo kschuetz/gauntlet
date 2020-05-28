@@ -6,11 +6,11 @@ import dev.marksman.kraftwerk.Seed;
 
 import static dev.marksman.gauntlet.SupplyTree.leaf;
 
-final class UnfilteredSupplyStrategy<A> implements SupplyStrategy<A>, StatefulSupply<A> {
+final class UnfilteredSupply<A> implements Supply<A> {
     private final Generate<A> generateFn;
     private final Fn0<String> labelSupplier;
 
-    UnfilteredSupplyStrategy(Generate<A> generateFn, Fn0<String> labelSupplier) {
+    UnfilteredSupply(Generate<A> generateFn, Fn0<String> labelSupplier) {
         this.generateFn = generateFn;
         this.labelSupplier = labelSupplier;
     }
@@ -18,11 +18,6 @@ final class UnfilteredSupplyStrategy<A> implements SupplyStrategy<A>, StatefulSu
     @Override
     public SupplyTree getSupplyTree() {
         return leaf(labelSupplier.apply());
-    }
-
-    @Override
-    public StatefulSupply<A> createSupply() {
-        return this;
     }
 
     @Override

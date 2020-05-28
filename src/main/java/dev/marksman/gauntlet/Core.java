@@ -256,7 +256,7 @@ final class Core implements GauntletApi {
     private <A> Tuple2<TestResult<A>, Seed> runGeneratorTest(Seed inputSeed,
                                                              GeneratorTest<A> generatorTest) {
         GeneratorTestSettings settings = createGeneratorSettings(generatorTest.getSettingsAdjustments());
-        GeneratedSampleReader<A> sampleReader = generatedSampleReader(settings.getSampleCount(), generatorTest.getArbitrary().supplyStrategy(settings.getGeneratorParameters()), inputSeed);
+        GeneratedSampleReader<A> sampleReader = generatedSampleReader(settings.getSampleCount(), generatorTest.getArbitrary().createSupply(settings.getGeneratorParameters()), inputSeed);
         TestRunnerSettings testRunnerSettings = TestRunnerSettings.testRunnerSettings(settings.getTimeout(), settings.getExecutor());
         Either<Abnormal<A>, UniversalTestResult<A>> testResult = universalTestRunner.run(testRunnerSettings, generatorTest.getProperty(), sampleReader);
 
