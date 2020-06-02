@@ -1,6 +1,7 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Either;
+import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.ImmutableVector;
 
 import java.time.Duration;
@@ -16,7 +17,7 @@ import static dev.marksman.gauntlet.ResultCollector.existentialResultCollector;
 import static dev.marksman.gauntlet.TestRunnerUtils.getBlockTimeout;
 import static dev.marksman.gauntlet.TestRunnerUtils.getDeadline;
 
-public final class ExistentialTestRunner {
+final class ExistentialTestRunner {
     private static final ExistentialTestRunner INSTANCE = new ExistentialTestRunner();
     private static final int BLOCK_SIZE = 100;
 
@@ -24,28 +25,30 @@ public final class ExistentialTestRunner {
         return INSTANCE;
     }
 
-    public <A> Either<Abnormal<A>, ExistentialTestResult<A>> run(TestRunnerSettings settings,
-                                                                 Prop<A> property,
-                                                                 SampleReader<A> sampleReader) {
+    public <Sample, A> Either<Abnormal<Sample>, ExistentialTestResult<Sample>> run(TestRunnerSettings settings,
+                                                                                   Fn1<Sample, A> getSampleValue,
+                                                                                   Prop<A> property,
+                                                                                   SampleReader<Sample> sampleReader) {
         LocalDateTime deadline = getDeadline(settings.getTimeout(), LocalDateTime.now());
-        ExistentialTestResult.Unproved<A> accumulator = unproved(0);
-        SampleBlock<A> block = sampleReader.readBlock(BLOCK_SIZE);
+        ExistentialTestResult.Unproved<Sample> accumulator = unproved(0);
+        SampleBlock<Sample> block = sampleReader.readBlock(BLOCK_SIZE);
         while (!block.isEmpty()) {
             Duration blockTimeout = getBlockTimeout(deadline, LocalDateTime.now());
-            Either<Abnormal<A>, ExistentialTestResult<A>> blockResult = runBlock(settings.getExecutor(), blockTimeout, block.getSamples(), property);
+            Either<Abnormal<Sample>, ExistentialTestResult<Sample>> blockResult = runBlock(settings.getExecutor(), blockTimeout,
+                    getSampleValue, block.getSamples(), property);
 
-            Abnormal<A> abnormal = blockResult.projectA().orElse(null);
+            Abnormal<Sample> abnormal = blockResult.projectA().orElse(null);
             if (abnormal != null) {
                 return left(abnormal);
             }
-            ExistentialTestResult<A> utr = blockResult.projectB().orElseThrow(AssertionError::new);
+            ExistentialTestResult<Sample> utr = blockResult.projectB().orElseThrow(AssertionError::new);
 
-            ExistentialTestResult.Proved<A> proved = utr.projectB().orElse(null);
+            ExistentialTestResult.Proved<Sample> proved = utr.projectB().orElse(null);
             if (proved != null) {
                 return right(accumulator.combine(proved));
             }
 
-            ExistentialTestResult.Unproved<A> unproved = utr.projectA().orElseThrow(AssertionError::new);
+            ExistentialTestResult.Unproved<Sample> unproved = utr.projectA().orElseThrow(AssertionError::new);
             accumulator = accumulator.combine(unproved);
 
             block = sampleReader.readBlock(BLOCK_SIZE);
@@ -58,14 +61,16 @@ public final class ExistentialTestRunner {
         }
     }
 
-    private <A> Either<Abnormal<A>, ExistentialTestResult<A>> runBlock(Executor executor,
-                                                                       Duration timeout,
-                                                                       ImmutableVector<A> elements,
-                                                                       Prop<A> property) {
-        ResultCollector.ExistentialResultCollector<A> collector = existentialResultCollector(elements);
+    private <Sample, A> Either<Abnormal<Sample>, ExistentialTestResult<Sample>> runBlock(Executor executor,
+                                                                                         Duration timeout,
+                                                                                         Fn1<Sample, A> getSampleValue,
+                                                                                         ImmutableVector<Sample> elements,
+                                                                                         Prop<A> property) {
+        ResultCollector.ExistentialResultCollector<Sample> collector = existentialResultCollector(elements);
         int elementCount = elements.size();
         for (int elementIndex = 0; elementIndex < elementCount; elementIndex++) {
-            EvaluateSampleTask<A> task = evaluateSampleTask(collector, property, elementIndex, elements.unsafeGet(elementIndex));
+            A sample = getSampleValue.apply(elements.unsafeGet(elementIndex));
+            EvaluateSampleTask<A> task = evaluateSampleTask(collector, property, elementIndex, sample);
             executor.execute(task);
         }
         return collector.getResultBlocking(timeout);

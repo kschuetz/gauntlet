@@ -17,6 +17,7 @@ import java.util.concurrent.Executor;
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
+import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
 import static dev.marksman.gauntlet.GeneratedSampleReader.generatedSampleReader;
 import static dev.marksman.gauntlet.GeneratorTestSettings.generatorTestSettings;
 import static dev.marksman.gauntlet.IndexInGroup.indexInGroup;
@@ -258,7 +259,7 @@ final class Core implements GauntletApi {
         GeneratorTestSettings settings = createGeneratorSettings(generatorTest.getSettingsAdjustments());
         GeneratedSampleReader<A> sampleReader = generatedSampleReader(settings.getSampleCount(), generatorTest.getArbitrary().createSupply(settings.getGeneratorParameters()), inputSeed);
         TestRunnerSettings testRunnerSettings = TestRunnerSettings.testRunnerSettings(settings.getTimeout(), settings.getExecutor());
-        Either<Abnormal<A>, UniversalTestResult<A>> testResult = universalTestRunner.run(testRunnerSettings, generatorTest.getProperty(), sampleReader);
+        Either<Abnormal<A>, UniversalTestResult<A>> testResult = universalTestRunner.run(testRunnerSettings, id(), generatorTest.getProperty(), sampleReader);
 
         TestResult<A> result = testResult.match(TestResult::testResult,
                 utr -> utr.match(TestResult::testResult,
@@ -271,10 +272,10 @@ final class Core implements GauntletApi {
         TestResult<A> result;
         IteratorSampleReader<A> sampleReader = iteratorSampleReader(domainTest.getDomain().getElements().iterator());
         if (domainTest.getQuantifier() == EXISTENTIAL) {
-            Either<Abnormal<A>, ExistentialTestResult<A>> etr = existentialTestRunner.run(settings, domainTest.getProperty(), sampleReader);
+            Either<Abnormal<A>, ExistentialTestResult<A>> etr = existentialTestRunner.run(settings, id(), domainTest.getProperty(), sampleReader);
             result = etr.match(TestResult::testResult, TestResult::testResult);
         } else {
-            Either<Abnormal<A>, UniversalTestResult<A>> etr = universalTestRunner.run(settings, domainTest.getProperty(), sampleReader);
+            Either<Abnormal<A>, UniversalTestResult<A>> etr = universalTestRunner.run(settings, id(), domainTest.getProperty(), sampleReader);
             result = etr.match(TestResult::testResult, TestResult::testResult);
         }
         return result;

@@ -1,6 +1,7 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Either;
+import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.ImmutableVector;
 
 import java.time.Duration;
@@ -16,7 +17,7 @@ import static dev.marksman.gauntlet.TestRunnerUtils.getBlockTimeout;
 import static dev.marksman.gauntlet.TestRunnerUtils.getDeadline;
 import static dev.marksman.gauntlet.UniversalTestResult.unfalsified;
 
-public final class UniversalTestRunner {
+final class UniversalTestRunner {
     private static final UniversalTestRunner INSTANCE = new UniversalTestRunner();
     private static final int BLOCK_SIZE = 100;
 
@@ -24,29 +25,30 @@ public final class UniversalTestRunner {
         return INSTANCE;
     }
 
-    public <A> Either<Abnormal<A>, UniversalTestResult<A>> run(TestRunnerSettings settings,
-                                                               Prop<A> property,
-                                                               SampleReader<A> sampleReader) {
+    public <Sample, A> Either<Abnormal<Sample>, UniversalTestResult<Sample>> run(TestRunnerSettings settings,
+                                                                                 Fn1<Sample, A> getSampleValue,
+                                                                                 Prop<A> property,
+                                                                                 SampleReader<Sample> sampleReader) {
         LocalDateTime deadline = getDeadline(settings.getTimeout(), LocalDateTime.now());
-        UniversalTestResult.Unfalsified<A> accumulator = unfalsified(0);
-        SampleBlock<A> block = sampleReader.readBlock(BLOCK_SIZE);
+        UniversalTestResult.Unfalsified<Sample> accumulator = unfalsified(0);
+        SampleBlock<Sample> block = sampleReader.readBlock(BLOCK_SIZE);
         while (!block.isEmpty()) {
             Duration blockTimeout = getBlockTimeout(deadline, LocalDateTime.now());
-            Either<Abnormal<A>, UniversalTestResult<A>> blockResult = runBlock(settings.getExecutor(), blockTimeout,
-                    block.getSamples(), property);
+            Either<Abnormal<Sample>, UniversalTestResult<Sample>> blockResult = runBlock(settings.getExecutor(), blockTimeout,
+                    getSampleValue, block.getSamples(), property);
 
-            Abnormal<A> abnormal = blockResult.projectA().orElse(null);
+            Abnormal<Sample> abnormal = blockResult.projectA().orElse(null);
             if (abnormal != null) {
                 return left(abnormal.addToSuccessCount(accumulator.getSuccessCount()));
             }
-            UniversalTestResult<A> utr = blockResult.projectB().orElseThrow(AssertionError::new);
+            UniversalTestResult<Sample> utr = blockResult.projectB().orElseThrow(AssertionError::new);
 
-            UniversalTestResult.Falsified<A> falsified = utr.projectB().orElse(null);
+            UniversalTestResult.Falsified<Sample> falsified = utr.projectB().orElse(null);
             if (falsified != null) {
                 return right(accumulator.combine(falsified));
             }
 
-            UniversalTestResult.Unfalsified<A> unfalsified = utr.projectA().orElseThrow(AssertionError::new);
+            UniversalTestResult.Unfalsified<Sample> unfalsified = utr.projectA().orElseThrow(AssertionError::new);
             accumulator = accumulator.combine(unfalsified);
 
             block = sampleReader.readBlock(BLOCK_SIZE);
@@ -59,14 +61,16 @@ public final class UniversalTestRunner {
         }
     }
 
-    private <A> Either<Abnormal<A>, UniversalTestResult<A>> runBlock(Executor executor,
-                                                                     Duration timeout,
-                                                                     ImmutableVector<A> elements,
-                                                                     Prop<A> property) {
-        ResultCollector.UniversalResultCollector<A> collector = universalResultCollector(elements);
+    private <Sample, A> Either<Abnormal<Sample>, UniversalTestResult<Sample>> runBlock(Executor executor,
+                                                                                       Duration timeout,
+                                                                                       Fn1<Sample, A> getSampleValue,
+                                                                                       ImmutableVector<Sample> elements,
+                                                                                       Prop<A> property) {
+        ResultCollector.UniversalResultCollector<Sample> collector = universalResultCollector(elements);
         int elementCount = elements.size();
         for (int elementIndex = 0; elementIndex < elementCount; elementIndex++) {
-            EvaluateSampleTask<A> task = evaluateSampleTask(collector, property, elementIndex, elements.unsafeGet(elementIndex));
+            A sample = getSampleValue.apply(elements.unsafeGet(elementIndex));
+            EvaluateSampleTask<A> task = evaluateSampleTask(collector, property, elementIndex, sample);
             executor.execute(task);
         }
         return collector.getResultBlocking(timeout);

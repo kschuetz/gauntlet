@@ -13,6 +13,7 @@ import dev.marksman.gauntlet.filter.Filter;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.GeneratorParameters;
+import dev.marksman.kraftwerk.Seed;
 import dev.marksman.kraftwerk.Weighted;
 import dev.marksman.kraftwerk.weights.MaybeWeights;
 
@@ -96,6 +97,10 @@ public final class Arbitrary<A> {
         } else {
             return new FilteredSupply<>(vs, filter, maxDiscards);
         }
+    }
+
+    public Arbitrary<A> getEffectiveArbitrary(Seed inputSeed) {
+        return this;
     }
 
     public Maybe<ShrinkStrategy<A>> getShrinkStrategy() {
