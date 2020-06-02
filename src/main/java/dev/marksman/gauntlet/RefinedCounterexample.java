@@ -1,6 +1,9 @@
 package dev.marksman.gauntlet;
 
-public final class RefinedCounterexample<A> {
+import com.jnape.palatable.lambda.functions.Fn1;
+import com.jnape.palatable.lambda.functor.Functor;
+
+public final class RefinedCounterexample<A> implements Functor<A, RefinedCounterexample<?>> {
     private final Counterexample<A> counterexample;
     private final int shrinkCount;
 
@@ -12,6 +15,11 @@ public final class RefinedCounterexample<A> {
     public static <A> RefinedCounterexample<A> refinedCounterexample(Counterexample<A> counterexample,
                                                                      int shrinkCount) {
         return new RefinedCounterexample<>(counterexample, shrinkCount);
+    }
+
+    @Override
+    public <B> RefinedCounterexample<B> fmap(Fn1<? super A, ? extends B> f) {
+        return new RefinedCounterexample<>(counterexample.fmap(f), shrinkCount);
     }
 
     public Counterexample<A> getCounterexample() {

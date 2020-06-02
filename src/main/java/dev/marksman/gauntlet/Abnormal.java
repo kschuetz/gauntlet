@@ -3,11 +3,12 @@ package dev.marksman.gauntlet;
 import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.adt.coproduct.CoProduct4;
 import com.jnape.palatable.lambda.functions.Fn1;
+import com.jnape.palatable.lambda.functor.Functor;
 
 import java.time.Duration;
 
 public abstract class Abnormal<A> implements CoProduct4<Abnormal.Error<A>, Abnormal.Exhausted<A>,
-        Abnormal.TimedOut<A>, Abnormal.Interrupted<A>, Abnormal<A>> {
+        Abnormal.TimedOut<A>, Abnormal.Interrupted<A>, Abnormal<A>>, Functor<A, Abnormal<?>> {
 
     public static <A> Error<A> error(A errorSample, Throwable error, int successCount) {
         return new Error<>(errorSample, error, successCount);
@@ -24,6 +25,9 @@ public abstract class Abnormal<A> implements CoProduct4<Abnormal.Error<A>, Abnor
     public static <A> Interrupted<A> interrupted(Maybe<String> message, int successCount) {
         return new Interrupted<>(message, successCount);
     }
+
+    @Override
+    public abstract <B> Abnormal<B> fmap(Fn1<? super A, ? extends B> f);
 
     public Abnormal<A> addToSuccessCount(int n) {
         // TODO
@@ -55,6 +59,11 @@ public abstract class Abnormal<A> implements CoProduct4<Abnormal.Error<A>, Abnor
             this.errorSample = errorSample;
             this.error = error;
             this.successCount = successCount;
+        }
+
+        @Override
+        public <B> Error<B> fmap(Fn1<? super A, ? extends B> f) {
+            return new Error<>(f.apply(errorSample), error, successCount);
         }
 
         @Override
@@ -118,6 +127,11 @@ public abstract class Abnormal<A> implements CoProduct4<Abnormal.Error<A>, Abnor
         }
 
         @Override
+        public <B> Exhausted<B> fmap(Fn1<? super A, ? extends B> f) {
+            return new Exhausted<>(supplyFailure, successCount);
+        }
+
+        @Override
         public <R> R match(Fn1<? super Error<A>, ? extends R> aFn, Fn1<? super Exhausted<A>, ? extends R> bFn, Fn1<? super TimedOut<A>, ? extends R> cFn, Fn1<? super Interrupted<A>, ? extends R> dFn) {
             return bFn.apply(this);
         }
@@ -170,6 +184,11 @@ public abstract class Abnormal<A> implements CoProduct4<Abnormal.Error<A>, Abnor
         }
 
         @Override
+        public <B> TimedOut<B> fmap(Fn1<? super A, ? extends B> f) {
+            return new TimedOut<>(duration, successCount);
+        }
+
+        @Override
         public <R> R match(Fn1<? super Error<A>, ? extends R> aFn, Fn1<? super Exhausted<A>, ? extends R> bFn, Fn1<? super TimedOut<A>, ? extends R> cFn, Fn1<? super Interrupted<A>, ? extends R> dFn) {
             return cFn.apply(this);
         }
@@ -219,6 +238,11 @@ public abstract class Abnormal<A> implements CoProduct4<Abnormal.Error<A>, Abnor
         private Interrupted(Maybe<String> message, int successCount) {
             this.successCount = successCount;
             this.message = message;
+        }
+
+        @Override
+        public <B> Interrupted<B> fmap(Fn1<? super A, ? extends B> f) {
+            return new Interrupted<>(message, successCount);
         }
 
         @Override

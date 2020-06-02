@@ -3,11 +3,12 @@ package dev.marksman.gauntlet;
 import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.adt.coproduct.CoProduct2;
 import com.jnape.palatable.lambda.functions.Fn1;
+import com.jnape.palatable.lambda.functor.Functor;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 
-public abstract class UniversalTestResult<A> implements CoProduct2<UniversalTestResult.Unfalsified<A>, UniversalTestResult.Falsified<A>, UniversalTestResult<A>> {
+public abstract class UniversalTestResult<A> implements CoProduct2<UniversalTestResult.Unfalsified<A>, UniversalTestResult.Falsified<A>, UniversalTestResult<A>>, Functor<A, UniversalTestResult<?>> {
 
     public static <A> Unfalsified<A> unfalsified(int successCount) {
         return new Unfalsified<>(successCount);
@@ -44,6 +45,11 @@ public abstract class UniversalTestResult<A> implements CoProduct2<UniversalTest
 
         private Unfalsified(int successCount) {
             this.successCount = successCount;
+        }
+
+        @Override
+        public <B> Unfalsified<B> fmap(Fn1<? super A, ? extends B> f) {
+            return new Unfalsified<>(successCount);
         }
 
         @Override
@@ -103,6 +109,11 @@ public abstract class UniversalTestResult<A> implements CoProduct2<UniversalTest
             this.successCount = successCount;
             this.counterexample = counterexample;
             this.refinedCounterexample = refinedCounterexample;
+        }
+
+        @Override
+        public <B> Falsified<B> fmap(Fn1<? super A, ? extends B> f) {
+            return new Falsified<>(counterexample.fmap(f), successCount, refinedCounterexample.fmap(rc -> rc.fmap(f)));
         }
 
         @Override

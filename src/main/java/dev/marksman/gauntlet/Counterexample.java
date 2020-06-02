@@ -1,6 +1,9 @@
 package dev.marksman.gauntlet;
 
-public final class Counterexample<A> {
+import com.jnape.palatable.lambda.functions.Fn1;
+import com.jnape.palatable.lambda.functor.Functor;
+
+public final class Counterexample<A> implements Functor<A, Counterexample<?>> {
     private final EvalFailure failure;
     private final A sample;
 
@@ -11,6 +14,11 @@ public final class Counterexample<A> {
 
     public static <A> Counterexample<A> counterexample(EvalFailure failure, A sample) {
         return new Counterexample<>(failure, sample);
+    }
+
+    @Override
+    public <B> Counterexample<B> fmap(Fn1<? super A, ? extends B> f) {
+        return new Counterexample<>(failure, f.apply(sample));
     }
 
     public EvalFailure getFailure() {

@@ -2,7 +2,6 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Either;
 import com.jnape.palatable.lambda.adt.Maybe;
-import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
@@ -16,7 +15,6 @@ import java.util.concurrent.Executor;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
-import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
 import static dev.marksman.gauntlet.GeneratedSampleReader.generatedSampleReader;
 import static dev.marksman.gauntlet.GeneratorTestSettings.generatorTestSettings;
@@ -175,21 +173,24 @@ final class Core implements GauntletApi {
         int groupSize = parameterValues.size();
         for (P parameter : parameterValues) {
             Test<A> test = createTest.apply(parameter);
+            PrettyPrinter<A> prettyPrinter;
             TestResult<A> result;
             if (test instanceof GeneratorTest<?>) {
                 GeneratorTest<A> generatorTest = (GeneratorTest<A>) test;
-                Tuple2<TestResult<A>, Seed> resultWithOutputSeed = runGeneratorTest(currentSeed, generatorTest);
-                result = resultWithOutputSeed._1();
-                currentSeed = resultWithOutputSeed._2();
+                GeneratorTestResult<A> generatorTestResult = runGeneratorTest(currentSeed, generatorTest);
+                result = generatorTestResult.getTestResult();
+                prettyPrinter = generatorTestResult.getPrettyPrinter();
+                currentSeed = generatorTestResult.getOutputSeed();
             } else if (test instanceof DomainTest<?>) {
                 DomainTest<A> domainTest = (DomainTest<A>) test;
                 result = runDomainTest(domainTest);
+                prettyPrinter = test.getPrettyPrinter();
             } else {
                 throw new IllegalArgumentException(UNSUPPORTED_TEST_TYPE);
             }
 
             TestParameterReportData testParameterData = TestParameterReportData.testParameterReportData(Objects.toString(parameter), indexInGroup(index, groupSize));
-            ReportData<A> reportData = reportData(test.getProperty(), result, test.getPrettyPrinter(),
+            ReportData<A> reportData = reportData(test.getProperty(), result, prettyPrinter,
                     just(initialSeedValue), just(testParameterData));
             reporter.report(reportSettings, reportRenderer, reportData);
 
@@ -248,23 +249,38 @@ final class Core implements GauntletApi {
     private <A> void runSingleGeneratorTest(long initialSeedValue,
                                             Seed inputSeed,
                                             GeneratorTest<A> generatorTest) {
-        TestResult<A> result = runGeneratorTest(inputSeed, generatorTest)._1();
-        ReportData<A> reportData = reportData(generatorTest.getProperty(), result, generatorTest.getArbitrary().getPrettyPrinter(),
-                just(initialSeedValue), nothing());
+        GeneratorTestResult<A> generatorTestResult = runGeneratorTest(inputSeed, generatorTest);
+        ReportData<A> reportData = reportData(generatorTest.getProperty(), generatorTestResult.getTestResult(),
+                generatorTestResult.getPrettyPrinter(), just(initialSeedValue), nothing());
         reporter.report(reportSettings, reportRenderer, reportData);
     }
 
-    private <A> Tuple2<TestResult<A>, Seed> runGeneratorTest(Seed inputSeed,
-                                                             GeneratorTest<A> generatorTest) {
+    private <A> GeneratorTestResult<A> runGeneratorTest(Seed inputSeed,
+                                                        GeneratorTest<A> generatorTest) {
         GeneratorTestSettings settings = createGeneratorSettings(generatorTest.getSettingsAdjustments());
         GeneratedSampleReader<A> sampleReader = generatedSampleReader(settings.getSampleCount(), generatorTest.getArbitrary().createSupply(settings.getGeneratorParameters()), inputSeed);
         TestRunnerSettings testRunnerSettings = TestRunnerSettings.testRunnerSettings(settings.getTimeout(), settings.getExecutor());
-        Either<Abnormal<A>, UniversalTestResult<A>> testResult = universalTestRunner.run(testRunnerSettings, id(), generatorTest.getProperty(), sampleReader);
+        Either<Abnormal<GeneratedSample<A>>, UniversalTestResult<GeneratedSample<A>>> testResult = universalTestRunner.run(testRunnerSettings, GeneratedSample::getValue, generatorTest.getProperty(), sampleReader);
+        Seed outputSeed = sampleReader.getOutputSeed();
 
-        TestResult<A> result = testResult.match(TestResult::testResult,
-                utr -> utr.match(TestResult::testResult,
-                        falsified -> TestResult.testResult(refineResult(settings, generatorTest.getProperty(), generatorTest.getArbitrary().getShrinkStrategy(), falsified))));
-        return tuple(result, sampleReader.getOutputSeed());
+        return testResult.match(abnormal -> {
+                    Arbitrary<A> effectiveArbitrary = generatorTest.getArbitrary().getEffectiveArbitrary(outputSeed);
+                    TestResult<A> result = TestResult.testResult(abnormal.fmap(GeneratedSample::getValue));
+                    return new GeneratorTestResult<>(result, effectiveArbitrary.getPrettyPrinter(), outputSeed);
+                },
+                utr -> utr.match(unfalsified -> {
+                            Arbitrary<A> effectiveArbitrary = generatorTest.getArbitrary().getEffectiveArbitrary(outputSeed);
+                            TestResult<A> result = TestResult.testResult(unfalsified.fmap(GeneratedSample::getValue));
+                            return new GeneratorTestResult<>(result, effectiveArbitrary.getPrettyPrinter(), outputSeed);
+                        },
+                        falsified -> {
+                            GeneratedSample<A> sample = falsified.getCounterexample().getSample();
+                            Arbitrary<A> effectiveArbitrary = generatorTest.getArbitrary().getEffectiveArbitrary(sample.getInputSeed());
+                            UniversalTestResult.Falsified<A> original = falsified.fmap(GeneratedSample::getValue);
+                            TestResult<A> result = TestResult.testResult(refineResult(settings, generatorTest.getProperty(), effectiveArbitrary.getShrinkStrategy(), original));
+                            return new GeneratorTestResult<>(result, effectiveArbitrary.getPrettyPrinter(), outputSeed);
+                        }));
+
     }
 
     private <A> TestResult<A> runDomainTest(DomainTest<A> domainTest) {
@@ -279,5 +295,29 @@ final class Core implements GauntletApi {
             result = etr.match(TestResult::testResult, TestResult::testResult);
         }
         return result;
+    }
+
+    private static class GeneratorTestResult<A> {
+        private final TestResult<A> testResult;
+        private final PrettyPrinter<A> prettyPrinter;
+        private final Seed outputSeed;
+
+        private GeneratorTestResult(TestResult<A> testResult, PrettyPrinter<A> prettyPrinter, Seed outputSeed) {
+            this.testResult = testResult;
+            this.prettyPrinter = prettyPrinter;
+            this.outputSeed = outputSeed;
+        }
+
+        public TestResult<A> getTestResult() {
+            return testResult;
+        }
+
+        public PrettyPrinter<A> getPrettyPrinter() {
+            return prettyPrinter;
+        }
+
+        public Seed getOutputSeed() {
+            return outputSeed;
+        }
     }
 }

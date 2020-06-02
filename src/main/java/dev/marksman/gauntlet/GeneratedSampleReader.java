@@ -7,9 +7,10 @@ import dev.marksman.collectionviews.VectorBuilder;
 import dev.marksman.kraftwerk.Seed;
 
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
+import static dev.marksman.gauntlet.GeneratedSample.generatedSample;
 import static dev.marksman.gauntlet.SampleBlock.sampleBlock;
 
-final class GeneratedSampleReader<A> implements SampleReader<A> {
+final class GeneratedSampleReader<A> implements SampleReader<GeneratedSample<A>> {
     private final Supply<A> supply;
     private int samplesRemaining;
     private Seed currentSeed;
@@ -29,23 +30,25 @@ final class GeneratedSampleReader<A> implements SampleReader<A> {
     }
 
     @Override
-    public SampleBlock<A> readBlock(int size) {
+    public SampleBlock<GeneratedSample<A>> readBlock(int size) {
         if (size <= 0 || samplesRemaining <= 0) {
             return sampleBlock(Vector.empty(), nothing());
         }
         int blockSize = Math.min(size, samplesRemaining);
-        VectorBuilder<A> builder = Vector.builder(blockSize);
+        VectorBuilder<GeneratedSample<A>> builder = Vector.builder(blockSize);
         Maybe<SupplyFailure> supplyFailure = nothing();
         int i = 0;
         while (i < blockSize) {
-            GeneratorOutput<A> next = supply.getNext(currentSeed);
+            Seed inputSeed = currentSeed;
+            GeneratorOutput<A> next = supply.getNext(inputSeed);
             currentSeed = next.getNextState();
             Either<SupplyFailure, A> value = next.getValue();
             supplyFailure = value.projectA();
             if (!supplyFailure.equals(nothing())) {
                 break;
             }
-            builder = builder.add(value.projectB().orElseThrow(AssertionError::new));
+            A element = value.projectB().orElseThrow(AssertionError::new);
+            builder = builder.add(generatedSample(inputSeed, element));
             i += 1;
             samplesRemaining -= 1;
         }
