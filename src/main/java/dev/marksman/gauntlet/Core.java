@@ -264,21 +264,21 @@ final class Core implements GauntletApi {
         Seed outputSeed = sampleReader.getOutputSeed();
 
         return testResult.match(abnormal -> {
-                    Arbitrary<A> effectiveArbitrary = generatorTest.getArbitrary().getEffectiveArbitrary(outputSeed);
+                    SampleTypeMetadata<A> sampleTypeMetadata = generatorTest.getArbitrary().getSampleTypeMetadata(outputSeed);
                     TestResult<A> result = TestResult.testResult(abnormal.fmap(GeneratedSample::getValue));
-                    return new GeneratorTestResult<>(result, effectiveArbitrary.getPrettyPrinter(), outputSeed);
+                    return new GeneratorTestResult<>(result, sampleTypeMetadata.getPrettyPrinter(), outputSeed);
                 },
                 utr -> utr.match(unfalsified -> {
-                            Arbitrary<A> effectiveArbitrary = generatorTest.getArbitrary().getEffectiveArbitrary(outputSeed);
+                            SampleTypeMetadata<A> sampleTypeMetadata = generatorTest.getArbitrary().getSampleTypeMetadata(outputSeed);
                             TestResult<A> result = TestResult.testResult(unfalsified.fmap(GeneratedSample::getValue));
-                            return new GeneratorTestResult<>(result, effectiveArbitrary.getPrettyPrinter(), outputSeed);
+                            return new GeneratorTestResult<>(result, sampleTypeMetadata.getPrettyPrinter(), outputSeed);
                         },
                         falsified -> {
                             GeneratedSample<A> sample = falsified.getCounterexample().getSample();
-                            Arbitrary<A> effectiveArbitrary = generatorTest.getArbitrary().getEffectiveArbitrary(sample.getInputSeed());
+                            SampleTypeMetadata<A> sampleTypeMetadata = generatorTest.getArbitrary().getSampleTypeMetadata(sample.getInputSeed());
                             UniversalTestResult.Falsified<A> original = falsified.fmap(GeneratedSample::getValue);
-                            TestResult<A> result = TestResult.testResult(refineResult(settings, generatorTest.getProperty(), effectiveArbitrary.getShrinkStrategy(), original));
-                            return new GeneratorTestResult<>(result, effectiveArbitrary.getPrettyPrinter(), outputSeed);
+                            TestResult<A> result = TestResult.testResult(refineResult(settings, generatorTest.getProperty(), sampleTypeMetadata.getShrinkStrategy(), original));
+                            return new GeneratorTestResult<>(result, sampleTypeMetadata.getPrettyPrinter(), outputSeed);
                         }));
 
     }

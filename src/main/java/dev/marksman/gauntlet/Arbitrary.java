@@ -48,7 +48,7 @@ import static dev.marksman.gauntlet.PrettyPrinter.defaultPrettyPrinter;
  *
  * @param <A>
  */
-public final class Arbitrary<A> {
+public final class Arbitrary<A> implements SampleTypeMetadata<A> {
     private final Fn1<GeneratorParameters, Supply<A>> generator;
     private final ImmutableFiniteIterable<Fn1<GeneratorParameters, GeneratorParameters>> parameterTransforms;
     private final Filter<A> filter;
@@ -99,7 +99,7 @@ public final class Arbitrary<A> {
         }
     }
 
-    public Arbitrary<A> getEffectiveArbitrary(Seed inputSeed) {
+    public SampleTypeMetadata<A> getSampleTypeMetadata(Seed inputSeed) {
         return this;
     }
 
