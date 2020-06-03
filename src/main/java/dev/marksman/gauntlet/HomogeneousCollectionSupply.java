@@ -7,6 +7,7 @@ import dev.marksman.kraftwerk.GeneratorParameters;
 import dev.marksman.kraftwerk.Result;
 import dev.marksman.kraftwerk.Seed;
 
+@Deprecated
 final class HomogeneousCollectionSupply implements Supply<Vector<?>> {
     private final Supply<Arbitrary<?>> arbitrarySupply;
     private final Generate<Integer> sizeGenerator;

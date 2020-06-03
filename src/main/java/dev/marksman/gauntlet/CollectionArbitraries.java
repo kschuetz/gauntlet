@@ -44,7 +44,7 @@ final class CollectionArbitraries {
                 defaultPrettyPrinter());
     }
 
-    static <A> Arbitrary<Vector<A>> vectorOfN(int count, Arbitrary<A> elements) {
+    static <A> Arbitrary<Vector<A>> vectorOfSize(int count, Arbitrary<A> elements) {
         return arbitrary(parameters ->
                         new CollectionSupply<>(elements.createSupply(parameters),
                                 Generators.constant(count).prepare(parameters),
@@ -65,7 +65,7 @@ final class CollectionArbitraries {
                 defaultPrettyPrinter());
     }
 
-    static <A> Arbitrary<NonEmptyVector<A>> nonEmptyVectorOfN(int count, Arbitrary<A> elements) {
+    static <A> Arbitrary<NonEmptyVector<A>> nonEmptyVectorOfSize(int count, Arbitrary<A> elements) {
         if (count < 1) {
             throw new IllegalArgumentException("count must be >= 1");
         }
@@ -144,10 +144,6 @@ final class CollectionArbitraries {
         return convertToNonEmptyHashMap(Arbitraries.tuplesOf(keys, values).nonEmptyVector());
     }
 
-    /**
-     * NOTE: the homogeneous collection methods are going away. Do not use.
-     * Once higher-order arbitraries are supported, the API will change.
-     */
     static <Collection> Arbitrary<Collection> customHomogeneousCollection(Fn1<? super Vector<?>, ? extends Collection> fromVector,
                                                                           Fn1<? super Collection, ? extends Vector<?>> toVector) {
         return homogeneousVector().convert(fromVector, toVector);
@@ -180,6 +176,7 @@ final class CollectionArbitraries {
     }
 
     @SuppressWarnings("unchecked")
+    @Deprecated
     static Arbitrary<Vector<?>> homogeneousVector(Fn1<GeneratorParameters, Generate<Integer>> buildSizeGenerator) {
         ShrinkStrategy<Vector<?>> shrink = (ShrinkStrategy<Vector<?>>) (ShrinkStrategy<? extends Vector<?>>) shrinkVector(ShrinkStrategy.none());
         return arbitrary(parameters -> {

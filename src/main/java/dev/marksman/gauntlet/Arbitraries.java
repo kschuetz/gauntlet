@@ -49,6 +49,8 @@ import java.util.UUID;
 
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
+import static dev.marksman.gauntlet.Arbitrary.higherOrderArbitrary;
+import static dev.marksman.gauntlet.ArbitraryGenerator.generateArbitrary;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkBoolean;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkByte;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkDouble;
@@ -370,6 +372,34 @@ public final class Arbitraries {
         return CompositeArbitraries.combine(a, b, c, d, e);
     }
 
+    public static Arbitrary<Tuple2<?, ?>> tuple2s() {
+        return higherOrderArbitrary(generateArbitrary(), a -> higherOrderArbitrary(generateArbitrary(), b -> tuplesOf(a, b)));
+    }
+
+    public static Arbitrary<Tuple3<?, ?, ?>> tuple3s() {
+        return higherOrderArbitrary(generateArbitrary(),
+                a -> higherOrderArbitrary(generateArbitrary(),
+                        b -> higherOrderArbitrary(generateArbitrary(),
+                                c -> tuplesOf(a, b, c))));
+    }
+
+    public static Arbitrary<Tuple4<?, ?, ?, ?>> tuple4s() {
+        return higherOrderArbitrary(generateArbitrary(),
+                a -> higherOrderArbitrary(generateArbitrary(),
+                        b -> higherOrderArbitrary(generateArbitrary(),
+                                c -> higherOrderArbitrary(generateArbitrary(),
+                                        d -> tuplesOf(a, b, c, d)))));
+    }
+
+    public static Arbitrary<Tuple5<?, ?, ?, ?, ?>> tuple5s() {
+        return higherOrderArbitrary(generateArbitrary(),
+                a -> higherOrderArbitrary(generateArbitrary(),
+                        b -> higherOrderArbitrary(generateArbitrary(),
+                                c -> higherOrderArbitrary(generateArbitrary(),
+                                        d -> higherOrderArbitrary(generateArbitrary(),
+                                                e -> tuplesOf(a, b, c, d, e))))));
+    }
+
     public static Arbitrary<Unit> unit() {
         return CoProductArbitraries.arbitraryUnit();
     }
@@ -421,43 +451,49 @@ public final class Arbitraries {
         return CoProductArbitraries.arbitraryEither(weights, left, right);
     }
 
+    @Deprecated
     public static <Collection> Arbitrary<Collection> homogeneousCollections(Fn1<? super Vector<?>, ? extends Collection> fromVector,
                                                                             Fn1<? super Collection, ? extends Vector<?>> toVector) {
         return CollectionArbitraries.customHomogeneousCollection(fromVector, toVector);
     }
 
+    @Deprecated
     public static <Collection> Arbitrary<Collection> homogeneousCollections(Iso<? super Vector<?>, ? extends Vector<?>, ? extends Collection, ? super Collection> iso) {
         return CollectionArbitraries.customHomogeneousCollection(iso);
     }
 
+    @Deprecated
     public static <Collection> Arbitrary<Collection> homogeneousCollections(Fn1<? super Vector<?>, ? extends Collection> fromVector,
                                                                             Fn1<? super Collection, ? extends Vector<?>> toVector,
                                                                             int size) {
         return CollectionArbitraries.customHomogeneousCollection(fromVector, toVector, IntRange.inclusive(size, size));
     }
 
+    @Deprecated
     public static <Collection> Arbitrary<Collection> homogeneousCollections(Iso<? super Vector<?>, ? extends Vector<?>, ? extends Collection, ? super Collection> iso,
                                                                             int size) {
         return CollectionArbitraries.customHomogeneousCollection(iso, IntRange.inclusive(size, size));
     }
 
+    @Deprecated
     public static <Collection> Arbitrary<Collection> homogeneousCollections(Fn1<? super Vector<?>, ? extends Collection> fromVector,
                                                                             Fn1<? super Collection, ? extends Vector<?>> toVector,
                                                                             IntRange sizeRange) {
         return CollectionArbitraries.customHomogeneousCollection(fromVector, toVector, sizeRange);
     }
 
+    @Deprecated
     public static <Collection> Arbitrary<Collection> homogeneousCollections(Iso<? super Vector<?>, ? extends Vector<?>, ? extends Collection, ? super Collection> iso,
                                                                             IntRange sizeRange) {
         return CollectionArbitraries.customHomogeneousCollection(iso, sizeRange);
     }
 
     public static Arbitrary<Vector<?>> vectors() {
-        return CollectionArbitraries.homogeneousVector();
+        return Arbitrary.higherOrderArbitrary(generateArbitrary(), Arbitrary::vector);
     }
 
     public static Arbitrary<Vector<?>> vectors(int size) {
-        return CollectionArbitraries.homogeneousVector(IntRange.inclusive(size, size));
+        return Arbitrary.higherOrderArbitrary(generateArbitrary(), a -> a.vectorOfSize(size));
     }
 
     public static Arbitrary<Vector<?>> vectors(IntRange sizeRange) {
@@ -469,7 +505,7 @@ public final class Arbitraries {
     }
 
     public static <A> Arbitrary<Vector<A>> vectorsOf(int size, Arbitrary<A> elements) {
-        return CollectionArbitraries.vectorOfN(size, elements);
+        return CollectionArbitraries.vectorOfSize(size, elements);
     }
 
     public static <A> Arbitrary<NonEmptyVector<A>> nonEmptyVectorsOf(Arbitrary<A> elements) {
@@ -477,7 +513,7 @@ public final class Arbitraries {
     }
 
     public static <A> Arbitrary<NonEmptyVector<A>> nonEmptyVectorsOf(int size, Arbitrary<A> elements) {
-        return CollectionArbitraries.nonEmptyVectorOfN(size, elements);
+        return CollectionArbitraries.nonEmptyVectorOfSize(size, elements);
     }
 
     public static Arbitrary<ArrayList<?>> arrayLists() {
@@ -510,6 +546,11 @@ public final class Arbitraries {
 
     public static <A> Arbitrary<HashSet<A>> nonEmptyHashSetsOf(Arbitrary<A> elements) {
         return CollectionArbitraries.nonEmptyHashSet(elements);
+    }
+
+    public static Arbitrary<HashMap<?, ?>> hashMaps() {
+        return higherOrderArbitrary(generateArbitrary(), keys ->
+                higherOrderArbitrary(generateArbitrary(), values -> hashMapsOf(keys, values)));
     }
 
     public static <K, V> Arbitrary<HashMap<K, V>> hashMapsOf(Arbitrary<K> keys,

@@ -1,6 +1,7 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Maybe;
+import com.jnape.palatable.lambda.adt.choice.Choice2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.functions.Fn0;
@@ -11,8 +12,10 @@ import dev.marksman.collectionviews.Vector;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.filter.Filter;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
+import dev.marksman.kraftwerk.Generate;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.GeneratorParameters;
+import dev.marksman.kraftwerk.Result;
 import dev.marksman.kraftwerk.Seed;
 import dev.marksman.kraftwerk.Weighted;
 import dev.marksman.kraftwerk.weights.MaybeWeights;
@@ -25,6 +28,7 @@ import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.optics.functions.View.view;
 import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
 import static dev.marksman.gauntlet.CompositeArbitraries.combine;
+import static dev.marksman.gauntlet.HigherOrderSupply.higherOrderSupply;
 import static dev.marksman.gauntlet.PrettyPrinter.defaultPrettyPrinter;
 
 /**
@@ -49,7 +53,7 @@ import static dev.marksman.gauntlet.PrettyPrinter.defaultPrettyPrinter;
  * @param <A>
  */
 public final class Arbitrary<A> implements SampleTypeMetadata<A> {
-    private final Fn1<GeneratorParameters, Supply<A>> generator;
+    private final Choice2<SimpleArbitrary<A>, HigherOrderArbitrary<? extends A>> generator;
     private final ImmutableFiniteIterable<Fn1<GeneratorParameters, GeneratorParameters>> parameterTransforms;
     private final Filter<A> filter;
     private final Maybe<ShrinkStrategy<A>> shrinkStrategy;
@@ -57,7 +61,7 @@ public final class Arbitrary<A> implements SampleTypeMetadata<A> {
     private final int maxDiscards;
 
     @SuppressWarnings("unchecked")
-    private Arbitrary(Fn1<GeneratorParameters, Supply<A>> generator,
+    private Arbitrary(Choice2<SimpleArbitrary<A>, HigherOrderArbitrary<? extends A>> generator,
                       ImmutableFiniteIterable<Fn1<GeneratorParameters, GeneratorParameters>> parameterTransforms,
                       Filter<A> filter, Maybe<ShrinkStrategy<A>> shrinkStrategy,
                       PrettyPrinter<? super A> prettyPrinter,
@@ -85,23 +89,44 @@ public final class Arbitrary<A> implements SampleTypeMetadata<A> {
     static <A> Arbitrary<A> arbitrary(Fn1<GeneratorParameters, Supply<A>> generator,
                                       Maybe<ShrinkStrategy<A>> shrinkStrategy,
                                       PrettyPrinter<? super A> prettyPrinter) {
-        return new Arbitrary<>(generator, emptyImmutableFiniteIterable(), Filter.emptyFilter(), shrinkStrategy,
+        return new Arbitrary<>(Choice2.a(new SimpleArbitrary<>(generator)),
+                emptyImmutableFiniteIterable(), Filter.emptyFilter(), shrinkStrategy,
                 prettyPrinter, Gauntlet.DEFAULT_MAX_DISCARDS);
     }
 
+    static <A> Arbitrary<A> higherOrderArbitrary(Generator<Arbitrary<?>> generator,
+                                                 Fn1<Arbitrary<?>, Arbitrary<? extends A>> transformFn) {
+        HigherOrderArbitrary<A> higherOrder = new HigherOrderArbitrary<>(generator, transformFn);
+        return new Arbitrary<>(Choice2.b(higherOrder), emptyImmutableFiniteIterable(), Filter.emptyFilter(), nothing(),
+                defaultPrettyPrinter(), Gauntlet.DEFAULT_MAX_DISCARDS);
+    }
+
+    @SuppressWarnings("unchecked")
     public Supply<A> createSupply(GeneratorParameters parameters) {
-        GeneratorParameters transformedParameters = parameterTransforms.foldLeft((acc, f) -> f.apply(acc), parameters);
-        Supply<A> vs = generator.apply(transformedParameters);
+        GeneratorParameters transformedParameters = transformGeneratorParameters(parameters);
+        Supply<A> supply = (Supply<A>) generator.match(simple -> simple.createSupply(transformedParameters),
+                higherOrder -> higherOrderSupply(transformedParameters, higherOrder.getGenerator().prepare(transformedParameters),
+                        higherOrder.getTransformFn()));
+
         if (filter.isEmpty()) {
-            return vs;
+            return supply;
         } else {
-            return new FilteredSupply<>(vs, filter, maxDiscards);
+            return new FilteredSupply<>(supply, filter, maxDiscards);
         }
     }
 
-    public SampleTypeMetadata<A> getSampleTypeMetadata(Seed inputSeed) {
-        return this;
+    @SuppressWarnings("unchecked")
+    public SampleTypeMetadata<A> getSampleTypeMetadata(GeneratorParameters generatorParameters, Seed inputSeed) {
+        return (SampleTypeMetadata<A>) generator.match(__ -> this,
+                higherOrder -> {
+                    GeneratorParameters transformedParameters = transformGeneratorParameters(generatorParameters);
+                    Generate<Arbitrary<?>> prepare = higherOrder.getGenerator().prepare(transformedParameters);
+                    Result<? extends Seed, Arbitrary<?>> aResult = prepare.apply(inputSeed);
+                    Arbitrary<? extends A> arbitrary = higherOrder.getTransformFn().apply(aResult.getValue());
+                    return arbitrary.getSampleTypeMetadata(transformedParameters, aResult.getNextState());
+                });
     }
+
 
     public Maybe<ShrinkStrategy<A>> getShrinkStrategy() {
         return shrinkStrategy;
@@ -168,30 +193,32 @@ public final class Arbitrary<A> implements SampleTypeMetadata<A> {
         return new Arbitrary<>(generator, parameterTransforms, filter, shrinkStrategy, prettyPrinter, maxDiscards);
     }
 
+    @SuppressWarnings("unchecked")
     public <B> Arbitrary<B> convert(Fn1<? super A, ? extends B> ab, Fn1<? super B, ? extends A> ba) {
-        return new Arbitrary<>(generator.fmap(vs -> vs.fmap(ab)),
+        Choice2<SimpleArbitrary<B>, HigherOrderArbitrary<? extends B>> newGenerator =
+                (Choice2<SimpleArbitrary<B>, HigherOrderArbitrary<? extends B>>)
+                        generator.match(simple -> Choice2.a((SimpleArbitrary<A>) simple.convert(ab, ba)),
+                                higherOrder -> Choice2.b(((HigherOrderArbitrary<A>) higherOrder).convert(ab, ba)));
+
+        return new Arbitrary<>(newGenerator,
                 parameterTransforms,
                 filter.contraMap(ba),
                 shrinkStrategy.fmap(s -> s.convert(ab, ba)),
                 prettyPrinter.contraMap(ba),
                 maxDiscards);
-
-    }
-
-    public <B> Arbitrary<Tuple2<B, A>> addLayer(int sampleCount, Fn1<A, Arbitrary<B>> f) {
-        throw new UnsupportedOperationException("TODO");
     }
 
     public Arbitrary<A> modifyGeneratorParameters(Fn1<GeneratorParameters, GeneratorParameters> modifyFn) {
         return new Arbitrary<>(generator, parameterTransforms.append(modifyFn), filter, shrinkStrategy, prettyPrinter, maxDiscards);
     }
 
+    // TODO: respect higher-order arbitraries
     public Arbitrary<Vector<A>> vector() {
         return CollectionArbitraries.vector(this);
     }
 
-    public Arbitrary<Vector<A>> vectorOfN(int count) {
-        return CollectionArbitraries.vectorOfN(count, this);
+    public Arbitrary<Vector<A>> vectorOfSize(int count) {
+        return CollectionArbitraries.vectorOfSize(count, this);
     }
 
     public Arbitrary<NonEmptyVector<A>> nonEmptyVector() {
@@ -199,7 +226,7 @@ public final class Arbitrary<A> implements SampleTypeMetadata<A> {
     }
 
     public Arbitrary<NonEmptyVector<A>> nonEmptyVectorOfN(int count) {
-        return CollectionArbitraries.nonEmptyVectorOfN(count, this);
+        return CollectionArbitraries.nonEmptyVectorOfSize(count, this);
     }
 
     public Arbitrary<ArrayList<A>> arrayList() {
@@ -248,5 +275,51 @@ public final class Arbitrary<A> implements SampleTypeMetadata<A> {
 
     public Arbitrary<Maybe<A>> maybe(MaybeWeights weights) {
         return CoProductArbitraries.arbitraryMaybe(weights, this);
+    }
+
+    private GeneratorParameters transformGeneratorParameters(GeneratorParameters parameters) {
+        return parameterTransforms.foldLeft((acc, f) -> f.apply(acc), parameters);
+    }
+
+    static final class SimpleArbitrary<A> {
+        private final Fn1<GeneratorParameters, Supply<A>> createSupplyFn;
+
+        SimpleArbitrary(Fn1<GeneratorParameters, Supply<A>> createSupplyFn) {
+            this.createSupplyFn = createSupplyFn;
+        }
+
+        Supply<A> createSupply(GeneratorParameters generatorParameters) {
+            return createSupplyFn.apply(generatorParameters);
+        }
+
+        <B> SimpleArbitrary<B> convert(Fn1<? super A, ? extends B> ab, Fn1<? super B, ? extends A> ba) {
+            return new SimpleArbitrary<>(createSupplyFn.fmap(supply -> supply.fmap(ab)));
+        }
+    }
+
+
+    static final class HigherOrderArbitrary<A> {
+        private final Generator<Arbitrary<?>> generator;
+        private final Fn1<Arbitrary<?>, Arbitrary<? extends A>> transformFn;
+
+
+        HigherOrderArbitrary(Generator<Arbitrary<?>> generator, Fn1<Arbitrary<?>, Arbitrary<? extends A>> transformFn) {
+            this.generator = generator;
+            this.transformFn = transformFn;
+        }
+
+        Generator<Arbitrary<?>> getGenerator() {
+            return generator;
+        }
+
+        @SuppressWarnings("unchecked")
+        <B> HigherOrderArbitrary<B> convert(Fn1<? super A, ? extends B> ab, Fn1<? super B, ? extends A> ba) {
+            return new HigherOrderArbitrary<>(generator, transformFn.fmap(arbitrary -> ((Arbitrary<A>) arbitrary).convert(ab, ba)));
+        }
+
+        Fn1<Arbitrary<?>, Arbitrary<? extends A>> getTransformFn() {
+            return transformFn;
+        }
+
     }
 }

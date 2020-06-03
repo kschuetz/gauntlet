@@ -258,24 +258,25 @@ final class Core implements GauntletApi {
     private <A> GeneratorTestResult<A> runGeneratorTest(Seed inputSeed,
                                                         GeneratorTest<A> generatorTest) {
         GeneratorTestSettings settings = createGeneratorSettings(generatorTest.getSettingsAdjustments());
-        GeneratedSampleReader<A> sampleReader = generatedSampleReader(settings.getSampleCount(), generatorTest.getArbitrary().createSupply(settings.getGeneratorParameters()), inputSeed);
+        GeneratorParameters generatorParameters = settings.getGeneratorParameters();
+        GeneratedSampleReader<A> sampleReader = generatedSampleReader(settings.getSampleCount(), generatorTest.getArbitrary().createSupply(generatorParameters), inputSeed);
         TestRunnerSettings testRunnerSettings = TestRunnerSettings.testRunnerSettings(settings.getTimeout(), settings.getExecutor());
         Either<Abnormal<GeneratedSample<A>>, UniversalTestResult<GeneratedSample<A>>> testResult = universalTestRunner.run(testRunnerSettings, GeneratedSample::getValue, generatorTest.getProperty(), sampleReader);
         Seed outputSeed = sampleReader.getOutputSeed();
 
         return testResult.match(abnormal -> {
-                    SampleTypeMetadata<A> sampleTypeMetadata = generatorTest.getArbitrary().getSampleTypeMetadata(outputSeed);
+                    SampleTypeMetadata<A> sampleTypeMetadata = generatorTest.getArbitrary().getSampleTypeMetadata(generatorParameters, outputSeed);
                     TestResult<A> result = TestResult.testResult(abnormal.fmap(GeneratedSample::getValue));
                     return new GeneratorTestResult<>(result, sampleTypeMetadata.getPrettyPrinter(), outputSeed);
                 },
                 utr -> utr.match(unfalsified -> {
-                            SampleTypeMetadata<A> sampleTypeMetadata = generatorTest.getArbitrary().getSampleTypeMetadata(outputSeed);
+                            SampleTypeMetadata<A> sampleTypeMetadata = generatorTest.getArbitrary().getSampleTypeMetadata(generatorParameters, outputSeed);
                             TestResult<A> result = TestResult.testResult(unfalsified.fmap(GeneratedSample::getValue));
                             return new GeneratorTestResult<>(result, sampleTypeMetadata.getPrettyPrinter(), outputSeed);
                         },
                         falsified -> {
                             GeneratedSample<A> sample = falsified.getCounterexample().getSample();
-                            SampleTypeMetadata<A> sampleTypeMetadata = generatorTest.getArbitrary().getSampleTypeMetadata(sample.getInputSeed());
+                            SampleTypeMetadata<A> sampleTypeMetadata = generatorTest.getArbitrary().getSampleTypeMetadata(generatorParameters, sample.getInputSeed());
                             UniversalTestResult.Falsified<A> original = falsified.fmap(GeneratedSample::getValue);
                             TestResult<A> result = TestResult.testResult(refineResult(settings, generatorTest.getProperty(), sampleTypeMetadata.getShrinkStrategy(), original));
                             return new GeneratorTestResult<>(result, sampleTypeMetadata.getPrettyPrinter(), outputSeed);
