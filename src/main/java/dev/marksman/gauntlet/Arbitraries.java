@@ -48,7 +48,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
 
-import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 import static dev.marksman.gauntlet.Arbitrary.higherOrderArbitrary;
 import static dev.marksman.gauntlet.ArbitraryGenerator.generateArbitrary;
@@ -442,41 +441,36 @@ public final class Arbitraries {
         return CoProductArbitraries.arbitraryEither(weights, left, right);
     }
 
-    @Deprecated
     public static <Collection> Arbitrary<Collection> homogeneousCollections(Fn1<? super Vector<?>, ? extends Collection> fromVector,
                                                                             Fn1<? super Collection, ? extends Vector<?>> toVector) {
-        return CollectionArbitraries.customHomogeneousCollection(fromVector, toVector);
+        return vectors().convert(fromVector, toVector);
     }
 
-    @Deprecated
     public static <Collection> Arbitrary<Collection> homogeneousCollections(Iso<? super Vector<?>, ? extends Vector<?>, ? extends Collection, ? super Collection> iso) {
-        return CollectionArbitraries.customHomogeneousCollection(iso);
+        return vectors().convert(iso);
     }
 
-    @Deprecated
     public static <Collection> Arbitrary<Collection> homogeneousCollections(Fn1<? super Vector<?>, ? extends Collection> fromVector,
                                                                             Fn1<? super Collection, ? extends Vector<?>> toVector,
                                                                             int size) {
-        return CollectionArbitraries.customHomogeneousCollection(fromVector, toVector, IntRange.inclusive(size, size));
+        return vectors(size).convert(fromVector, toVector);
     }
 
-    @Deprecated
     public static <Collection> Arbitrary<Collection> homogeneousCollections(Iso<? super Vector<?>, ? extends Vector<?>, ? extends Collection, ? super Collection> iso,
                                                                             int size) {
-        return CollectionArbitraries.customHomogeneousCollection(iso, IntRange.inclusive(size, size));
+        return vectors(size).convert(iso);
     }
 
-    @Deprecated
     public static <Collection> Arbitrary<Collection> homogeneousCollections(Fn1<? super Vector<?>, ? extends Collection> fromVector,
                                                                             Fn1<? super Collection, ? extends Vector<?>> toVector,
                                                                             IntRange sizeRange) {
-        return CollectionArbitraries.customHomogeneousCollection(fromVector, toVector, sizeRange);
+        return vectors(sizeRange).convert(fromVector, toVector);
     }
 
     @Deprecated
     public static <Collection> Arbitrary<Collection> homogeneousCollections(Iso<? super Vector<?>, ? extends Vector<?>, ? extends Collection, ? super Collection> iso,
                                                                             IntRange sizeRange) {
-        return CollectionArbitraries.customHomogeneousCollection(iso, sizeRange);
+        return vectors(sizeRange).convert(iso);
     }
 
     public static Arbitrary<Vector<?>> vectors() {
@@ -488,7 +482,7 @@ public final class Arbitraries {
     }
 
     public static Arbitrary<Vector<?>> vectors(IntRange sizeRange) {
-        return CollectionArbitraries.homogeneousVector(sizeRange).convert(Vector::copyFrom, id());
+        return Arbitrary.higherOrderArbitrary(generateArbitrary(), a -> a.vectorOfSize(sizeRange));
     }
 
     public static <A> Arbitrary<Vector<A>> vectorsOf(Arbitrary<A> elements) {
@@ -516,7 +510,7 @@ public final class Arbitraries {
     }
 
     public static Arbitrary<ArrayList<?>> arrayLists(IntRange sizeRange) {
-        return CollectionArbitraries.customHomogeneousCollection(vec -> vec.toCollection(ArrayList::new), Vector::wrap, sizeRange);
+        return homogeneousCollections(vector -> vector.toCollection(ArrayList::new), Vector::wrap, sizeRange);
     }
 
     public static <A> Arbitrary<ArrayList<A>> arrayListsOf(Arbitrary<A> elements) {

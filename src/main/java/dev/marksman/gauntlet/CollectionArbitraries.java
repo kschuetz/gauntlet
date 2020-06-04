@@ -1,9 +1,7 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
-import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.builtin.fn2.ToMap;
-import com.jnape.palatable.lambda.optics.Iso;
 import dev.marksman.collectionviews.NonEmptyVector;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.collectionviews.VectorBuilder;
@@ -21,7 +19,6 @@ import java.util.HashSet;
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
-import static dev.marksman.gauntlet.ArbitraryGenerator.generateArbitrary;
 import static dev.marksman.gauntlet.PrettyPrinter.defaultPrettyPrinter;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkArrayList;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkHashSet;
@@ -149,54 +146,6 @@ final class CollectionArbitraries {
     static <K, V> Arbitrary<HashMap<K, V>> nonEmptyHashMap(Arbitrary<K> keys,
                                                            Arbitrary<V> values) {
         return convertToNonEmptyHashMap(Arbitraries.tuplesOf(keys, values).nonEmptyVector());
-    }
-
-    static <Collection> Arbitrary<Collection> customHomogeneousCollection(Fn1<? super Vector<?>, ? extends Collection> fromVector,
-                                                                          Fn1<? super Collection, ? extends Vector<?>> toVector) {
-        return homogeneousVector().convert(fromVector, toVector);
-    }
-
-    static <Collection> Arbitrary<Collection> customHomogeneousCollection(Iso<? super Vector<?>, ? extends Vector<?>, ? extends Collection, ? super Collection> iso) {
-        return homogeneousVector().convert(iso);
-    }
-
-    static <Collection> Arbitrary<Collection> customHomogeneousCollection(Fn1<? super Vector<?>, ? extends Collection> fromVector,
-                                                                          Fn1<? super Collection, ? extends Vector<?>> toVector,
-                                                                          IntRange sizeRange) {
-        return homogeneousVector(sizeRange).convert(fromVector, toVector);
-    }
-
-    static <Collection> Arbitrary<Collection> customHomogeneousCollection(Iso<? super Vector<?>, ? extends Vector<?>, ? extends Collection, ? super Collection> iso,
-                                                                          IntRange sizeRange) {
-        return homogeneousVector(sizeRange).convert(iso);
-    }
-
-    static Arbitrary<Vector<?>> homogeneousVector() {
-        return homogeneousVector(CollectionArbitraries::sizeGenerator);
-    }
-
-    static Arbitrary<Vector<?>> homogeneousVector(IntRange sizeRange) {
-        if (sizeRange.minInclusive() < 0 || sizeRange.maxInclusive() < 0) {
-            throw new IllegalArgumentException("size must be >= 0");
-        }
-        return homogeneousVector(parameters -> sizeGenerator(sizeRange, parameters));
-    }
-
-    @SuppressWarnings("unchecked")
-    @Deprecated
-    static Arbitrary<Vector<?>> homogeneousVector(Fn1<GeneratorParameters, Generate<Integer>> buildSizeGenerator) {
-        ShrinkStrategy<Vector<?>> shrink = (ShrinkStrategy<Vector<?>>) (ShrinkStrategy<? extends Vector<?>>) shrinkVector(ShrinkStrategy.none());
-        return arbitrary(parameters -> {
-                    Supply<Arbitrary<?>> arbitrarySupply = arbitraryArbitrary().createSupply(parameters);
-                    return new HomogeneousCollectionSupply(arbitrarySupply,
-                            buildSizeGenerator.apply(parameters),
-                            parameters);
-                },
-                just(shrink), defaultPrettyPrinter());
-    }
-
-    static Arbitrary<Arbitrary<?>> arbitraryArbitrary() {
-        return Arbitrary.arbitrary(generateArbitrary());
     }
 
     private static <K, V> Arbitrary<HashMap<K, V>> convertToHashMap(Arbitrary<Vector<Tuple2<K, V>>> entries) {
