@@ -107,9 +107,9 @@ public final class Arbitrary<A> implements SampleTypeMetadata<A> {
     @SuppressWarnings("unchecked")
     public Supply<A> createSupply(GeneratorParameters parameters) {
         GeneratorParameters transformedParameters = transformGeneratorParameters(parameters);
-        Supply<A> supply = (Supply<A>) generator.match(simple -> simple.createSupply(transformedParameters),
+        Supply<A> supply = generator.match(simple -> simple.createSupply(transformedParameters),
                 higherOrder -> higherOrderSupply(transformedParameters, higherOrder.getGenerator().prepare(transformedParameters),
-                        higherOrder.getTransformFn()));
+                        ((HigherOrderArbitrary<A>) higherOrder).getTransformFn()));
 
         if (filter.isEmpty()) {
             return supply;
