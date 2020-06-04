@@ -14,6 +14,7 @@ import com.jnape.palatable.lambda.optics.Iso;
 import dev.marksman.collectionviews.NonEmptyVector;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.kraftwerk.Generator;
+import dev.marksman.kraftwerk.Generators;
 import dev.marksman.kraftwerk.Weighted;
 import dev.marksman.kraftwerk.constraints.BigDecimalRange;
 import dev.marksman.kraftwerk.constraints.BigIntegerRange;
@@ -373,31 +374,21 @@ public final class Arbitraries {
     }
 
     public static Arbitrary<Tuple2<?, ?>> tuple2s() {
-        return higherOrderArbitrary(generateArbitrary(), a -> higherOrderArbitrary(generateArbitrary(), b -> tuplesOf(a, b)));
+        return higherOrderArbitrary(generateArbitrary().pair(), x -> tuplesOf(x._1(), x._2()));
     }
 
     public static Arbitrary<Tuple3<?, ?, ?>> tuple3s() {
-        return higherOrderArbitrary(generateArbitrary(),
-                a -> higherOrderArbitrary(generateArbitrary(),
-                        b -> higherOrderArbitrary(generateArbitrary(),
-                                c -> tuplesOf(a, b, c))));
+        return higherOrderArbitrary(generateArbitrary().triple(), x -> tuplesOf(x._1(), x._2(), x._3()));
     }
 
     public static Arbitrary<Tuple4<?, ?, ?, ?>> tuple4s() {
-        return higherOrderArbitrary(generateArbitrary(),
-                a -> higherOrderArbitrary(generateArbitrary(),
-                        b -> higherOrderArbitrary(generateArbitrary(),
-                                c -> higherOrderArbitrary(generateArbitrary(),
-                                        d -> tuplesOf(a, b, c, d)))));
+        return higherOrderArbitrary(Generators.tupled(generateArbitrary(), generateArbitrary(), generateArbitrary(),
+                generateArbitrary()), x -> tuplesOf(x._1(), x._2(), x._3(), x._4()));
     }
 
     public static Arbitrary<Tuple5<?, ?, ?, ?, ?>> tuple5s() {
-        return higherOrderArbitrary(generateArbitrary(),
-                a -> higherOrderArbitrary(generateArbitrary(),
-                        b -> higherOrderArbitrary(generateArbitrary(),
-                                c -> higherOrderArbitrary(generateArbitrary(),
-                                        d -> higherOrderArbitrary(generateArbitrary(),
-                                                e -> tuplesOf(a, b, c, d, e))))));
+        return higherOrderArbitrary(Generators.tupled(generateArbitrary(), generateArbitrary(), generateArbitrary(),
+                generateArbitrary(), generateArbitrary()), x -> tuplesOf(x._1(), x._2(), x._3(), x._4(), x._5()));
     }
 
     public static Arbitrary<Unit> unit() {
@@ -533,7 +524,7 @@ public final class Arbitraries {
     }
 
     public static <A> Arbitrary<ArrayList<A>> arrayListsOf(int count, Arbitrary<A> elements) {
-        return CollectionArbitraries.arrayListOfN(count, elements);
+        return CollectionArbitraries.arrayListOfSize(count, elements);
     }
 
     public static <A> Arbitrary<ArrayList<A>> nonEmptyArrayListsOf(Arbitrary<A> elements) {

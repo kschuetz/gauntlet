@@ -44,14 +44,18 @@ final class CollectionArbitraries {
                 defaultPrettyPrinter());
     }
 
-    static <A> Arbitrary<Vector<A>> vectorOfSize(int count, Arbitrary<A> elements) {
+    static <A> Arbitrary<Vector<A>> vectorOfSize(IntRange sizeRange, Arbitrary<A> elements) {
         return arbitrary(parameters ->
                         new CollectionSupply<>(elements.createSupply(parameters),
-                                Generators.constant(count).prepare(parameters),
+                                sizeGenerator(sizeRange, parameters),
                                 vectorAggregator()),
-                just(shrinkVector(count, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
+                just(shrinkVector(sizeRange.minInclusive(), elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
                 defaultPrettyPrinter());
+    }
+
+    static <A> Arbitrary<Vector<A>> vectorOfSize(int count, Arbitrary<A> elements) {
+        return vectorOfSize(IntRange.inclusive(count, count), elements);
     }
 
     static <A> Arbitrary<NonEmptyVector<A>> nonEmptyVector(Arbitrary<A> elements) {
@@ -65,20 +69,23 @@ final class CollectionArbitraries {
                 defaultPrettyPrinter());
     }
 
-    static <A> Arbitrary<NonEmptyVector<A>> nonEmptyVectorOfSize(int count, Arbitrary<A> elements) {
-        if (count < 1) {
-            throw new IllegalArgumentException("count must be >= 1");
+    static <A> Arbitrary<NonEmptyVector<A>> nonEmptyVectorOfSize(IntRange sizeRange, Arbitrary<A> elements) {
+        if (sizeRange.minInclusive() < 1) {
+            throw new IllegalArgumentException("minimum size must be >= 1");
         }
         return arbitrary(parameters ->
                         new CollectionSupply<>(elements.createSupply(parameters),
-                                Generators.constant(count).prepare(parameters),
+                                sizeGenerator(sizeRange, parameters),
                                 vectorAggregator())
                                 .fmap(Vector::toNonEmptyOrThrow),
-                just(shrinkNonEmptyVector(count, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
+                just(shrinkNonEmptyVector(sizeRange.minInclusive(), elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
                 defaultPrettyPrinter());
     }
 
+    static <A> Arbitrary<NonEmptyVector<A>> nonEmptyVectorOfSize(int size, Arbitrary<A> elements) {
+        return nonEmptyVectorOfSize(IntRange.inclusive(size, size), elements);
+    }
 
     static <A> Arbitrary<ArrayList<A>> arrayList(Arbitrary<A> elements) {
         return arbitrary(parameters ->
@@ -91,7 +98,7 @@ final class CollectionArbitraries {
     }
 
 
-    static <A> Arbitrary<ArrayList<A>> arrayListOfN(int count, Arbitrary<A> elements) {
+    static <A> Arbitrary<ArrayList<A>> arrayListOfSize(int count, Arbitrary<A> elements) {
         return arbitrary(parameters ->
                         new CollectionSupply<>(elements.createSupply(parameters),
                                 Generators.constant(count).prepare(parameters),

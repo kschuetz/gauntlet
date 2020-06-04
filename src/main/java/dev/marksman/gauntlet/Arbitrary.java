@@ -18,6 +18,7 @@ import dev.marksman.kraftwerk.GeneratorParameters;
 import dev.marksman.kraftwerk.Result;
 import dev.marksman.kraftwerk.Seed;
 import dev.marksman.kraftwerk.Weighted;
+import dev.marksman.kraftwerk.constraints.IntRange;
 import dev.marksman.kraftwerk.weights.MaybeWeights;
 
 import java.util.ArrayList;
@@ -94,9 +95,11 @@ public final class Arbitrary<A> implements SampleTypeMetadata<A> {
                 prettyPrinter, Gauntlet.DEFAULT_MAX_DISCARDS);
     }
 
-    static <A> Arbitrary<A> higherOrderArbitrary(Generator<Arbitrary<?>> generator,
-                                                 Fn1<Arbitrary<?>, Arbitrary<? extends A>> transformFn) {
-        HigherOrderArbitrary<A> higherOrder = new HigherOrderArbitrary<>(generator, transformFn);
+    @SuppressWarnings("unchecked")
+    static <Z, A> Arbitrary<A> higherOrderArbitrary(Generator<Z> generator,
+                                                    Fn1<Z, Arbitrary<? extends A>> transformFn) {
+        HigherOrderArbitrary<A> higherOrder = new HigherOrderArbitrary<>((Generator<Object>) generator,
+                (Fn1<Object, Arbitrary<? extends A>>) transformFn);
         return new Arbitrary<>(Choice2.b(higherOrder), emptyImmutableFiniteIterable(), Filter.emptyFilter(), nothing(),
                 defaultPrettyPrinter(), Gauntlet.DEFAULT_MAX_DISCARDS);
     }
@@ -120,8 +123,8 @@ public final class Arbitrary<A> implements SampleTypeMetadata<A> {
         return (SampleTypeMetadata<A>) generator.match(__ -> this,
                 higherOrder -> {
                     GeneratorParameters transformedParameters = transformGeneratorParameters(generatorParameters);
-                    Generate<Arbitrary<?>> prepare = higherOrder.getGenerator().prepare(transformedParameters);
-                    Result<? extends Seed, Arbitrary<?>> aResult = prepare.apply(inputSeed);
+                    Generate<?> prepare = higherOrder.getGenerator().prepare(transformedParameters);
+                    Result<? extends Seed, ?> aResult = prepare.apply(inputSeed);
                     Arbitrary<? extends A> arbitrary = higherOrder.getTransformFn().apply(aResult.getValue());
                     return arbitrary.getSampleTypeMetadata(transformedParameters, aResult.getNextState());
                 });
@@ -164,7 +167,6 @@ public final class Arbitrary<A> implements SampleTypeMetadata<A> {
     public Arbitrary<A> suchThat(Fn1<? super A, Boolean> predicate) {
         return new Arbitrary<>(generator, parameterTransforms, filter.add(predicate), shrinkStrategy.fmap(s -> s.filter(predicate)),
                 prettyPrinter, maxDiscards);
-
     }
 
     /**
@@ -217,24 +219,32 @@ public final class Arbitrary<A> implements SampleTypeMetadata<A> {
         return CollectionArbitraries.vector(this);
     }
 
-    public Arbitrary<Vector<A>> vectorOfSize(int count) {
-        return CollectionArbitraries.vectorOfSize(count, this);
+    public Arbitrary<Vector<A>> vectorOfSize(int size) {
+        return CollectionArbitraries.vectorOfSize(size, this);
+    }
+
+    public Arbitrary<Vector<A>> vectorOfSize(IntRange sizeRange) {
+        return CollectionArbitraries.vectorOfSize(sizeRange, this);
     }
 
     public Arbitrary<NonEmptyVector<A>> nonEmptyVector() {
         return CollectionArbitraries.nonEmptyVector(this);
     }
 
-    public Arbitrary<NonEmptyVector<A>> nonEmptyVectorOfN(int count) {
-        return CollectionArbitraries.nonEmptyVectorOfSize(count, this);
+    public Arbitrary<NonEmptyVector<A>> nonEmptyVectorOfSize(int size) {
+        return CollectionArbitraries.nonEmptyVectorOfSize(size, this);
+    }
+
+    public Arbitrary<NonEmptyVector<A>> nonEmptyVectorOfSize(IntRange sizeRange) {
+        return CollectionArbitraries.nonEmptyVectorOfSize(sizeRange, this);
     }
 
     public Arbitrary<ArrayList<A>> arrayList() {
         return CollectionArbitraries.arrayList(this);
     }
 
-    public Arbitrary<ArrayList<A>> arrayListOfN(int count) {
-        return CollectionArbitraries.arrayListOfN(count, this);
+    public Arbitrary<ArrayList<A>> arrayListOfSize(int count) {
+        return CollectionArbitraries.arrayListOfSize(count, this);
     }
 
     public Arbitrary<ArrayList<A>> nonEmptyArrayList() {
@@ -299,16 +309,15 @@ public final class Arbitrary<A> implements SampleTypeMetadata<A> {
 
 
     static final class HigherOrderArbitrary<A> {
-        private final Generator<Arbitrary<?>> generator;
-        private final Fn1<Arbitrary<?>, Arbitrary<? extends A>> transformFn;
+        private final Generator<Object> generator;
+        private final Fn1<Object, Arbitrary<? extends A>> transformFn;
 
-
-        HigherOrderArbitrary(Generator<Arbitrary<?>> generator, Fn1<Arbitrary<?>, Arbitrary<? extends A>> transformFn) {
+        HigherOrderArbitrary(Generator<Object> generator, Fn1<Object, Arbitrary<? extends A>> transformFn) {
             this.generator = generator;
             this.transformFn = transformFn;
         }
 
-        Generator<Arbitrary<?>> getGenerator() {
+        Generator<Object> getGenerator() {
             return generator;
         }
 
@@ -317,7 +326,7 @@ public final class Arbitrary<A> implements SampleTypeMetadata<A> {
             return new HigherOrderArbitrary<>(generator, transformFn.fmap(arbitrary -> ((Arbitrary<A>) arbitrary).convert(ab, ba)));
         }
 
-        Fn1<Arbitrary<?>, Arbitrary<? extends A>> getTransformFn() {
+        Fn1<Object, Arbitrary<? extends A>> getTransformFn() {
             return transformFn;
         }
 
