@@ -12,11 +12,8 @@ import dev.marksman.collectionviews.Vector;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.filter.Filter;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
-import dev.marksman.kraftwerk.Generate;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.GeneratorParameters;
-import dev.marksman.kraftwerk.Result;
-import dev.marksman.kraftwerk.Seed;
 import dev.marksman.kraftwerk.Weighted;
 import dev.marksman.kraftwerk.constraints.IntRange;
 import dev.marksman.kraftwerk.weights.MaybeWeights;
@@ -53,7 +50,7 @@ import static dev.marksman.gauntlet.PrettyPrinter.defaultPrettyPrinter;
  *
  * @param <A>
  */
-public final class Arbitrary<A> implements SampleTypeMetadata<A> {
+public final class Arbitrary<A> {
     private final Choice2<SimpleArbitrary<A>, HigherOrderArbitrary<? extends A>> generator;
     private final ImmutableFiniteIterable<Fn1<GeneratorParameters, GeneratorParameters>> parameterTransforms;
     private final Filter<A> filter;
@@ -117,19 +114,6 @@ public final class Arbitrary<A> implements SampleTypeMetadata<A> {
             return new FilteredSupply<>(supply, filter, maxDiscards);
         }
     }
-
-    @SuppressWarnings("unchecked")
-    public SampleTypeMetadata<A> getSampleTypeMetadata(GeneratorParameters generatorParameters, Seed inputSeed) {
-        return (SampleTypeMetadata<A>) generator.match(__ -> this,
-                higherOrder -> {
-                    GeneratorParameters transformedParameters = transformGeneratorParameters(generatorParameters);
-                    Generate<?> prepare = higherOrder.getGenerator().prepare(transformedParameters);
-                    Result<? extends Seed, ?> aResult = prepare.apply(inputSeed);
-                    Arbitrary<? extends A> arbitrary = higherOrder.getTransformFn().apply(aResult.getValue());
-                    return arbitrary.getSampleTypeMetadata(transformedParameters, aResult.getNextState());
-                });
-    }
-
 
     public Maybe<ShrinkStrategy<A>> getShrinkStrategy() {
         return shrinkStrategy;
