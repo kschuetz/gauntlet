@@ -33,6 +33,7 @@ import dev.marksman.kraftwerk.constraints.LongRange;
 import dev.marksman.kraftwerk.constraints.ShortRange;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
@@ -322,6 +323,14 @@ public final class ShrinkStrategies {
         return shrinkCollection(minimumSize, element)
                 .convert(vector -> vector.toCollection(HashSet::new),
                         hashSet -> Vector.copyFrom(hashSet).toNonEmptyOrThrow());
+    }
+
+    public static <K, V> ShrinkStrategy<HashMap<K, V>> shrinkHashMap(ShrinkStrategy<V> values) {
+        return shrinkHashMap(0, values);
+    }
+
+    public static <K, V> ShrinkStrategy<HashMap<K, V>> shrinkHashMap(int minimumSize, ShrinkStrategy<V> values) {
+        return ShrinkStrategy.none(); // TODO
     }
 
     public static <A, Collection> ShrinkStrategy<Collection> shrinkCustomCollection(Fn1<? super Vector<A>, ? extends Collection> fromVector,

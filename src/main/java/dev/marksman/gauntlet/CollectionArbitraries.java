@@ -8,7 +8,6 @@ import dev.marksman.collectionviews.VectorBuilder;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.Generate;
 import dev.marksman.kraftwerk.GeneratorParameters;
-import dev.marksman.kraftwerk.Generators;
 import dev.marksman.kraftwerk.aggregator.Aggregator;
 import dev.marksman.kraftwerk.constraints.IntRange;
 
@@ -95,14 +94,18 @@ final class CollectionArbitraries {
     }
 
 
-    static <A> Arbitrary<ArrayList<A>> arrayListOfSize(int count, Arbitrary<A> elements) {
+    static <A> Arbitrary<ArrayList<A>> arrayListOfSize(IntRange sizeRange, Arbitrary<A> elements) {
         return arbitrary(parameters ->
                         new CollectionSupply<>(elements.createSupply(parameters),
-                                Generators.constant(count).prepare(parameters),
+                                sizeGenerator(sizeRange, parameters),
                                 collectionAggregator(ArrayList::new)),
-                just(shrinkArrayList(count, elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
+                just(shrinkArrayList(sizeRange.minInclusive(), elements.getShrinkStrategy().orElse(ShrinkStrategy.none()))),
                 // TODO: prettyPrinter
                 defaultPrettyPrinter());
+    }
+
+    static <A> Arbitrary<ArrayList<A>> arrayListOfSize(int count, Arbitrary<A> elements) {
+        return arrayListOfSize(IntRange.inclusive(count, count), elements);
     }
 
 

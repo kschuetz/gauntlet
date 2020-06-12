@@ -13,6 +13,7 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.optics.Iso;
 import dev.marksman.collectionviews.NonEmptyVector;
 import dev.marksman.collectionviews.Vector;
+import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.Generators;
 import dev.marksman.kraftwerk.Weighted;
@@ -55,9 +56,11 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkBoole
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkByte;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkDouble;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkFloat;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkHashMap;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkInt;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkLong;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkShort;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkVector;
 import static dev.marksman.kraftwerk.Generators.generateBigDecimal;
 import static dev.marksman.kraftwerk.Generators.generateBigInteger;
 import static dev.marksman.kraftwerk.Generators.generateBigIntegerRange;
@@ -473,8 +476,11 @@ public final class Arbitraries {
         return vectors(sizeRange).convert(iso);
     }
 
+    @SuppressWarnings("unchecked")
     public static Arbitrary<Vector<?>> vectors() {
-        return Arbitrary.higherOrderArbitrary(generateArbitrary(), Arbitrary::vector);
+        ShrinkStrategy<Vector<?>> shrinkStrategy = (ShrinkStrategy<Vector<?>>) (ShrinkStrategy<? extends Vector<?>>) shrinkVector(ShrinkStrategy.none());
+        return Arbitrary.<Arbitrary<?>, Vector<?>>higherOrderArbitrary(generateArbitrary(), Arbitrary::vector)
+                .withShrinkStrategy(shrinkStrategy);
     }
 
     public static Arbitrary<Vector<?>> vectors(int size) {
@@ -517,8 +523,12 @@ public final class Arbitraries {
         return CollectionArbitraries.arrayList(elements);
     }
 
-    public static <A> Arbitrary<ArrayList<A>> arrayListsOf(int count, Arbitrary<A> elements) {
-        return CollectionArbitraries.arrayListOfSize(count, elements);
+    public static <A> Arbitrary<ArrayList<A>> arrayListsOf(int size, Arbitrary<A> elements) {
+        return CollectionArbitraries.arrayListOfSize(size, elements);
+    }
+
+    public static <A> Arbitrary<ArrayList<A>> arrayListsOf(IntRange sizeRange, Arbitrary<A> elements) {
+        return CollectionArbitraries.arrayListOfSize(sizeRange, elements);
     }
 
     public static <A> Arbitrary<ArrayList<A>> nonEmptyArrayListsOf(Arbitrary<A> elements) {
@@ -533,9 +543,12 @@ public final class Arbitraries {
         return CollectionArbitraries.nonEmptyHashSet(elements);
     }
 
+    @SuppressWarnings("unchecked")
     public static Arbitrary<HashMap<?, ?>> hashMaps() {
-        return higherOrderArbitrary(generateArbitrary(), keys ->
-                higherOrderArbitrary(generateArbitrary(), values -> hashMapsOf(keys, values)));
+        ShrinkStrategy<HashMap<?, ?>> shrinkStrategy = (ShrinkStrategy<HashMap<?, ?>>) (ShrinkStrategy<? extends HashMap<?, ?>>) shrinkHashMap(ShrinkStrategy.none());
+        return Arbitrary.<Arbitrary<?>, HashMap<?, ?>>higherOrderArbitrary(generateArbitrary(), keys ->
+                higherOrderArbitrary(generateArbitrary(), values -> hashMapsOf(keys, values)))
+                .withShrinkStrategy(shrinkStrategy);
     }
 
     public static <K, V> Arbitrary<HashMap<K, V>> hashMapsOf(Arbitrary<K> keys,
