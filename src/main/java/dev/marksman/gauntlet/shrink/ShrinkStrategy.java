@@ -1,6 +1,8 @@
 package dev.marksman.gauntlet.shrink;
 
+import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.functions.Fn1;
+import com.jnape.palatable.lambda.functions.builtin.fn1.CatMaybes;
 import com.jnape.palatable.lambda.optics.Iso;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.filter.Filter;
@@ -27,5 +29,14 @@ public interface ShrinkStrategy<A> {
     default <B> ShrinkStrategy<B> convert(Fn1<? super A, ? extends B> ab, Fn1<? super B, ? extends A> ba) {
         ShrinkStrategy<A> orig = this;
         return input -> orig.apply(ba.apply(input)).fmap(ab);
+    }
+
+    @SuppressWarnings("unchecked")
+    default <B> ShrinkStrategy<B> prism(Fn1<? super A, ? extends Maybe<? extends B>> ab, Fn1<? super B, ? extends A> ba) {
+        ShrinkStrategy<A> orig = this;
+        return input -> {
+            ImmutableFiniteIterable<Maybe<B>> fmap = (ImmutableFiniteIterable<Maybe<B>>) orig.apply(ba.apply(input)).fmap(ab);
+            return () -> CatMaybes.catMaybes(fmap).iterator();
+        };
     }
 }

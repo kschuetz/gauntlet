@@ -26,8 +26,10 @@ import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.optics.functions.View.view;
 import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
 import static dev.marksman.gauntlet.CompositeArbitraries.combine;
+import static dev.marksman.gauntlet.FlattenedSupply.flattenedSupply;
 import static dev.marksman.gauntlet.HigherOrderSupply.higherOrderSupply;
 import static dev.marksman.gauntlet.PrettyPrinter.defaultPrettyPrinter;
+import static dev.marksman.gauntlet.SupplyParameters.supplyParameters;
 
 /**
  * An {@code Arbitrary} differs from a {@code Generator} in that an {@code Arbitrary} adds the following capabilities:
@@ -87,7 +89,8 @@ public final class Arbitrary<A> {
     static <A> Arbitrary<A> arbitrary(Fn1<GeneratorParameters, Supply<A>> generator,
                                       Maybe<ShrinkStrategy<A>> shrinkStrategy,
                                       PrettyPrinter<? super A> prettyPrinter) {
-        return new Arbitrary<>(Choice2.a(new SimpleArbitrary<>(generator)),
+        Fn1<SupplyParameters, Supply<A>> f = sp -> generator.apply(sp.getGeneratorParameters());
+        return new Arbitrary<>(Choice2.a(new SimpleArbitrary<>(f)),
                 emptyImmutableFiniteIterable(), Filter.emptyFilter(), shrinkStrategy,
                 prettyPrinter, Gauntlet.DEFAULT_MAX_DISCARDS);
     }
@@ -104,7 +107,8 @@ public final class Arbitrary<A> {
     @SuppressWarnings("unchecked")
     public Supply<A> createSupply(GeneratorParameters parameters) {
         GeneratorParameters transformedParameters = transformGeneratorParameters(parameters);
-        Supply<A> supply = generator.match(simple -> simple.createSupply(transformedParameters),
+        SupplyParameters supplyParameters = supplyParameters(transformedParameters, maxDiscards);
+        Supply<A> supply = generator.match(simple -> simple.createSupply(supplyParameters),
                 higherOrder -> higherOrderSupply(transformedParameters, higherOrder.getGenerator().prepare(transformedParameters),
                         ((HigherOrderArbitrary<A>) higherOrder).getTransformFn()));
 
@@ -194,6 +198,21 @@ public final class Arbitrary<A> {
                 maxDiscards);
     }
 
+    @SuppressWarnings("unchecked")
+    public <B> Arbitrary<B> prism(Fn1<? super A, ? extends Maybe<? extends B>> ab, Fn1<? super B, ? extends A> ba) {
+        Choice2<SimpleArbitrary<B>, HigherOrderArbitrary<? extends B>> newGenerator =
+                (Choice2<SimpleArbitrary<B>, HigherOrderArbitrary<? extends B>>)
+                        generator.match(simple -> Choice2.a((SimpleArbitrary<A>) simple.prism(ab, ba)),
+                                higherOrder -> Choice2.b(((HigherOrderArbitrary<A>) higherOrder).prism(ab, ba)));
+
+        return new Arbitrary<>(newGenerator,
+                parameterTransforms,
+                this.filter.contraMap(ba),
+                shrinkStrategy.fmap(s -> s.prism(ab, ba)),
+                this.prettyPrinter.contraMap(ba),
+                maxDiscards);
+    }
+
     public Arbitrary<A> modifyGeneratorParameters(Fn1<GeneratorParameters, GeneratorParameters> modifyFn) {
         return new Arbitrary<>(generator, parameterTransforms.append(modifyFn), filter, shrinkStrategy, prettyPrinter, maxDiscards);
     }
@@ -276,18 +295,24 @@ public final class Arbitrary<A> {
     }
 
     static final class SimpleArbitrary<A> {
-        private final Fn1<GeneratorParameters, Supply<A>> createSupplyFn;
+        private final Fn1<SupplyParameters, Supply<A>> createSupplyFn;
 
-        SimpleArbitrary(Fn1<GeneratorParameters, Supply<A>> createSupplyFn) {
+        SimpleArbitrary(Fn1<SupplyParameters, Supply<A>> createSupplyFn) {
             this.createSupplyFn = createSupplyFn;
         }
 
-        Supply<A> createSupply(GeneratorParameters generatorParameters) {
-            return createSupplyFn.apply(generatorParameters);
+        Supply<A> createSupply(SupplyParameters supplyParameters) {
+            return createSupplyFn.apply(supplyParameters);
         }
 
         <B> SimpleArbitrary<B> convert(Fn1<? super A, ? extends B> ab, Fn1<? super B, ? extends A> ba) {
             return new SimpleArbitrary<>(createSupplyFn.fmap(supply -> supply.fmap(ab)));
+        }
+
+        <B> SimpleArbitrary<B> prism(Fn1<? super A, ? extends Maybe<? extends B>> ab, Fn1<? super B, ? extends A> ba) {
+            return new SimpleArbitrary<>(supplyParameters -> createSupplyFn
+                    .<Supply<B>>fmap(supply -> flattenedSupply(supply.fmap(ab), supplyParameters.getMaxDiscards()))
+                    .apply(supplyParameters));
         }
     }
 
@@ -308,6 +333,11 @@ public final class Arbitrary<A> {
         @SuppressWarnings("unchecked")
         <B> HigherOrderArbitrary<B> convert(Fn1<? super A, ? extends B> ab, Fn1<? super B, ? extends A> ba) {
             return new HigherOrderArbitrary<>(generator, transformFn.fmap(arbitrary -> ((Arbitrary<A>) arbitrary).convert(ab, ba)));
+        }
+
+        @SuppressWarnings("unchecked")
+        <B> HigherOrderArbitrary<B> prism(Fn1<? super A, ? extends Maybe<? extends B>> ab, Fn1<? super B, ? extends A> ba) {
+            return new HigherOrderArbitrary<>(generator, transformFn.fmap(arbitrary -> ((Arbitrary<A>) arbitrary).prism(ab, ba)));
         }
 
         Fn1<Object, Arbitrary<? extends A>> getTransformFn() {
