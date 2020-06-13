@@ -46,7 +46,9 @@ class ArbitraryTest extends GauntletApiBase {
     }
 
     private static Arbitrary<Seed> seeds() {
-        return longs().withNoShrinkStrategy().convert(Seed::create, Seed::getSeedValue);
+        return longs()
+                .withNoShrinkStrategy()
+                .convert(Seed::create, Seed::getSeedValue);
     }
 
     private static <A> Prop<Seed> equivalentSuppliesForSeed(Supply<A> supply1, Supply<A> supply2) {
