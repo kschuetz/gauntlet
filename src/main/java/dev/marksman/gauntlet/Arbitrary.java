@@ -7,6 +7,7 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.functions.Fn0;
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.optics.Iso;
+import com.jnape.palatable.lambda.optics.Prism;
 import dev.marksman.collectionviews.NonEmptyVector;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
@@ -23,6 +24,8 @@ import java.util.HashSet;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
+import static com.jnape.palatable.lambda.optics.functions.Pre.pre;
+import static com.jnape.palatable.lambda.optics.functions.Re.re;
 import static com.jnape.palatable.lambda.optics.functions.View.view;
 import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
 import static dev.marksman.gauntlet.CompositeArbitraries.combine;
@@ -198,19 +201,27 @@ public final class Arbitrary<A> {
                 maxDiscards);
     }
 
+    public <B> Arbitrary<B> convert(Iso<? super A, ? extends A, ? extends B, ? super B> iso) {
+        return convert(view(iso), view(iso.mirror()));
+    }
+
     @SuppressWarnings("unchecked")
-    public <B> Arbitrary<B> prism(Fn1<? super A, ? extends Maybe<? extends B>> ab, Fn1<? super B, ? extends A> ba) {
+    public <B> Arbitrary<B> convertWithPrism(Fn1<? super A, ? extends Maybe<? extends B>> ab, Fn1<? super B, ? extends A> ba) {
         Choice2<SimpleArbitrary<B>, HigherOrderArbitrary<? extends B>> newGenerator =
                 (Choice2<SimpleArbitrary<B>, HigherOrderArbitrary<? extends B>>)
-                        generator.match(simple -> Choice2.a((SimpleArbitrary<A>) simple.prism(ab, ba)),
-                                higherOrder -> Choice2.b(((HigherOrderArbitrary<A>) higherOrder).prism(ab, ba)));
+                        generator.match(simple -> Choice2.a((SimpleArbitrary<A>) simple.convertWithPrism(ab, ba)),
+                                higherOrder -> Choice2.b(((HigherOrderArbitrary<A>) higherOrder).convertWithPrism(ab, ba)));
 
         return new Arbitrary<>(newGenerator,
                 parameterTransforms,
                 this.filter.contraMap(ba),
-                shrinkStrategy.fmap(s -> s.prism(ab, ba)),
+                shrinkStrategy.fmap(s -> s.convertWithPrism(ab, ba)),
                 this.prettyPrinter.contraMap(ba),
                 maxDiscards);
+    }
+
+    public <B> Arbitrary<B> convertWithPrism(Prism<? super A, ? extends A, ? extends B, ? super B> prism) {
+        return convertWithPrism(view(pre(prism)), view(re(prism)));
     }
 
     public Arbitrary<A> modifyGeneratorParameters(Fn1<GeneratorParameters, GeneratorParameters> modifyFn) {
@@ -270,10 +281,6 @@ public final class Arbitrary<A> {
         return Weighted.weighted(weight, this);
     }
 
-    public <B> Arbitrary<B> convert(Iso<? super A, ? extends A, ? extends B, ? super B> iso) {
-        return convert(view(iso), view(iso.mirror()));
-    }
-
     public Arbitrary<Tuple2<A, A>> pair() {
         return combine(this, this);
     }
@@ -309,13 +316,12 @@ public final class Arbitrary<A> {
             return new SimpleArbitrary<>(createSupplyFn.fmap(supply -> supply.fmap(ab)));
         }
 
-        <B> SimpleArbitrary<B> prism(Fn1<? super A, ? extends Maybe<? extends B>> ab, Fn1<? super B, ? extends A> ba) {
+        <B> SimpleArbitrary<B> convertWithPrism(Fn1<? super A, ? extends Maybe<? extends B>> ab, Fn1<? super B, ? extends A> ba) {
             return new SimpleArbitrary<>(supplyParameters -> createSupplyFn
                     .<Supply<B>>fmap(supply -> flattenedSupply(supply.fmap(ab), supplyParameters.getMaxDiscards()))
                     .apply(supplyParameters));
         }
     }
-
 
     static final class HigherOrderArbitrary<A> {
         private final Generator<Object> generator;
@@ -336,13 +342,12 @@ public final class Arbitrary<A> {
         }
 
         @SuppressWarnings("unchecked")
-        <B> HigherOrderArbitrary<B> prism(Fn1<? super A, ? extends Maybe<? extends B>> ab, Fn1<? super B, ? extends A> ba) {
-            return new HigherOrderArbitrary<>(generator, transformFn.fmap(arbitrary -> ((Arbitrary<A>) arbitrary).prism(ab, ba)));
+        <B> HigherOrderArbitrary<B> convertWithPrism(Fn1<? super A, ? extends Maybe<? extends B>> ab, Fn1<? super B, ? extends A> ba) {
+            return new HigherOrderArbitrary<>(generator, transformFn.fmap(arbitrary -> ((Arbitrary<A>) arbitrary).convertWithPrism(ab, ba)));
         }
 
         Fn1<Object, Arbitrary<? extends A>> getTransformFn() {
             return transformFn;
         }
-
     }
 }

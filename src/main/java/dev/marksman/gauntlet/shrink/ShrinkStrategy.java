@@ -4,9 +4,12 @@ import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.builtin.fn1.CatMaybes;
 import com.jnape.palatable.lambda.optics.Iso;
+import com.jnape.palatable.lambda.optics.Prism;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.filter.Filter;
 
+import static com.jnape.palatable.lambda.optics.functions.Pre.pre;
+import static com.jnape.palatable.lambda.optics.functions.Re.re;
 import static com.jnape.palatable.lambda.optics.functions.View.view;
 import static dev.marksman.gauntlet.shrink.ShrinkStrategyNone.shrinkNone;
 
@@ -32,11 +35,15 @@ public interface ShrinkStrategy<A> {
     }
 
     @SuppressWarnings("unchecked")
-    default <B> ShrinkStrategy<B> prism(Fn1<? super A, ? extends Maybe<? extends B>> ab, Fn1<? super B, ? extends A> ba) {
+    default <B> ShrinkStrategy<B> convertWithPrism(Fn1<? super A, ? extends Maybe<? extends B>> ab, Fn1<? super B, ? extends A> ba) {
         ShrinkStrategy<A> orig = this;
         return input -> {
             ImmutableFiniteIterable<Maybe<B>> fmap = (ImmutableFiniteIterable<Maybe<B>>) orig.apply(ba.apply(input)).fmap(ab);
             return () -> CatMaybes.catMaybes(fmap).iterator();
         };
+    }
+
+    default <B> ShrinkStrategy<B> convertWithPrism(Prism<? super A, ? extends A, ? extends B, ? super B> prism) {
+        return convertWithPrism(view(pre(prism)), view(re(prism)));
     }
 }
