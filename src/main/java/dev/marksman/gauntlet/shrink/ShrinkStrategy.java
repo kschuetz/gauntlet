@@ -38,8 +38,10 @@ public interface ShrinkStrategy<A> {
     default <B> ShrinkStrategy<B> convertWithPrism(Fn1<? super A, ? extends Maybe<? extends B>> ab, Fn1<? super B, ? extends A> ba) {
         ShrinkStrategy<A> orig = this;
         return input -> {
-            ImmutableFiniteIterable<Maybe<B>> fmap = (ImmutableFiniteIterable<Maybe<B>>) orig.apply(ba.apply(input)).fmap(ab);
-            return () -> CatMaybes.catMaybes(fmap).iterator();
+            // Need two following lines to keep Java 8 compiler happy
+            ImmutableFiniteIterable<? extends Maybe<? extends B>> step1 = orig.apply(ba.apply(input)).fmap(ab);
+            ImmutableFiniteIterable<Maybe<B>> maybeBs = (ImmutableFiniteIterable<Maybe<B>>) step1;
+            return () -> CatMaybes.catMaybes(maybeBs).iterator();
         };
     }
 
