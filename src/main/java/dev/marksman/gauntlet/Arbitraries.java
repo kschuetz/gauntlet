@@ -16,6 +16,7 @@ import dev.marksman.collectionviews.Vector;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.Generators;
+import dev.marksman.kraftwerk.Seed;
 import dev.marksman.kraftwerk.Weighted;
 import dev.marksman.kraftwerk.constraints.BigDecimalRange;
 import dev.marksman.kraftwerk.constraints.BigIntegerRange;
@@ -95,6 +96,7 @@ import static dev.marksman.kraftwerk.Generators.generateLong;
 import static dev.marksman.kraftwerk.Generators.generateLongIndex;
 import static dev.marksman.kraftwerk.Generators.generateLongRange;
 import static dev.marksman.kraftwerk.Generators.generateMonth;
+import static dev.marksman.kraftwerk.Generators.generateSeed;
 import static dev.marksman.kraftwerk.Generators.generateShort;
 import static dev.marksman.kraftwerk.Generators.generateShortRange;
 import static dev.marksman.kraftwerk.Generators.generateShuffled;
@@ -721,5 +723,7 @@ public final class Arbitraries {
         return arbitrary(generateShuffled(elements));
     }
 
-
+    public static Arbitrary<Seed> seeds() {
+        return arbitrary(generateSeed());
+    }
 }

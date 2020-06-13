@@ -10,11 +10,11 @@ import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Constantly.constantly;
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
 import static dev.marksman.gauntlet.Arbitraries.ints;
-import static dev.marksman.gauntlet.Arbitraries.longs;
+import static dev.marksman.gauntlet.Arbitraries.seeds;
 
 class ArbitraryTest extends GauntletApiBase {
 
-    private static final int SAMPLES_COUNT_FOR_COMPARING_SUPPLIES = 10;
+    private static final int SAMPLE_COUNT_FOR_COMPARING_SUPPLIES = 10;
 
     @Nested
     @DisplayName("convertWithPrism")
@@ -45,16 +45,10 @@ class ArbitraryTest extends GauntletApiBase {
         }
     }
 
-    private static Arbitrary<Seed> seeds() {
-        return longs()
-                .withNoShrinkStrategy()
-                .convert(Seed::create, Seed::getSeedValue);
-    }
-
     private static <A> Prop<Seed> equivalentSuppliesForSeed(Supply<A> supply1, Supply<A> supply2) {
         return Prop.prop("equivalent supplies", (Seed initialSeed) -> {
             Seed current = initialSeed;
-            for (int i = 1; i <= SAMPLES_COUNT_FOR_COMPARING_SUPPLIES; i++) {
+            for (int i = 1; i <= SAMPLE_COUNT_FOR_COMPARING_SUPPLIES; i++) {
                 GeneratorOutput<A> value1 = supply1.getNext(current);
                 GeneratorOutput<A> value2 = supply2.getNext(current);
                 if (!value1.equals(value2)) {
