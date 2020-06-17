@@ -38,7 +38,6 @@ final class PropsTest {
     @Nested
     @DisplayName("basic prop")
     class BasicProp {
-
         @Test
         void successCase() {
             assertThat(Facade.prop(constantly(SimpleResult.pass())).evaluate(0), isEvalSuccess());
@@ -54,13 +53,11 @@ final class PropsTest {
         void takesNameThatWasGiven() {
             assertEquals("custom name", Facade.prop("custom name", constantly(SimpleResult.pass())).getName());
         }
-
     }
 
     @Nested
     @DisplayName("predicate prop")
     class PredicateProp {
-
         @Test
         void successCase() {
             assertThat(Facade.predicate(constantly(true)).evaluate(0), isEvalSuccess());
@@ -70,17 +67,14 @@ final class PropsTest {
         void failureCase() {
             assertThat(Facade.predicate(constantly(false)).evaluate(0), isEvalFailure());
         }
-
     }
 
     @Nested
     @DisplayName("conjunction")
     class Conjunction {
-
         @Nested
         @DisplayName("prefix")
         class Prefix {
-
             @Test
             void successCases() {
                 assertThat(conjunction(yes, yes).evaluate(0), isEvalSuccess());
@@ -104,13 +98,11 @@ final class PropsTest {
                         allOf(containsString("prop1"),
                                 containsString("prop2")));
             }
-
         }
 
         @Nested
         @DisplayName("infix")
         class Infix {
-
             @Test
             void successCases() {
                 assertThat(yes.and(yes).evaluate(0), isEvalSuccess());
@@ -137,19 +129,15 @@ final class PropsTest {
                         allOf(containsString("prop1"),
                                 containsString("prop2")));
             }
-
         }
-
     }
 
     @Nested
     @DisplayName("disjunction")
     class Disjunction {
-
         @Nested
         @DisplayName("prefix")
         class Prefix {
-
             @Test
             void successCases() {
                 assertThat(disjunction(yes, yes).evaluate(0), isEvalSuccess());
@@ -172,13 +160,11 @@ final class PropsTest {
                         allOf(containsString("prop1"),
                                 containsString("prop2")));
             }
-
         }
 
         @Nested
         @DisplayName("infix")
         class Infix {
-
             @Test
             void successCases() {
                 assertThat(yes.or(yes).evaluate(0), isEvalSuccess());
@@ -206,19 +192,15 @@ final class PropsTest {
                         allOf(containsString("prop1"),
                                 containsString("prop2")));
             }
-
         }
-
     }
 
     @Nested
     @DisplayName("negation")
     class Negation {
-
         @Nested
         @DisplayName("prefix")
         class Prefix {
-
             @Test
             void successCase() {
                 assertThat(negation(no).evaluate(0), isEvalSuccess());
@@ -234,13 +216,11 @@ final class PropsTest {
                 assertThat(negation(yes.rename("prop1")).getName(),
                         containsString("prop1"));
             }
-
         }
 
         @Nested
         @DisplayName("postfix")
         class Postfix {
-
             @Test
             void successCase() {
                 assertThat(no.not().evaluate(0), isEvalSuccess());
@@ -256,7 +236,6 @@ final class PropsTest {
                 assertThat(yes.rename("prop1").not().getName(),
                         containsString("prop1"));
             }
-
         }
 
         @Test
@@ -264,13 +243,11 @@ final class PropsTest {
             Prop<Object> prop = Prop.predicate(Objects::nonNull);
             assertSame(prop, prop.not().not());
         }
-
     }
 
     @Nested
     @DisplayName("implication")
     class Implication {
-
         @Nested
         @DisplayName("prefix")
         class Prefix {
@@ -293,13 +270,11 @@ final class PropsTest {
                         allOf(containsString("prop1"),
                                 containsString("prop2")));
             }
-
         }
 
         @Nested
         @DisplayName("infix")
         class Infix {
-
             @Test
             void successCases() {
                 assertThat(yes.implies(yes).evaluate(0), isEvalSuccess());
@@ -318,19 +293,15 @@ final class PropsTest {
                         allOf(containsString("prop1"),
                                 containsString("prop2")));
             }
-
         }
-
     }
 
     @Nested
     @DisplayName("biconditional")
     class Biconditional {
-
         @Nested
         @DisplayName("prefix")
         class Prefix {
-
             @Test
             void successCases() {
                 assertThat(biconditional(yes, yes).evaluate(0), isEvalSuccess());
@@ -349,13 +320,11 @@ final class PropsTest {
                         allOf(containsString("prop1"),
                                 containsString("prop2")));
             }
-
         }
 
         @Nested
         @DisplayName("infix")
         class Infix {
-
             @Test
             void successCases() {
                 assertThat(yes.iff(yes).evaluate(0), isEvalSuccess());
@@ -374,19 +343,15 @@ final class PropsTest {
                         allOf(containsString("prop1"),
                                 containsString("prop2")));
             }
-
         }
-
     }
 
     @Nested
     @DisplayName("exclusiveDisjunction")
     class ExclusiveDisjunction {
-
         @Nested
         @DisplayName("prefix")
         class Prefix {
-
             @Test
             void successCases() {
                 assertThat(exclusiveDisjunction(yes, no).evaluate(0), isEvalSuccess());
@@ -405,13 +370,11 @@ final class PropsTest {
                         allOf(containsString("prop1"),
                                 containsString("prop2")));
             }
-
         }
 
         @Nested
         @DisplayName("infix")
         class Infix {
-
             @Test
             void successCases() {
                 assertThat(yes.xor(no).evaluate(0), isEvalSuccess());
@@ -430,15 +393,12 @@ final class PropsTest {
                         allOf(containsString("prop1"),
                                 containsString("prop2")));
             }
-
         }
-
     }
 
     @Nested
     @DisplayName("anyOf")
     class AnyOf {
-
         @Test
         void successCases() {
             assertThat(Prop.anyOf(yes).evaluate(0), isEvalSuccess());
@@ -453,13 +413,11 @@ final class PropsTest {
             assertThat(Prop.anyOf(no, no).evaluate(0), isEvalFailure());
             assertThat(Prop.anyOf(no, no, no).evaluate(0), isEvalFailure());
         }
-
     }
 
     @Nested
     @DisplayName("allOf")
     class AllOf {
-
         @Test
         void successCases() {
             assertThat(Prop.allOf(yes).evaluate(0), isEvalSuccess());
@@ -474,13 +432,11 @@ final class PropsTest {
             assertThat(Prop.allOf(no, yes, yes).evaluate(0), isEvalFailure());
             assertThat(Prop.allOf(no, no, no).evaluate(0), isEvalFailure());
         }
-
     }
 
     @Nested
     @DisplayName("noneOf")
     class NoneOf {
-
         @Test
         void successCases() {
             assertThat(Prop.noneOf(no).evaluate(0), isEvalSuccess());
@@ -494,13 +450,11 @@ final class PropsTest {
             assertThat(Prop.noneOf(no, yes).evaluate(0), isEvalFailure());
             assertThat(Prop.noneOf(no, no, yes).evaluate(0), isEvalFailure());
         }
-
     }
 
     @Nested
     @DisplayName("notAllOf")
     class NotAllOf {
-
         @Test
         void successCases() {
             assertThat(Prop.notAllOf(no).evaluate(0), isEvalSuccess());
@@ -514,17 +468,14 @@ final class PropsTest {
             assertThat(Prop.notAllOf(yes, yes).evaluate(0), isEvalFailure());
             assertThat(Prop.notAllOf(yes, yes, yes).evaluate(0), isEvalFailure());
         }
-
     }
 
     @Nested
     @DisplayName("rename")
     class Rename {
-
         @Nested
         @DisplayName("prefix")
         class Prefix {
-
             @Test
             void takesOnNameGiven() {
                 assertEquals("new name", Prop.named("new name", yes).getName());
@@ -535,13 +486,11 @@ final class PropsTest {
             void replacesPreviousCallsToNamed() {
                 assertEquals("new name", Prop.named("new name", Facade.named("temporary", yes)).getName());
             }
-
         }
 
         @Nested
         @DisplayName("infix")
         class Infix {
-
             @Test
             void takesOnNameGiven() {
                 assertEquals("new name", yes.rename("new name").getName());
@@ -552,15 +501,12 @@ final class PropsTest {
             void replacesPreviousCallsToNamed() {
                 assertEquals("new name", yes.rename("temporary").rename("new name").getName());
             }
-
         }
-
     }
 
     @Nested
     @DisplayName("safe")
     class Safe {
-
         @Test
         void failsIfUnderlyingThrows() {
             Prop<Object> prop = Prop.predicate(x -> {
@@ -585,25 +531,20 @@ final class PropsTest {
             Prop<Object> prop = Prop.predicate(Objects::nonNull).safe();
             assertSame(prop, prop.safe());
         }
-
     }
 
     @Nested
     @DisplayName("alwaysPass")
     class AlwaysPass {
-
         @Test
         void passes() {
             assertThat(alwaysPass().evaluate(0), isEvalSuccess());
         }
-
     }
-
 
     @Nested
     @DisplayName("alwaysFail")
     class AlwaysFail {
-
         @Test
         void fails() {
             assertThat(alwaysFail().evaluate(0), isEvalFailure());
@@ -614,13 +555,11 @@ final class PropsTest {
             assertThat(alwaysFail("because").evaluate(0),
                     isEvalFailureThat(satisfiesPredicate(ef -> ef.getReasons().getPrimary().equals("because"))));
         }
-
     }
 
     @Nested
     @DisplayName("when executing")
     class WhenExecuting {
-
         @Nested
         @DisplayName("throws exception of class")
         class ThrowsExceptionOfClass {
@@ -641,7 +580,6 @@ final class PropsTest {
                         isEvalFailure());
             }
 
-
             @Test
             void doesNotThrow() {
                 assertThat(whenExecuting(nonThrowingConsumer())
@@ -649,13 +587,11 @@ final class PropsTest {
                                 .evaluate(0),
                         isEvalFailure());
             }
-
         }
 
         @Nested
         @DisplayName("throws exception matching")
         class ThrowsExceptionMatching {
-
             @Test
             void successCase() {
                 assertThat(whenExecuting(throwingConsumer(() -> new RuntimeException("message")))
@@ -672,7 +608,6 @@ final class PropsTest {
                         isEvalFailure());
             }
 
-
             @Test
             void doesNotThrow() {
                 assertThat(whenExecuting(nonThrowingConsumer())
@@ -680,13 +615,11 @@ final class PropsTest {
                                 .evaluate(0),
                         isEvalFailure());
             }
-
         }
 
         @Nested
         @DisplayName("does not throw")
         class DoesNotThrow {
-
             @Test
             void successCase() {
                 assertThat(whenExecuting(nonThrowingConsumer())
@@ -702,9 +635,7 @@ final class PropsTest {
                                 .evaluate(0),
                         isEvalFailure());
             }
-
         }
-
     }
 
     private static class ExceptionA extends RuntimeException {
