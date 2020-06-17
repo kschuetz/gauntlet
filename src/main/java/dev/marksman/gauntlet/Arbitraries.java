@@ -53,6 +53,7 @@ import java.util.UUID;
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 import static dev.marksman.gauntlet.Arbitrary.higherOrderArbitrary;
 import static dev.marksman.gauntlet.ArbitraryGenerator.generateArbitrary;
+import static dev.marksman.gauntlet.Preconditions.requirePositiveSize;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkBoolean;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkByte;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkDouble;
@@ -501,12 +502,30 @@ public final class Arbitraries {
         return CollectionArbitraries.vectorOfSize(size, elements);
     }
 
+    public static Arbitrary<NonEmptyVector<?>> nonEmptyVectors() {
+        return Arbitrary.higherOrderArbitrary(generateArbitrary(), Arbitrary::nonEmptyVector);
+    }
+
+    public static Arbitrary<NonEmptyVector<?>> nonEmptyVectors(int size) {
+        requirePositiveSize(size);
+        return Arbitrary.higherOrderArbitrary(generateArbitrary(), elements -> nonEmptyVectorsOf(size, elements));
+    }
+
+    public static Arbitrary<NonEmptyVector<?>> nonEmptyVectors(IntRange sizeRange) {
+        requirePositiveSize(sizeRange);
+        return Arbitrary.higherOrderArbitrary(generateArbitrary(), elements -> nonEmptyVectorsOf(sizeRange, elements));
+    }
+
     public static <A> Arbitrary<NonEmptyVector<A>> nonEmptyVectorsOf(Arbitrary<A> elements) {
         return CollectionArbitraries.nonEmptyVector(elements);
     }
 
     public static <A> Arbitrary<NonEmptyVector<A>> nonEmptyVectorsOf(int size, Arbitrary<A> elements) {
         return CollectionArbitraries.nonEmptyVectorOfSize(size, elements);
+    }
+
+    public static <A> Arbitrary<NonEmptyVector<A>> nonEmptyVectorsOf(IntRange sizeRange, Arbitrary<A> elements) {
+        return CollectionArbitraries.nonEmptyVectorOfSize(sizeRange, elements);
     }
 
     public static Arbitrary<ArrayList<?>> arrayLists() {

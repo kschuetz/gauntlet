@@ -66,9 +66,7 @@ final class CollectionArbitraries {
     }
 
     static <A> Arbitrary<NonEmptyVector<A>> nonEmptyVectorOfSize(IntRange sizeRange, Arbitrary<A> elements) {
-        if (sizeRange.minInclusive() < 1) {
-            throw new IllegalArgumentException("minimum size must be >= 1");
-        }
+        Preconditions.requirePositiveSize(sizeRange);
         return arbitrary(parameters ->
                         new CollectionSupply<>(elements.createSupply(parameters),
                                 sizeGenerator(sizeRange, parameters),

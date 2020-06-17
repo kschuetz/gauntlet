@@ -25,6 +25,7 @@ import static dev.marksman.gauntlet.Arbitraries.localDates;
 import static dev.marksman.gauntlet.Arbitraries.localTimes;
 import static dev.marksman.gauntlet.Arbitraries.longNaturals;
 import static dev.marksman.gauntlet.Arbitraries.longs;
+import static dev.marksman.gauntlet.Arbitraries.nonEmptyVectors;
 import static dev.marksman.gauntlet.Arbitraries.seeds;
 import static dev.marksman.gauntlet.Arbitraries.shortNaturals;
 import static dev.marksman.gauntlet.Arbitraries.shorts;
@@ -36,6 +37,7 @@ import static dev.marksman.kraftwerk.Generators.generateByteRange;
 import static dev.marksman.kraftwerk.Generators.generateDoubleRange;
 import static dev.marksman.kraftwerk.Generators.generateDurationRange;
 import static dev.marksman.kraftwerk.Generators.generateFloatRange;
+import static dev.marksman.kraftwerk.Generators.generateInt;
 import static dev.marksman.kraftwerk.Generators.generateIntRange;
 import static dev.marksman.kraftwerk.Generators.generateLocalDateRange;
 import static dev.marksman.kraftwerk.Generators.generateLocalDateTimeRange;
@@ -290,6 +292,27 @@ final class ArbitrariesTest extends GauntletApiBase {
                     maybeRange -> all(seeds())
                             .satisfy(equivalentSuppliesForSeed(maybeRange.match(__ -> durations(), Arbitraries::durations).createSupply(getGeneratorParameters()),
                                     maybeRange.match(__ -> durations(), Arbitraries::durations).createSupply(getGeneratorParameters()))));
+        }
+    }
+
+    @Nested
+    @DisplayName("nonEmptyVectors")
+    class NonEmptyVectors {
+        @Test
+        void haveAtLeastOneElement() {
+            assertThat(all(nonEmptyVectors()).satisfy(Prop.predicate("non-empty", nev -> !nev.isEmpty())));
+        }
+
+        @Test
+        void haveExactSizeRequested() {
+            assertForEach(generateParametersForTests(generateInt(IntRange.from(1).to(10))),
+                    size -> all(nonEmptyVectors(size)).satisfy(Prop.predicate("has requested size", nev -> nev.size() == size)));
+        }
+
+        @Test
+        void haveSizeWithinRequestedRange() {
+            assertForEach(generateParametersForTests(generateIntRange(IntRange.from(1).to(10))),
+                    sizeRange -> all(nonEmptyVectors(sizeRange)).satisfy(Prop.predicate("has requested size", nev -> sizeRange.includes(nev.size()))));
         }
     }
 
