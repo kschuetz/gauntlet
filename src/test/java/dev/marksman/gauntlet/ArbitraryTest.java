@@ -1,9 +1,9 @@
 package dev.marksman.gauntlet;
 
-import dev.marksman.kraftwerk.Seed;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import testsupport.TestSupportProps;
 
 import static com.jnape.palatable.lambda.adt.Maybe.just;
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
@@ -13,8 +13,6 @@ import static dev.marksman.gauntlet.Arbitraries.ints;
 import static dev.marksman.gauntlet.Arbitraries.seeds;
 
 class ArbitraryTest extends GauntletApiBase {
-
-    private static final int SAMPLE_COUNT_FOR_COMPARING_SUPPLIES = 10;
 
     @Nested
     @DisplayName("convertWithPrism")
@@ -33,7 +31,7 @@ class ArbitraryTest extends GauntletApiBase {
             Supply<Integer> supply1 = evens1.createSupply(getGeneratorParameters());
             Supply<Integer> supply2 = evens2.createSupply(getGeneratorParameters());
 
-            assertThat(all(seeds()).satisfy(equivalentSuppliesForSeed(supply1, supply2)));
+            assertThat(all(seeds()).satisfy(TestSupportProps.equivalentSuppliesForSeed(supply1, supply2)));
         }
 
         @Test
@@ -41,26 +39,8 @@ class ArbitraryTest extends GauntletApiBase {
             Arbitrary<Integer> unproductive = ints().convertWithPrism(constantly(nothing()), id())
                     .withMaxDiscards(5);
             Supply<Integer> supply = unproductive.createSupply(getGeneratorParameters());
-            assertThat(all(seeds()).satisfy(supplyFailureForSeed(supply)));
+            assertThat(all(seeds()).satisfy(TestSupportProps.supplyFailureForSeed(supply)));
         }
     }
 
-    private static <A> Prop<Seed> equivalentSuppliesForSeed(Supply<A> supply1, Supply<A> supply2) {
-        return Prop.prop("equivalent supplies", (Seed initialSeed) -> {
-            Seed current = initialSeed;
-            for (int i = 1; i <= SAMPLE_COUNT_FOR_COMPARING_SUPPLIES; i++) {
-                GeneratorOutput<A> value1 = supply1.getNext(current);
-                GeneratorOutput<A> value2 = supply2.getNext(current);
-                if (!value1.equals(value2)) {
-                    return SimpleResult.fail("Different output on sample " + i);
-                }
-                current = value1.getNextState();
-            }
-            return SimpleResult.pass();
-        });
-    }
-
-    private static <A> Prop<Seed> supplyFailureForSeed(Supply<A> supply) {
-        return Prop.predicate("results in SupplyFailure", (Seed seed) -> supply.getNext(seed).isFailure());
-    }
 }
