@@ -4,12 +4,18 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
 import com.jnape.palatable.lambda.adt.hlist.Tuple5;
+import com.jnape.palatable.lambda.adt.hlist.Tuple6;
+import com.jnape.palatable.lambda.adt.hlist.Tuple7;
+import com.jnape.palatable.lambda.adt.hlist.Tuple8;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct2.shrinkProduct2;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct3.shrinkProduct3;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct4.shrinkProduct4;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct5.shrinkProduct5;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct6.shrinkProduct6;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct7.shrinkProduct7;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct8.shrinkProduct8;
 
 final class ShrinkTuple {
     private ShrinkTuple() {
@@ -43,5 +49,38 @@ final class ShrinkTuple {
                                                                               ShrinkStrategy<E> se) {
         return shrinkProduct5(sa, sb, sc, sd, se,
                 Tuple5::tuple, t -> t);
+    }
+
+    static <A, B, C, D, E, F> ShrinkStrategy<Tuple6<A, B, C, D, E, F>> shrinkTuple6(ShrinkStrategy<A> sa,
+                                                                                    ShrinkStrategy<B> sb,
+                                                                                    ShrinkStrategy<C> sc,
+                                                                                    ShrinkStrategy<D> sd,
+                                                                                    ShrinkStrategy<E> se,
+                                                                                    ShrinkStrategy<F> sf) {
+        return shrinkProduct6(sa, sb, sc, sd, se, sf,
+                Tuple6::tuple, t -> t);
+    }
+
+    static <A, B, C, D, E, F, G> ShrinkStrategy<Tuple7<A, B, C, D, E, F, G>> shrinkTuple7(ShrinkStrategy<A> sa,
+                                                                                          ShrinkStrategy<B> sb,
+                                                                                          ShrinkStrategy<C> sc,
+                                                                                          ShrinkStrategy<D> sd,
+                                                                                          ShrinkStrategy<E> se,
+                                                                                          ShrinkStrategy<F> sf,
+                                                                                          ShrinkStrategy<G> sg) {
+        return shrinkProduct7(sa, sb, sc, sd, se, sf, sg,
+                Tuple7::tuple, t -> t);
+    }
+
+    static <A, B, C, D, E, F, G, H> ShrinkStrategy<Tuple8<A, B, C, D, E, F, G, H>> shrinkTuple8(ShrinkStrategy<A> sa,
+                                                                                                ShrinkStrategy<B> sb,
+                                                                                                ShrinkStrategy<C> sc,
+                                                                                                ShrinkStrategy<D> sd,
+                                                                                                ShrinkStrategy<E> se,
+                                                                                                ShrinkStrategy<F> sf,
+                                                                                                ShrinkStrategy<G> sg,
+                                                                                                ShrinkStrategy<H> sh) {
+        return shrinkProduct8(sa, sb, sc, sd, se, sf, sg, sh,
+                Tuple8::tuple, t -> t);
     }
 }

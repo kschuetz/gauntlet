@@ -9,15 +9,24 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
 import com.jnape.palatable.lambda.adt.hlist.Tuple5;
+import com.jnape.palatable.lambda.adt.hlist.Tuple6;
+import com.jnape.palatable.lambda.adt.hlist.Tuple7;
+import com.jnape.palatable.lambda.adt.hlist.Tuple8;
 import com.jnape.palatable.lambda.adt.product.Product2;
 import com.jnape.palatable.lambda.adt.product.Product3;
 import com.jnape.palatable.lambda.adt.product.Product4;
 import com.jnape.palatable.lambda.adt.product.Product5;
+import com.jnape.palatable.lambda.adt.product.Product6;
+import com.jnape.palatable.lambda.adt.product.Product7;
+import com.jnape.palatable.lambda.adt.product.Product8;
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.functions.Fn2;
 import com.jnape.palatable.lambda.functions.Fn3;
 import com.jnape.palatable.lambda.functions.Fn4;
 import com.jnape.palatable.lambda.functions.Fn5;
+import com.jnape.palatable.lambda.functions.Fn6;
+import com.jnape.palatable.lambda.functions.Fn7;
+import com.jnape.palatable.lambda.functions.Fn8;
 import com.jnape.palatable.lambda.optics.Iso;
 import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.collectionviews.ImmutableVector;
@@ -46,6 +55,9 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct2.shrinkProduct
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct3.shrinkProduct3;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct4.shrinkProduct4;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct5.shrinkProduct5;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct6.shrinkProduct6;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct7.shrinkProduct7;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkProduct8.shrinkProduct8;
 
 public final class ShrinkStrategies {
     private ShrinkStrategies() {
@@ -198,6 +210,36 @@ public final class ShrinkStrategies {
         return ShrinkTuple.shrinkTuple5(sa, sb, sc, sd, se);
     }
 
+    public static <A, B, C, D, E, F> ShrinkStrategy<Tuple6<A, B, C, D, E, F>> shrinkTuple(ShrinkStrategy<A> sa,
+                                                                                          ShrinkStrategy<B> sb,
+                                                                                          ShrinkStrategy<C> sc,
+                                                                                          ShrinkStrategy<D> sd,
+                                                                                          ShrinkStrategy<E> se,
+                                                                                          ShrinkStrategy<F> sf) {
+        return ShrinkTuple.shrinkTuple6(sa, sb, sc, sd, se, sf);
+    }
+
+    public static <A, B, C, D, E, F, G> ShrinkStrategy<Tuple7<A, B, C, D, E, F, G>> shrinkTuple(ShrinkStrategy<A> sa,
+                                                                                                ShrinkStrategy<B> sb,
+                                                                                                ShrinkStrategy<C> sc,
+                                                                                                ShrinkStrategy<D> sd,
+                                                                                                ShrinkStrategy<E> se,
+                                                                                                ShrinkStrategy<F> sf,
+                                                                                                ShrinkStrategy<G> sg) {
+        return ShrinkTuple.shrinkTuple7(sa, sb, sc, sd, se, sf, sg);
+    }
+
+    public static <A, B, C, D, E, F, G, H> ShrinkStrategy<Tuple8<A, B, C, D, E, F, G, H>> shrinkTuple(ShrinkStrategy<A> sa,
+                                                                                                      ShrinkStrategy<B> sb,
+                                                                                                      ShrinkStrategy<C> sc,
+                                                                                                      ShrinkStrategy<D> sd,
+                                                                                                      ShrinkStrategy<E> se,
+                                                                                                      ShrinkStrategy<F> sf,
+                                                                                                      ShrinkStrategy<G> sg,
+                                                                                                      ShrinkStrategy<H> sh) {
+        return ShrinkTuple.shrinkTuple8(sa, sb, sc, sd, se, sf, sg, sh);
+    }
+
     public static <A, B, T> ShrinkStrategy<T> shrinkProduct(ShrinkStrategy<A> sa,
                                                             ShrinkStrategy<B> sb,
                                                             Fn2<A, B, T> fromProduct,
@@ -267,6 +309,81 @@ public final class ShrinkStrategies {
                                                                      Iso<Product5<A, B, C, D, E>, Product5<A, B, C, D, E>, T, T> iso) {
         return shrinkProduct5(sa, sb, sc, sd, se,
                 (a, b, c, d, e) -> view(iso).apply(tuple(a, b, c, d, e)),
+                view(iso.mirror()));
+    }
+
+    public static <A, B, C, D, E, F, T> ShrinkStrategy<T> shrinkProduct(ShrinkStrategy<A> sa,
+                                                                        ShrinkStrategy<B> sb,
+                                                                        ShrinkStrategy<C> sc,
+                                                                        ShrinkStrategy<D> sd,
+                                                                        ShrinkStrategy<E> se,
+                                                                        ShrinkStrategy<F> sf,
+                                                                        Fn6<A, B, C, D, E, F, T> fromProduct,
+                                                                        Fn1<T, Product6<A, B, C, D, E, F>> toProduct) {
+        return shrinkProduct6(sa, sb, sc, sd, se, sf, fromProduct, toProduct);
+    }
+
+    public static <A, B, C, D, E, F, T> ShrinkStrategy<T> shrinkProduct(ShrinkStrategy<A> sa,
+                                                                        ShrinkStrategy<B> sb,
+                                                                        ShrinkStrategy<C> sc,
+                                                                        ShrinkStrategy<D> sd,
+                                                                        ShrinkStrategy<E> se,
+                                                                        ShrinkStrategy<F> sf,
+                                                                        Iso<Product6<A, B, C, D, E, F>, Product6<A, B, C, D, E, F>, T, T> iso) {
+        return shrinkProduct6(sa, sb, sc, sd, se, sf,
+                (a, b, c, d, e, f) -> view(iso).apply(tuple(a, b, c, d, e, f)),
+                view(iso.mirror()));
+    }
+
+    public static <A, B, C, D, E, F, G, T> ShrinkStrategy<T> shrinkProduct(ShrinkStrategy<A> sa,
+                                                                           ShrinkStrategy<B> sb,
+                                                                           ShrinkStrategy<C> sc,
+                                                                           ShrinkStrategy<D> sd,
+                                                                           ShrinkStrategy<E> se,
+                                                                           ShrinkStrategy<F> sf,
+                                                                           ShrinkStrategy<G> sg,
+                                                                           Fn7<A, B, C, D, E, F, G, T> fromProduct,
+                                                                           Fn1<T, Product7<A, B, C, D, E, F, G>> toProduct) {
+        return shrinkProduct7(sa, sb, sc, sd, se, sf, sg, fromProduct, toProduct);
+    }
+
+    public static <A, B, C, D, E, F, G, T> ShrinkStrategy<T> shrinkProduct(ShrinkStrategy<A> sa,
+                                                                           ShrinkStrategy<B> sb,
+                                                                           ShrinkStrategy<C> sc,
+                                                                           ShrinkStrategy<D> sd,
+                                                                           ShrinkStrategy<E> se,
+                                                                           ShrinkStrategy<F> sf,
+                                                                           ShrinkStrategy<G> sg,
+                                                                           Iso<Product7<A, B, C, D, E, F, G>, Product7<A, B, C, D, E, F, G>, T, T> iso) {
+        return shrinkProduct7(sa, sb, sc, sd, se, sf, sg,
+                (a, b, c, d, e, f, g) -> view(iso).apply(tuple(a, b, c, d, e, f, g)),
+                view(iso.mirror()));
+    }
+
+    public static <A, B, C, D, E, F, G, H, T> ShrinkStrategy<T> shrinkProduct(ShrinkStrategy<A> sa,
+                                                                              ShrinkStrategy<B> sb,
+                                                                              ShrinkStrategy<C> sc,
+                                                                              ShrinkStrategy<D> sd,
+                                                                              ShrinkStrategy<E> se,
+                                                                              ShrinkStrategy<F> sf,
+                                                                              ShrinkStrategy<G> sg,
+                                                                              ShrinkStrategy<H> sh,
+                                                                              Fn8<A, B, C, D, E, F, G, H, T> fromProduct,
+                                                                              Fn1<T, Product8<A, B, C, D, E, F, G, H>> toProduct) {
+        return shrinkProduct8(sa, sb, sc, sd, se, sf, sg, sh, fromProduct, toProduct);
+    }
+
+    public static <A, B, C, D, E, F, G, H, T> ShrinkStrategy<T> shrinkProduct(ShrinkStrategy<A> sa,
+                                                                              ShrinkStrategy<B> sb,
+                                                                              ShrinkStrategy<C> sc,
+                                                                              ShrinkStrategy<D> sd,
+                                                                              ShrinkStrategy<E> se,
+                                                                              ShrinkStrategy<F> sf,
+                                                                              ShrinkStrategy<G> sg,
+                                                                              ShrinkStrategy<H> sh,
+                                                                              Iso<Product8<A, B, C, D, E, F, G, H>, Product8<A, B, C, D, E, F, G, H>, T, T> iso) {
+        return shrinkProduct8(sa, sb, sc, sd, se, sf, sg, sh,
+                (a, b, c, d, e, f, g, h) -> view(iso).apply(tuple(a, b, c, d, e, f, g, h)),
                 view(iso.mirror()));
     }
 
