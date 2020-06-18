@@ -3,6 +3,10 @@ package dev.marksman.gauntlet;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
+import com.jnape.palatable.lambda.adt.hlist.Tuple5;
+import com.jnape.palatable.lambda.adt.hlist.Tuple6;
+import com.jnape.palatable.lambda.adt.hlist.Tuple7;
+import com.jnape.palatable.lambda.adt.hlist.Tuple8;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.kraftwerk.GeneratorParameters;
 
@@ -30,6 +34,52 @@ public interface GauntletApi {
                                                            Arbitrary<B> arbitraryB,
                                                            Arbitrary<C> arbitraryC) {
         return generatorTestApi(Arbitraries.tuplesOf(arbitraryA, arbitraryB, arbitraryC));
+    }
+
+    static <A, B, C, D> GeneratorTestApi<Tuple4<A, B, C, D>> all(Arbitrary<A> arbitraryA,
+                                                                 Arbitrary<B> arbitraryB,
+                                                                 Arbitrary<C> arbitraryC,
+                                                                 Arbitrary<D> arbitraryD) {
+        return generatorTestApi(Arbitraries.tuplesOf(arbitraryA, arbitraryB, arbitraryC, arbitraryD));
+    }
+
+    static <A, B, C, D, E> GeneratorTestApi<Tuple5<A, B, C, D, E>> all(Arbitrary<A> arbitraryA,
+                                                                       Arbitrary<B> arbitraryB,
+                                                                       Arbitrary<C> arbitraryC,
+                                                                       Arbitrary<D> arbitraryD,
+                                                                       Arbitrary<E> arbitraryE) {
+        return generatorTestApi(Arbitraries.tuplesOf(arbitraryA, arbitraryB, arbitraryC, arbitraryD, arbitraryE));
+    }
+
+    static <A, B, C, D, E, F> GeneratorTestApi<Tuple6<A, B, C, D, E, F>> all(Arbitrary<A> arbitraryA,
+                                                                             Arbitrary<B> arbitraryB,
+                                                                             Arbitrary<C> arbitraryC,
+                                                                             Arbitrary<D> arbitraryD,
+                                                                             Arbitrary<E> arbitraryE,
+                                                                             Arbitrary<F> arbitraryF) {
+        return generatorTestApi(Arbitraries.tuplesOf(arbitraryA, arbitraryB, arbitraryC, arbitraryD, arbitraryE, arbitraryF));
+    }
+
+    static <A, B, C, D, E, F, G> GeneratorTestApi<Tuple7<A, B, C, D, E, F, G>> all(Arbitrary<A> arbitraryA,
+                                                                                   Arbitrary<B> arbitraryB,
+                                                                                   Arbitrary<C> arbitraryC,
+                                                                                   Arbitrary<D> arbitraryD,
+                                                                                   Arbitrary<E> arbitraryE,
+                                                                                   Arbitrary<F> arbitraryF,
+                                                                                   Arbitrary<G> arbitraryG) {
+        return generatorTestApi(Arbitraries.tuplesOf(arbitraryA, arbitraryB, arbitraryC, arbitraryD, arbitraryE, arbitraryF, arbitraryG));
+    }
+
+    static <A, B, C, D, E, F, G, H> GeneratorTestApi<Tuple8<A, B, C, D, E, F, G, H>> all(Arbitrary<A> arbitraryA,
+                                                                                         Arbitrary<B> arbitraryB,
+                                                                                         Arbitrary<C> arbitraryC,
+                                                                                         Arbitrary<D> arbitraryD,
+                                                                                         Arbitrary<E> arbitraryE,
+                                                                                         Arbitrary<F> arbitraryF,
+                                                                                         Arbitrary<G> arbitraryG,
+                                                                                         Arbitrary<H> arbitraryH) {
+        return generatorTestApi(Arbitraries.tuplesOf(arbitraryA, arbitraryB, arbitraryC, arbitraryD, arbitraryE, arbitraryF,
+                arbitraryG, arbitraryH));
     }
 
     static <A> DomainTestApi<A> all(Domain<A> domain) {

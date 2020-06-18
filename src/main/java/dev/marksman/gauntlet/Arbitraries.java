@@ -9,6 +9,9 @@ import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
 import com.jnape.palatable.lambda.adt.hlist.Tuple5;
+import com.jnape.palatable.lambda.adt.hlist.Tuple6;
+import com.jnape.palatable.lambda.adt.hlist.Tuple7;
+import com.jnape.palatable.lambda.adt.hlist.Tuple8;
 import com.jnape.palatable.lambda.functions.Fn1;
 import com.jnape.palatable.lambda.optics.Iso;
 import dev.marksman.collectionviews.NonEmptyVector;
@@ -378,6 +381,36 @@ public final class Arbitraries {
         return CompositeArbitraries.combine(a, b, c, d, e);
     }
 
+    public static <A, B, C, D, E, F> Arbitrary<Tuple6<A, B, C, D, E, F>> tuplesOf(Arbitrary<A> a,
+                                                                                  Arbitrary<B> b,
+                                                                                  Arbitrary<C> c,
+                                                                                  Arbitrary<D> d,
+                                                                                  Arbitrary<E> e,
+                                                                                  Arbitrary<F> f) {
+        return CompositeArbitraries.combine(a, b, c, d, e, f);
+    }
+
+    public static <A, B, C, D, E, F, G> Arbitrary<Tuple7<A, B, C, D, E, F, G>> tuplesOf(Arbitrary<A> a,
+                                                                                        Arbitrary<B> b,
+                                                                                        Arbitrary<C> c,
+                                                                                        Arbitrary<D> d,
+                                                                                        Arbitrary<E> e,
+                                                                                        Arbitrary<F> f,
+                                                                                        Arbitrary<G> g) {
+        return CompositeArbitraries.combine(a, b, c, d, e, f, g);
+    }
+
+    public static <A, B, C, D, E, F, G, H> Arbitrary<Tuple8<A, B, C, D, E, F, G, H>> tuplesOf(Arbitrary<A> a,
+                                                                                              Arbitrary<B> b,
+                                                                                              Arbitrary<C> c,
+                                                                                              Arbitrary<D> d,
+                                                                                              Arbitrary<E> e,
+                                                                                              Arbitrary<F> f,
+                                                                                              Arbitrary<G> g,
+                                                                                              Arbitrary<H> h) {
+        return CompositeArbitraries.combine(a, b, c, d, e, f, g, h);
+    }
+
     public static Arbitrary<Tuple2<?, ?>> tuple2s() {
         return higherOrderArbitrary(generateArbitrary().pair(), x -> tuplesOf(x._1(), x._2()));
     }
@@ -394,6 +427,23 @@ public final class Arbitraries {
     public static Arbitrary<Tuple5<?, ?, ?, ?, ?>> tuple5s() {
         return higherOrderArbitrary(Generators.tupled(generateArbitrary(), generateArbitrary(), generateArbitrary(),
                 generateArbitrary(), generateArbitrary()), x -> tuplesOf(x._1(), x._2(), x._3(), x._4(), x._5()));
+    }
+
+    public static Arbitrary<Tuple6<?, ?, ?, ?, ?, ?>> tuple6s() {
+        return higherOrderArbitrary(Generators.tupled(generateArbitrary(), generateArbitrary(), generateArbitrary(),
+                generateArbitrary(), generateArbitrary(), generateArbitrary()), x -> tuplesOf(x._1(), x._2(), x._3(), x._4(), x._5(), x._6()));
+    }
+
+    public static Arbitrary<Tuple7<?, ?, ?, ?, ?, ?, ?>> tuple7s() {
+        return higherOrderArbitrary(Generators.tupled(generateArbitrary(), generateArbitrary(), generateArbitrary(),
+                generateArbitrary(), generateArbitrary(), generateArbitrary(), generateArbitrary()),
+                x -> tuplesOf(x._1(), x._2(), x._3(), x._4(), x._5(), x._6(), x._7()));
+    }
+
+    public static Arbitrary<Tuple8<?, ?, ?, ?, ?, ?, ?, ?>> tuple8s() {
+        return higherOrderArbitrary(Generators.tupled(generateArbitrary(), generateArbitrary(), generateArbitrary(),
+                generateArbitrary(), generateArbitrary(), generateArbitrary(), generateArbitrary(), generateArbitrary()),
+                x -> tuplesOf(x._1(), x._2(), x._3(), x._4(), x._5(), x._6(), x._7(), x._8()));
     }
 
     public static Arbitrary<Unit> unit() {
