@@ -11,7 +11,9 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static com.jnape.palatable.lambda.adt.hlist.HList.tuple;
 import static com.jnape.palatable.lambda.functions.builtin.fn1.Constantly.constantly;
+import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
 import static dev.marksman.gauntlet.Prop.alwaysFail;
 import static dev.marksman.gauntlet.Prop.alwaysPass;
 import static dev.marksman.gauntlet.prop.Facade.biconditional;
@@ -34,6 +36,8 @@ import static testsupport.matchers.SatisfiesPredicate.satisfiesPredicate;
 final class PropsTest {
     private static final Prop<Object> yes = Prop.predicate("yes", constantly(true));
     private static final Prop<Object> no = Prop.predicate("no", constantly(false));
+    private static final Prop<Boolean> isTrue = Prop.predicate("isTrue", id());
+    private static final Prop<Boolean> isFalse = Prop.predicate("isFalse", b -> !b);
 
     @Nested
     @DisplayName("basic prop")
@@ -530,6 +534,106 @@ final class PropsTest {
         void safeOnAnAlreadySafePropIsANoOp() {
             Prop<Object> prop = Prop.predicate(Objects::nonNull).safe();
             assertSame(prop, prop.safe());
+        }
+    }
+
+    @Nested
+    @DisplayName("zipAnd")
+    class ZipAnd {
+        @Test
+        void successCases() {
+            assertThat(yes.zipAnd(yes).evaluate(tuple(0, 0)), isEvalSuccess());
+            assertThat(isTrue.zipAnd(isTrue).evaluate(tuple(true, true)), isEvalSuccess());
+        }
+
+        @Test
+        void failureCases() {
+            assertThat(yes.zipAnd(no).evaluate(tuple(0, 0)), isEvalFailure());
+            assertThat(no.zipAnd(yes).evaluate(tuple(0, 0)), isEvalFailure());
+            assertThat(no.zipAnd(no).evaluate(tuple(0, 0)), isEvalFailure());
+            assertThat(isTrue.zipAnd(isTrue).evaluate(tuple(false, true)), isEvalFailure());
+            assertThat(isTrue.zipAnd(isTrue).evaluate(tuple(true, false)), isEvalFailure());
+            assertThat(isTrue.zipAnd(isTrue).evaluate(tuple(false, false)), isEvalFailure());
+        }
+    }
+
+    @Nested
+    @DisplayName("zipOr")
+    class ZipOr {
+        @Test
+        void successCases() {
+            assertThat(yes.zipOr(yes).evaluate(tuple(0, 0)), isEvalSuccess());
+            assertThat(yes.zipOr(no).evaluate(tuple(0, 0)), isEvalSuccess());
+            assertThat(no.zipOr(yes).evaluate(tuple(0, 0)), isEvalSuccess());
+            assertThat(isTrue.zipOr(isTrue).evaluate(tuple(true, true)), isEvalSuccess());
+            assertThat(isTrue.zipOr(isTrue).evaluate(tuple(true, false)), isEvalSuccess());
+            assertThat(isTrue.zipOr(isTrue).evaluate(tuple(false, true)), isEvalSuccess());
+        }
+
+        @Test
+        void failureCases() {
+            assertThat(no.zipOr(no).evaluate(tuple(0, 0)), isEvalFailure());
+            assertThat(isTrue.zipOr(isTrue).evaluate(tuple(false, false)), isEvalFailure());
+        }
+    }
+
+    @Nested
+    @DisplayName("zipImplies")
+    class ZipImplies {
+        @Test
+        void successCases() {
+            assertThat(yes.zipImplies(yes).evaluate(tuple(0, 0)), isEvalSuccess());
+            assertThat(no.zipImplies(yes).evaluate(tuple(0, 0)), isEvalSuccess());
+            assertThat(no.zipImplies(no).evaluate(tuple(0, 0)), isEvalSuccess());
+            assertThat(isTrue.zipImplies(isTrue).evaluate(tuple(true, true)), isEvalSuccess());
+            assertThat(isTrue.zipImplies(isTrue).evaluate(tuple(false, true)), isEvalSuccess());
+            assertThat(isTrue.zipImplies(isTrue).evaluate(tuple(false, false)), isEvalSuccess());
+        }
+
+        @Test
+        void failureCases() {
+            assertThat(yes.zipImplies(no).evaluate(tuple(0, 0)), isEvalFailure());
+            assertThat(isTrue.zipImplies(isTrue).evaluate(tuple(true, false)), isEvalFailure());
+        }
+    }
+
+    @Nested
+    @DisplayName("zipIff")
+    class ZipIff {
+        @Test
+        void successCases() {
+            assertThat(yes.zipIff(yes).evaluate(tuple(0, 0)), isEvalSuccess());
+            assertThat(no.zipIff(no).evaluate(tuple(0, 0)), isEvalSuccess());
+            assertThat(isTrue.zipIff(isTrue).evaluate(tuple(true, true)), isEvalSuccess());
+            assertThat(isTrue.zipIff(isTrue).evaluate(tuple(false, false)), isEvalSuccess());
+        }
+
+        @Test
+        void failureCases() {
+            assertThat(yes.zipIff(no).evaluate(tuple(0, 0)), isEvalFailure());
+            assertThat(no.zipIff(yes).evaluate(tuple(0, 0)), isEvalFailure());
+            assertThat(isTrue.zipIff(isTrue).evaluate(tuple(true, false)), isEvalFailure());
+            assertThat(isTrue.zipIff(isTrue).evaluate(tuple(false, true)), isEvalFailure());
+        }
+    }
+
+    @Nested
+    @DisplayName("zipXor")
+    class ZipXor {
+        @Test
+        void successCases() {
+            assertThat(yes.zipXor(no).evaluate(tuple(0, 0)), isEvalSuccess());
+            assertThat(no.zipXor(yes).evaluate(tuple(0, 0)), isEvalSuccess());
+            assertThat(isTrue.zipXor(isTrue).evaluate(tuple(true, false)), isEvalSuccess());
+            assertThat(isTrue.zipXor(isTrue).evaluate(tuple(false, true)), isEvalSuccess());
+        }
+
+        @Test
+        void failureCases() {
+            assertThat(yes.zipXor(yes).evaluate(tuple(0, 0)), isEvalFailure());
+            assertThat(no.zipXor(no).evaluate(tuple(0, 0)), isEvalFailure());
+            assertThat(isTrue.zipXor(isTrue).evaluate(tuple(true, true)), isEvalFailure());
+            assertThat(isTrue.zipXor(isTrue).evaluate(tuple(false, false)), isEvalFailure());
         }
     }
 

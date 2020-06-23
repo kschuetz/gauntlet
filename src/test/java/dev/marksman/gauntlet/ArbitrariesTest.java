@@ -50,7 +50,7 @@ final class ArbitrariesTest extends GauntletApiBase {
 
     @Override
     protected GauntletApi initializeGauntletApi() {
-        return gauntlet().withDefaultSampleCount(500);
+        return gauntlet().withDefaultSampleCount(200);
     }
 
     @Nested
