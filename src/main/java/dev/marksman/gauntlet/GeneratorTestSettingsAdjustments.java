@@ -71,5 +71,4 @@ final class GeneratorTestSettingsAdjustments {
     public GeneratorTestSettingsAdjustments adjustGeneratorParameters(SettingAdjustment<GeneratorParameters> generatorParameters) {
         return new GeneratorTestSettingsAdjustments(sampleCount, maximumShrinkCount, timeout, executor, this.generatorParameters.add(generatorParameters));
     }
-
 }
