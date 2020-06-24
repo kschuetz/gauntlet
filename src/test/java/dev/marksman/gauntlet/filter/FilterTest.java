@@ -18,14 +18,14 @@ final class FilterTest extends GauntletApiBase {
     @Test
     void emptyFilter() {
         Filter<Object> filter = Filter.emptyFilter();
-        assertThat(all(boxedPrimitives())
+        checkThat(all(boxedPrimitives())
                 .satisfy(predicate("always true", filter::apply)));
     }
 
     @Test
     void basicFilter() {
         Filter<Integer> isEven = Filter.filter(n -> n % 2 == 0);
-        assertThat(all(Arbitraries.ints())
+        checkThat(all(Arbitraries.ints())
                 .satisfy(allOf(predicate("true for even numbers", n -> isEven.apply(n * 2)),
                         predicate("false for odd numbers", n -> !isEven.apply(n * 2 + 1)),
                         predicate(isEven).xor(predicate(not(isEven))))));
@@ -43,7 +43,7 @@ final class FilterTest extends GauntletApiBase {
         Prop<Integer> divisibleBy3and5 = predicate(div35);
         Prop<Integer> divisibleBy5and3 = predicate(div53);
 
-        assertThat(all(Arbitraries.ints())
+        checkThat(all(Arbitraries.ints())
                 .satisfy(allOf(
                         named("combines all components with 'and'", divisibleBy3and5.iff(divisibleBy3.and(divisibleBy5))),
                         named("commutative", divisibleBy3and5.iff(divisibleBy5and3)))));

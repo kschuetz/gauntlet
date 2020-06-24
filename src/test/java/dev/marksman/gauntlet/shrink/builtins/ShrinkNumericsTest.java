@@ -44,7 +44,7 @@ final class ShrinkNumericsTest extends GauntletApiBase {
     class Ints {
         @Test
         void unclamped() {
-            assertThat(all(shrinkTestCases(generateInt(), shrinkInt()))
+            checkThat(all(shrinkTestCases(generateInt(), shrinkInt()))
                     .satisfy(neverRepeatsAnElement()));
         }
 
@@ -54,7 +54,7 @@ final class ShrinkNumericsTest extends GauntletApiBase {
             // TODO:
             // java.lang.AssertionError: Failed property 'never repeats an element ∧ all elements within domain ∧ when input is outside of shrink domain, shrink output is empty' with value 'ShrinkTestCase(input=-2147483648, output=dev.marksman.gauntlet.shrink.LazyCons$1@30272916, min=-2147483648, max=1413962530)'. reasons: FailureReasons(items=Vector(Conjuncts failed.))
 
-            assertThat(all(constrainedShrinkTestCase(generateIntRange(),
+            checkThat(all(constrainedShrinkTestCase(generateIntRange(),
                     ShrinkNumericsTest::generateMostlyInDomain,
                     ShrinkNumerics::shrinkInt))
                     .satisfy(allOf(
@@ -70,7 +70,7 @@ final class ShrinkNumericsTest extends GauntletApiBase {
     class Longs {
         @Test
         void unclamped() {
-            assertThat(all(shrinkTestCases(generateLong(), shrinkLong()))
+            checkThat(all(shrinkTestCases(generateLong(), shrinkLong()))
                     .satisfy(neverRepeatsAnElement()));
         }
     }
@@ -80,7 +80,7 @@ final class ShrinkNumericsTest extends GauntletApiBase {
     class Shorts {
         @Test
         void unclamped() {
-            assertThat(all(shrinkTestCases(generateShort(), shrinkShort()))
+            checkThat(all(shrinkTestCases(generateShort(), shrinkShort()))
                     .satisfy(neverRepeatsAnElement()));
         }
     }
@@ -90,7 +90,7 @@ final class ShrinkNumericsTest extends GauntletApiBase {
     class Bytes {
         @Test
         void unclamped() {
-            assertThat(all(shrinkTestCases(generateByte(), shrinkByte()))
+            checkThat(all(shrinkTestCases(generateByte(), shrinkByte()))
                     .satisfy(neverRepeatsAnElement()));
         }
     }

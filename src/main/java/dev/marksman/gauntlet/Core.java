@@ -142,9 +142,9 @@ final class Core implements GauntletApi {
     }
 
     @Override
-    public <A> void assertThat(Test<A> test) {
+    public <A> void checkThat(Test<A> test) {
         if (test instanceof GeneratorTest<?>) {
-            assertThatWithSeed(seedGenerator.nextLong(), (GeneratorTest<A>) test);
+            checkThatWithSeed(seedGenerator.nextLong(), (GeneratorTest<A>) test);
         } else if (test instanceof DomainTest<?>) {
             runSingleDomainTest((DomainTest<A>) test);
         } else {
@@ -153,18 +153,18 @@ final class Core implements GauntletApi {
     }
 
     @Override
-    public <A> void assertThatWithSeed(long initialSeedValue, GeneratorTest<A> generatorTest) {
+    public <A> void checkThatWithSeed(long initialSeedValue, GeneratorTest<A> generatorTest) {
         Seed inputSeed = Seed.create(initialSeedValue);
         runSingleGeneratorTest(initialSeedValue, inputSeed, generatorTest);
     }
 
     @Override
-    public <A, P> void assertForEach(TestParametersSource<P> parametersSource, Fn1<P, Test<A>> createTest) {
-        assertForEachWithSeed(seedGenerator.nextLong(), parametersSource, createTest);
+    public <A, P> void checkThatForEach(TestParametersSource<P> parametersSource, Fn1<P, Test<A>> createTest) {
+        checkThatForEachWithSeed(seedGenerator.nextLong(), parametersSource, createTest);
     }
 
     @Override
-    public <A, P> void assertForEachWithSeed(long initialSeedValue, TestParametersSource<P> parametersSource, Fn1<P, Test<A>> createTest) {
+    public <A, P> void checkThatForEachWithSeed(long initialSeedValue, TestParametersSource<P> parametersSource, Fn1<P, Test<A>> createTest) {
         Seed inputSeed = Seed.create(initialSeedValue);
         TestParameterCollection<P> testParameterCollection = parametersSource.getTestParameterCollection(generatorParameters, inputSeed);
         Seed currentSeed = testParameterCollection.getOutputSeed();

@@ -144,23 +144,23 @@ public abstract class GauntletApiBase implements GauntletApi {
     }
 
     @Override
-    public <A> void assertThat(Test<A> test) {
-        getApi().assertThat(test);
+    public <A> void checkThat(Test<A> test) {
+        getApi().checkThat(test);
     }
 
     @Override
-    public <A> void assertThatWithSeed(long initialSeedValue, GeneratorTest<A> generatorTest) {
-        getApi().assertThatWithSeed(initialSeedValue, generatorTest);
+    public <A> void checkThatWithSeed(long initialSeedValue, GeneratorTest<A> generatorTest) {
+        getApi().checkThatWithSeed(initialSeedValue, generatorTest);
     }
 
     @Override
-    public <A, P> void assertForEach(TestParametersSource<P> parametersSource, Fn1<P, Test<A>> createTest) {
-        getApi().assertForEach(parametersSource, createTest);
+    public <A, P> void checkThatForEach(TestParametersSource<P> parametersSource, Fn1<P, Test<A>> createTest) {
+        getApi().checkThatForEach(parametersSource, createTest);
     }
 
     @Override
-    public <A, P> void assertForEachWithSeed(long initialSeedValue, TestParametersSource<P> parametersSource, Fn1<P, Test<A>> createTest) {
-        getApi().assertForEachWithSeed(initialSeedValue, parametersSource, createTest);
+    public <A, P> void checkThatForEachWithSeed(long initialSeedValue, TestParametersSource<P> parametersSource, Fn1<P, Test<A>> createTest) {
+        getApi().checkThatForEachWithSeed(initialSeedValue, parametersSource, createTest);
     }
 
     @Override

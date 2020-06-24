@@ -20,7 +20,7 @@ class ArbitraryTest extends GauntletApiBase {
         @Test
         void filtersValuesCorrectly() {
             Arbitrary<Integer> evens = ints().convertWithPrism(n -> n % 2 == 0 ? just(n) : nothing(), id());
-            assertThat(all(evens).satisfy(Prop.predicate(n -> n % 2 == 0)));
+            checkThat(all(evens).satisfy(Prop.predicate(n -> n % 2 == 0)));
         }
 
         @Test
@@ -31,7 +31,7 @@ class ArbitraryTest extends GauntletApiBase {
             Supply<Integer> supply1 = evens1.createSupply(getGeneratorParameters());
             Supply<Integer> supply2 = evens2.createSupply(getGeneratorParameters());
 
-            assertThat(all(seeds()).satisfy(TestSupportProps.equivalentSuppliesForSeed(supply1, supply2)));
+            checkThat(all(seeds()).satisfy(TestSupportProps.equivalentSuppliesForSeed(supply1, supply2)));
         }
 
         @Test
@@ -39,7 +39,7 @@ class ArbitraryTest extends GauntletApiBase {
             Arbitrary<Integer> unproductive = ints().convertWithPrism(constantly(nothing()), id())
                     .withMaxDiscards(5);
             Supply<Integer> supply = unproductive.createSupply(getGeneratorParameters());
-            assertThat(all(seeds()).satisfy(TestSupportProps.supplyFailureForSeed(supply)));
+            checkThat(all(seeds()).satisfy(TestSupportProps.supplyFailureForSeed(supply)));
         }
     }
 

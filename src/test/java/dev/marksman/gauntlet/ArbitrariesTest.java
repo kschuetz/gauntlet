@@ -58,18 +58,18 @@ final class ArbitrariesTest extends GauntletApiBase {
     class Ints {
         @Test
         void allInRange() {
-            assertForEach(generateParametersForTests(generateIntRange()),
+            checkThatForEach(generateParametersForTests(generateIntRange()),
                     range -> all(ints(range)).satisfy(inRange(range)));
         }
 
         @Test
         void allNaturalsInRange() {
-            assertThat(all(intNaturals()).satisfy(inRange(IntRange.inclusive(0, Integer.MAX_VALUE))));
+            checkThat(all(intNaturals()).satisfy(inRange(IntRange.inclusive(0, Integer.MAX_VALUE))));
         }
 
         @Test
         void deterministicForAGivenSeed() {
-            assertForEach(generateParametersForTests(generateIntRange().maybe()),
+            checkThatForEach(generateParametersForTests(generateIntRange().maybe()),
                     maybeRange -> all(seeds())
                             .satisfy(equivalentSuppliesForSeed(maybeRange.match(__ -> ints(), Arbitraries::ints).createSupply(getGeneratorParameters()),
                                     maybeRange.match(__ -> ints(), Arbitraries::ints).createSupply(getGeneratorParameters()))));
@@ -81,18 +81,18 @@ final class ArbitrariesTest extends GauntletApiBase {
     class Longs {
         @Test
         void allInRange() {
-            assertForEach(generateParametersForTests(generateLongRange()),
+            checkThatForEach(generateParametersForTests(generateLongRange()),
                     range -> all(longs(range)).satisfy(inRange(range)));
         }
 
         @Test
         void allNaturalsInRange() {
-            assertThat(all(longNaturals()).satisfy(inRange(LongRange.inclusive(0, Long.MAX_VALUE))));
+            checkThat(all(longNaturals()).satisfy(inRange(LongRange.inclusive(0, Long.MAX_VALUE))));
         }
 
         @Test
         void deterministicForAGivenSeed() {
-            assertForEach(generateParametersForTests(generateLongRange().maybe()),
+            checkThatForEach(generateParametersForTests(generateLongRange().maybe()),
                     maybeRange -> all(seeds())
                             .satisfy(equivalentSuppliesForSeed(maybeRange.match(__ -> longs(), Arbitraries::longs).createSupply(getGeneratorParameters()),
                                     maybeRange.match(__ -> longs(), Arbitraries::longs).createSupply(getGeneratorParameters()))));
@@ -105,18 +105,18 @@ final class ArbitrariesTest extends GauntletApiBase {
     class Shorts {
         @Test
         void allInRange() {
-            assertForEach(generateParametersForTests(generateShortRange()),
+            checkThatForEach(generateParametersForTests(generateShortRange()),
                     range -> all(shorts(range)).satisfy(inRange(range)));
         }
 
         @Test
         void allNaturalsInRange() {
-            assertThat(all(shortNaturals()).satisfy(inRange(ShortRange.inclusive((short) 0, Short.MAX_VALUE))));
+            checkThat(all(shortNaturals()).satisfy(inRange(ShortRange.inclusive((short) 0, Short.MAX_VALUE))));
         }
 
         @Test
         void deterministicForAGivenSeed() {
-            assertForEach(generateParametersForTests(generateShortRange().maybe()),
+            checkThatForEach(generateParametersForTests(generateShortRange().maybe()),
                     maybeRange -> all(seeds())
                             .satisfy(equivalentSuppliesForSeed(maybeRange.match(__ -> shorts(), Arbitraries::shorts).createSupply(getGeneratorParameters()),
                                     maybeRange.match(__ -> shorts(), Arbitraries::shorts).createSupply(getGeneratorParameters()))));
@@ -128,13 +128,13 @@ final class ArbitrariesTest extends GauntletApiBase {
     class Bytes {
         @Test
         void allInRange() {
-            assertForEach(generateParametersForTests(generateByteRange()),
+            checkThatForEach(generateParametersForTests(generateByteRange()),
                     range -> all(bytes(range)).satisfy(inRange(range)));
         }
 
         @Test
         void deterministicForAGivenSeed() {
-            assertForEach(generateParametersForTests(generateByteRange().maybe()),
+            checkThatForEach(generateParametersForTests(generateByteRange().maybe()),
                     maybeRange -> all(seeds())
                             .satisfy(equivalentSuppliesForSeed(maybeRange.match(__ -> bytes(), Arbitraries::bytes).createSupply(getGeneratorParameters()),
                                     maybeRange.match(__ -> bytes(), Arbitraries::bytes).createSupply(getGeneratorParameters()))));
@@ -146,18 +146,18 @@ final class ArbitrariesTest extends GauntletApiBase {
     class Doubles {
         @Test
         void allInRange() {
-            assertForEach(generateParametersForTests(generateDoubleRange()),
+            checkThatForEach(generateParametersForTests(generateDoubleRange()),
                     range -> all(doubles(range)).satisfy(inRange(range)));
         }
 
         @Test
         void fractionalsInRange() {
-            assertThat(all(doubleFractionals()).satisfy(inRange(DoubleRange.exclusive(1f))));
+            checkThat(all(doubleFractionals()).satisfy(inRange(DoubleRange.exclusive(1f))));
         }
 
         @Test
         void deterministicForAGivenSeed() {
-            assertForEach(generateParametersForTests(generateDoubleRange().maybe()),
+            checkThatForEach(generateParametersForTests(generateDoubleRange().maybe()),
                     maybeRange -> all(seeds())
                             .satisfy(equivalentSuppliesForSeed(maybeRange.match(__ -> doubles(), Arbitraries::doubles).createSupply(getGeneratorParameters()),
                                     maybeRange.match(__ -> doubles(), Arbitraries::doubles).createSupply(getGeneratorParameters()))));
@@ -169,18 +169,18 @@ final class ArbitrariesTest extends GauntletApiBase {
     class Floats {
         @Test
         void allInRange() {
-            assertForEach(generateParametersForTests(generateFloatRange()),
+            checkThatForEach(generateParametersForTests(generateFloatRange()),
                     range -> all(floats(range)).satisfy(inRange(range)));
         }
 
         @Test
         void fractionalsInRange() {
-            assertThat(all(floatFractionals()).satisfy(inRange(FloatRange.exclusive(1f))));
+            checkThat(all(floatFractionals()).satisfy(inRange(FloatRange.exclusive(1f))));
         }
 
         @Test
         void deterministicForAGivenSeed() {
-            assertForEach(generateParametersForTests(generateFloatRange().maybe()),
+            checkThatForEach(generateParametersForTests(generateFloatRange().maybe()),
                     maybeRange -> all(seeds())
                             .satisfy(equivalentSuppliesForSeed(maybeRange.match(__ -> floats(), Arbitraries::floats).createSupply(getGeneratorParameters()),
                                     maybeRange.match(__ -> floats(), Arbitraries::floats).createSupply(getGeneratorParameters()))));
@@ -192,13 +192,13 @@ final class ArbitrariesTest extends GauntletApiBase {
     class BigIntegers {
         @Test
         void allInRange() {
-            assertForEach(generateParametersForTests(generateBigIntegerRange()),
+            checkThatForEach(generateParametersForTests(generateBigIntegerRange()),
                     range -> all(bigIntegers(range)).satisfy(inRange(range)));
         }
 
         @Test
         void deterministicForAGivenSeed() {
-            assertForEach(generateParametersForTests(generateBigIntegerRange().maybe()),
+            checkThatForEach(generateParametersForTests(generateBigIntegerRange().maybe()),
                     maybeRange -> all(seeds())
                             .satisfy(equivalentSuppliesForSeed(maybeRange.match(__ -> bigIntegers(), Arbitraries::bigIntegers).createSupply(getGeneratorParameters()),
                                     maybeRange.match(__ -> bigIntegers(), Arbitraries::bigIntegers).createSupply(getGeneratorParameters()))));
@@ -210,13 +210,13 @@ final class ArbitrariesTest extends GauntletApiBase {
     class BigDecimals {
         @Test
         void allInRange() {
-            assertForEach(generateParametersForTests(generateBigDecimalRange()),
+            checkThatForEach(generateParametersForTests(generateBigDecimalRange()),
                     range -> all(bigDecimals(range)).satisfy(inRange(range)));
         }
 
         @Test
         void deterministicForAGivenSeed() {
-            assertForEach(generateParametersForTests(generateBigDecimalRange().maybe()),
+            checkThatForEach(generateParametersForTests(generateBigDecimalRange().maybe()),
                     maybeRange -> all(seeds())
                             .satisfy(equivalentSuppliesForSeed(maybeRange.match(__ -> bigDecimals(), Arbitraries::bigDecimals).createSupply(getGeneratorParameters()),
                                     maybeRange.match(__ -> bigDecimals(), Arbitraries::bigDecimals).createSupply(getGeneratorParameters()))));
@@ -228,13 +228,13 @@ final class ArbitrariesTest extends GauntletApiBase {
     class LocalDates {
         @Test
         void allInRange() {
-            assertForEach(generateParametersForTests(generateLocalDateRange()),
+            checkThatForEach(generateParametersForTests(generateLocalDateRange()),
                     range -> all(localDates(range)).satisfy(inRange(range)));
         }
 
         @Test
         void deterministicForAGivenSeed() {
-            assertForEach(generateParametersForTests(generateLocalDateRange().maybe()),
+            checkThatForEach(generateParametersForTests(generateLocalDateRange().maybe()),
                     maybeRange -> all(seeds())
                             .satisfy(equivalentSuppliesForSeed(maybeRange.match(__ -> localDates(), Arbitraries::localDates).createSupply(getGeneratorParameters()),
                                     maybeRange.match(__ -> localDates(), Arbitraries::localDates).createSupply(getGeneratorParameters()))));
@@ -246,13 +246,13 @@ final class ArbitrariesTest extends GauntletApiBase {
     class LocalTimes {
         @Test
         void allInRange() {
-            assertForEach(generateParametersForTests(generateLocalTimeRange()),
+            checkThatForEach(generateParametersForTests(generateLocalTimeRange()),
                     range -> all(localTimes(range)).satisfy(inRange(range)));
         }
 
         @Test
         void deterministicForAGivenSeed() {
-            assertForEach(generateParametersForTests(generateLocalTimeRange().maybe()),
+            checkThatForEach(generateParametersForTests(generateLocalTimeRange().maybe()),
                     maybeRange -> all(seeds())
                             .satisfy(equivalentSuppliesForSeed(maybeRange.match(__ -> localTimes(), Arbitraries::localTimes).createSupply(getGeneratorParameters()),
                                     maybeRange.match(__ -> localTimes(), Arbitraries::localTimes).createSupply(getGeneratorParameters()))));
@@ -264,13 +264,13 @@ final class ArbitrariesTest extends GauntletApiBase {
     class LocalDateTimes {
         @Test
         void allInRange() {
-            assertForEach(generateParametersForTests(generateLocalDateTimeRange()),
+            checkThatForEach(generateParametersForTests(generateLocalDateTimeRange()),
                     range -> all(localDateTimes(range)).satisfy(inRange(range)));
         }
 
         @Test
         void deterministicForAGivenSeed() {
-            assertForEach(generateParametersForTests(generateLocalDateTimeRange().maybe()),
+            checkThatForEach(generateParametersForTests(generateLocalDateTimeRange().maybe()),
                     maybeRange -> all(seeds())
                             .satisfy(equivalentSuppliesForSeed(maybeRange.match(__ -> localDateTimes(), Arbitraries::localDateTimes).createSupply(getGeneratorParameters()),
                                     maybeRange.match(__ -> localDateTimes(), Arbitraries::localDateTimes).createSupply(getGeneratorParameters()))));
@@ -282,13 +282,13 @@ final class ArbitrariesTest extends GauntletApiBase {
     class Durations {
         @Test
         void allInRange() {
-            assertForEach(generateParametersForTests(generateDurationRange()),
+            checkThatForEach(generateParametersForTests(generateDurationRange()),
                     range -> all(durations(range)).satisfy(inRange(range)));
         }
 
         @Test
         void deterministicForAGivenSeed() {
-            assertForEach(generateParametersForTests(generateDurationRange().maybe()),
+            checkThatForEach(generateParametersForTests(generateDurationRange().maybe()),
                     maybeRange -> all(seeds())
                             .satisfy(equivalentSuppliesForSeed(maybeRange.match(__ -> durations(), Arbitraries::durations).createSupply(getGeneratorParameters()),
                                     maybeRange.match(__ -> durations(), Arbitraries::durations).createSupply(getGeneratorParameters()))));
@@ -300,18 +300,18 @@ final class ArbitrariesTest extends GauntletApiBase {
     class NonEmptyVectors {
         @Test
         void haveAtLeastOneElement() {
-            assertThat(all(nonEmptyVectors()).satisfy(Prop.predicate("non-empty", nev -> !nev.isEmpty())));
+            checkThat(all(nonEmptyVectors()).satisfy(Prop.predicate("non-empty", nev -> !nev.isEmpty())));
         }
 
         @Test
         void haveExactSizeRequested() {
-            assertForEach(generateParametersForTests(generateInt(IntRange.from(1).to(10))),
+            checkThatForEach(generateParametersForTests(generateInt(IntRange.from(1).to(10))),
                     size -> all(nonEmptyVectors(size)).satisfy(Prop.predicate("has requested size", nev -> nev.size() == size)));
         }
 
         @Test
         void haveSizeWithinRequestedRange() {
-            assertForEach(generateParametersForTests(generateIntRange(IntRange.from(1).to(10))),
+            checkThatForEach(generateParametersForTests(generateIntRange(IntRange.from(1).to(10))),
                     sizeRange -> all(nonEmptyVectors(sizeRange)).satisfy(Prop.predicate("has requested size", nev -> sizeRange.includes(nev.size()))));
         }
     }
