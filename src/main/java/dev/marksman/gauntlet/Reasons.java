@@ -33,6 +33,10 @@ public final class Reasons {
         return items.head();
     }
 
+    public Reasons concat(Reasons other) {
+        return reasons(this.items.concat(other.getItems()));
+    }
+
     public ImmutableNonEmptyVector<String> getItems() {
         return this.items;
     }
