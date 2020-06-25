@@ -1,7 +1,9 @@
 package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.coproduct.CoProduct2;
+import com.jnape.palatable.lambda.functions.Fn0;
 import com.jnape.palatable.lambda.functions.Fn1;
+import com.jnape.palatable.lambda.monoid.Monoid;
 
 import static dev.marksman.gauntlet.Reasons.reasons;
 
@@ -18,6 +20,24 @@ public abstract class SimpleResult implements CoProduct2<SimpleResult.Pass, Simp
         return new Fail(reasons);
     }
 
+    public static SimpleResult test(boolean condition, Fn0<String> reasonForFailure) {
+        return condition
+                ? pass()
+                : fail(reasonForFailure.apply());
+    }
+
+    public static SimpleResult test(boolean condition, String reasonForFailure) {
+        return condition
+                ? pass()
+                : fail(reasonForFailure);
+    }
+
+    public static Monoid<SimpleResult> and() {
+        return And.INSTANCE;
+    }
+
+    public abstract SimpleResult and(SimpleResult other);
+
     public static final class Pass extends SimpleResult {
         private static final Pass INSTANCE = new Pass();
 
@@ -27,6 +47,11 @@ public abstract class SimpleResult implements CoProduct2<SimpleResult.Pass, Simp
         @Override
         public <R> R match(Fn1<? super Pass, ? extends R> aFn, Fn1<? super Fail, ? extends R> bFn) {
             return aFn.apply(this);
+        }
+
+        @Override
+        public SimpleResult and(SimpleResult other) {
+            return other;
         }
 
         public String toString() {
@@ -44,7 +69,6 @@ public abstract class SimpleResult implements CoProduct2<SimpleResult.Pass, Simp
         protected boolean canEqual(final Object other) {
             return other instanceof Pass;
         }
-
     }
 
     public static final class Fail extends SimpleResult {
@@ -61,6 +85,12 @@ public abstract class SimpleResult implements CoProduct2<SimpleResult.Pass, Simp
         @Override
         public <R> R match(Fn1<? super Pass, ? extends R> aFn, Fn1<? super Fail, ? extends R> bFn) {
             return bFn.apply(this);
+        }
+
+        @Override
+        public SimpleResult and(SimpleResult other) {
+            return other.match(__ -> this,
+                    fail2 -> fail(this.reasons.concat(fail2.getReasons())));
         }
 
         public Reasons getReasons() {
@@ -92,6 +122,20 @@ public abstract class SimpleResult implements CoProduct2<SimpleResult.Pass, Simp
             final Object $reasons = this.getReasons();
             result = result * PRIME + ($reasons == null ? 43 : $reasons.hashCode());
             return result;
+        }
+    }
+
+    private static class And implements Monoid<SimpleResult> {
+        private static final And INSTANCE = new And();
+
+        @Override
+        public SimpleResult identity() {
+            return pass();
+        }
+
+        @Override
+        public SimpleResult checkedApply(SimpleResult result1, SimpleResult result2) {
+            return result1.and(result2);
         }
     }
 }
