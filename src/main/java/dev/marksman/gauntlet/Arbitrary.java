@@ -85,7 +85,7 @@ public final class Arbitrary<A> {
      */
     public static <A> Arbitrary<A> arbitrary(Generator<A> generator) {
         Fn0<String> labelSupplier = () -> generator.getLabel().orElseGet(generator::toString);
-        return arbitrary(p -> new UnfilteredSupply<>(generator.prepare(p), labelSupplier),
+        return arbitrary(p -> new GeneratorSupply<>(generator.prepare(p), labelSupplier),
                 nothing(), defaultPrettyPrinter());
     }
 

@@ -6,11 +6,11 @@ import dev.marksman.kraftwerk.Seed;
 
 import static dev.marksman.gauntlet.SupplyTree.leaf;
 
-final class UnfilteredSupply<A> implements Supply<A> {
+final class GeneratorSupply<A> implements Supply<A> {
     private final Generate<A> generateFn;
     private final Fn0<String> labelSupplier;
 
-    UnfilteredSupply(Generate<A> generateFn, Fn0<String> labelSupplier) {
+    GeneratorSupply(Generate<A> generateFn, Fn0<String> labelSupplier) {
         this.generateFn = generateFn;
         this.labelSupplier = labelSupplier;
     }
