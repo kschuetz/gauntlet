@@ -4,6 +4,8 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.gauntlet.util.MapperChain;
 import dev.marksman.kraftwerk.Seed;
 
+import static dev.marksman.gauntlet.SupplyTree.mapping;
+
 final class MappedSupply<A, B> implements Supply<B> {
     private final Supply<A> underlying;
     private final MapperChain mapperChain;
@@ -21,7 +23,7 @@ final class MappedSupply<A, B> implements Supply<B> {
 
     @Override
     public SupplyTree getSupplyTree() {
-        return underlying.getSupplyTree();
+        return mapping(underlying.getSupplyTree());
     }
 
     @SuppressWarnings("unchecked")
@@ -34,6 +36,7 @@ final class MappedSupply<A, B> implements Supply<B> {
     @Override
     public GeneratorOutput<B> getNext(Seed input) {
         return underlying.getNext(input)
-                .fmap(a -> (B) mapperChain.getFn().apply(a));
+                .fmap(a -> (B) mapperChain.getFn().apply(a))
+                .mapFailure(failure -> failure.modifySupplyTree(SupplyTree::mapping));
     }
 }

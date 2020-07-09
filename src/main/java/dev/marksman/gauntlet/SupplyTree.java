@@ -11,12 +11,24 @@ public abstract class SupplyTree implements CoProduct6<SupplyTree.Leaf, SupplyTr
         return new Leaf(name);
     }
 
+    public static SupplyTree composite(SupplyTree first, SupplyTree... rest) {
+        return new Composite(NonEmptyVector.of(first, rest));
+    }
+
     public static SupplyTree collection(SupplyTree child) {
         return new Collection(child);
     }
 
-    public static SupplyTree composite(SupplyTree first, SupplyTree... rest) {
-        return new Composite(NonEmptyVector.of(first, rest));
+    public static SupplyTree mapping(SupplyTree underlying) {
+        return new Mapping(underlying);
+    }
+
+    public static SupplyTree filter(SupplyTree underlying) {
+        return new Filter(underlying);
+    }
+
+    public static SupplyTree exhausted(SupplyTree underlying, int attemptCount) {
+        return new Exhausted(underlying, attemptCount);
     }
 
     public static class Leaf extends SupplyTree {

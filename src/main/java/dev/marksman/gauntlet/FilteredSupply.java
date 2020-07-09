@@ -4,6 +4,7 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.kraftwerk.Seed;
 
 import static dev.marksman.gauntlet.SupplyFailure.supplyFailure;
+import static dev.marksman.gauntlet.SupplyTree.filter;
 
 final class FilteredSupply<A> implements Supply<A> {
     private final Supply<A> underlying;
@@ -18,7 +19,7 @@ final class FilteredSupply<A> implements Supply<A> {
 
     @Override
     public SupplyTree getSupplyTree() {
-        return underlying.getSupplyTree();
+        return filter(underlying.getSupplyTree());
     }
 
     @Override
@@ -28,7 +29,7 @@ final class FilteredSupply<A> implements Supply<A> {
         while (discardsRemaining >= 0) {
             GeneratorOutput<A> current = underlying.getNext(state);
             if (current.isFailure()) {
-                return current;
+                return current.mapFailure(failure -> failure.modifySupplyTree(SupplyTree::filter));
             }
 
             A value = current.getValue().orThrow(AssertionError::new);
@@ -41,6 +42,6 @@ final class FilteredSupply<A> implements Supply<A> {
             }
         }
 
-        return GeneratorOutput.failure(state, supplyFailure(maxDiscards, getSupplyTree()));
+        return GeneratorOutput.failure(state, supplyFailure(maxDiscards, SupplyTree.exhausted(underlying.getSupplyTree(), maxDiscards)));
     }
 }

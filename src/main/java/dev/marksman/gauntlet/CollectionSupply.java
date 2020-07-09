@@ -35,7 +35,8 @@ final class CollectionSupply<A, Builder, Out> implements Supply<Out> {
             GeneratorOutput<A> current = elementSupply.getNext(state);
             state = current.getNextState();
             if (current.isFailure()) {
-                return GeneratorOutput.failure(state, current.getValue().projectA().orElseThrow(AssertionError::new));
+                return GeneratorOutput.failure(state, current.getValue().projectA().orElseThrow(AssertionError::new)
+                        .modifySupplyTree(SupplyTree::collection));
             }
             builder = aggregator.add(builder, current.getValue().orThrow(AssertionError::new));
             size--;

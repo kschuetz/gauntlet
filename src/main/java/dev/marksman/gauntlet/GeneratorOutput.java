@@ -8,6 +8,7 @@ import dev.marksman.kraftwerk.Seed;
 
 import static com.jnape.palatable.lambda.adt.Either.left;
 import static com.jnape.palatable.lambda.adt.Either.right;
+import static com.jnape.palatable.lambda.functions.builtin.fn1.Id.id;
 
 public final class GeneratorOutput<A> implements Functor<A, GeneratorOutput<?>> {
     private final Seed nextState;
@@ -43,12 +44,32 @@ public final class GeneratorOutput<A> implements Functor<A, GeneratorOutput<?>> 
         return generatorOutput(nextState, value.fmap(fn));
     }
 
+    public GeneratorOutput<A> mapFailure(Fn1<SupplyFailure, SupplyFailure> f) {
+        return value.match(
+                failure -> generatorOutput(nextState, left(f.apply(failure))),
+                __ -> this);
+    }
+
     public Seed getNextState() {
         return this.nextState;
     }
 
     public Either<SupplyFailure, A> getValue() {
         return this.value;
+    }
+
+    public A getSuccessOrThrow() {
+        return this.value.match(__ -> {
+                    throw new IllegalStateException("Result is not success");
+                },
+                id());
+    }
+
+    public SupplyFailure getFailureOrThrow() {
+        return this.value.match(id(),
+                __ -> {
+                    throw new IllegalStateException("Result is not failure");
+                });
     }
 
     @Override

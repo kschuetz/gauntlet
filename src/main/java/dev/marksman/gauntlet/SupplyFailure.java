@@ -1,5 +1,7 @@
 package dev.marksman.gauntlet;
 
+import com.jnape.palatable.lambda.functions.Fn1;
+
 public final class SupplyFailure {
     private final int discardCount;
     private final SupplyTree supplyTree;
@@ -19,5 +21,9 @@ public final class SupplyFailure {
 
     public SupplyTree getSupplyTree() {
         return supplyTree;
+    }
+
+    public SupplyFailure modifySupplyTree(Fn1<SupplyTree, SupplyTree> f) {
+        return supplyFailure(discardCount, f.apply(supplyTree));
     }
 }

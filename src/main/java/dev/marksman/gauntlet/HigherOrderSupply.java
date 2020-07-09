@@ -38,6 +38,6 @@ final class HigherOrderSupply<A> implements Supply<A> {
 
     @Override
     public SupplyTree getSupplyTree() {
-        return leaf("TODO");
+        return leaf("HigherOrderSupply");
     }
 }

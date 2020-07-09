@@ -3,7 +3,7 @@ package dev.marksman.gauntlet;
 import com.jnape.palatable.lambda.functions.Fn7;
 import dev.marksman.kraftwerk.Seed;
 
-import static dev.marksman.gauntlet.CompositeSupply2.threadSeed;
+import static com.jnape.palatable.lambda.functions.builtin.fn1.Upcast.upcast;
 import static dev.marksman.gauntlet.SupplyTree.composite;
 
 final class CompositeSupply7<A, B, C, D, E, F, G, Out> implements Supply<Out> {
@@ -33,15 +33,75 @@ final class CompositeSupply7<A, B, C, D, E, F, G, Out> implements Supply<Out> {
                 supplyE.getSupplyTree(), supplyF.getSupplyTree(), supplyG.getSupplyTree());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public GeneratorOutput<Out> getNext(Seed input) {
-        return threadSeed(0,
-                supplyA.getNext(input), (a, s1) -> threadSeed(1, supplyB.getNext(s1),
-                        (b, s2) -> threadSeed(2, supplyC.getNext(s2),
-                                (c, s3) -> threadSeed(3, supplyD.getNext(s3),
-                                        (d, s4) -> threadSeed(4, supplyE.getNext(s4),
-                                                (e, s5) -> threadSeed(5, supplyF.getNext(s5),
-                                                        (f, s6) -> threadSeed(6, supplyG.getNext(s6),
-                                                                (g, s7) -> GeneratorOutput.success(s7, fn.apply(a, b, c, d, e, f, g)))))))));
+        GeneratorOutput<A> output1 = supplyA.getNext(input);
+        if (output1.isFailure()) {
+            return (GeneratorOutput<Out>) output1.mapFailure(sf -> sf.modifySupplyTree(st ->
+                    composite(st)))
+                    .fmap(upcast());
+        }
+        GeneratorOutput<B> output2 = supplyB.getNext(output1.getNextState());
+        if (output2.isFailure()) {
+            return (GeneratorOutput<Out>) output2.mapFailure(sf -> sf.modifySupplyTree(st ->
+                    composite(supplyA.getSupplyTree(),
+                            st)))
+                    .fmap(upcast());
+        }
+        GeneratorOutput<C> output3 = supplyC.getNext(output2.getNextState());
+        if (output3.isFailure()) {
+            return (GeneratorOutput<Out>) output3.mapFailure(sf -> sf.modifySupplyTree(st ->
+                    composite(supplyA.getSupplyTree(),
+                            supplyB.getSupplyTree(),
+                            st)))
+                    .fmap(upcast());
+        }
+        GeneratorOutput<D> output4 = supplyD.getNext(output3.getNextState());
+        if (output4.isFailure()) {
+            return (GeneratorOutput<Out>) output4.mapFailure(sf -> sf.modifySupplyTree(st ->
+                    composite(supplyA.getSupplyTree(),
+                            supplyB.getSupplyTree(),
+                            supplyC.getSupplyTree(),
+                            st)))
+                    .fmap(upcast());
+        }
+        GeneratorOutput<E> output5 = supplyE.getNext(output4.getNextState());
+        if (output5.isFailure()) {
+            return (GeneratorOutput<Out>) output5.mapFailure(sf -> sf.modifySupplyTree(st ->
+                    composite(supplyA.getSupplyTree(),
+                            supplyB.getSupplyTree(),
+                            supplyC.getSupplyTree(),
+                            supplyD.getSupplyTree(),
+                            st)))
+                    .fmap(upcast());
+        }
+        GeneratorOutput<F> output6 = supplyF.getNext(output5.getNextState());
+        if (output6.isFailure()) {
+            return (GeneratorOutput<Out>) output6.mapFailure(sf -> sf.modifySupplyTree(st ->
+                    composite(supplyA.getSupplyTree(),
+                            supplyB.getSupplyTree(),
+                            supplyC.getSupplyTree(),
+                            supplyD.getSupplyTree(),
+                            supplyE.getSupplyTree(),
+                            st)))
+                    .fmap(upcast());
+        }
+        GeneratorOutput<G> output7 = supplyG.getNext(output6.getNextState());
+        if (output7.isFailure()) {
+            return (GeneratorOutput<Out>) output7.mapFailure(sf -> sf.modifySupplyTree(st ->
+                    composite(supplyA.getSupplyTree(),
+                            supplyB.getSupplyTree(),
+                            supplyC.getSupplyTree(),
+                            supplyD.getSupplyTree(),
+                            supplyE.getSupplyTree(),
+                            supplyF.getSupplyTree(),
+                            st)))
+                    .fmap(upcast());
+        }
+        return GeneratorOutput.success(output3.getNextState(),
+                fn.apply(output1.getSuccessOrThrow(), output2.getSuccessOrThrow(), output3.getSuccessOrThrow(),
+                        output4.getSuccessOrThrow(), output5.getSuccessOrThrow(), output6.getSuccessOrThrow(),
+                        output7.getSuccessOrThrow()));
     }
 }

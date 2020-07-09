@@ -29,8 +29,8 @@ final class FlattenedSupply<A> implements Supply<A> {
         while (discardsRemaining >= 0) {
             GeneratorOutput<Maybe<? extends A>> current = underlying.getNext(state);
             if (current.isFailure()) {
-                SupplyFailure supplyFailure = current.getValue().projectA().orElseThrow(AssertionError::new);
-                return generatorOutput(current.getNextState(), left(supplyFailure));
+                SupplyFailure supplyFailure = current.getFailureOrThrow();
+                return generatorOutput(current.getNextState(), left(supplyFailure.modifySupplyTree(SupplyTree::filter)));
             }
 
             Maybe<? extends A> value = current.getValue().orThrow(AssertionError::new);
@@ -43,11 +43,11 @@ final class FlattenedSupply<A> implements Supply<A> {
             }
         }
 
-        return GeneratorOutput.failure(state, supplyFailure(maxDiscards, getSupplyTree()));
+        return GeneratorOutput.failure(state, supplyFailure(maxDiscards, SupplyTree.exhausted(underlying.getSupplyTree(), maxDiscards)));
     }
 
     @Override
     public SupplyTree getSupplyTree() {
-        return underlying.getSupplyTree();
+        return SupplyTree.filter(underlying.getSupplyTree());
     }
 }
