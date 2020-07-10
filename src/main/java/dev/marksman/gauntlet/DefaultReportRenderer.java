@@ -88,7 +88,29 @@ public final class DefaultReportRenderer implements ReportRenderer {
     }
 
     private <A> String renderReportForExhausted(ReportSettings settings, ReportData<A> reportData, Abnormal.Exhausted<A> result) {
-        return "Supply failure";
+        SupplyFailure supplyFailure = result.getSupplyFailure();
+        int discardCount = supplyFailure.getDiscardCount();
+        MutableReportBuilder output = new MutableReportBuilder();
+        reportData.getTestParameterData().toOptional().ifPresent(tpd -> renderTestParameterData(tpd, output));
+        output.write("Supply of samples exhausted after ");
+        int successCount = result.getSuccessCount();
+        output.write(successCount);
+        output.write(successCount == 1 ? " success" : " successes");
+        reportData.getInitialSeedValue().toOptional().ifPresent(seed -> {
+            output.write(" using seed ");
+            output.write(seed);
+        });
+        output.newLine();
+        output.write("A filter caused ");
+        output.write(discardCount);
+        output.write(discardCount == 1 ? " sample" : " samples");
+        output.writeLine(" to be discarded before giving up.");
+        output.writeLine("You may need to redesign your filters.  Check your calls to 'suchThat'.");
+        output.writeLine("The following may help you diagnose where the problem is:");
+        output.newLine();
+        writeSupplyTree(output, supplyFailure.getSupplyTree());
+
+        return output.render();
     }
 
     private <A> String renderReportForError(ReportSettings settings, ReportData<A> reportData, Abnormal.Error<A> result) {
@@ -158,5 +180,55 @@ public final class DefaultReportRenderer implements ReportRenderer {
             output.write(reason);
         }
         output.newLine();
+    }
+
+    private void writeSupplyTree(MutableReportBuilder output, SupplyTree supplyTree) {
+        supplyTree.match(
+                leaf -> {
+                    output.writeLine("- " + leaf.getLabel());
+                    return UNIT;
+                },
+                composite -> {
+                    output.writeLine("- Composite of [");
+                    output.indent();
+                    composite.getChildren().forEach(st -> writeSupplyTree(output, st));
+                    output.unindent();
+                    output.writeLine("  ]");
+                    return UNIT;
+                },
+                collection -> {
+                    output.writeLine("- Collection of [");
+                    output.indent();
+                    writeSupplyTree(output, collection.getChild());
+                    output.unindent();
+                    output.writeLine("  ]");
+                    return UNIT;
+                },
+                mapping -> {
+                    output.writeLine("- Mapping of [");
+                    output.indent();
+                    writeSupplyTree(output, mapping.getUnderlying());
+                    output.unindent();
+                    output.writeLine("  ]");
+                    return UNIT;
+                },
+                filter -> {
+                    output.writeLine("- Filter of [");
+                    output.indent();
+                    writeSupplyTree(output, filter.getUnderlying());
+                    output.unindent();
+                    output.writeLine("  ]");
+                    return UNIT;
+                },
+                exhausted -> {
+                    int attemptCount = exhausted.getAttemptCount();
+                    String attempts = "" + attemptCount + " " + (attemptCount == 1 ? "attempt" : "attempts");
+                    output.writeLine("*** Filter failed here after " + attempts + "[");
+                    output.indent();
+                    writeSupplyTree(output, exhausted.getUnderlying());
+                    output.unindent();
+                    output.writeLine("  ]");
+                    return UNIT;
+                });
     }
 }

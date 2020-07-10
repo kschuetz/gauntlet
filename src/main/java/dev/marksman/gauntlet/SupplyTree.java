@@ -230,7 +230,7 @@ public abstract class SupplyTree implements CoProduct6<SupplyTree.Leaf, SupplyTr
         private final SupplyTree underlying;
         private final int attemptCount;
 
-        public Exhausted(SupplyTree underlying, int attemptCount) {
+        private Exhausted(SupplyTree underlying, int attemptCount) {
             this.underlying = underlying;
             this.attemptCount = attemptCount;
         }
@@ -240,7 +240,7 @@ public abstract class SupplyTree implements CoProduct6<SupplyTree.Leaf, SupplyTr
             return fFn.apply(this);
         }
 
-        private SupplyTree getUnderlying() {
+        public SupplyTree getUnderlying() {
             return underlying;
         }
 
