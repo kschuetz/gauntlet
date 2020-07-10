@@ -26,4 +26,30 @@ public final class SupplyFailure {
     public SupplyFailure modifySupplyTree(Fn1<SupplyTree, SupplyTree> f) {
         return supplyFailure(discardCount, f.apply(supplyTree));
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SupplyFailure that = (SupplyFailure) o;
+
+        if (discardCount != that.discardCount) return false;
+        return supplyTree.equals(that.supplyTree);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = discardCount;
+        result = 31 * result + supplyTree.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "SupplyFailure{" +
+                "discardCount=" + discardCount +
+                ", supplyTree=" + supplyTree +
+                '}';
+    }
 }

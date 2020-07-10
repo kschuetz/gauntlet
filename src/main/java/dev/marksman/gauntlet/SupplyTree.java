@@ -61,6 +61,13 @@ public abstract class SupplyTree implements CoProduct6<SupplyTree.Leaf, SupplyTr
         public int hashCode() {
             return label.hashCode();
         }
+
+        @Override
+        public String toString() {
+            return "Leaf{" +
+                    "label='" + label + '\'' +
+                    '}';
+        }
     }
 
     public static class Composite extends SupplyTree {
@@ -92,6 +99,13 @@ public abstract class SupplyTree implements CoProduct6<SupplyTree.Leaf, SupplyTr
         @Override
         public int hashCode() {
             return children.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return "Composite{" +
+                    "children=" + children +
+                    '}';
         }
     }
 
@@ -125,6 +139,13 @@ public abstract class SupplyTree implements CoProduct6<SupplyTree.Leaf, SupplyTr
         public int hashCode() {
             return child.hashCode();
         }
+
+        @Override
+        public String toString() {
+            return "Collection{" +
+                    "child=" + child +
+                    '}';
+        }
     }
 
     public static class Mapping extends SupplyTree {
@@ -157,6 +178,13 @@ public abstract class SupplyTree implements CoProduct6<SupplyTree.Leaf, SupplyTr
         public int hashCode() {
             return underlying.hashCode();
         }
+
+        @Override
+        public String toString() {
+            return "Mapping{" +
+                    "underlying=" + underlying +
+                    '}';
+        }
     }
 
     public static class Filter extends SupplyTree {
@@ -188,6 +216,13 @@ public abstract class SupplyTree implements CoProduct6<SupplyTree.Leaf, SupplyTr
         @Override
         public int hashCode() {
             return underlying.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return "Filter{" +
+                    "underlying=" + underlying +
+                    '}';
         }
     }
 
@@ -229,6 +264,14 @@ public abstract class SupplyTree implements CoProduct6<SupplyTree.Leaf, SupplyTr
             int result = underlying.hashCode();
             result = 31 * result + attemptCount;
             return result;
+        }
+
+        @Override
+        public String toString() {
+            return "Exhausted{" +
+                    "underlying=" + underlying +
+                    ", attemptCount=" + attemptCount +
+                    '}';
         }
     }
 }

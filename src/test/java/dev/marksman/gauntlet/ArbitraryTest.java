@@ -42,5 +42,4 @@ class ArbitraryTest extends GauntletApiBase {
             checkThat(all(seeds()).satisfy(TestSupportProps.supplyFailureForSeed(supply)));
         }
     }
-
 }

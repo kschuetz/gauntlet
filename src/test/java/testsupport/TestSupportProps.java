@@ -1,9 +1,11 @@
 package testsupport;
 
+import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.gauntlet.GeneratorOutput;
 import dev.marksman.gauntlet.Prop;
 import dev.marksman.gauntlet.SimpleResult;
 import dev.marksman.gauntlet.Supply;
+import dev.marksman.gauntlet.SupplyFailure;
 import dev.marksman.kraftwerk.Seed;
 
 public final class TestSupportProps {
@@ -26,5 +28,18 @@ public final class TestSupportProps {
 
     public static <A> Prop<Seed> supplyFailureForSeed(Supply<A> supply) {
         return Prop.predicate("results in SupplyFailure", (Seed seed) -> supply.getNext(seed).isFailure());
+    }
+
+    public static <A> Prop<Seed> supplyFailureForSeedMatching(Supply<A> supply, Fn1<SupplyFailure, Boolean> matchesSupplyFailure) {
+        return Prop.prop("results in SupplyFailure with matching SupplyTree", (Seed seed) -> supply.getNext(seed)
+                .getValue()
+                .match(sf -> matchesSupplyFailure.apply(sf)
+                                ? SimpleResult.pass()
+                                : SimpleResult.fail("SupplyFailure didn't match expected: " + sf),
+                        __ -> SimpleResult.fail("SupplyFailure expected but did not occur")));
+    }
+
+    public static <A> Prop<Seed> supplyFailureForSeedMatching(Supply<A> supply, SupplyFailure expected) {
+        return supplyFailureForSeedMatching(supply, sf -> sf.equals(expected));
     }
 }

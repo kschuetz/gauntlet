@@ -15,5 +15,4 @@ public interface Supply<A> extends Functor<A, Supply<?>> {
     default <B> Supply<B> fmap(Fn1<? super A, ? extends B> fn) {
         return mappedSupply(fn, this);
     }
-
 }
