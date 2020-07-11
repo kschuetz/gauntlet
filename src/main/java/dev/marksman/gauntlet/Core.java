@@ -240,7 +240,6 @@ final class Core implements GauntletApi {
         return executorOverride.orElseGet(DefaultGauntletExecutor::defaultGauntletExecutor);
     }
 
-
     // generate all inputs
     // if generator fails early:
     //    - test all anyway.  if falsified, fail as normal.

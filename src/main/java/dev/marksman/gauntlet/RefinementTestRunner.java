@@ -18,7 +18,7 @@ import static com.jnape.palatable.lambda.adt.Maybe.nothing;
 import static dev.marksman.gauntlet.EvaluateSampleTask.evaluateSampleTask;
 import static dev.marksman.gauntlet.ResultCollector.universalResultCollector;
 
-public final class RefinementTestRunner {
+final class RefinementTestRunner {
     public static final Duration TIMEOUT_TODO = Duration.ofMinutes(1);
     private static final RefinementTestRunner INSTANCE = new RefinementTestRunner();
 

@@ -2,7 +2,7 @@ package dev.marksman.gauntlet;
 
 import dev.marksman.kraftwerk.GeneratorParameters;
 
-public final class SupplyParameters {
+final class SupplyParameters {
     private final GeneratorParameters generatorParameters;
     private final int maxDiscards;
 

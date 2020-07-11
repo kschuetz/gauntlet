@@ -20,7 +20,6 @@ import static dev.marksman.gauntlet.Quantifier.EXISTENTIAL;
 import static dev.marksman.gauntlet.Quantifier.UNIVERSAL;
 
 public interface GauntletApi {
-
     static <A> GeneratorTestApi<A> all(Arbitrary<A> arbitrary) {
         return generatorTestApi(arbitrary);
     }
@@ -164,4 +163,3 @@ public interface GauntletApi {
 
     GauntletApi withDefaultTimeout(Duration timeout);
 }
-

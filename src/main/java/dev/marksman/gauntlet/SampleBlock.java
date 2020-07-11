@@ -4,7 +4,7 @@ import com.jnape.palatable.lambda.adt.Maybe;
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.collectionviews.Vector;
 
-public final class SampleBlock<A> {
+final class SampleBlock<A> {
     private final ImmutableVector<A> samples;
     private final Maybe<SupplyFailure> supplyFailure;
 
