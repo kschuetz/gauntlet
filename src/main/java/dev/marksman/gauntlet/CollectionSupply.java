@@ -1,6 +1,6 @@
 package dev.marksman.gauntlet;
 
-import dev.marksman.kraftwerk.Generate;
+import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.kraftwerk.Result;
 import dev.marksman.kraftwerk.Seed;
 import dev.marksman.kraftwerk.aggregator.Aggregator;
@@ -9,10 +9,10 @@ import static dev.marksman.gauntlet.SupplyTree.collection;
 
 final class CollectionSupply<A, Builder, Out> implements Supply<Out> {
     private final Supply<A> elementSupply;
-    private final Generate<Integer> sizeGenerator;
+    private final Fn1<Seed, Result<? extends Seed, Integer>> sizeGenerator;
     private final Aggregator<A, Builder, Out> aggregator;
 
-    CollectionSupply(Supply<A> elementSupply, Generate<Integer> sizeGenerator, Aggregator<A, Builder, Out> aggregator) {
+    CollectionSupply(Supply<A> elementSupply, Fn1<Seed, Result<? extends Seed, Integer>> sizeGenerator, Aggregator<A, Builder, Out> aggregator) {
         this.elementSupply = elementSupply;
         this.sizeGenerator = sizeGenerator;
         this.aggregator = aggregator;
