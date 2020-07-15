@@ -99,7 +99,7 @@ final class CompositeSupply7<A, B, C, D, E, F, G, Out> implements Supply<Out> {
                             st)))
                     .fmap(upcast());
         }
-        return GeneratorOutput.success(output3.getNextState(),
+        return GeneratorOutput.success(output7.getNextState(),
                 fn.apply(output1.getSuccessOrThrow(), output2.getSuccessOrThrow(), output3.getSuccessOrThrow(),
                         output4.getSuccessOrThrow(), output5.getSuccessOrThrow(), output6.getSuccessOrThrow(),
                         output7.getSuccessOrThrow()));
