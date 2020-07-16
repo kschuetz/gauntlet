@@ -34,6 +34,7 @@ import dev.marksman.kraftwerk.constraints.LocalDateTimeRange;
 import dev.marksman.kraftwerk.constraints.LocalTimeRange;
 import dev.marksman.kraftwerk.constraints.LongRange;
 import dev.marksman.kraftwerk.constraints.ShortRange;
+import dev.marksman.kraftwerk.domain.Characters;
 import dev.marksman.kraftwerk.frequency.FrequencyMap;
 import dev.marksman.kraftwerk.weights.EitherWeights;
 import dev.marksman.kraftwerk.weights.MaybeWeights;
@@ -56,6 +57,7 @@ import java.util.UUID;
 import static dev.marksman.gauntlet.Arbitrary.arbitrary;
 import static dev.marksman.gauntlet.Arbitrary.higherOrderArbitrary;
 import static dev.marksman.gauntlet.ArbitraryGenerator.generateArbitrary;
+import static dev.marksman.gauntlet.Preconditions.requireNaturalSize;
 import static dev.marksman.gauntlet.Preconditions.requirePositiveSize;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkBoolean;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkByte;
@@ -65,6 +67,7 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkHashM
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkInt;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkLong;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkShort;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkString;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkVector;
 import static dev.marksman.kraftwerk.Generators.generateBigDecimal;
 import static dev.marksman.kraftwerk.Generators.generateBigInteger;
@@ -105,6 +108,7 @@ import static dev.marksman.kraftwerk.Generators.generateShort;
 import static dev.marksman.kraftwerk.Generators.generateShortRange;
 import static dev.marksman.kraftwerk.Generators.generateShuffled;
 import static dev.marksman.kraftwerk.Generators.generateString;
+import static dev.marksman.kraftwerk.Generators.generateStringFromCharacters;
 import static dev.marksman.kraftwerk.Generators.generateUUID;
 
 public final class Arbitraries {
@@ -300,7 +304,7 @@ public final class Arbitraries {
     }
 
     public static Arbitrary<String> strings(Generator<String> generator) {
-        return arbitrary(generator); // TODO: shrink strings
+        return arbitrary(generator).withShrinkStrategy(shrinkString());
     }
 
     public static Arbitrary<String> strings() {
@@ -309,6 +313,19 @@ public final class Arbitraries {
 
     public static Arbitrary<String> strings(FrequencyMap<String> frequencyMap) {
         return strings(frequencyMap.toGenerator());
+    }
+
+    public static Arbitrary<String> stringsOfLength(int length) {
+        requireNaturalSize(length);
+        return arbitrary(generateStringFromCharacters(length, Characters.asciiPrintable()))
+                .withShrinkStrategy(shrinkString(length));
+    }
+
+    public static Arbitrary<String> stringsOfLength(IntRange lengthRange) {
+        requireNaturalSize(lengthRange);
+        return arbitrary(generateInt(lengthRange)
+                .flatMap(length -> generateStringFromCharacters(length, Characters.asciiPrintable())))
+                .withShrinkStrategy(shrinkString(lengthRange.minInclusive()));
     }
 
     public static Arbitrary<BigInteger> bigIntegers(Generator<BigInteger> generator) {

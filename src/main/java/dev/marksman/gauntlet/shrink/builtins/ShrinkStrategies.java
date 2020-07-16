@@ -151,6 +151,14 @@ public final class ShrinkStrategies {
         return input -> input ? ShrinkResult.singleton(false) : ShrinkResult.empty();
     }
 
+    public static ShrinkStrategy<String> shrinkString() {
+        return ShrinkString.shrinkString();
+    }
+
+    public static ShrinkStrategy<String> shrinkString(int minLength) {
+        return ShrinkString.shrinkString(minLength);
+    }
+
     public static <A> ShrinkStrategy<Maybe<A>> shrinkMaybe(ShrinkStrategy<A> sa) {
         return input -> input.match(__ -> ShrinkResult.empty(),
                 a -> ShrinkResult.cons(nothing(), () -> sa.apply(a).fmap(Maybe::just)));
