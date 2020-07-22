@@ -64,7 +64,7 @@ public final class ShrinkStrategies {
     }
 
     /**
-     * Returns a shrinking strategy that shrinks longs.
+     * Returns a shrinking strategy that shrinks ints.
      */
     public static ShrinkStrategy<Integer> shrinkInt() {
         return ShrinkNumerics.shrinkInt();
