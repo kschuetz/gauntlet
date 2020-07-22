@@ -77,19 +77,28 @@ final class ShrinkCollection {
     }
 
     private static <A> ImmutableFiniteIterable<Vector<A>> shrinkIndividualElements(final int n, ShrinkStrategy<A> shrink, Vector<A> input) {
-        if (n >= input.size()) {
+        final int size = input.size();
+        if (n >= size) {
             return ShrinkResult.empty();
         } else {
             Vector<A> front = input.take(n);
             Vector<A> back = input.drop(n + 1);
             A element = input.unsafeGet(n);
-            ImmutableFiniteIterable<Vector<A>> nthShrinks = shrink.apply(element).fmap(newElement -> splice(front, newElement, back));
+            ImmutableFiniteIterable<Vector<A>> nthShrinks = shrink.apply(element).fmap(newElement -> splice(size, front, newElement, back));
             return nthShrinks.concat(() -> shrinkIndividualElements(n + 1, shrink, input).iterator());
         }
     }
 
-    private static <A> Vector<A> splice(Vector<A> front, A newElement, Vector<A> back) {
-        return Vector.copyFrom(front.append(newElement).concat(back));
+    private static <A> Vector<A> splice(final int size, Vector<A> front, A newElement, Vector<A> back) {
+        final int spliceIndex = front.size();
+        return Vector.lazyFill(size, index -> {
+            if (index < spliceIndex) {
+                return front.unsafeGet(index);
+            } else if (index == spliceIndex) {
+                return newElement;
+            } else {
+                return back.unsafeGet(index - spliceIndex - 1);
+            }
+        });
     }
-
 }
