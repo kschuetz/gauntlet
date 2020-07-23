@@ -11,11 +11,12 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkCollection.shrinkColle
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkInt;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.emptyIterable;
 
 final class ShrinkCollectionsTest {
     @Nested
     @DisplayName("shrinkCollection")
-    class Collection {
+    class Collections {
         @Nested
         @DisplayName("structural")
         class Structural {
@@ -73,6 +74,33 @@ final class ShrinkCollectionsTest {
                 ));
             }
 
+            @Test
+            void willNotIncludeLastIfEqualToFirst() {
+                ShrinkStrategy<Vector<Integer>> shrink = shrinkCollection(0, ShrinkStrategy.none());
+                ImmutableFiniteIterable<Vector<Integer>> output = shrink.apply(Vector.of(0, 1, 2, 3, 3, 2, 1, 0));
+                assertThat(output, contains(
+                        Vector.empty(),
+                        Vector.of(0),
+                        Vector.of(0, 1),
+                        Vector.of(1, 0),
+                        Vector.of(0, 2, 3, 1),
+                        Vector.of(1, 3, 2, 0),
+                        Vector.of(0, 1, 2, 3),
+                        Vector.of(3, 2, 1, 0),
+                        Vector.of(0, 1, 2, 3, 3, 2, 1),
+                        Vector.of(1, 2, 3, 3, 2, 1, 0)
+                ));
+            }
+
+            @Test
+            void emptyIfMinimumSizeEqualToInputSize() {
+                assertThat(shrinkCollection(4, ShrinkStrategy.none()).apply(Vector.of(1, 2, 3, 4)), emptyIterable());
+            }
+
+            @Test
+            void emptyIfMinimumSizeGreaterThanInputSize() {
+                assertThat(shrinkCollection(4, ShrinkStrategy.none()).apply(Vector.of(1, 2, 3)), emptyIterable());
+            }
         }
 
         @Nested
@@ -141,6 +169,24 @@ final class ShrinkCollectionsTest {
                         Vector.of(2, 4, 8, 16, 28),
                         Vector.of(2, 4, 8, 16, 30),
                         Vector.of(2, 4, 8, 16, 31)));
+            }
+
+            @Test
+            void emptyIfMinimumSizeGreaterThanInputSize() {
+                assertThat(shrinkCollection(4, shrinkInt()).apply(Vector.of(1, 2, 3)), emptyIterable());
+            }
+
+            @Test
+            void shrinksElementsIfMinimumSizeEqualToInputSize() {
+                assertThat(shrinkCollection(3, shrinkInt()).apply(Vector.of(2, 2, 2)),
+                        contains(
+                                Vector.of(0, 2, 2),
+                                Vector.of(1, 2, 2),
+                                Vector.of(2, 0, 2),
+                                Vector.of(2, 1, 2),
+                                Vector.of(2, 2, 0),
+                                Vector.of(2, 2, 1)
+                        ));
             }
         }
     }

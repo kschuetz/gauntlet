@@ -16,49 +16,56 @@ final class ShrinkCollection {
         }
         return input -> {
             int size = input.size();
-            if (size <= minimumSize) {
+            if (size < minimumSize) {
                 return ShrinkResult.empty();
             }
             ShrinkResultBuilder<Vector<A>> builder = ShrinkResultBuilder.shrinkResultBuilder();
-            if (minimumSize == 0) builder = builder.append(Vector.empty());
-            final int single = Math.max(1, minimumSize);
-            if (single < size) {
-                // first element
-                builder = builder.lazyAppend(() -> input.take(single));
+            if (size > minimumSize) {
+                if (minimumSize == 0) builder = builder.append(Vector.empty());
+                final int single = Math.max(1, minimumSize);
+                if (single < size) {
+                    Vector<A> front = input.take(single);
+                    Vector<A> back = input.drop(size - single);
 
-                // last element
-                builder = builder.lazyAppend(() -> input.drop(size - single));
-            }
-            final int quarter = Math.max(size / 4, minimumSize);
-            if (quarter > single) {
-                // first quarter
-                builder = builder.lazyAppend(() -> input.take(quarter));
+                    // first element
+                    builder = builder.append(front);
 
-                // last quarter
-                builder = builder.lazyAppend(() -> input.drop(size - quarter));
-            }
-            if (size >= 4 && size / 2 >= minimumSize) {
-                // even elements
-                builder = builder.lazyAppend(() -> evenElements(input));
+                    // last element
+                    if (!front.equals(back)) {
+                        builder = builder.append(back);
+                    }
+                }
+                final int quarter = Math.max(size / 4, minimumSize);
+                if (quarter > single) {
+                    // first quarter
+                    builder = builder.append(input.take(quarter));
 
-                // odd elements
-                builder = builder.lazyAppend(() -> oddElements(input));
-            }
-            final int half = Math.max(size / 2, minimumSize);
-            if (half > quarter) {
-                // first half
-                builder = builder.lazyAppend(() -> input.take(half));
+                    // last quarter
+                    builder = builder.append(input.drop(size - quarter));
+                }
+                if (size >= 4 && size / 2 >= minimumSize) {
+                    // even elements
+                    builder = builder.lazyAppend(() -> evenElements(input));
 
-                // second half
-                builder = builder.lazyAppend(() -> input.drop(size - half));
-            }
-            final int init = size - single;
-            if (init >= minimumSize) {
-                // init
-                builder = builder.lazyAppend(() -> input.take(init));
+                    // odd elements
+                    builder = builder.lazyAppend(() -> oddElements(input));
+                }
+                final int half = Math.max(size / 2, minimumSize);
+                if (half > quarter) {
+                    // first half
+                    builder = builder.lazyAppend(() -> input.take(half));
 
-                // tail
-                builder = builder.lazyAppend(() -> input.drop(single));
+                    // second half
+                    builder = builder.lazyAppend(() -> input.drop(size - half));
+                }
+                final int init = size - single;
+                if (init >= minimumSize) {
+                    // init
+                    builder = builder.lazyAppend(() -> input.take(init));
+
+                    // tail
+                    builder = builder.lazyAppend(() -> input.drop(single));
+                }
             }
             // individual elements
             builder = builder.lazyConcat(() -> shrinkIndividualElements(0, element, input));
