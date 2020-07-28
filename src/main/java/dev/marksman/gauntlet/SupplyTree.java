@@ -4,6 +4,7 @@ import com.jnape.palatable.lambda.adt.coproduct.CoProduct6;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.collectionviews.NonEmptyVector;
+import dev.marksman.collectionviews.Vector;
 
 public abstract class SupplyTree implements CoProduct6<SupplyTree.Leaf, SupplyTree.Composite, SupplyTree.Collection,
         SupplyTree.Mapping, SupplyTree.Filter, SupplyTree.Exhausted, SupplyTree> {
@@ -13,6 +14,10 @@ public abstract class SupplyTree implements CoProduct6<SupplyTree.Leaf, SupplyTr
 
     public static SupplyTree composite(SupplyTree first, SupplyTree... rest) {
         return new Composite(NonEmptyVector.of(first, rest));
+    }
+
+    public static SupplyTree composite(Iterable<SupplyTree> components) {
+        return new Composite(Vector.copyFrom(components));
     }
 
     public static SupplyTree collection(SupplyTree child) {

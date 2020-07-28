@@ -514,6 +514,36 @@ public final class Arbitraries {
         return CoProductArbitraries.arbitraryEither(weights, left, right);
     }
 
+    /**
+     * An arbitrary that, given one or more source arbitraries, will randomly select and draw from these sources,
+     * with probability to be determined by the provided weights.
+     *
+     * @param first the first source in the frequency map.  The resulting {@code Arbitrary} will assume the
+     *              {@link ShrinkStrategy} and {@link PrettyPrinter} of this argument.
+     * @param rest  additional sources in the frequency map.
+     * @return an {@code Arbitrary<A>}
+     */
+    @SafeVarargs
+    public static <A> Arbitrary<A> frequencies(Weighted<Arbitrary<A>> first,
+                                               Weighted<Arbitrary<A>>... rest) {
+        return FrequencyMapArbitrary.frequencies(first, rest);
+    }
+
+    /**
+     * An arbitrary that, given one or more source arbitraries, will randomly select and draw from these sources,
+     * with equal probability for each source.
+     *
+     * @param first the first entry in the frequency map.  The resulting {@code Arbitrary} will assume the
+     *              {@link ShrinkStrategy} and {@link PrettyPrinter} of this argument.
+     * @param rest  additional sources in the frequency map.
+     * @return an {@code Arbitrary<A>}
+     */
+    @SafeVarargs
+    public static <A> Arbitrary<A> frequencies(Arbitrary<A> first,
+                                               Arbitrary<A>... rest) {
+        return FrequencyMapArbitrary.frequencies(first, rest);
+    }
+
     public static <Collection> Arbitrary<Collection> homogeneousCollections(Fn1<? super Vector<?>, ? extends Collection> fromVector,
                                                                             Fn1<? super Collection, ? extends Vector<?>> toVector) {
         return vectors().convert(fromVector, toVector);
