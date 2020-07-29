@@ -29,6 +29,4 @@ final class ChoiceSupply2<A, B> implements Supply<Choice2<A, B>> {
                 .match(__ -> supplyA.getNext(r1.getNextState()).fmap(Choice2::a),
                         __ -> supplyB.getNext(r1.getNextState()).fmap(Choice2::b));
     }
-
-
 }
