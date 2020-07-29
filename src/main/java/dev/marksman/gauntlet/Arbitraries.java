@@ -2,6 +2,7 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Either;
 import com.jnape.palatable.lambda.adt.Maybe;
+import com.jnape.palatable.lambda.adt.These;
 import com.jnape.palatable.lambda.adt.Unit;
 import com.jnape.palatable.lambda.adt.choice.Choice2;
 import com.jnape.palatable.lambda.adt.choice.Choice3;
@@ -607,6 +608,11 @@ public final class Arbitraries {
                                                            Arbitrary<L> left,
                                                            Arbitrary<R> right) {
         return CoProductArbitraries.arbitraryEither(weights, left, right);
+    }
+
+    public static <A, B> Arbitrary<These<A, B>> theseOf(Arbitrary<A> a,
+                                                        Arbitrary<B> b) {
+        return CoProductArbitraries.arbitraryThese(a, b);
     }
 
     /**

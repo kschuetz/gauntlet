@@ -2,6 +2,7 @@ package dev.marksman.gauntlet;
 
 import com.jnape.palatable.lambda.adt.Either;
 import com.jnape.palatable.lambda.adt.Maybe;
+import com.jnape.palatable.lambda.adt.These;
 import com.jnape.palatable.lambda.adt.Unit;
 import com.jnape.palatable.lambda.adt.choice.Choice2;
 import com.jnape.palatable.lambda.adt.choice.Choice3;
@@ -10,6 +11,7 @@ import com.jnape.palatable.lambda.adt.choice.Choice5;
 import com.jnape.palatable.lambda.adt.choice.Choice6;
 import com.jnape.palatable.lambda.adt.choice.Choice7;
 import com.jnape.palatable.lambda.adt.choice.Choice8;
+import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.Generators;
@@ -30,6 +32,7 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkChoic
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkChoice7;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkChoice8;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkMaybe;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkThese;
 import static dev.marksman.kraftwerk.Generators.generateUnit;
 import static dev.marksman.kraftwerk.Weighted.weighted;
 import static dev.marksman.kraftwerk.weights.MaybeWeights.justs;
@@ -255,6 +258,18 @@ final class CoProductArbitraries {
                                                           Arbitrary<L> left,
                                                           Arbitrary<R> right) {
         return arbitraryEither(left.weighted(weights.getLeftWeight()), right.weighted(weights.getRightWeight()));
+    }
+
+    static <A, B> Arbitrary<These<A, B>> arbitraryThese(Arbitrary<A> a,
+                                                        Arbitrary<B> b) {
+        Arbitrary<Tuple2<A, B>> both = CompositeArbitraries.combine(a, b);
+        ShrinkStrategy<These<A, B>> shrinkStrategy = shrinkThese(a.getShrinkStrategy().orElse(ShrinkStrategy.none()), b.getShrinkStrategy().orElse(ShrinkStrategy.none()));
+        Arbitrary<Choice3<A, B, Tuple2<A, B>>> choice3Arbitrary = arbitraryCoProduct3(a.weighted(), b.weighted(), both.weighted(), nothing());
+        Arbitrary<These<A, B>> result = choice3Arbitrary.convert((Choice3<A, B, Tuple2<A, B>> c3) -> c3.match(These::a,
+                These::b,
+                xy -> These.both(xy._1(), xy._2())),
+                (These<A, B> t) -> t.match(Choice3::a, Choice3::b, Choice3::c));
+        return result.withShrinkStrategy(shrinkStrategy);
     }
 
     private static Generator<Choice2<Unit, Unit>> generateWhich(int weightA, int weightB) {
