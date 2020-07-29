@@ -5,6 +5,7 @@ import com.jnape.palatable.lambda.adt.Maybe;
 import com.jnape.palatable.lambda.adt.Unit;
 import com.jnape.palatable.lambda.adt.choice.Choice2;
 import com.jnape.palatable.lambda.adt.choice.Choice3;
+import com.jnape.palatable.lambda.adt.choice.Choice4;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
@@ -487,6 +488,20 @@ public final class Arbitraries {
                                                                   Arbitrary<B> b,
                                                                   Arbitrary<C> c) {
         return CoProductArbitraries.arbitraryChoice3(a, b, c);
+    }
+
+    public static <A, B, C, D> Arbitrary<Choice4<A, B, C, D>> choicesOf(Weighted<Arbitrary<A>> a,
+                                                                        Weighted<Arbitrary<B>> b,
+                                                                        Weighted<Arbitrary<C>> c,
+                                                                        Weighted<Arbitrary<D>> d) {
+        return CoProductArbitraries.arbitraryChoice4(a, b, c, d);
+    }
+
+    public static <A, B, C, D> Arbitrary<Choice4<A, B, C, D>> choicesOf(Arbitrary<A> a,
+                                                                        Arbitrary<B> b,
+                                                                        Arbitrary<C> c,
+                                                                        Arbitrary<D> d) {
+        return CoProductArbitraries.arbitraryChoice4(a, b, c, d);
     }
 
     public static <A> Arbitrary<Maybe<A>> maybesOf(MaybeWeights weights,
