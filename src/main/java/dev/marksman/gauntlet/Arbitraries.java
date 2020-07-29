@@ -8,6 +8,7 @@ import com.jnape.palatable.lambda.adt.choice.Choice3;
 import com.jnape.palatable.lambda.adt.choice.Choice4;
 import com.jnape.palatable.lambda.adt.choice.Choice5;
 import com.jnape.palatable.lambda.adt.choice.Choice6;
+import com.jnape.palatable.lambda.adt.choice.Choice7;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
@@ -538,6 +539,26 @@ public final class Arbitraries {
                                                                                     Arbitrary<E> e,
                                                                                     Arbitrary<F> f) {
         return CoProductArbitraries.arbitraryChoice6(a, b, c, d, e, f);
+    }
+
+    public static <A, B, C, D, E, F, G> Arbitrary<Choice7<A, B, C, D, E, F, G>> choicesOf(Weighted<Arbitrary<A>> a,
+                                                                                          Weighted<Arbitrary<B>> b,
+                                                                                          Weighted<Arbitrary<C>> c,
+                                                                                          Weighted<Arbitrary<D>> d,
+                                                                                          Weighted<Arbitrary<E>> e,
+                                                                                          Weighted<Arbitrary<F>> f,
+                                                                                          Weighted<Arbitrary<G>> g) {
+        return CoProductArbitraries.arbitraryChoice7(a, b, c, d, e, f, g);
+    }
+
+    public static <A, B, C, D, E, F, G> Arbitrary<Choice7<A, B, C, D, E, F, G>> choicesOf(Arbitrary<A> a,
+                                                                                          Arbitrary<B> b,
+                                                                                          Arbitrary<C> c,
+                                                                                          Arbitrary<D> d,
+                                                                                          Arbitrary<E> e,
+                                                                                          Arbitrary<F> f,
+                                                                                          Arbitrary<G> g) {
+        return CoProductArbitraries.arbitraryChoice7(a, b, c, d, e, f, g);
     }
 
     public static <A> Arbitrary<Maybe<A>> maybesOf(MaybeWeights weights,
