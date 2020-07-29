@@ -9,6 +9,7 @@ import com.jnape.palatable.lambda.adt.choice.Choice4;
 import com.jnape.palatable.lambda.adt.choice.Choice5;
 import com.jnape.palatable.lambda.adt.choice.Choice6;
 import com.jnape.palatable.lambda.adt.choice.Choice7;
+import com.jnape.palatable.lambda.adt.choice.Choice8;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.Generators;
@@ -27,6 +28,7 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkChoic
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkChoice5;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkChoice6;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkChoice7;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkChoice8;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkMaybe;
 import static dev.marksman.kraftwerk.Generators.generateUnit;
 import static dev.marksman.kraftwerk.Weighted.weighted;
@@ -185,6 +187,44 @@ final class CoProductArbitraries {
         return arbitraryChoice7(a.weighted(), b.weighted(), c.weighted(), d.weighted(), e.weighted(), f.weighted(), g.weighted());
     }
 
+    static <A, B, C, D, E, F, G, H> Arbitrary<Choice8<A, B, C, D, E, F, G, H>> arbitraryChoice8(Weighted<Arbitrary<A>> a,
+                                                                                                Weighted<Arbitrary<B>> b,
+                                                                                                Weighted<Arbitrary<C>> c,
+                                                                                                Weighted<Arbitrary<D>> d,
+                                                                                                Weighted<Arbitrary<E>> e,
+                                                                                                Weighted<Arbitrary<F>> f,
+                                                                                                Weighted<Arbitrary<G>> g,
+                                                                                                Weighted<Arbitrary<H>> h) {
+        Arbitrary<A> arbitraryA = a.getValue();
+        Arbitrary<B> arbitraryB = b.getValue();
+        Arbitrary<C> arbitraryC = c.getValue();
+        Arbitrary<D> arbitraryD = d.getValue();
+        Arbitrary<E> arbitraryE = e.getValue();
+        Arbitrary<F> arbitraryF = f.getValue();
+        Arbitrary<G> arbitraryG = g.getValue();
+        Arbitrary<H> arbitraryH = h.getValue();
+        ShrinkStrategy<Choice8<A, B, C, D, E, F, G, H>> shrinkStrategy = shrinkChoice8(arbitraryA.getShrinkStrategy().orElse(ShrinkStrategy.none()),
+                arbitraryB.getShrinkStrategy().orElse(ShrinkStrategy.none()),
+                arbitraryC.getShrinkStrategy().orElse(ShrinkStrategy.none()),
+                arbitraryD.getShrinkStrategy().orElse(ShrinkStrategy.none()),
+                arbitraryE.getShrinkStrategy().orElse(ShrinkStrategy.none()),
+                arbitraryF.getShrinkStrategy().orElse(ShrinkStrategy.none()),
+                arbitraryG.getShrinkStrategy().orElse(ShrinkStrategy.none()),
+                arbitraryH.getShrinkStrategy().orElse(ShrinkStrategy.none()));
+        return arbitraryCoProduct8(a, b, c, d, e, f, g, h, just(shrinkStrategy));
+    }
+
+    static <A, B, C, D, E, F, G, H> Arbitrary<Choice8<A, B, C, D, E, F, G, H>> arbitraryChoice8(Arbitrary<A> a,
+                                                                                                Arbitrary<B> b,
+                                                                                                Arbitrary<C> c,
+                                                                                                Arbitrary<D> d,
+                                                                                                Arbitrary<E> e,
+                                                                                                Arbitrary<F> f,
+                                                                                                Arbitrary<G> g,
+                                                                                                Arbitrary<H> h) {
+        return arbitraryChoice8(a.weighted(), b.weighted(), c.weighted(), d.weighted(), e.weighted(), f.weighted(), g.weighted(), h.weighted());
+    }
+
     static <A> Arbitrary<Maybe<A>> arbitraryMaybe(MaybeWeights weights,
                                                   Arbitrary<A> a) {
         return arbitraryCoProduct2(arbitraryUnit().weighted(weights.getNothingWeight()),
@@ -274,6 +314,20 @@ final class CoProductArbitraries {
                 .orValue(weighted(weightE, UNIT))
                 .orValue(weighted(weightF, UNIT))
                 .orValue(weighted(weightG, UNIT))
+                .toGenerator();
+    }
+
+    private static Generator<Choice8<Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit>> generateWhich(int weightA, int weightB, int weightC, int weightD,
+                                                                                                    int weightE, int weightF, int weightG, int weightH) {
+        validateWeights(weightA + weightB + weightC + weightD + weightE + weightF + weightG + weightH);
+        return Generators.choiceBuilderValue(weighted(weightA, UNIT))
+                .orValue(weighted(weightB, UNIT))
+                .orValue(weighted(weightC, UNIT))
+                .orValue(weighted(weightD, UNIT))
+                .orValue(weighted(weightE, UNIT))
+                .orValue(weighted(weightF, UNIT))
+                .orValue(weighted(weightG, UNIT))
+                .orValue(weighted(weightH, UNIT))
                 .toGenerator();
     }
 
@@ -415,6 +469,41 @@ final class CoProductArbitraries {
                                 arbitraryE.createSupply(parameters),
                                 arbitraryF.createSupply(parameters),
                                 arbitraryG.createSupply(parameters),
+                                generateWhich.prepare(parameters)),
+                shrinkStrategy,
+                // TODO: prettyPrinter
+                defaultPrettyPrinter());
+    }
+
+    private static <A, B, C, D, E, F, G, H> Arbitrary<Choice8<A, B, C, D, E, F, G, H>> arbitraryCoProduct8(Weighted<Arbitrary<A>> a,
+                                                                                                           Weighted<Arbitrary<B>> b,
+                                                                                                           Weighted<Arbitrary<C>> c,
+                                                                                                           Weighted<Arbitrary<D>> d,
+                                                                                                           Weighted<Arbitrary<E>> e,
+                                                                                                           Weighted<Arbitrary<F>> f,
+                                                                                                           Weighted<Arbitrary<G>> g,
+                                                                                                           Weighted<Arbitrary<H>> h,
+                                                                                                           Maybe<ShrinkStrategy<Choice8<A, B, C, D, E, F, G, H>>> shrinkStrategy) {
+        Generator<Choice8<Unit, Unit, Unit, Unit, Unit, Unit, Unit, Unit>> generateWhich = generateWhich(a.getWeight(), b.getWeight(), c.getWeight(),
+                d.getWeight(), e.getWeight(), f.getWeight(), g.getWeight(), h.getWeight());
+
+        Arbitrary<A> arbitraryA = a.getValue();
+        Arbitrary<B> arbitraryB = b.getValue();
+        Arbitrary<C> arbitraryC = c.getValue();
+        Arbitrary<D> arbitraryD = d.getValue();
+        Arbitrary<E> arbitraryE = e.getValue();
+        Arbitrary<F> arbitraryF = f.getValue();
+        Arbitrary<G> arbitraryG = g.getValue();
+        Arbitrary<H> arbitraryH = h.getValue();
+        return Arbitrary.arbitrary(parameters ->
+                        new ChoiceSupply8<>(arbitraryA.createSupply(parameters),
+                                arbitraryB.createSupply(parameters),
+                                arbitraryC.createSupply(parameters),
+                                arbitraryD.createSupply(parameters),
+                                arbitraryE.createSupply(parameters),
+                                arbitraryF.createSupply(parameters),
+                                arbitraryG.createSupply(parameters),
+                                arbitraryH.createSupply(parameters),
                                 generateWhich.prepare(parameters)),
                 shrinkStrategy,
                 // TODO: prettyPrinter

@@ -9,6 +9,7 @@ import com.jnape.palatable.lambda.adt.choice.Choice4;
 import com.jnape.palatable.lambda.adt.choice.Choice5;
 import com.jnape.palatable.lambda.adt.choice.Choice6;
 import com.jnape.palatable.lambda.adt.choice.Choice7;
+import com.jnape.palatable.lambda.adt.choice.Choice8;
 import com.jnape.palatable.lambda.adt.hlist.Tuple2;
 import com.jnape.palatable.lambda.adt.hlist.Tuple3;
 import com.jnape.palatable.lambda.adt.hlist.Tuple4;
@@ -238,6 +239,24 @@ public final class ShrinkStrategies {
                 e -> se.apply(e).fmap(Choice7::e),
                 f -> sf.apply(f).fmap(Choice7::f),
                 g -> sg.apply(g).fmap(Choice7::g));
+    }
+
+    public static <A, B, C, D, E, F, G, H> ShrinkStrategy<Choice8<A, B, C, D, E, F, G, H>> shrinkChoice8(ShrinkStrategy<A> sa,
+                                                                                                         ShrinkStrategy<B> sb,
+                                                                                                         ShrinkStrategy<C> sc,
+                                                                                                         ShrinkStrategy<D> sd,
+                                                                                                         ShrinkStrategy<E> se,
+                                                                                                         ShrinkStrategy<F> sf,
+                                                                                                         ShrinkStrategy<G> sg,
+                                                                                                         ShrinkStrategy<H> sh) {
+        return input -> input.match(a -> sa.apply(a).fmap(Choice8::a),
+                b -> sb.apply(b).fmap(Choice8::b),
+                c -> sc.apply(c).fmap(Choice8::c),
+                d -> sd.apply(d).fmap(Choice8::d),
+                e -> se.apply(e).fmap(Choice8::e),
+                f -> sf.apply(f).fmap(Choice8::f),
+                g -> sg.apply(g).fmap(Choice8::g),
+                h -> sh.apply(h).fmap(Choice8::h));
     }
 
     public static <A, B> ShrinkStrategy<These<A, B>> shrinkThese(ShrinkStrategy<A> sa,
