@@ -700,6 +700,8 @@ public final class Arbitraries {
         return CollectionArbitraries.vectorOfSize(size, elements);
     }
 
+    // TODO: vectorsOf size range
+
     public static Arbitrary<NonEmptyVector<?>> nonEmptyVectors() {
         return Arbitrary.higherOrderArbitrary(generateArbitrary(), Arbitrary::nonEmptyVector);
     }
@@ -753,6 +755,8 @@ public final class Arbitraries {
     public static <A> Arbitrary<ArrayList<A>> nonEmptyArrayListsOf(Arbitrary<A> elements) {
         return CollectionArbitraries.nonEmptyArrayList(elements);
     }
+
+    // TODO: hashSets()
 
     public static <A> Arbitrary<HashSet<A>> hashSetsOf(Arbitrary<A> elements) {
         return CollectionArbitraries.hashSet(elements);
