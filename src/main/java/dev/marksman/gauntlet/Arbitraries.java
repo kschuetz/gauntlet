@@ -41,7 +41,6 @@ import dev.marksman.kraftwerk.constraints.LocalTimeRange;
 import dev.marksman.kraftwerk.constraints.LongRange;
 import dev.marksman.kraftwerk.constraints.ShortRange;
 import dev.marksman.kraftwerk.domain.Characters;
-import dev.marksman.kraftwerk.frequency.FrequencyMap;
 import dev.marksman.kraftwerk.weights.EitherWeights;
 import dev.marksman.kraftwerk.weights.MaybeWeights;
 
@@ -121,19 +120,22 @@ public final class Arbitraries {
     private Arbitraries() {
     }
 
+    /**
+     * An arbitrary that generates {@link Integer}s using a custom generator.
+     */
     public static Arbitrary<Integer> ints(Generator<Integer> generator) {
         return arbitrary(generator).withShrinkStrategy(shrinkInt());
     }
 
     /**
-     * An arbitrary that generates an {@link Integer} within the specified range.
+     * An arbitrary that generates {@link Integer}s.
      */
     public static Arbitrary<Integer> ints() {
         return ints(generateInt());
     }
 
     /**
-     * An arbitrary that generates {@link Integer}s within the specified range.
+     * An arbitrary that generates {@link Integer}s within a specific range.
      */
     public static Arbitrary<Integer> ints(IntRange range) {
         return arbitrary(generateInt(range)).withShrinkStrategy(shrinkInt(range));
@@ -155,14 +157,23 @@ public final class Arbitraries {
         return ints(IntRange.from(0).to(Integer.MAX_VALUE));
     }
 
+    /**
+     * An arbitrary that generates {@link Long}s using a custom generator.
+     */
     public static Arbitrary<Long> longs(Generator<Long> generator) {
         return arbitrary(generator).withShrinkStrategy(shrinkLong());
     }
 
+    /**
+     * An arbitrary that generates {@link Long}s.
+     */
     public static Arbitrary<Long> longs() {
         return longs(generateLong());
     }
 
+    /**
+     * An arbitrary that generates {@link Long}s within a specific range.
+     */
     public static Arbitrary<Long> longs(LongRange range) {
         return arbitrary(generateLong(range)).withShrinkStrategy(shrinkLong(range));
     }
@@ -183,68 +194,109 @@ public final class Arbitraries {
         return longs(LongRange.from(0).to(Long.MAX_VALUE));
     }
 
+    /**
+     * An arbitrary that generates {@link Short}s using a custom generator.
+     */
     public static Arbitrary<Short> shorts(Generator<Short> generator) {
         return arbitrary(generator).withShrinkStrategy(shrinkShort());
     }
 
+    /**
+     * An arbitrary that generates {@link Short}s.
+     */
     public static Arbitrary<Short> shorts() {
         return shorts(generateShort());
     }
 
+    /**
+     * An arbitrary that generates {@link Short}s within a specific range.
+     */
     public static Arbitrary<Short> shorts(ShortRange range) {
         return arbitrary(generateShort(range)).withShrinkStrategy(shrinkShort(range));
     }
 
+    /**
+     * An arbitrary that generates {@link Short}s &gt;= 0.
+     */
     public static Arbitrary<Short> shortNaturals() {
         return shorts(ShortRange.from((short) 0).to(Short.MAX_VALUE));
     }
 
+    /**
+     * An arbitrary that generates {@link Byte}s using a custom generator.
+     */
     public static Arbitrary<Byte> bytes(Generator<Byte> generator) {
         return arbitrary(generator).withShrinkStrategy(shrinkByte());
     }
 
+    /**
+     * An arbitrary that generates {@link Byte}s.
+     */
     public static Arbitrary<Byte> bytes() {
         return bytes(generateByte());
     }
 
+    /**
+     * An arbitrary that generates {@link Byte}s within a specific range.
+     */
     public static Arbitrary<Byte> bytes(ByteRange range) {
         return arbitrary(generateByte(range)).withShrinkStrategy(shrinkByte(range));
     }
 
+    /**
+     * An arbitrary that generates {@link Boolean}s using a custom generator.
+     */
     public static Arbitrary<Boolean> booleans(Generator<Boolean> generator) {
         return arbitrary(generator).withShrinkStrategy(shrinkBoolean());
     }
 
+    /**
+     * An arbitrary that generates {@link Boolean}s.
+     */
     public static Arbitrary<Boolean> booleans() {
         return booleans(generateBoolean());
     }
 
+    /**
+     * An arbitrary that generates {@link Character}s using a custom generator.
+     */
     public static Arbitrary<Character> characters(Generator<Character> generator) {
         return arbitrary(generator); // TODO: shrink characters
     }
 
+    /**
+     * An arbitrary that generates {@link Character}s.
+     */
     public static Arbitrary<Character> characters() {
         return characters(generateChar());
     }
 
+    /**
+     * An arbitrary that generates {@link Character}s within a specific range.
+     */
     public static Arbitrary<Character> characters(CharRange range) {
         return arbitrary(generateChar(range));  // TODO: shrink characters
     }
 
+    /**
+     * An arbitrary that generates {@link Float}s using a custom generator.
+     */
     public static Arbitrary<Float> floats(Generator<Float> generator) {
         return arbitrary(generator).withShrinkStrategy(shrinkFloat());
     }
 
+    /**
+     * An arbitrary that generates {@link Float}s.
+     */
     public static Arbitrary<Float> floats() {
         return floats(generateFloat());
     }
 
+    /**
+     * An arbitrary that generates {@link Float}s within a specific range.
+     */
     public static Arbitrary<Float> floats(FloatRange range) {
         return arbitrary(generateFloat(range)).withShrinkStrategy(shrinkFloat(range));
-    }
-
-    public static Arbitrary<Float> floats(FrequencyMap<Float> frequencyMap) {
-        return floats(frequencyMap.toGenerator());
     }
 
     /**
@@ -254,14 +306,23 @@ public final class Arbitraries {
         return arbitrary(generateFloatFractional()).withShrinkStrategy(shrinkFloat(FloatRange.exclusive(1)));
     }
 
+    /**
+     * An arbitrary that generates {@link Double}s using a custom generator.
+     */
     public static Arbitrary<Double> doubles(Generator<Double> generator) {
         return arbitrary(generator).withShrinkStrategy(shrinkDouble());
     }
 
+    /**
+     * An arbitrary that generates {@link Double}s.
+     */
     public static Arbitrary<Double> doubles() {
         return doubles(generateDouble());
     }
 
+    /**
+     * An arbitrary that generates {@link Double}s within a specific range.
+     */
     public static Arbitrary<Double> doubles(DoubleRange range) {
         return arbitrary(generateDouble(range)).withShrinkStrategy(shrinkDouble(range));
     }
@@ -273,32 +334,54 @@ public final class Arbitraries {
         return arbitrary(generateDoubleFractional()).withShrinkStrategy(shrinkDouble(DoubleRange.exclusive(1)));
     }
 
+    /**
+     * An arbitrary that generates byte arrays of varying sizes.
+     */
     public static Arbitrary<Byte[]> byteArrays() {
         return arbitrary(generateByteArray());
     }
 
+    /**
+     * An arbitrary that generates byte arrays of a specific size.
+     */
     public static Arbitrary<Byte[]> byteArrays(int size) {
         return arbitrary(generateByteArray(size));
     }
 
+    /**
+     * An arbitrary that generates boxed primitives, i.e., {@link Integer}s, {@link Long}s, {@link Short}s, {@link Byte}s,
+     * {@link Double}s, {@link Float}s, {@link Boolean}s, or {@link Character}s.
+     */
     public static Arbitrary<Object> boxedPrimitives() {
         return arbitrary(generateBoxedPrimitive());
     }
 
+    /**
+     * An arbitrary that generates {@link String}s using a custom generator.
+     */
     public static Arbitrary<String> strings(Generator<String> generator) {
         return arbitrary(generator).withShrinkStrategy(shrinkString());
     }
 
+    /**
+     * An arbitrary that generates {@link String}s.
+     */
     public static Arbitrary<String> strings() {
         return strings(generateString());
     }
 
+    /**
+     * An arbitrary that generates {@link String}s of a specific length.
+     */
     public static Arbitrary<String> stringsOfLength(int length) {
         requireNaturalSize(length);
         return arbitrary(generateStringFromCharacters(length, Characters.asciiPrintable()))
                 .withShrinkStrategy(shrinkString(length));
     }
 
+    /**
+     * An arbitrary that generates {@link String}s with lengths that are within a specific range.
+     */
     public static Arbitrary<String> stringsOfLength(IntRange lengthRange) {
         requireNaturalSize(lengthRange);
         return arbitrary(generateInt(lengthRange)
@@ -306,53 +389,89 @@ public final class Arbitraries {
                 .withShrinkStrategy(shrinkString(lengthRange.minInclusive()));
     }
 
+    /**
+     * An arbitrary that generates {@link BigInteger}s using a custom generator.
+     */
     public static Arbitrary<BigInteger> bigIntegers(Generator<BigInteger> generator) {
         return arbitrary(generator); // TODO: shrink BigIntegers
     }
 
+    /**
+     * An arbitrary that generates {@link BigInteger}s.
+     */
     public static Arbitrary<BigInteger> bigIntegers() {
         return bigIntegers(generateBigInteger());
     }
 
+    /**
+     * An arbitrary that generates {@link BigInteger}s within a specific range.
+     */
     public static Arbitrary<BigInteger> bigIntegers(BigIntegerRange range) {
         return bigIntegers(generateBigInteger(range));
     }
 
+    /**
+     * An arbitrary that generates {@link BigDecimal}s using a custom generator.
+     */
     public static Arbitrary<BigDecimal> bigDecimals(Generator<BigDecimal> generator) {
         return arbitrary(generator); // TODO: shrink BigDecimal
     }
 
+    /**
+     * An arbitrary that generates {@link BigDecimal}s.
+     */
     public static Arbitrary<BigDecimal> bigDecimals() {
         return bigDecimals(generateBigDecimal());
     }
 
+    /**
+     * An arbitrary that generates {@link BigDecimal}s within a specific range.
+     */
     public static Arbitrary<BigDecimal> bigDecimals(BigDecimalRange range) {
         return bigDecimals(generateBigDecimal(range));
     }
 
+    /**
+     * An arbitrary that generates {@link BigDecimal}s within a specific range, and with a specific number of decimal places.
+     */
     public static Arbitrary<BigDecimal> bigDecimals(int decimalPlaces, BigDecimalRange range) {
         return bigDecimals(generateBigDecimal(decimalPlaces, range));
     }
 
+    /**
+     * An arbitrary that generates {@link BigDecimal}s within a specific range, and with the number of decimal places within a specific range.
+     */
     public static Arbitrary<BigDecimal> bigDecimals(IntRange decimalPlaces, BigDecimalRange range) {
         return bigDecimals(generateBigDecimal(generateInt(decimalPlaces), range));
     }
 
+    /**
+     * An arbitrary that chooses values from a specific enum.
+     */
     public static <A extends Enum<A>> Arbitrary<A> valuesOfEnumClass(Class<A> enumType) {
         return arbitrary(generateFromEnum(enumType));
     }
 
+    /**
+     * An arbitrary that generates {@code Tuple2}s, formed by combining two component arbitraries.
+     */
     public static <A, B> Arbitrary<Tuple2<A, B>> tuplesOf(Arbitrary<A> a,
                                                           Arbitrary<B> b) {
         return CompositeArbitraries.combine(a, b);
     }
 
+    /**
+     * An arbitrary that generates {@code Tuple3}s, formed by combining three component arbitraries.
+     */
     public static <A, B, C> Arbitrary<Tuple3<A, B, C>> tuplesOf(Arbitrary<A> a,
                                                                 Arbitrary<B> b,
                                                                 Arbitrary<C> c) {
         return CompositeArbitraries.combine(a, b, c);
     }
 
+    /**
+     * An arbitrary that generates {@code Tuple4}s, formed by combining four component arbitraries.
+     */
     public static <A, B, C, D> Arbitrary<Tuple4<A, B, C, D>> tuplesOf(Arbitrary<A> a,
                                                                       Arbitrary<B> b,
                                                                       Arbitrary<C> c,
@@ -360,6 +479,9 @@ public final class Arbitraries {
         return CompositeArbitraries.combine(a, b, c, d);
     }
 
+    /**
+     * An arbitrary that generates {@code Tuple5}s, formed by combining five component arbitraries.
+     */
     public static <A, B, C, D, E> Arbitrary<Tuple5<A, B, C, D, E>> tuplesOf(Arbitrary<A> a,
                                                                             Arbitrary<B> b,
                                                                             Arbitrary<C> c,
@@ -368,6 +490,9 @@ public final class Arbitraries {
         return CompositeArbitraries.combine(a, b, c, d, e);
     }
 
+    /**
+     * An arbitrary that generates {@code Tuple6}s, formed by combining six component arbitraries.
+     */
     public static <A, B, C, D, E, F> Arbitrary<Tuple6<A, B, C, D, E, F>> tuplesOf(Arbitrary<A> a,
                                                                                   Arbitrary<B> b,
                                                                                   Arbitrary<C> c,
@@ -377,6 +502,9 @@ public final class Arbitraries {
         return CompositeArbitraries.combine(a, b, c, d, e, f);
     }
 
+    /**
+     * An arbitrary that generates {@code Tuple7}s, formed by combining seven component arbitraries.
+     */
     public static <A, B, C, D, E, F, G> Arbitrary<Tuple7<A, B, C, D, E, F, G>> tuplesOf(Arbitrary<A> a,
                                                                                         Arbitrary<B> b,
                                                                                         Arbitrary<C> c,
@@ -387,6 +515,9 @@ public final class Arbitraries {
         return CompositeArbitraries.combine(a, b, c, d, e, f, g);
     }
 
+    /**
+     * An arbitrary that generates {@code Tuple8}s, formed by combining eight component arbitraries.
+     */
     public static <A, B, C, D, E, F, G, H> Arbitrary<Tuple8<A, B, C, D, E, F, G, H>> tuplesOf(Arbitrary<A> a,
                                                                                               Arbitrary<B> b,
                                                                                               Arbitrary<C> c,
@@ -398,67 +529,111 @@ public final class Arbitraries {
         return CompositeArbitraries.combine(a, b, c, d, e, f, g, h);
     }
 
+    /**
+     * An arbitrary that generates {@code Tuple2}s of arbitrary component types.
+     */
     public static Arbitrary<Tuple2<?, ?>> tuple2s() {
         return higherOrderArbitrary(generateArbitrary().pair(), x -> tuplesOf(x._1(), x._2()));
     }
 
+    /**
+     * An arbitrary that generates {@code Tuple3}s of arbitrary component types.
+     */
     public static Arbitrary<Tuple3<?, ?, ?>> tuple3s() {
         return higherOrderArbitrary(generateArbitrary().triple(), x -> tuplesOf(x._1(), x._2(), x._3()));
     }
 
+    /**
+     * An arbitrary that generates {@code Tuple4}s of arbitrary component types.
+     */
     public static Arbitrary<Tuple4<?, ?, ?, ?>> tuple4s() {
         return higherOrderArbitrary(Generators.tupled(generateArbitrary(), generateArbitrary(), generateArbitrary(),
                 generateArbitrary()), x -> tuplesOf(x._1(), x._2(), x._3(), x._4()));
     }
 
+    /**
+     * An arbitrary that generates {@code Tuple5}s of arbitrary component types.
+     */
     public static Arbitrary<Tuple5<?, ?, ?, ?, ?>> tuple5s() {
         return higherOrderArbitrary(Generators.tupled(generateArbitrary(), generateArbitrary(), generateArbitrary(),
                 generateArbitrary(), generateArbitrary()), x -> tuplesOf(x._1(), x._2(), x._3(), x._4(), x._5()));
     }
 
+    /**
+     * An arbitrary that generates {@code Tuple6}s of arbitrary component types.
+     */
     public static Arbitrary<Tuple6<?, ?, ?, ?, ?, ?>> tuple6s() {
         return higherOrderArbitrary(Generators.tupled(generateArbitrary(), generateArbitrary(), generateArbitrary(),
                 generateArbitrary(), generateArbitrary(), generateArbitrary()), x -> tuplesOf(x._1(), x._2(), x._3(), x._4(), x._5(), x._6()));
     }
 
+    /**
+     * An arbitrary that generates {@code Tuple7}s of arbitrary component types.
+     */
     public static Arbitrary<Tuple7<?, ?, ?, ?, ?, ?, ?>> tuple7s() {
         return higherOrderArbitrary(Generators.tupled(generateArbitrary(), generateArbitrary(), generateArbitrary(),
                 generateArbitrary(), generateArbitrary(), generateArbitrary(), generateArbitrary()),
                 x -> tuplesOf(x._1(), x._2(), x._3(), x._4(), x._5(), x._6(), x._7()));
     }
 
+    /**
+     * An arbitrary that generates {@code Tuple8}s of arbitrary component types.
+     */
     public static Arbitrary<Tuple8<?, ?, ?, ?, ?, ?, ?, ?>> tuple8s() {
         return higherOrderArbitrary(Generators.tupled(generateArbitrary(), generateArbitrary(), generateArbitrary(),
                 generateArbitrary(), generateArbitrary(), generateArbitrary(), generateArbitrary(), generateArbitrary()),
                 x -> tuplesOf(x._1(), x._2(), x._3(), x._4(), x._5(), x._6(), x._7(), x._8()));
     }
 
+    /**
+     * An arbitrary that only generates a single value, {@code Unit.UNIT}.
+     */
     public static Arbitrary<Unit> unit() {
         return CoProductArbitraries.arbitraryUnit();
     }
 
+    /**
+     * An arbitrary that generates {@code Choice2}s, formed by randomly selecting and drawing from two component arbitraries
+     * with custom probabilities for each.
+     */
     public static <A, B> Arbitrary<Choice2<A, B>> choicesOf(Weighted<Arbitrary<A>> a,
                                                             Weighted<Arbitrary<B>> b) {
         return CoProductArbitraries.arbitraryChoice2(a, b);
     }
 
+    /**
+     * An arbitrary that generates {@code Choice2}s, formed by randomly selecting and drawing from two component arbitraries,
+     * with equal probability for each.
+     */
     public static <A, B> Arbitrary<Choice2<A, B>> choicesOf(Arbitrary<A> a,
                                                             Arbitrary<B> b) {
         return CoProductArbitraries.arbitraryChoice2(a, b);
     }
 
+    /**
+     * An arbitrary that generates {@code Choice3}s, formed by randomly selecting and drawing from three component arbitraries
+     * with custom probabilities for each.
+     */
     public static <A, B, C> Arbitrary<Choice3<A, B, C>> choicesOf(Weighted<Arbitrary<A>> a,
                                                                   Weighted<Arbitrary<B>> b,
                                                                   Weighted<Arbitrary<C>> c) {
         return CoProductArbitraries.arbitraryChoice3(a, b, c);
     }
 
+    /**
+     * An arbitrary that generates {@code Choice3}s, formed by randomly selecting and drawing from three component arbitraries,
+     * with equal probability for each.
+     */
     public static <A, B, C> Arbitrary<Choice3<A, B, C>> choicesOf(Arbitrary<A> a,
                                                                   Arbitrary<B> b,
                                                                   Arbitrary<C> c) {
         return CoProductArbitraries.arbitraryChoice3(a, b, c);
     }
 
+    /**
+     * An arbitrary that generates {@code Choice4}s, formed by randomly selecting and drawing from four component arbitraries
+     * with custom probabilities for each.
+     */
     public static <A, B, C, D> Arbitrary<Choice4<A, B, C, D>> choicesOf(Weighted<Arbitrary<A>> a,
                                                                         Weighted<Arbitrary<B>> b,
                                                                         Weighted<Arbitrary<C>> c,
@@ -466,6 +641,10 @@ public final class Arbitraries {
         return CoProductArbitraries.arbitraryChoice4(a, b, c, d);
     }
 
+    /**
+     * An arbitrary that generates {@code Choice4}s, formed by randomly selecting and drawing from four component arbitraries,
+     * with equal probability for each.
+     */
     public static <A, B, C, D> Arbitrary<Choice4<A, B, C, D>> choicesOf(Arbitrary<A> a,
                                                                         Arbitrary<B> b,
                                                                         Arbitrary<C> c,
@@ -473,6 +652,10 @@ public final class Arbitraries {
         return CoProductArbitraries.arbitraryChoice4(a, b, c, d);
     }
 
+    /**
+     * An arbitrary that generates {@code Choice5}s, formed by randomly selecting and drawing from five component arbitraries
+     * with custom probabilities for each.
+     */
     public static <A, B, C, D, E> Arbitrary<Choice5<A, B, C, D, E>> choicesOf(Weighted<Arbitrary<A>> a,
                                                                               Weighted<Arbitrary<B>> b,
                                                                               Weighted<Arbitrary<C>> c,
@@ -481,6 +664,10 @@ public final class Arbitraries {
         return CoProductArbitraries.arbitraryChoice5(a, b, c, d, e);
     }
 
+    /**
+     * An arbitrary that generates {@code Choice5}s, formed by randomly selecting and drawing from five component arbitraries,
+     * with equal probability for each.
+     */
     public static <A, B, C, D, E> Arbitrary<Choice5<A, B, C, D, E>> choicesOf(Arbitrary<A> a,
                                                                               Arbitrary<B> b,
                                                                               Arbitrary<C> c,
@@ -489,6 +676,10 @@ public final class Arbitraries {
         return CoProductArbitraries.arbitraryChoice5(a, b, c, d, e);
     }
 
+    /**
+     * An arbitrary that generates {@code Choice6}s, formed by randomly selecting and drawing from six component arbitraries
+     * with custom probabilities for each.
+     */
     public static <A, B, C, D, E, F> Arbitrary<Choice6<A, B, C, D, E, F>> choicesOf(Weighted<Arbitrary<A>> a,
                                                                                     Weighted<Arbitrary<B>> b,
                                                                                     Weighted<Arbitrary<C>> c,
@@ -498,6 +689,10 @@ public final class Arbitraries {
         return CoProductArbitraries.arbitraryChoice6(a, b, c, d, e, f);
     }
 
+    /**
+     * An arbitrary that generates {@code Choice6}s, formed by randomly selecting and drawing from six component arbitraries,
+     * with equal probability for each.
+     */
     public static <A, B, C, D, E, F> Arbitrary<Choice6<A, B, C, D, E, F>> choicesOf(Arbitrary<A> a,
                                                                                     Arbitrary<B> b,
                                                                                     Arbitrary<C> c,
@@ -507,6 +702,10 @@ public final class Arbitraries {
         return CoProductArbitraries.arbitraryChoice6(a, b, c, d, e, f);
     }
 
+    /**
+     * An arbitrary that generates {@code Choice7}s, formed by randomly selecting and drawing from seven component arbitraries
+     * with custom probabilities for each.
+     */
     public static <A, B, C, D, E, F, G> Arbitrary<Choice7<A, B, C, D, E, F, G>> choicesOf(Weighted<Arbitrary<A>> a,
                                                                                           Weighted<Arbitrary<B>> b,
                                                                                           Weighted<Arbitrary<C>> c,
@@ -517,6 +716,10 @@ public final class Arbitraries {
         return CoProductArbitraries.arbitraryChoice7(a, b, c, d, e, f, g);
     }
 
+    /**
+     * An arbitrary that generates {@code Choice7}s, formed by randomly selecting and drawing from seven component arbitraries,
+     * with equal probability for each.
+     */
     public static <A, B, C, D, E, F, G> Arbitrary<Choice7<A, B, C, D, E, F, G>> choicesOf(Arbitrary<A> a,
                                                                                           Arbitrary<B> b,
                                                                                           Arbitrary<C> c,
@@ -527,6 +730,10 @@ public final class Arbitraries {
         return CoProductArbitraries.arbitraryChoice7(a, b, c, d, e, f, g);
     }
 
+    /**
+     * An arbitrary that generates {@code Choice8}s, formed by randomly selecting and drawing from eight component arbitraries
+     * with custom probabilities for each.
+     */
     public static <A, B, C, D, E, F, G, H> Arbitrary<Choice8<A, B, C, D, E, F, G, H>> choicesOf(Weighted<Arbitrary<A>> a,
                                                                                                 Weighted<Arbitrary<B>> b,
                                                                                                 Weighted<Arbitrary<C>> c,
@@ -538,6 +745,10 @@ public final class Arbitraries {
         return CoProductArbitraries.arbitraryChoice8(a, b, c, d, e, f, g, h);
     }
 
+    /**
+     * An arbitrary that generates {@code Choice8}s, formed by randomly selecting and drawing from eight component arbitraries,
+     * with equal probability for each.
+     */
     public static <A, B, C, D, E, F, G, H> Arbitrary<Choice8<A, B, C, D, E, F, G, H>> choicesOf(Arbitrary<A> a,
                                                                                                 Arbitrary<B> b,
                                                                                                 Arbitrary<C> c,
@@ -549,31 +760,55 @@ public final class Arbitraries {
         return CoProductArbitraries.arbitraryChoice8(a, b, c, d, e, f, g, h);
     }
 
+    /**
+     * Converts an arbitrary that generates {@code A} to an arbitrary that generates {@code Maybe<A>},
+     * with custom probabilities for {@code just} vs. {@code nothing}.
+     */
     public static <A> Arbitrary<Maybe<A>> maybesOf(MaybeWeights weights,
                                                    Arbitrary<A> a) {
         return CoProductArbitraries.arbitraryMaybe(weights, a);
     }
 
+    /**
+     * Converts an arbitrary that generates {@code A} to an arbitrary that generates {@code Maybe<A>}.
+     * Most frequently will yield a {@code just}, but will occasionally yield a {@code nothing}.
+     */
     public static <A> Arbitrary<Maybe<A>> maybesOf(Arbitrary<A> a) {
         return CoProductArbitraries.arbitraryMaybe(a);
     }
 
+    /**
+     * An arbitrary that generates {@code Either}s, formed by randomly selecting and drawing from two component arbitraries, with
+     * custom probabilities for each.
+     */
     public static <L, R> Arbitrary<Either<L, R>> eithersOf(Weighted<Arbitrary<L>> left,
                                                            Weighted<Arbitrary<R>> right) {
         return CoProductArbitraries.arbitraryEither(left, right);
     }
 
+    /**
+     * An arbitrary that generates {@code Either}s, formed by randomly selecting and drawing from two component arbitraries, with
+     * equal probabilities for each.
+     */
     public static <L, R> Arbitrary<Either<L, R>> eithersOf(Arbitrary<L> left,
                                                            Arbitrary<R> right) {
         return CoProductArbitraries.arbitraryEither(left, right);
     }
 
+    /**
+     * An arbitrary that generates {@code Either}s, formed by randomly selecting and drawing from two component arbitraries, with
+     * custom probabilities for each.
+     */
     public static <L, R> Arbitrary<Either<L, R>> eithersOf(EitherWeights weights,
                                                            Arbitrary<L> left,
                                                            Arbitrary<R> right) {
         return CoProductArbitraries.arbitraryEither(weights, left, right);
     }
 
+    /**
+     * An arbitrary that generates {@code These}s, formed by randomly selecting and drawing from two component arbitraries, with
+     * equal probabilities for {@code a}, {@code b}, and {@code both}.
+     */
     public static <A, B> Arbitrary<These<A, B>> theseOf(Arbitrary<A> a,
                                                         Arbitrary<B> b) {
         return CoProductArbitraries.arbitraryThese(a, b);
