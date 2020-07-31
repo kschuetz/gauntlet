@@ -139,10 +139,6 @@ public final class Arbitraries {
         return arbitrary(generateInt(range)).withShrinkStrategy(shrinkInt(range));
     }
 
-    public static Arbitrary<Integer> ints(FrequencyMap<Integer> frequencyMap) {
-        return ints(frequencyMap.toGenerator());
-    }
-
     /**
      * An arbitrary that generates {@link Integer}s (0 &lt;= n &lt; bound) that are intended to be used
      * as an index into a collection or sequence.  Output is uniform and unaffected by bias
@@ -169,10 +165,6 @@ public final class Arbitraries {
 
     public static Arbitrary<Long> longs(LongRange range) {
         return arbitrary(generateLong(range)).withShrinkStrategy(shrinkLong(range));
-    }
-
-    public static Arbitrary<Long> longs(FrequencyMap<Long> frequencyMap) {
-        return longs(frequencyMap.toGenerator());
     }
 
     /**
@@ -203,10 +195,6 @@ public final class Arbitraries {
         return arbitrary(generateShort(range)).withShrinkStrategy(shrinkShort(range));
     }
 
-    public static Arbitrary<Short> shorts(FrequencyMap<Short> frequencyMap) {
-        return shorts(frequencyMap.toGenerator());
-    }
-
     public static Arbitrary<Short> shortNaturals() {
         return shorts(ShortRange.from((short) 0).to(Short.MAX_VALUE));
     }
@@ -221,10 +209,6 @@ public final class Arbitraries {
 
     public static Arbitrary<Byte> bytes(ByteRange range) {
         return arbitrary(generateByte(range)).withShrinkStrategy(shrinkByte(range));
-    }
-
-    public static Arbitrary<Byte> bytes(FrequencyMap<Byte> frequencyMap) {
-        return bytes(frequencyMap.toGenerator());
     }
 
     public static Arbitrary<Boolean> booleans(Generator<Boolean> generator) {
@@ -245,10 +229,6 @@ public final class Arbitraries {
 
     public static Arbitrary<Character> characters(CharRange range) {
         return arbitrary(generateChar(range));  // TODO: shrink characters
-    }
-
-    public static Arbitrary<Character> characters(FrequencyMap<Character> frequencyMap) {
-        return characters(frequencyMap.toGenerator());
     }
 
     public static Arbitrary<Float> floats(Generator<Float> generator) {
@@ -286,10 +266,6 @@ public final class Arbitraries {
         return arbitrary(generateDouble(range)).withShrinkStrategy(shrinkDouble(range));
     }
 
-    public static Arbitrary<Double> doubles(FrequencyMap<Double> frequencyMap) {
-        return doubles(frequencyMap.toGenerator());
-    }
-
     /**
      * An arbitrary that generates {@link Double}s between 0 (inclusive) and 1 (exclusive).
      */
@@ -317,10 +293,6 @@ public final class Arbitraries {
         return strings(generateString());
     }
 
-    public static Arbitrary<String> strings(FrequencyMap<String> frequencyMap) {
-        return strings(frequencyMap.toGenerator());
-    }
-
     public static Arbitrary<String> stringsOfLength(int length) {
         requireNaturalSize(length);
         return arbitrary(generateStringFromCharacters(length, Characters.asciiPrintable()))
@@ -346,10 +318,6 @@ public final class Arbitraries {
         return bigIntegers(generateBigInteger(range));
     }
 
-    public static Arbitrary<BigInteger> bigIntegers(FrequencyMap<BigInteger> frequencyMap) {
-        return bigIntegers(frequencyMap.toGenerator());
-    }
-
     public static Arbitrary<BigDecimal> bigDecimals(Generator<BigDecimal> generator) {
         return arbitrary(generator); // TODO: shrink BigDecimal
     }
@@ -368,10 +336,6 @@ public final class Arbitraries {
 
     public static Arbitrary<BigDecimal> bigDecimals(IntRange decimalPlaces, BigDecimalRange range) {
         return bigDecimals(generateBigDecimal(generateInt(decimalPlaces), range));
-    }
-
-    public static Arbitrary<BigDecimal> bigDecimals(FrequencyMap<BigDecimal> frequencyMap) {
-        return bigDecimals(frequencyMap.toGenerator());
     }
 
     public static <A extends Enum<A>> Arbitrary<A> valuesOfEnumClass(Class<A> enumType) {
