@@ -4,7 +4,7 @@ import com.jnape.palatable.lambda.adt.Maybe;
 import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.collectionviews.NonEmptyVector;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
-import dev.marksman.kraftwerk.Generate;
+import dev.marksman.kraftwerk.GenerateFn;
 import dev.marksman.kraftwerk.Weighted;
 
 import java.util.TreeMap;
@@ -44,7 +44,7 @@ final class FrequencyMapArbitrary {
                 total += source.getWeight();
                 tree.put(total, source.getValue());
             }
-            Generate<Long> generateWhich = generateLongIndex(total).prepare(generatorParameters);
+            GenerateFn<Long> generateWhich = generateLongIndex(total).createGenerateFn(generatorParameters);
             return new FrequencyMapSupply<>(generateWhich, tree);
 
         }, shrinkStrategy, prettyPrinter);

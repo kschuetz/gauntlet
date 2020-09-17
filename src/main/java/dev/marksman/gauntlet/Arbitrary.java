@@ -85,7 +85,7 @@ public final class Arbitrary<A> {
      */
     public static <A> Arbitrary<A> arbitrary(Generator<A> generator) {
         Fn0<String> labelSupplier = () -> generator.getLabel().orElseGet(generator::toString);
-        return arbitrary(p -> new GeneratorSupply<>(generator.prepare(p), labelSupplier),
+        return arbitrary(p -> new GeneratorSupply<>(generator.createGenerateFn(p), labelSupplier),
                 nothing(), defaultPrettyPrinter());
     }
 
@@ -112,7 +112,7 @@ public final class Arbitrary<A> {
         GeneratorParameters transformedParameters = transformGeneratorParameters(parameters);
         SupplyParameters supplyParameters = supplyParameters(transformedParameters, maxDiscards);
         Supply<A> supply = generator.match(simple -> simple.createSupply(supplyParameters),
-                higherOrder -> higherOrderSupply(transformedParameters, higherOrder.getGenerator().prepare(transformedParameters),
+                higherOrder -> higherOrderSupply(transformedParameters, higherOrder.getGenerator().createGenerateFn(transformedParameters),
                         ((HigherOrderArbitrary<A>) higherOrder).getTransformFn()));
 
         if (filter.isEmpty()) {

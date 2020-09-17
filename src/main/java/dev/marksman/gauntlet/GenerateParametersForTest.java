@@ -3,7 +3,7 @@ package dev.marksman.gauntlet;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.ImmutableNonEmptyVector;
 import dev.marksman.collectionviews.VectorBuilder;
-import dev.marksman.kraftwerk.Generate;
+import dev.marksman.kraftwerk.GenerateFn;
 import dev.marksman.kraftwerk.Generator;
 import dev.marksman.kraftwerk.GeneratorParameters;
 import dev.marksman.kraftwerk.Result;
@@ -39,7 +39,7 @@ public final class GenerateParametersForTest<A> implements TestParametersSource<
     @Override
     public TestParameterCollection<A> getTestParameterCollection(GeneratorParameters generatorParameters, Seed inputSeed) {
         GeneratorParameters effectiveGeneratorParameters = generatorParametersAdjustment.apply(() -> generatorParameters);
-        Generate<A> gen = generator.prepare(effectiveGeneratorParameters);
+        GenerateFn<A> gen = generator.createGenerateFn(effectiveGeneratorParameters);
         VectorBuilder<A> builder = VectorBuilder.builder();
         Seed current = inputSeed;
         for (int i = 0; i < sampleCount; i++) {

@@ -356,7 +356,7 @@ final class CoProductArbitraries {
         return Arbitrary.arbitrary(parameters ->
                         new ChoiceSupply2<>(arbitraryA.createSupply(parameters),
                                 arbitraryB.createSupply(parameters),
-                                generateWhich.prepare(parameters)),
+                                generateWhich.createGenerateFn(parameters)),
                 shrinkStrategy,
                 // TODO: prettyPrinter
                 defaultPrettyPrinter());
@@ -375,7 +375,7 @@ final class CoProductArbitraries {
                         new ChoiceSupply3<>(arbitraryA.createSupply(parameters),
                                 arbitraryB.createSupply(parameters),
                                 arbitraryC.createSupply(parameters),
-                                generateWhich.prepare(parameters)),
+                                generateWhich.createGenerateFn(parameters)),
                 shrinkStrategy,
                 // TODO: prettyPrinter
                 defaultPrettyPrinter());
@@ -397,7 +397,7 @@ final class CoProductArbitraries {
                                 arbitraryB.createSupply(parameters),
                                 arbitraryC.createSupply(parameters),
                                 arbitraryD.createSupply(parameters),
-                                generateWhich.prepare(parameters)),
+                                generateWhich.createGenerateFn(parameters)),
                 shrinkStrategy,
                 // TODO: prettyPrinter
                 defaultPrettyPrinter());
@@ -423,7 +423,7 @@ final class CoProductArbitraries {
                                 arbitraryC.createSupply(parameters),
                                 arbitraryD.createSupply(parameters),
                                 arbitraryE.createSupply(parameters),
-                                generateWhich.prepare(parameters)),
+                                generateWhich.createGenerateFn(parameters)),
                 shrinkStrategy,
                 // TODO: prettyPrinter
                 defaultPrettyPrinter());
@@ -452,7 +452,7 @@ final class CoProductArbitraries {
                                 arbitraryD.createSupply(parameters),
                                 arbitraryE.createSupply(parameters),
                                 arbitraryF.createSupply(parameters),
-                                generateWhich.prepare(parameters)),
+                                generateWhich.createGenerateFn(parameters)),
                 shrinkStrategy,
                 // TODO: prettyPrinter
                 defaultPrettyPrinter());
@@ -484,7 +484,7 @@ final class CoProductArbitraries {
                                 arbitraryE.createSupply(parameters),
                                 arbitraryF.createSupply(parameters),
                                 arbitraryG.createSupply(parameters),
-                                generateWhich.prepare(parameters)),
+                                generateWhich.createGenerateFn(parameters)),
                 shrinkStrategy,
                 // TODO: prettyPrinter
                 defaultPrettyPrinter());
@@ -519,7 +519,7 @@ final class CoProductArbitraries {
                                 arbitraryF.createSupply(parameters),
                                 arbitraryG.createSupply(parameters),
                                 arbitraryH.createSupply(parameters),
-                                generateWhich.prepare(parameters)),
+                                generateWhich.createGenerateFn(parameters)),
                 shrinkStrategy,
                 // TODO: prettyPrinter
                 defaultPrettyPrinter());

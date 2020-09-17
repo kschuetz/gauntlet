@@ -9,7 +9,7 @@ import static dev.marksman.gauntlet.ExistentialTestRunner.existentialTestRunner;
 import static dev.marksman.gauntlet.RefinementTestRunner.refinementTestRunner;
 import static dev.marksman.gauntlet.ReportSettings.defaultReportSettings;
 import static dev.marksman.gauntlet.UniversalTestRunner.universalTestRunner;
-import static dev.marksman.kraftwerk.StandardGeneratorParameters.defaultGeneratorParameters;
+import static dev.marksman.kraftwerk.GeneratorParameters.generatorParameters;
 import static dev.marksman.kraftwerk.bias.DefaultPropertyTestingBiasSettings.defaultPropertyTestBiasSettings;
 
 public final class Gauntlet {
@@ -34,7 +34,7 @@ public final class Gauntlet {
                             defaultReporter(),
                             defaultReportSettings(),
                             defaultReportRenderer(),
-                            defaultGeneratorParameters()
+                            generatorParameters()
                                     .withBiasSettings(defaultPropertyTestBiasSettings()),
                             DEFAULT_SAMPLE_COUNT,
                             DEFAULT_MAXIMUM_SHRINK_COUNT,

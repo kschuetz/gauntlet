@@ -6,7 +6,7 @@ import dev.marksman.collectionviews.NonEmptyVector;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.collectionviews.VectorBuilder;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
-import dev.marksman.kraftwerk.Generate;
+import dev.marksman.kraftwerk.GenerateFn;
 import dev.marksman.kraftwerk.GeneratorParameters;
 import dev.marksman.kraftwerk.aggregator.Aggregator;
 import dev.marksman.kraftwerk.constraints.IntRange;
@@ -170,20 +170,20 @@ final class CollectionArbitraries {
                 });
     }
 
-    private static Generate<Integer> sizeGenerator(GeneratorParameters parameters) {
+    private static GenerateFn<Integer> sizeGenerator(GeneratorParameters parameters) {
         return generateSize()
-                .prepare(parameters);
+                .createGenerateFn(parameters);
     }
 
-    private static Generate<Integer> sizeGenerator(int minSize, GeneratorParameters parameters) {
+    private static GenerateFn<Integer> sizeGenerator(int minSize, GeneratorParameters parameters) {
         return generateSize()
                 .fmap(s -> Math.max(minSize, s))
-                .prepare(parameters);
+                .createGenerateFn(parameters);
     }
 
-    private static Generate<Integer> sizeGenerator(IntRange sizeRange, GeneratorParameters parameters) {
+    private static GenerateFn<Integer> sizeGenerator(IntRange sizeRange, GeneratorParameters parameters) {
         return generateInt(sizeRange)
-                .prepare(parameters);
+                .createGenerateFn(parameters);
     }
 
     // TODO: move to kraftwerk?
