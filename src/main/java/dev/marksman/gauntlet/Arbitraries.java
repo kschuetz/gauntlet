@@ -73,6 +73,15 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkLong;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkShort;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkString;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkVector;
+import static dev.marksman.kraftwerk.Generators.generateAlphaChar;
+import static dev.marksman.kraftwerk.Generators.generateAlphaLowerChar;
+import static dev.marksman.kraftwerk.Generators.generateAlphaLowerString;
+import static dev.marksman.kraftwerk.Generators.generateAlphaString;
+import static dev.marksman.kraftwerk.Generators.generateAlphaUpperChar;
+import static dev.marksman.kraftwerk.Generators.generateAlphaUpperString;
+import static dev.marksman.kraftwerk.Generators.generateAlphanumericChar;
+import static dev.marksman.kraftwerk.Generators.generateAlphanumericString;
+import static dev.marksman.kraftwerk.Generators.generateAsciiPrintableChar;
 import static dev.marksman.kraftwerk.Generators.generateBigDecimal;
 import static dev.marksman.kraftwerk.Generators.generateBigInteger;
 import static dev.marksman.kraftwerk.Generators.generateBigIntegerRange;
@@ -82,6 +91,7 @@ import static dev.marksman.kraftwerk.Generators.generateByte;
 import static dev.marksman.kraftwerk.Generators.generateByteArray;
 import static dev.marksman.kraftwerk.Generators.generateByteRange;
 import static dev.marksman.kraftwerk.Generators.generateChar;
+import static dev.marksman.kraftwerk.Generators.generateControlChar;
 import static dev.marksman.kraftwerk.Generators.generateDayOfWeek;
 import static dev.marksman.kraftwerk.Generators.generateDouble;
 import static dev.marksman.kraftwerk.Generators.generateDoubleFractional;
@@ -92,6 +102,7 @@ import static dev.marksman.kraftwerk.Generators.generateFloat;
 import static dev.marksman.kraftwerk.Generators.generateFloatFractional;
 import static dev.marksman.kraftwerk.Generators.generateFloatRange;
 import static dev.marksman.kraftwerk.Generators.generateFromEnum;
+import static dev.marksman.kraftwerk.Generators.generateIdentifier;
 import static dev.marksman.kraftwerk.Generators.generateInt;
 import static dev.marksman.kraftwerk.Generators.generateIntIndex;
 import static dev.marksman.kraftwerk.Generators.generateIntRange;
@@ -107,6 +118,8 @@ import static dev.marksman.kraftwerk.Generators.generateLong;
 import static dev.marksman.kraftwerk.Generators.generateLongIndex;
 import static dev.marksman.kraftwerk.Generators.generateLongRange;
 import static dev.marksman.kraftwerk.Generators.generateMonth;
+import static dev.marksman.kraftwerk.Generators.generateNumericChar;
+import static dev.marksman.kraftwerk.Generators.generatePunctuationChar;
 import static dev.marksman.kraftwerk.Generators.generateSeed;
 import static dev.marksman.kraftwerk.Generators.generateShort;
 import static dev.marksman.kraftwerk.Generators.generateShortRange;
@@ -387,6 +400,98 @@ public final class Arbitraries {
         return arbitrary(generateInt(lengthRange)
                 .flatMap(length -> generateStringFromCharacters(length, Characters.asciiPrintable())))
                 .withShrinkStrategy(shrinkString(lengthRange.minInclusive()));
+    }
+
+    public static Arbitrary<String> alphaStrings() {
+        return strings(generateAlphaString());
+    }
+
+    public static Arbitrary<String> alphaStringsOfLength(int length) {
+        return arbitrary(generateAlphaString(length)).withShrinkStrategy(shrinkString(length));
+    }
+
+    public static Arbitrary<String> alphaStringsOfLength(IntRange lengthRange) {
+        return arbitrary(generateAlphaString(lengthRange)).withShrinkStrategy(shrinkString(lengthRange.minInclusive()));
+    }
+
+    public static Arbitrary<String> alphaUpperStrings() {
+        return strings(generateAlphaUpperString());
+    }
+
+    public static Arbitrary<String> alphaUpperStringsOfLength(int length) {
+        return arbitrary(generateAlphaUpperString(length)).withShrinkStrategy(shrinkString(length));
+    }
+
+    public static Arbitrary<String> alphaUpperStringsOfLength(IntRange lengthRange) {
+        return arbitrary(generateAlphaUpperString(lengthRange)).withShrinkStrategy(shrinkString(lengthRange.minInclusive()));
+    }
+
+    public static Arbitrary<String> alphaLowerStrings() {
+        return strings(generateAlphaLowerString());
+    }
+
+    public static Arbitrary<String> alphaLowerStringsOfLength(int length) {
+        return arbitrary(generateAlphaLowerString(length)).withShrinkStrategy(shrinkString(length));
+    }
+
+    public static Arbitrary<String> alphaLowerStringsOfLength(IntRange lengthRange) {
+        return arbitrary(generateAlphaLowerString(lengthRange)).withShrinkStrategy(shrinkString(lengthRange.minInclusive()));
+    }
+
+    public static Arbitrary<String> alphanumericStrings() {
+        return strings(generateAlphanumericString());
+    }
+
+    public static Arbitrary<String> alphanumericStringsOfLength(int length) {
+        return arbitrary(generateAlphanumericString(length)).withShrinkStrategy(shrinkString(length));
+    }
+
+    public static Arbitrary<String> alphanumericStringsOfLength(IntRange lengthRange) {
+        return arbitrary(generateAlphaLowerString(lengthRange)).withShrinkStrategy(shrinkString(lengthRange.minInclusive()));
+    }
+
+    public static Arbitrary<String> identifiers() {
+        return strings(generateIdentifier());
+    }
+
+    public static Arbitrary<String> identifiersOfLength(int length) {
+        return arbitrary(generateIdentifier(length)).withShrinkStrategy(shrinkString(length));
+    }
+
+    public static Arbitrary<String> identifiersOfLength(IntRange lengthRange) {
+        return arbitrary(generateIdentifier(lengthRange)).withShrinkStrategy(shrinkString(lengthRange.minInclusive()));
+    }
+
+    public static Arbitrary<Character> alphaCharacters() {
+        return characters(generateAlphaChar());
+    }
+
+    public static Arbitrary<Character> alphaUpperCharacters() {
+        return characters(generateAlphaUpperChar());
+    }
+
+    public static Arbitrary<Character> alphaLowerCharacters() {
+        return characters(generateAlphaLowerChar());
+    }
+
+    public static Arbitrary<Character> alphanumericCharacters() {
+        return characters(generateAlphanumericChar());
+    }
+
+    public static Arbitrary<Character> numericCharacters() {
+        return characters(generateNumericChar());
+    }
+
+    public static Arbitrary<Character> punctuationCharacters() {
+        return characters(generatePunctuationChar());
+    }
+
+    public static Arbitrary<Character> asciiPrintableCharacters() {
+        return characters(generateAsciiPrintableChar());
+    }
+
+    public static Arbitrary<Character> controlCharacters() {
+        return characters(generateControlChar());
     }
 
     /**
