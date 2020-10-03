@@ -116,6 +116,8 @@ WORK IN PROGRESS
 
 # <a name="license">License</a>
 
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkschuetz%2Fgauntlet.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkschuetz%2Fgauntlet?ref=badge_shield)
+
 *gauntlet* is distributed under [The MIT License](http://choosealicense.com/licenses/mit/).
 
 The MIT License (MIT)
