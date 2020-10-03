@@ -24,7 +24,6 @@ import dev.marksman.collectionviews.NonEmptyVector;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 import dev.marksman.kraftwerk.Generator;
-import dev.marksman.kraftwerk.Generators;
 import dev.marksman.kraftwerk.Seed;
 import dev.marksman.kraftwerk.Weighted;
 import dev.marksman.kraftwerk.constraints.BigDecimalRange;
@@ -114,6 +113,7 @@ import static dev.marksman.kraftwerk.Generators.generateShortRange;
 import static dev.marksman.kraftwerk.Generators.generateShuffled;
 import static dev.marksman.kraftwerk.Generators.generateString;
 import static dev.marksman.kraftwerk.Generators.generateStringFromCharacters;
+import static dev.marksman.kraftwerk.Generators.generateTuple;
 import static dev.marksman.kraftwerk.Generators.generateUUID;
 
 public final class Arbitraries {
@@ -547,7 +547,7 @@ public final class Arbitraries {
      * An arbitrary that generates {@code Tuple4}s of arbitrary component types.
      */
     public static Arbitrary<Tuple4<?, ?, ?, ?>> tuple4s() {
-        return higherOrderArbitrary(Generators.tupled(generateArbitrary(), generateArbitrary(), generateArbitrary(),
+        return higherOrderArbitrary(generateTuple(generateArbitrary(), generateArbitrary(), generateArbitrary(),
                 generateArbitrary()), x -> tuplesOf(x._1(), x._2(), x._3(), x._4()));
     }
 
@@ -555,7 +555,7 @@ public final class Arbitraries {
      * An arbitrary that generates {@code Tuple5}s of arbitrary component types.
      */
     public static Arbitrary<Tuple5<?, ?, ?, ?, ?>> tuple5s() {
-        return higherOrderArbitrary(Generators.tupled(generateArbitrary(), generateArbitrary(), generateArbitrary(),
+        return higherOrderArbitrary(generateTuple(generateArbitrary(), generateArbitrary(), generateArbitrary(),
                 generateArbitrary(), generateArbitrary()), x -> tuplesOf(x._1(), x._2(), x._3(), x._4(), x._5()));
     }
 
@@ -563,7 +563,7 @@ public final class Arbitraries {
      * An arbitrary that generates {@code Tuple6}s of arbitrary component types.
      */
     public static Arbitrary<Tuple6<?, ?, ?, ?, ?, ?>> tuple6s() {
-        return higherOrderArbitrary(Generators.tupled(generateArbitrary(), generateArbitrary(), generateArbitrary(),
+        return higherOrderArbitrary(generateTuple(generateArbitrary(), generateArbitrary(), generateArbitrary(),
                 generateArbitrary(), generateArbitrary(), generateArbitrary()), x -> tuplesOf(x._1(), x._2(), x._3(), x._4(), x._5(), x._6()));
     }
 
@@ -571,7 +571,7 @@ public final class Arbitraries {
      * An arbitrary that generates {@code Tuple7}s of arbitrary component types.
      */
     public static Arbitrary<Tuple7<?, ?, ?, ?, ?, ?, ?>> tuple7s() {
-        return higherOrderArbitrary(Generators.tupled(generateArbitrary(), generateArbitrary(), generateArbitrary(),
+        return higherOrderArbitrary(generateTuple(generateArbitrary(), generateArbitrary(), generateArbitrary(),
                 generateArbitrary(), generateArbitrary(), generateArbitrary(), generateArbitrary()),
                 x -> tuplesOf(x._1(), x._2(), x._3(), x._4(), x._5(), x._6(), x._7()));
     }
@@ -580,7 +580,7 @@ public final class Arbitraries {
      * An arbitrary that generates {@code Tuple8}s of arbitrary component types.
      */
     public static Arbitrary<Tuple8<?, ?, ?, ?, ?, ?, ?, ?>> tuple8s() {
-        return higherOrderArbitrary(Generators.tupled(generateArbitrary(), generateArbitrary(), generateArbitrary(),
+        return higherOrderArbitrary(generateTuple(generateArbitrary(), generateArbitrary(), generateArbitrary(),
                 generateArbitrary(), generateArbitrary(), generateArbitrary(), generateArbitrary(), generateArbitrary()),
                 x -> tuplesOf(x._1(), x._2(), x._3(), x._4(), x._5(), x._6(), x._7(), x._8()));
     }
