@@ -63,13 +63,23 @@ import static dev.marksman.gauntlet.Arbitrary.higherOrderArbitrary;
 import static dev.marksman.gauntlet.ArbitraryGenerator.generateArbitrary;
 import static dev.marksman.gauntlet.Preconditions.requireNaturalSize;
 import static dev.marksman.gauntlet.Preconditions.requirePositiveSize;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkAlphaCharacter;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkAlphaLowerCharacter;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkAlphaLowerString;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkAlphaString;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkAlphaUpperCharacter;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkAlphaUpperString;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkAlphanumericCharacter;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkAlphanumericString;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkBoolean;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkByte;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkCharacter;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkDouble;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkFloat;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkHashMap;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkInt;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkLong;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkNumericCharacter;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkShort;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkString;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkVector;
@@ -274,7 +284,7 @@ public final class Arbitraries {
      * An arbitrary that generates {@link Character}s using a custom generator.
      */
     public static Arbitrary<Character> characters(Generator<Character> generator) {
-        return arbitrary(generator); // TODO: shrink characters
+        return arbitrary(generator).withShrinkStrategy(shrinkCharacter());
     }
 
     /**
@@ -288,7 +298,7 @@ public final class Arbitraries {
      * An arbitrary that generates {@link Character}s within a specific range.
      */
     public static Arbitrary<Character> characters(CharRange range) {
-        return arbitrary(generateChar(range));  // TODO: shrink characters
+        return arbitrary(generateChar(range)).withShrinkStrategy(shrinkCharacter().filter(range::includes));
     }
 
     /**
@@ -403,83 +413,83 @@ public final class Arbitraries {
     }
 
     public static Arbitrary<String> alphaStrings() {
-        return strings(generateAlphaString());
+        return arbitrary(generateAlphaString()).withShrinkStrategy(shrinkAlphaString(0));
     }
 
     public static Arbitrary<String> alphaStringsOfLength(int length) {
-        return arbitrary(generateAlphaString(length)).withShrinkStrategy(shrinkString(length));
+        return arbitrary(generateAlphaString(length)).withShrinkStrategy(shrinkAlphaString(length));
     }
 
     public static Arbitrary<String> alphaStringsOfLength(IntRange lengthRange) {
-        return arbitrary(generateAlphaString(lengthRange)).withShrinkStrategy(shrinkString(lengthRange.minInclusive()));
+        return arbitrary(generateAlphaString(lengthRange)).withShrinkStrategy(shrinkAlphaString(lengthRange.minInclusive()));
     }
 
     public static Arbitrary<String> alphaUpperStrings() {
-        return strings(generateAlphaUpperString());
+        return arbitrary(generateAlphaUpperString()).withShrinkStrategy(shrinkAlphaUpperString(0));
     }
 
     public static Arbitrary<String> alphaUpperStringsOfLength(int length) {
-        return arbitrary(generateAlphaUpperString(length)).withShrinkStrategy(shrinkString(length));
+        return arbitrary(generateAlphaUpperString(length)).withShrinkStrategy(shrinkAlphaUpperString(length));
     }
 
     public static Arbitrary<String> alphaUpperStringsOfLength(IntRange lengthRange) {
-        return arbitrary(generateAlphaUpperString(lengthRange)).withShrinkStrategy(shrinkString(lengthRange.minInclusive()));
+        return arbitrary(generateAlphaUpperString(lengthRange)).withShrinkStrategy(shrinkAlphaUpperString(lengthRange.minInclusive()));
     }
 
     public static Arbitrary<String> alphaLowerStrings() {
-        return strings(generateAlphaLowerString());
+        return arbitrary(generateAlphaLowerString()).withShrinkStrategy(shrinkAlphaLowerString(0));
     }
 
     public static Arbitrary<String> alphaLowerStringsOfLength(int length) {
-        return arbitrary(generateAlphaLowerString(length)).withShrinkStrategy(shrinkString(length));
+        return arbitrary(generateAlphaLowerString()).withShrinkStrategy(shrinkAlphaLowerString(length));
     }
 
     public static Arbitrary<String> alphaLowerStringsOfLength(IntRange lengthRange) {
-        return arbitrary(generateAlphaLowerString(lengthRange)).withShrinkStrategy(shrinkString(lengthRange.minInclusive()));
+        return arbitrary(generateAlphaLowerString(lengthRange)).withShrinkStrategy(shrinkAlphaLowerString(lengthRange.minInclusive()));
     }
 
     public static Arbitrary<String> alphanumericStrings() {
-        return strings(generateAlphanumericString());
+        return arbitrary(generateAlphanumericString()).withShrinkStrategy(shrinkAlphanumericString(0));
     }
 
     public static Arbitrary<String> alphanumericStringsOfLength(int length) {
-        return arbitrary(generateAlphanumericString(length)).withShrinkStrategy(shrinkString(length));
+        return arbitrary(generateAlphanumericString()).withShrinkStrategy(shrinkAlphanumericString(length));
     }
 
     public static Arbitrary<String> alphanumericStringsOfLength(IntRange lengthRange) {
-        return arbitrary(generateAlphaLowerString(lengthRange)).withShrinkStrategy(shrinkString(lengthRange.minInclusive()));
+        return arbitrary(generateAlphanumericString(lengthRange)).withShrinkStrategy(shrinkAlphanumericString(lengthRange.minInclusive()));
     }
 
     public static Arbitrary<String> identifiers() {
-        return strings(generateIdentifier());
+        return arbitrary(generateIdentifier()).withShrinkStrategy(shrinkString(ShrinkStrategy.none()));
     }
 
     public static Arbitrary<String> identifiersOfLength(int length) {
-        return arbitrary(generateIdentifier(length)).withShrinkStrategy(shrinkString(length));
+        return arbitrary(generateIdentifier(length)).withShrinkStrategy(shrinkString(length, ShrinkStrategy.none()));
     }
 
     public static Arbitrary<String> identifiersOfLength(IntRange lengthRange) {
-        return arbitrary(generateIdentifier(lengthRange)).withShrinkStrategy(shrinkString(lengthRange.minInclusive()));
+        return arbitrary(generateIdentifier(lengthRange)).withShrinkStrategy(shrinkString(lengthRange.minInclusive(), ShrinkStrategy.none()));
     }
 
     public static Arbitrary<Character> alphaCharacters() {
-        return characters(generateAlphaChar());
+        return arbitrary(generateAlphaChar()).withShrinkStrategy(shrinkAlphaCharacter());
     }
 
     public static Arbitrary<Character> alphaUpperCharacters() {
-        return characters(generateAlphaUpperChar());
+        return arbitrary(generateAlphaUpperChar()).withShrinkStrategy(shrinkAlphaUpperCharacter());
     }
 
     public static Arbitrary<Character> alphaLowerCharacters() {
-        return characters(generateAlphaLowerChar());
+        return arbitrary(generateAlphaLowerChar()).withShrinkStrategy(shrinkAlphaLowerCharacter());
     }
 
     public static Arbitrary<Character> alphanumericCharacters() {
-        return characters(generateAlphanumericChar());
+        return arbitrary(generateAlphanumericChar()).withShrinkStrategy(shrinkAlphanumericCharacter());
     }
 
     public static Arbitrary<Character> numericCharacters() {
-        return characters(generateNumericChar());
+        return arbitrary(generateNumericChar()).withShrinkStrategy(shrinkNumericCharacter());
     }
 
     public static Arbitrary<Character> punctuationCharacters() {
@@ -491,7 +501,7 @@ public final class Arbitraries {
     }
 
     public static Arbitrary<Character> controlCharacters() {
-        return characters(generateControlChar());
+        return arbitrary(generateControlChar()).withShrinkStrategy(shrinkCharacter().filter(c -> c < 32));
     }
 
     /**

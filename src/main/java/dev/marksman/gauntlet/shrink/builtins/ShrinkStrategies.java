@@ -156,12 +156,60 @@ public final class ShrinkStrategies {
         return input -> input ? ShrinkResult.singleton(false) : ShrinkResult.empty();
     }
 
+    public static ShrinkStrategy<Character> shrinkCharacter() {
+        return ShrinkCharacter.shrinkCharacter();
+    }
+
+    public static ShrinkStrategy<Character> shrinkAlphaCharacter() {
+        return ShrinkCharacter.shrinkCharacter().filter(Character::isLetter);
+    }
+
+    public static ShrinkStrategy<Character> shrinkAlphaUpperCharacter() {
+        return ShrinkCharacter.shrinkCharacter().filter(c -> Character.isLetter(c) && Character.isUpperCase(c));
+    }
+
+    public static ShrinkStrategy<Character> shrinkAlphaLowerCharacter() {
+        return ShrinkCharacter.shrinkCharacter().filter(c -> Character.isLetter(c) && Character.isLowerCase(c));
+    }
+
+    public static ShrinkStrategy<Character> shrinkAlphanumericCharacter() {
+        return ShrinkCharacter.shrinkCharacter().filter(Character::isLetterOrDigit);
+    }
+
+    public static ShrinkStrategy<Character> shrinkNumericCharacter() {
+        return ShrinkCharacter.shrinkCharacter().filter(Character::isDigit);
+    }
+
     public static ShrinkStrategy<String> shrinkString() {
         return ShrinkString.shrinkString();
     }
 
+    public static ShrinkStrategy<String> shrinkString(ShrinkStrategy<Character> elements) {
+        return ShrinkString.shrinkString(elements);
+    }
+
     public static ShrinkStrategy<String> shrinkString(int minLength) {
         return ShrinkString.shrinkString(minLength);
+    }
+
+    public static ShrinkStrategy<String> shrinkString(int minLength, ShrinkStrategy<Character> elements) {
+        return ShrinkString.shrinkString(minLength, elements);
+    }
+
+    public static ShrinkStrategy<String> shrinkAlphaString(int minLength) {
+        return shrinkString(minLength, shrinkAlphaCharacter());
+    }
+
+    public static ShrinkStrategy<String> shrinkAlphaUpperString(int minLength) {
+        return shrinkString(minLength, shrinkAlphaUpperCharacter());
+    }
+
+    public static ShrinkStrategy<String> shrinkAlphaLowerString(int minLength) {
+        return shrinkString(minLength, shrinkAlphaLowerCharacter());
+    }
+
+    public static ShrinkStrategy<String> shrinkAlphanumericString(int minLength) {
+        return shrinkString(minLength, shrinkAlphanumericCharacter());
     }
 
     public static <A> ShrinkStrategy<Maybe<A>> shrinkMaybe(ShrinkStrategy<A> sa) {
