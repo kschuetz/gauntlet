@@ -88,11 +88,17 @@ final class ShrinkCollection {
         if (n >= size) {
             return ShrinkResult.empty();
         } else {
-            Vector<A> front = input.take(n);
-            Vector<A> back = input.drop(n + 1);
             A element = input.unsafeGet(n);
-            ImmutableFiniteIterable<Vector<A>> nthShrinks = shrink.apply(element).fmap(newElement -> splice(size, front, newElement, back));
-            return nthShrinks.concat(() -> shrinkIndividualElements(n + 1, shrink, input).iterator());
+            ImmutableFiniteIterable<A> nthShrinks = shrink.apply(element);
+            if (nthShrinks.isEmpty()) {
+                return shrinkIndividualElements(n + 1, shrink, input);
+            } else {
+                Vector<A> front = input.take(n);
+                Vector<A> back = input.drop(n + 1);
+
+                ImmutableFiniteIterable<Vector<A>> spliced = nthShrinks.fmap(newElement -> splice(size, front, newElement, back));
+                return spliced.concat(() -> shrinkIndividualElements(n + 1, shrink, input).iterator());
+            }
         }
     }
 

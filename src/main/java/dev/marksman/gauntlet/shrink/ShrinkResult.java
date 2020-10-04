@@ -5,7 +5,6 @@ import dev.marksman.collectionviews.Vector;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.enhancediterables.ImmutableNonEmptyFiniteIterable;
 
-import static dev.marksman.enhancediterables.ImmutableFiniteIterable.emptyImmutableFiniteIterable;
 import static dev.marksman.gauntlet.shrink.LazyCons.lazyTail;
 
 public final class ShrinkResult {
@@ -14,11 +13,11 @@ public final class ShrinkResult {
     }
 
     public static <A> ImmutableFiniteIterable<A> empty() {
-        return emptyImmutableFiniteIterable();
+        return Vector.empty();
     }
 
     public static <A> ImmutableNonEmptyFiniteIterable<A> singleton(A value) {
-        return ImmutableNonEmptyFiniteIterable.of(value);
+        return Vector.of(value);
     }
 
     public static <A> ImmutableNonEmptyFiniteIterable<A> cons(A head, Fn0<ImmutableFiniteIterable<A>> tailSupplier) {
