@@ -4,6 +4,7 @@ import com.jnape.palatable.lambda.adt.Maybe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 
@@ -23,11 +24,13 @@ final class RefinementTestRunnerTest {
     private static final Duration timeout = Duration.ofSeconds(5);
     private RefinementTestRunner runner;
     private ExecutorService executorService;
+    private Clock clock;
 
     @BeforeEach
     void setUp() {
+        clock = Clock.systemUTC();
         executorService = newFixedThreadPool(2);
-        runner = RefinementTestRunner.refinementTestRunner();
+        runner = RefinementTestRunner.refinementTestRunner(clock);
     }
 
     @Test

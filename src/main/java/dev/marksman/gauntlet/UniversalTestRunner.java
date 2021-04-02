@@ -4,8 +4,9 @@ import com.jnape.palatable.lambda.adt.Either;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.ImmutableVector;
 
+import java.time.Clock;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.concurrent.Executor;
 
 import static com.jnape.palatable.lambda.adt.Either.left;
@@ -18,22 +19,26 @@ import static dev.marksman.gauntlet.TestRunnerUtils.getDeadline;
 import static dev.marksman.gauntlet.UniversalTestResult.unfalsified;
 
 final class UniversalTestRunner {
-    private static final UniversalTestRunner INSTANCE = new UniversalTestRunner();
     private static final int BLOCK_SIZE = 100;
+    private final Clock clock;
 
-    static UniversalTestRunner universalTestRunner() {
-        return INSTANCE;
+    public UniversalTestRunner(Clock clock) {
+        this.clock = clock;
+    }
+
+    static UniversalTestRunner universalTestRunner(Clock clock) {
+        return new UniversalTestRunner(clock);
     }
 
     public <Sample, A> Either<Abnormal<Sample>, UniversalTestResult<Sample>> run(TestRunnerSettings settings,
                                                                                  Fn1<Sample, A> getSampleValue,
                                                                                  Prop<A> property,
                                                                                  SampleReader<Sample> sampleReader) {
-        LocalDateTime deadline = getDeadline(settings.getTimeout(), LocalDateTime.now());
+        Instant deadline = getDeadline(settings.getTimeout(), clock.instant());
         UniversalTestResult.Unfalsified<Sample> accumulator = unfalsified(0);
         SampleBlock<Sample> block = sampleReader.readBlock(BLOCK_SIZE);
         while (!block.isEmpty()) {
-            Duration blockTimeout = getBlockTimeout(deadline, LocalDateTime.now());
+            Duration blockTimeout = getBlockTimeout(deadline, clock.instant());
             Either<Abnormal<Sample>, UniversalTestResult<Sample>> blockResult = runBlock(settings.getExecutor(), blockTimeout,
                     getSampleValue, block.getSamples(), property);
 

@@ -4,8 +4,9 @@ import com.jnape.palatable.lambda.adt.Either;
 import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.collectionviews.ImmutableVector;
 
+import java.time.Clock;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.concurrent.Executor;
 
 import static com.jnape.palatable.lambda.adt.Either.left;
@@ -18,22 +19,26 @@ import static dev.marksman.gauntlet.TestRunnerUtils.getBlockTimeout;
 import static dev.marksman.gauntlet.TestRunnerUtils.getDeadline;
 
 final class ExistentialTestRunner {
-    private static final ExistentialTestRunner INSTANCE = new ExistentialTestRunner();
     private static final int BLOCK_SIZE = 100;
+    private final Clock clock;
 
-    static ExistentialTestRunner existentialTestRunner() {
-        return INSTANCE;
+    public ExistentialTestRunner(Clock clock) {
+        this.clock = clock;
+    }
+
+    static ExistentialTestRunner existentialTestRunner(Clock clock) {
+        return new ExistentialTestRunner(clock);
     }
 
     public <Sample, A> Either<Abnormal<Sample>, ExistentialTestResult<Sample>> run(TestRunnerSettings settings,
                                                                                    Fn1<Sample, A> getSampleValue,
                                                                                    Prop<A> property,
                                                                                    SampleReader<Sample> sampleReader) {
-        LocalDateTime deadline = getDeadline(settings.getTimeout(), LocalDateTime.now());
+        Instant deadline = getDeadline(settings.getTimeout(), clock.instant());
         ExistentialTestResult.Unproved<Sample> accumulator = unproved(0);
         SampleBlock<Sample> block = sampleReader.readBlock(BLOCK_SIZE);
         while (!block.isEmpty()) {
-            Duration blockTimeout = getBlockTimeout(deadline, LocalDateTime.now());
+            Duration blockTimeout = getBlockTimeout(deadline, clock.instant());
             Either<Abnormal<Sample>, ExistentialTestResult<Sample>> blockResult = runBlock(settings.getExecutor(), blockTimeout,
                     getSampleValue, block.getSamples(), property);
 

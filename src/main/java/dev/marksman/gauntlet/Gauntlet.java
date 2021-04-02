@@ -1,5 +1,6 @@
 package dev.marksman.gauntlet;
 
+import java.time.Clock;
 import java.time.Duration;
 
 import static com.jnape.palatable.lambda.adt.Maybe.nothing;
@@ -28,9 +29,10 @@ public final class Gauntlet {
         if (INSTANCE == null) {
             synchronized (Gauntlet.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new Core(universalTestRunner(),
-                            existentialTestRunner(),
-                            refinementTestRunner(),
+                    Clock clock = Clock.systemUTC();
+                    INSTANCE = new Core(universalTestRunner(clock),
+                            existentialTestRunner(clock),
+                            refinementTestRunner(clock),
                             defaultReporter(),
                             defaultReportSettings(),
                             defaultReportRenderer(),

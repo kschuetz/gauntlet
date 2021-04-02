@@ -7,8 +7,9 @@ import dev.marksman.collectionviews.Vector;
 import dev.marksman.collectionviews.VectorBuilder;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
 
+import java.time.Clock;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.concurrent.Executor;
 
@@ -20,7 +21,11 @@ import static dev.marksman.gauntlet.ResultCollector.universalResultCollector;
 
 final class RefinementTestRunner {
     public static final Duration TIMEOUT_TODO = Duration.ofMinutes(1);
-    private static final RefinementTestRunner INSTANCE = new RefinementTestRunner();
+    private final Clock clock;
+
+    public RefinementTestRunner(Clock clock) {
+        this.clock = clock;
+    }
 
     private static <A> ImmutableVector<A> readBlock(int size, Iterator<A> source) {
         VectorBuilder<A> builder = Vector.builder(size);
@@ -32,12 +37,12 @@ final class RefinementTestRunner {
         return builder.build();
     }
 
-    static RefinementTestRunner refinementTestRunner() {
-        return INSTANCE;
+    static RefinementTestRunner refinementTestRunner(Clock clock) {
+        return new RefinementTestRunner(clock);
     }
 
     public <A> Maybe<RefinedCounterexample<A>> run(RefinementTest<A> refinementTest) {
-        LocalDateTime deadline = LocalDateTime.now().plus(refinementTest.getTimeout());
+        Instant deadline = clock.instant().plus(refinementTest.getTimeout());
 
         Session<A> session = new Session<>(refinementTest.getExecutor(),
                 refinementTest.getShrinkStrategy(), refinementTest.getProperty(), refinementTest.getMaximumShrinkCount(),
@@ -51,10 +56,10 @@ final class RefinementTestRunner {
         private final ShrinkStrategy<A> shrinkStrategy;
         private final Prop<A> property;
         private final int maximumShrinkCount;
-        private final LocalDateTime deadline;
+        private final Instant deadline;
         private final int blockSize;
 
-        private Session(Executor executor, ShrinkStrategy<A> shrinkStrategy, Prop<A> property, int maximumShrinkCount, LocalDateTime deadline, int blockSize) {
+        private Session(Executor executor, ShrinkStrategy<A> shrinkStrategy, Prop<A> property, int maximumShrinkCount, Instant deadline, int blockSize) {
             this.executor = executor;
             this.shrinkStrategy = shrinkStrategy;
             this.property = property;
