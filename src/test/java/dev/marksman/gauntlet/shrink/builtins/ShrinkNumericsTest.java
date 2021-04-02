@@ -2,6 +2,7 @@ package dev.marksman.gauntlet.shrink.builtins;
 
 import dev.marksman.gauntlet.GauntletApiBase;
 import dev.marksman.kraftwerk.Generator;
+import dev.marksman.kraftwerk.constraints.BigIntegerRange;
 import dev.marksman.kraftwerk.constraints.ByteRange;
 import dev.marksman.kraftwerk.constraints.IntRange;
 import dev.marksman.kraftwerk.constraints.LongRange;
@@ -11,11 +12,16 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import testsupport.shrink.ShrinkStrategyTestCase;
 
+import java.math.BigInteger;
+
 import static dev.marksman.gauntlet.Prop.allOf;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkByte;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkInt;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkLong;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkNumerics.shrinkShort;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkBigInteger;
+import static dev.marksman.kraftwerk.Generators.generateBigInteger;
+import static dev.marksman.kraftwerk.Generators.generateBigIntegerRange;
 import static dev.marksman.kraftwerk.Generators.generateByte;
 import static dev.marksman.kraftwerk.Generators.generateByteRange;
 import static dev.marksman.kraftwerk.Generators.generateInt;
@@ -123,6 +129,28 @@ final class ShrinkNumericsTest extends GauntletApiBase {
         }
     }
 
+    @Nested
+    @DisplayName("BigIntegers")
+    class BigIntegers {
+        @Test
+        void unclamped() {
+            checkThat(all(shrinkTestCases(generateBigInteger(), shrinkBigInteger()))
+                    .satisfy(neverRepeatsAnElement()));
+        }
+
+        @Test
+        void clamped() {
+            checkThat(all(constrainedShrinkTestCase(generateBigIntegerRange(),
+                    ShrinkNumericsTest::generateBigIntegerMostlyInDomain,
+                    ShrinkNumerics::shrinkBigInteger))
+                    .satisfy(allOf(
+                            ShrinkStrategyTestCase.<BigInteger>neverRepeatsAnElement(),
+                            allElementsWithinDomain(),
+                            shrinkOutputEmptyWhenInputOutsideOfDomain()
+                    )));
+        }
+    }
+
 
     // For the shrink input, we want most values to be in the domain, but occasionally exercise it outside of the domain
     private static Generator<Integer> generateIntMostlyInDomain(IntRange range) {
@@ -146,6 +174,12 @@ final class ShrinkNumericsTest extends GauntletApiBase {
     private static Generator<Byte> generateByteMostlyInDomain(ByteRange range) {
         return frequencyMap(generateByte().weighted(1))
                 .add(generateByte(range).weighted(3))
+                .toGenerator();
+    }
+
+    private static Generator<BigInteger> generateBigIntegerMostlyInDomain(BigIntegerRange range) {
+        return frequencyMap(generateBigInteger().weighted(1))
+                .add(generateBigInteger(range).weighted(3))
                 .toGenerator();
     }
 }

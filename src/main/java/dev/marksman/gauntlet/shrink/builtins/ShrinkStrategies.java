@@ -39,6 +39,7 @@ import dev.marksman.collectionviews.NonEmptyVector;
 import dev.marksman.collectionviews.Vector;
 import dev.marksman.gauntlet.shrink.ShrinkResult;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
+import dev.marksman.kraftwerk.constraints.BigIntegerRange;
 import dev.marksman.kraftwerk.constraints.ByteRange;
 import dev.marksman.kraftwerk.constraints.DoubleRange;
 import dev.marksman.kraftwerk.constraints.FloatRange;
@@ -46,6 +47,7 @@ import dev.marksman.kraftwerk.constraints.IntRange;
 import dev.marksman.kraftwerk.constraints.LongRange;
 import dev.marksman.kraftwerk.constraints.ShortRange;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -111,6 +113,13 @@ public final class ShrinkStrategies {
     }
 
     /**
+     * Returns a shrinking strategy that shrinks BigIntegers, but limits values in the output to a given range.
+     */
+    public static ShrinkStrategy<BigInteger> shrinkBigInteger() {
+        return ShrinkNumerics.shrinkBigInteger();
+    }
+
+    /**
      * Returns a shrinking strategy that shrinks integers, but limits values in the output to a given range.
      */
     public static ShrinkStrategy<Integer> shrinkInt(IntRange range) {
@@ -150,6 +159,13 @@ public final class ShrinkStrategies {
      */
     public static ShrinkStrategy<Double> shrinkDouble(DoubleRange range) {
         return ShrinkNumerics.shrinkDouble(range);
+    }
+
+    /**
+     * Returns a shrinking strategy that shrinks BigIntegers, but limits values in the output to a given range.
+     */
+    public static ShrinkStrategy<BigInteger> shrinkBigInteger(BigIntegerRange range) {
+        return ShrinkNumerics.shrinkBigInteger(range);
     }
 
     public static ShrinkStrategy<Boolean> shrinkBoolean() {

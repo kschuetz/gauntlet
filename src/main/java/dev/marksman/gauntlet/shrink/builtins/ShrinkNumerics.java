@@ -4,12 +4,15 @@ import com.jnape.palatable.lambda.functions.Fn1;
 import dev.marksman.enhancediterables.ImmutableFiniteIterable;
 import dev.marksman.gauntlet.shrink.ShrinkResult;
 import dev.marksman.gauntlet.shrink.ShrinkStrategy;
+import dev.marksman.kraftwerk.constraints.BigIntegerRange;
 import dev.marksman.kraftwerk.constraints.ByteRange;
 import dev.marksman.kraftwerk.constraints.DoubleRange;
 import dev.marksman.kraftwerk.constraints.FloatRange;
 import dev.marksman.kraftwerk.constraints.IntRange;
 import dev.marksman.kraftwerk.constraints.LongRange;
 import dev.marksman.kraftwerk.constraints.ShortRange;
+
+import java.math.BigInteger;
 
 final class ShrinkNumerics {
     private static final ShrinkStrategy<Integer> INT = input -> {
@@ -20,6 +23,7 @@ final class ShrinkNumerics {
             return series(0, input);
         }
     };
+
     private static final ShrinkStrategy<Long> LONG = input -> {
         if (input < 0) {
             long high = input == Long.MIN_VALUE ? Long.MAX_VALUE : -input;
@@ -28,6 +32,7 @@ final class ShrinkNumerics {
             return series(0, input);
         }
     };
+
     private static final ShrinkStrategy<Short> SHORT = input -> {
         if (input < 0) {
             short high = input == Short.MIN_VALUE ? Short.MAX_VALUE : (short) (-input);
@@ -36,12 +41,22 @@ final class ShrinkNumerics {
             return series((short) 0, input);
         }
     };
+
     private static final ShrinkStrategy<Byte> BYTE = input -> {
         if (input < 0) {
             byte high = input == Byte.MIN_VALUE ? Byte.MAX_VALUE : (byte) (-input);
             return ShrinkResult.cons(high, () -> series((byte) 0, high).fmap(n -> (byte) -n));
         } else {
             return series((byte) 0, input);
+        }
+    };
+
+    private static final ShrinkStrategy<BigInteger> BIG_INTEGER = input -> {
+        if (input.signum() < 0) {
+            BigInteger high = input.negate();
+            return ShrinkResult.cons(high, () -> series(BigInteger.ZERO, high).fmap(BigInteger::negate));
+        } else {
+            return series(BigInteger.ZERO, input);
         }
     };
 
@@ -82,6 +97,13 @@ final class ShrinkNumerics {
 
     static ShrinkStrategy<Double> shrinkDouble() {
         return shrinkDouble(DoubleRange.inclusive(-Double.MAX_VALUE, Double.MAX_VALUE));
+    }
+
+    /**
+     * Returns a shrinking strategy that shrinks BigIntegers.
+     */
+    static ShrinkStrategy<BigInteger> shrinkBigInteger() {
+        return BIG_INTEGER;
     }
 
     /**
@@ -240,6 +262,34 @@ final class ShrinkNumerics {
         }
     }
 
+    /**
+     * Returns a shrinking strategy that shrinks BigIntegers, but limits values in the output to a given range.
+     */
+    static ShrinkStrategy<BigInteger> shrinkBigInteger(BigIntegerRange range) {
+        BigInteger min = range.minInclusive();
+        BigInteger max = range.maxExclusive().subtract(BigInteger.ONE);
+        if (min.compareTo(max) >= 0) {
+            return ShrinkStrategy.none();
+        } else if (min.signum() < 0 && max.signum() < 0) {
+            // all negative
+            return clamped(range, input -> series(max.negate(), input.negate()).fmap(BigInteger::negate));
+        } else if (min.signum() < 0) {
+            // negative and positive
+            return clamped(range, input -> {
+                if (input.signum() < 0) {
+                    BigInteger negativeInput = input.negate();
+                    BigInteger high = negativeInput.compareTo(max) <= 0 ? negativeInput : max;
+                    return ShrinkResult.cons(high, () -> series(BigInteger.ZERO, high).fmap(BigInteger::negate));
+                } else {
+                    return series(BigInteger.ZERO, input);
+                }
+            });
+        } else {
+            // non-negative
+            return clamped(range, input -> series(min, input));
+        }
+    }
+
     private static ShrinkStrategy<Integer> clamped(IntRange range, Fn1<Integer, ImmutableFiniteIterable<Integer>> f) {
         return input -> range.includes(input)
                 ? f.apply(input)
@@ -271,6 +321,12 @@ final class ShrinkNumerics {
     }
 
     private static ShrinkStrategy<Double> clamped(DoubleRange range, Fn1<Double, ImmutableFiniteIterable<Double>> f) {
+        return input -> range.includes(input)
+                ? f.apply(input)
+                : ShrinkResult.empty();
+    }
+
+    private static ShrinkStrategy<BigInteger> clamped(BigIntegerRange range, Fn1<BigInteger, ImmutableFiniteIterable<BigInteger>> f) {
         return input -> range.includes(input)
                 ? f.apply(input)
                 : ShrinkResult.empty();
@@ -346,6 +402,18 @@ final class ShrinkNumerics {
             }
         } else {
             double middle = low + ((high - low) / 2);
+            return ShrinkResult.cons(low, () -> series(middle, high));
+        }
+    }
+
+    private static ImmutableFiniteIterable<BigInteger> series(BigInteger low, BigInteger high) {
+        if (low.compareTo(high) >= 0) {
+            return ShrinkResult.empty();
+        } else if (low.add(BigInteger.ONE).compareTo(high) == 0) {
+            return ShrinkResult.singleton(low);
+        } else {
+            BigInteger half = high.subtract(low).shiftRight(1);
+            BigInteger middle = low.add(half);
             return ShrinkResult.cons(low, () -> series(middle, high));
         }
     }

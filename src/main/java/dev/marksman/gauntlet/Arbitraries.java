@@ -71,6 +71,7 @@ import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkAlpha
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkAlphaUpperString;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkAlphanumericCharacter;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkAlphanumericString;
+import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkBigInteger;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkBoolean;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkByte;
 import static dev.marksman.gauntlet.shrink.builtins.ShrinkStrategies.shrinkCharacter;
@@ -508,21 +509,21 @@ public final class Arbitraries {
      * An arbitrary that generates {@link BigInteger}s using a custom generator.
      */
     public static Arbitrary<BigInteger> bigIntegers(Generator<BigInteger> generator) {
-        return arbitrary(generator); // TODO: shrink BigIntegers
+        return arbitrary(generator).withShrinkStrategy(shrinkBigInteger());
     }
 
     /**
      * An arbitrary that generates {@link BigInteger}s.
      */
     public static Arbitrary<BigInteger> bigIntegers() {
-        return bigIntegers(generateBigInteger());
+        return arbitrary(generateBigInteger()).withShrinkStrategy(shrinkBigInteger());
     }
 
     /**
      * An arbitrary that generates {@link BigInteger}s within a specific range.
      */
     public static Arbitrary<BigInteger> bigIntegers(BigIntegerRange range) {
-        return bigIntegers(generateBigInteger(range));
+        return arbitrary(generateBigInteger(range)).withShrinkStrategy(shrinkBigInteger(range));
     }
 
     /**
