@@ -24,13 +24,11 @@ final class RefinementTestRunnerTest {
     private static final Duration timeout = Duration.ofSeconds(5);
     private RefinementTestRunner runner;
     private ExecutorService executorService;
-    private Clock clock;
 
     @BeforeEach
     void setUp() {
-        clock = Clock.systemUTC();
         executorService = newFixedThreadPool(2);
-        runner = RefinementTestRunner.refinementTestRunner(clock);
+        runner = RefinementTestRunner.refinementTestRunner(Clock.systemUTC());
     }
 
     @Test
@@ -72,5 +70,14 @@ final class RefinementTestRunnerTest {
 
         assertEquals(101, result.getCounterexample().getSample());
         assertEquals(6, result.getShrinkCount());
+    }
+
+    @Test
+    void returnsNothingIfTimesOut() {
+        RefinementTest<Integer> testParams = refinementTest(shrinkInt(), lessThan100, 105, 1000, Duration.ZERO, executorService, BLOCK_SIZE);
+
+        Maybe<RefinedCounterexample<Integer>> result = runner.run(testParams);
+
+        assertEquals(nothing(), result);
     }
 }
