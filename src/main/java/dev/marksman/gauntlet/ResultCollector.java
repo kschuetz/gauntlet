@@ -7,7 +7,7 @@ import dev.marksman.collectionviews.ImmutableVector;
 import dev.marksman.collectionviews.VectorBuilder;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
+import java.util.Date;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -28,7 +28,7 @@ abstract class ResultCollector<A> implements ResultReceiver {
     protected final ImmutableVector<A> samples;
     protected final ReentrantLock lock;
     protected final CheckList reported;
-    private final Condition doneLatch;
+    private final Condition doneCondition;
     protected volatile int cutoffIndex;
     private volatile boolean done;
 
@@ -37,7 +37,7 @@ abstract class ResultCollector<A> implements ResultReceiver {
         this.samples = samples;
         this.cutoffIndex = sampleCount;
         this.lock = new ReentrantLock();
-        this.doneLatch = lock.newCondition();
+        this.doneCondition = lock.newCondition();
         this.done = false;
         this.reported = new CheckList(sampleCount);
     }
@@ -96,7 +96,7 @@ abstract class ResultCollector<A> implements ResultReceiver {
         try {
             if (reported.firstUnmarkedIndex() >= cutoffIndex) {
                 this.done = true;
-                doneLatch.signalAll();
+                doneCondition.signalAll();
             }
         } finally {
             lock.unlock();
@@ -115,7 +115,14 @@ abstract class ResultCollector<A> implements ResultReceiver {
             if (done) {
                 return true;
             } else {
-                return doneLatch.await(timeout.toMillis(), TimeUnit.MILLISECONDS);
+                long timeoutMillis = timeout.toMillis();
+                Date deadline = new Date(System.currentTimeMillis() + timeoutMillis);
+                boolean finishedOnTime = doneCondition.awaitUntil(deadline);
+                // check for spurious wakeup
+                while (finishedOnTime && !done) {
+                    finishedOnTime = doneCondition.awaitUntil(deadline);
+                }
+                return finishedOnTime;
             }
         } finally {
             lock.unlock();
