@@ -5,7 +5,7 @@
 
     <groupId>software.kes</groupId>
     <artifactId>gauntlet</artifactId>
-    <version>0.4.5-SNAPSHOT</version>
+    <version>0.5.0</version>
 
     <name>gauntlet</name>
     <description>
