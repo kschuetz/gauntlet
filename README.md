@@ -1,6 +1,6 @@
 # gauntlet
 
-[![gauntlet](https://img.shields.io/maven-central/v/dev.marksman/gauntlet.svg)](http://search.maven.org/#search%7Cga%7C1%7Cdev.marksman.gauntlet)
+[![gauntlet](https://img.shields.io/maven-central/v/software.kes/gauntlet.svg)](http://search.maven.org/#search%7Cga%7C1%7Csoftware.kes.gauntlet)
 [![CircleCI](https://circleci.com/gh/kschuetz/gauntlet.svg?style=svg)](https://circleci.com/gh/kschuetz/gauntlet)
 
 WORK IN PROGRESS
@@ -115,6 +115,8 @@ WORK IN PROGRESS
 |`These<A, B>`|`theseOf(Arbitrary<A> a, Arbitrary<B> b)`|equal probability of selecting an `a`, a `b`, or a `both`|
 
 # <a name="license">License</a>
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkschuetz%2Fgauntlet.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkschuetz%2Fgauntlet?ref=badge_shield)
 
 *gauntlet* is distributed under [The MIT License](http://choosealicense.com/licenses/mit/).
 
