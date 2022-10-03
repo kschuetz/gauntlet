@@ -1,8 +1,8 @@
 package testsupport.matchers;
 
-import dev.marksman.gauntlet.EvalResult;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
+import software.kes.gauntlet.EvalResult;
 
 public final class EvalSuccessMatcher extends TypeSafeMatcher<EvalResult> {
     private EvalSuccessMatcher() {

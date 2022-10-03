@@ -1,13 +1,13 @@
 package testsupport;
 
 import com.jnape.palatable.lambda.functions.Fn1;
-import dev.marksman.gauntlet.GeneratorOutput;
-import dev.marksman.gauntlet.Supply;
-import dev.marksman.gauntlet.SupplyTree;
-import dev.marksman.kraftwerk.Result;
-import dev.marksman.kraftwerk.Seed;
+import software.kes.gauntlet.GeneratorOutput;
+import software.kes.gauntlet.Supply;
+import software.kes.gauntlet.SupplyTree;
+import software.kes.kraftwerk.Result;
+import software.kes.kraftwerk.Seed;
 
-import static dev.marksman.gauntlet.SupplyTree.leaf;
+import static software.kes.gauntlet.SupplyTree.leaf;
 
 public class SequentialSupply<A> implements Supply<A> {
     private final Fn1<Seed, Result<? extends Seed, A>> generateFn;

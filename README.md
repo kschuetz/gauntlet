@@ -1,6 +1,6 @@
 # gauntlet
 
-[![gauntlet](https://img.shields.io/maven-central/v/dev.marksman/gauntlet.svg)](http://search.maven.org/#search%7Cga%7C1%7Cdev.marksman.gauntlet)
+[![gauntlet](https://img.shields.io/maven-central/v/software.kes/gauntlet.svg)](http://search.maven.org/#search%7Cga%7C1%7Csoftware.kes.gauntlet)
 [![CircleCI](https://circleci.com/gh/kschuetz/gauntlet.svg?style=svg)](https://circleci.com/gh/kschuetz/gauntlet)
 
 WORK IN PROGRESS

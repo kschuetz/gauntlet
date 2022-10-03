@@ -1,12 +1,12 @@
 package testsupport;
 
 import com.jnape.palatable.lambda.functions.Fn1;
-import dev.marksman.gauntlet.GeneratorOutput;
-import dev.marksman.gauntlet.Prop;
-import dev.marksman.gauntlet.SimpleResult;
-import dev.marksman.gauntlet.Supply;
-import dev.marksman.gauntlet.SupplyFailure;
-import dev.marksman.kraftwerk.Seed;
+import software.kes.gauntlet.GeneratorOutput;
+import software.kes.gauntlet.Prop;
+import software.kes.gauntlet.SimpleResult;
+import software.kes.gauntlet.Supply;
+import software.kes.gauntlet.SupplyFailure;
+import software.kes.kraftwerk.Seed;
 
 public final class TestSupportProps {
     private static final int SAMPLE_COUNT_FOR_COMPARING_SUPPLIES = 50;

@@ -1,6 +1,6 @@
 package testsupport;
 
-import dev.marksman.kraftwerk.Seed;
+import software.kes.kraftwerk.Seed;
 
 public class SequentialSeed implements Seed {
     private final long n;

@@ -1,10 +1,10 @@
 package testsupport.matchers;
 
-import dev.marksman.gauntlet.EvalFailure;
-import dev.marksman.gauntlet.EvalResult;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import software.kes.gauntlet.EvalFailure;
+import software.kes.gauntlet.EvalResult;
 
 import static com.jnape.palatable.lambda.io.IO.io;
 import static org.hamcrest.core.IsAnything.anything;

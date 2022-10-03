@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>dev.marksman</groupId>
+    <groupId>software.kes</groupId>
     <artifactId>gauntlet</artifactId>
     <version>0.4.5-SNAPSHOT</version>
 
@@ -16,8 +16,8 @@
 
     <properties>
         <lambda.version>5.2.0</lambda.version>
-        <kraftwerk.version>0.10.0</kraftwerk.version>
-        <collection-views.version>1.2.3</collection-views.version>
+        <kraftwerk.version>0.11.0</kraftwerk.version>
+        <collection-views.version>2.0.0</collection-views.version>
         <junit.version>5.5.0</junit.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
         <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
@@ -42,11 +42,11 @@
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
             <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/
             </url>
         </repository>
     </distributionManagement>
@@ -66,12 +66,12 @@
             <version>${lambda.version}</version>
         </dependency>
         <dependency>
-            <groupId>dev.marksman</groupId>
+            <groupId>software.kes</groupId>
             <artifactId>kraftwerk</artifactId>
             <version>${kraftwerk.version}</version>
         </dependency>
         <dependency>
-            <groupId>dev.marksman</groupId>
+            <groupId>software.kes</groupId>
             <artifactId>collection-views</artifactId>
             <version>${collection-views.version}</version>
         </dependency>
@@ -183,7 +183,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>

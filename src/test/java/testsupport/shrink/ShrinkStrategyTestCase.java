@@ -1,19 +1,19 @@
 package testsupport.shrink;
 
 import com.jnape.palatable.lambda.functions.Fn1;
-import dev.marksman.enhancediterables.ImmutableFiniteIterable;
-import dev.marksman.gauntlet.Arbitrary;
-import dev.marksman.gauntlet.Prop;
-import dev.marksman.gauntlet.shrink.ShrinkStrategy;
-import dev.marksman.kraftwerk.Generator;
-import dev.marksman.kraftwerk.constraints.Constraint;
+import software.kes.enhancediterables.ImmutableFiniteIterable;
+import software.kes.gauntlet.Arbitrary;
+import software.kes.gauntlet.Prop;
+import software.kes.gauntlet.shrink.ShrinkStrategy;
+import software.kes.kraftwerk.Generator;
+import software.kes.kraftwerk.constraints.Constraint;
 
 import java.util.HashSet;
 
-import static dev.marksman.gauntlet.Arbitrary.arbitrary;
-import static dev.marksman.gauntlet.Prop.prop;
-import static dev.marksman.gauntlet.SimpleResult.fail;
-import static dev.marksman.gauntlet.SimpleResult.pass;
+import static software.kes.gauntlet.Arbitrary.arbitrary;
+import static software.kes.gauntlet.Prop.prop;
+import static software.kes.gauntlet.SimpleResult.fail;
+import static software.kes.gauntlet.SimpleResult.pass;
 
 public final class ShrinkStrategyTestCase<A> {
     private final A input;
